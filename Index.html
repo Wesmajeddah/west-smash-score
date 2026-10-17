@@ -171,11 +171,11 @@
     <script>
         // Default team structure
         const defaultTeams = [
-            { id: 1, name: "Team 1", wins: 0, badgeBg: "bg-amber-500" },
-            { id: 2, name: "Team 2", wins: 0, badgeBg: "bg-blue-600" },
-            { id: 3, name: "Team 3", wins: 0, badgeBg: "bg-emerald-600" },
-            { id: 4, name: "Team 4", wins: 0, badgeBg: "bg-rose-600" },
-            { id: 5, name: "Team 5", wins: 0, badgeBg: "bg-purple-600" }
+            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500" },
+            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600" },
+            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600" },
+            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600" },
+            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600" }
         ];
 
         let teams = [];
@@ -200,7 +200,6 @@
                 render();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                // Fallback to localStorage if offline
                 const saved = localStorage.getItem("west_smash_scores_v1");
                 if (saved) {
                     try { teams = JSON.parse(saved); } catch(e) { teams = JSON.parse(JSON.stringify(defaultTeams)); }
@@ -212,7 +211,6 @@
         }
 
         function saveData() {
-            // Save to Firebase (updates instantly across all devices)
             dbRef.set(teams).catch((error) => {
                 console.error("Firebase write error:", error);
                 localStorage.setItem("west_smash_scores_v1", JSON.stringify(teams));
@@ -220,7 +218,6 @@
             updateLeaderboard();
         }
 
-        // Render function
         function render() {
             const container = document.getElementById("teams-list");
             container.innerHTML = "";
@@ -230,7 +227,6 @@
                 card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-md gap-2";
 
                 card.innerHTML = `
-                    <!-- Team Name Input -->
                     <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
                         <input type="text" 
@@ -240,16 +236,13 @@
                                placeholder="ടീം പേര്">
                     </div>
 
-                    <!-- Counter Controls -->
                     <div class="flex items-center gap-1.5 shrink-0">
-                        <!-- Decrement Button -->
                         <button onclick="changeScore(${idx}, -1)" 
                                 class="w-9 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-950 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg border border-slate-700/80 active:scale-95 transition-all"
                                 title="സ്കോർ കുറയ്ക്കുക">
                             <i class="fa-solid fa-minus text-xs"></i>
                         </button>
 
-                        <!-- Score Display / Tap to Increment -->
                         <div onclick="changeScore(${idx}, 1)" 
                              id="score-box-${idx}"
                              class="w-14 h-11 bg-slate-950 hover:bg-black rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 cursor-pointer active:scale-95 transition-all shadow-inner"
@@ -257,7 +250,6 @@
                             ${team.wins}
                         </div>
 
-                        <!-- Increment Button -->
                         <button onclick="changeScore(${idx}, 1)" 
                                 class="w-11 h-11 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xl shadow-md active:scale-95 transition-all"
                                 title="ജയം കൂട്ടുക">
