@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+    <!-- Google Fonts for Malayalam & English -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Manjari:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase App & Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -19,11 +19,14 @@
 
     <style>
         * {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Manjari', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         .font-cinzel {
             font-family: 'Cinzel', serif;
+        }
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
         }
         .gold-gradient-text {
             background: linear-gradient(135deg, #FFF099 0%, #F1C40F 40%, #B8860B 80%, #FFD700 100%);
@@ -125,8 +128,8 @@
                 <span id="lock-status-text" class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
                     <i class="fa-solid fa-lock-open"></i> Live Active
                 </span>
-                <button id="admin-toggle-btn" onclick="toggleAdminLock()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-md shadow">
-                    <i class="fa-solid fa-gear mr-1"></i> Admin Options
+                <button id="unlock-btn" onclick="requestAdminUnlock()" class="hidden text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-md shadow">
+                    <i class="fa-solid fa-key mr-1"></i> Amend (Unlock)
                 </button>
             </div>
         </div>
@@ -139,16 +142,16 @@
         <!-- Total Play Section & Active Timer -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
             <div class="flex items-center justify-between px-2">
-                <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
-                    <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays:
+                <span class="text-xs font-bold text-slate-300 flex items-center gap-2 font-poppins">
+                    <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
                 </span>
-                <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner">
+                <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner font-poppins">
                     0
                 </span>
             </div>
             
             <!-- Live Active Match Duration Counter with Start Match Option -->
-            <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800">
+            <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
                 <span class="flex items-center gap-1 text-slate-300">
                     <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
                 </span>
@@ -165,30 +168,30 @@
         <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2">
             <div>
                 <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-crown text-amber-400"></i> Undefeated Champions
+                    <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
                 </div>
                 <div id="leader-text" class="text-sm sm:text-base font-black text-white mt-0.5">
-                    Loading standings...
+                    ലോഡ് ചെയ്യുന്നു...
                 </div>
             </div>
 
             <div id="podium-text" class="text-xs text-amber-200/80 font-medium pt-1 border-t border-amber-500/20">
-                Calculating 2nd Place...
+                2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
             </div>
 
-            <!-- Loser Note Section -->
+            <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
             <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1 border-t border-rose-500/20">
-                Finding lowest ranking team...
+                തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="grid grid-cols-2 gap-2 pt-1">
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
-                <i class="fa-solid fa-rotate-right text-slate-400"></i> Reset
+                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
             </button>
             <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
-                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> Share WhatsApp
+                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
             </button>
         </div>
 
@@ -196,7 +199,7 @@
 
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-full text-xs shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
-        Score updated!
+        സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
 
     <script>
@@ -274,7 +277,7 @@
 
         function startFirstMatch() {
             if (isLocked) {
-                alert("Board is locked. Unlock using Admin PIN.");
+                alert("സ്കോർ ബോർഡ് ലോക്ക് ആണ്. അമൻഡ് ചെയ്യാൻ അഡ്മിൻ പിൻ ഉപയോഗിക്കുക.");
                 return;
             }
             lastActionTimestamp = Date.now();
@@ -321,31 +324,33 @@
                                    onchange="updateTeamName(${idx}, this.value)"
                                    ${isLocked ? 'disabled' : ''}
                                    class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700 disabled:opacity-70"
-                                   placeholder="Team Name">
+                                   placeholder="ടീം പേര്">
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <!-- Minus Button (Requires PIN if Locked) -->
+                            <!-- Minus Button -->
                             <button onclick="handleScoreChange(${idx}, -1)" 
-                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50">
+                                    ${isLocked ? 'disabled' : ''}
+                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50 disabled:opacity-40 disabled:cursor-not-allowed">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
 
                             <div id="score-box-${idx}"
-                                 class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner">
+                                 class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
 
                             <!-- Plus Button -->
                             <button onclick="handleScoreChange(${idx}, 1)" 
-                                    class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50">
+                                    ${isLocked ? 'disabled' : ''}
+                                    class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Match Time Indicator -->
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins">
                         <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> Last Match Duration:</span>
                         <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'Not recorded'}</span>
                     </div>
@@ -357,26 +362,26 @@
 
             // Lock UI Status update
             const lockStatusEl = document.getElementById("lock-status-text");
+            const unlockBtn = document.getElementById("unlock-btn");
 
             if (isLocked) {
-                lockStatusEl.innerHTML = '<i class="fa-solid fa-lock text-rose-400"></i> Locked (Admin Edit Required)';
+                lockStatusEl.innerHTML = '<i class="fa-solid fa-lock text-rose-400"></i> Locked (Permanently)';
                 lockStatusEl.className = "text-[11px] text-rose-400 font-semibold flex items-center gap-1";
+                unlockBtn.classList.remove("hidden");
             } else {
                 lockStatusEl.innerHTML = '<i class="fa-solid fa-lock-open text-emerald-400"></i> Live Active';
                 lockStatusEl.className = "text-[11px] text-emerald-400 font-semibold flex items-center gap-1";
+                unlockBtn.classList.add("hidden");
             }
 
             updateLeaderboard();
         }
 
         function handleScoreChange(idx, delta) {
-            // If locked, demand PIN for making changes
+            // Prevent scoring if locked
             if (isLocked) {
-                const pin = prompt("Scoreboard is locked. Enter Admin PIN to make amendments:");
-                if (pin !== ADMIN_PIN) {
-                    if (pin !== null) alert("Incorrect Admin PIN!");
-                    return;
-                }
+                showToast("സ്കോർ ബോർഡ് ലോക്ക് ആണ്! അൺലോക്ക് ചെയ്യുക.");
+                return;
             }
 
             // Prevent negative wins
@@ -392,10 +397,15 @@
             // Reset current timer timestamp
             lastActionTimestamp = now;
 
+            // 1. Update score
             teams[idx].wins += delta;
+            
+            // 2. Automatically LOCK permanently after adding score!
+            isLocked = true;
+
             saveData();
 
-            showToast(`${teams[idx].name} score updated!`);
+            showToast(`${teams[idx].name} സ്കോർ ചേർത്തു - ബോർഡ് ലോക്ക് ആയി!`);
 
             const box = document.getElementById(`score-box-${idx}`);
             if (box) {
@@ -406,14 +416,14 @@
             }
         }
 
-        function toggleAdminLock() {
-            const pin = prompt("Enter Admin PIN to Lock/Unlock Board:");
+        function requestAdminUnlock() {
+            const pin = prompt("സ്കോർ ബോർഡ് അൺലോക്ക് ചെയ്ത് മാറ്റങ്ങൾ വരുത്തുന്നതിനായി Admin PIN നൽകുക:");
             if (pin === ADMIN_PIN) {
-                isLocked = !isLocked;
+                isLocked = false;
                 saveData();
-                showToast(isLocked ? "Board Locked!" : "Board Unlocked!");
+                showToast("സ്കോർ ബോർഡ് അൺലോക്ക് ചെയ്തു!");
             } else if (pin !== null) {
-                alert("Incorrect PIN!");
+                alert("തെറ്റായ PIN!");
             }
         }
 
@@ -434,46 +444,46 @@
             const minWins = sorted[sorted.length - 1].wins;
 
             if (maxWins === 0) {
-                leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">Matches not started yet</span>`;
-                podiumEl.innerHTML = `Calculating 2nd Place...`;
-                loserEl.innerHTML = `Finding lowest ranking team...`;
+                leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
+                podiumEl.innerHTML = `2-ാം സ്ഥാനം കണക്കാക്കുന്നു...`;
+                loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
                 return;
             }
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             let leaderHtml = "";
             firstPlaces.forEach(f => {
-                leaderHtml += `<div class="text-amber-300 font-black text-base">⭐ ${escapeHtml(f.name)} (${maxWins} Wins) ⭐</div>`;
+                leaderHtml += `<div class="text-amber-300 font-black text-base">⭐ ${escapeHtml(f.name)} (${maxWins} ജയം) ⭐</div>`;
             });
-            leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 Master Smashers! 🌟</div>`;
+            leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
             leaderEl.innerHTML = leaderHtml;
 
             let remaining = sorted.filter(t => t.wins < maxWins);
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
                 const secondPlaces = remaining.filter(t => t.wins === secondWins);
-                podiumEl.innerHTML = `🥈 2nd Place: ${secondPlaces.map(s => escapeHtml(s.name)).join(", ")} (${secondWins} Wins)`;
+                podiumEl.innerHTML = `🥈 2nd Place: ${secondPlaces.map(s => escapeHtml(s.name)).join(", ")} (${secondWins} ജയം)`;
             } else {
-                podiumEl.innerHTML = `All teams are tied!`;
+                podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 Needs Improvement: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} Wins) <br><span class="text-[10px] italic text-rose-400">"Needs more practice & coordination! 🏸💥"</span>`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
             } else {
-                loserEl.innerHTML = `Competitive match underway!`;
+                loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
         }
 
         function resetScores() {
             if (isLocked) {
-                const inputPin = prompt("Enter Admin PIN to Reset:");
+                const inputPin = prompt("സ്കോറുകൾ റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
                 if (inputPin !== ADMIN_PIN) {
-                    if (inputPin !== null) alert("Incorrect PIN!");
+                    if (inputPin !== null) alert("തെറ്റായ PIN!");
                     return;
                 }
             }
-            if (window.confirm("Reset all scores and match timers?")) {
+            if (window.confirm("ടൂർണമെന്റ് സ്കോറുകളും പ്ലേ ടൈമറും റീസെറ്റ് ചെയ്യണോ?")) {
                 teams.forEach(t => {
                     t.wins = 0;
                     t.lastMatchTime = 0;
@@ -495,7 +505,7 @@
 
             teams.forEach((t, i) => {
                 let timeStr = t.lastMatchTime ? ` (${t.lastMatchTime} mins)` : '';
-                msg += `${i + 1}. ${t.name} : *${t.wins}* Wins${timeStr}\n`;
+                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം${timeStr}\n`;
             });
 
             msg += `\n🎮 *Total Plays:* ${calculateTotalPlays()}\n`;
@@ -503,19 +513,19 @@
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
             if (firstPlaces.length > 0) {
-                msg += `👑 *1st Place (Champions):* ${firstPlaces.map(f => f.name).join(", ")} (${maxWins} Wins)\n`;
+                msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(", ")} (${maxWins} ജയം)\n`;
             }
 
             let remaining = sorted.filter(t => t.wins < maxWins && maxWins > 0);
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
                 const secondPlaces = remaining.filter(t => t.wins === secondWins);
-                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(", ")} (${secondWins} Wins)\n`;
+                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(", ")} (${secondWins} ജയം)\n`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
             if (lowestTeams.length > 0) {
-                msg += `🚨 *Needs Practice:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} Wins)\n`;
+                msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(", ")} needs practice! (${minWins} ജയം)\n`;
             }
 
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
