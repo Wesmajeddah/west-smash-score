@@ -136,14 +136,24 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Play Section -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between px-4 shadow-md">
-            <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
-                <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
-            </span>
-            <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner">
-                0
-            </span>
+        <!-- Total Play Section & Match Time Summary -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
+            <div class="flex items-center justify-between px-2">
+                <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
+                </span>
+                <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner">
+                    0
+                </span>
+            </div>
+            
+            <!-- Live Active Match Duration Counter -->
+            <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800">
+                <span class="flex items-center gap-1 text-slate-300">
+                    <i class="fa-solid fa-stopwatch text-emerald-400"></i> നിലവിലെ കളി സമയം:
+                </span>
+                <span id="current-match-timer" class="font-bold text-emerald-400">0 മിനിറ്റ്</span>
+            </div>
         </div>
 
         <!-- Leader / Winner / Loser Summary Section -->
@@ -188,16 +198,18 @@
         const ADMIN_PIN = "1234"; // Default Security PIN for Unlock
 
         const defaultTeams = [
-            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500" },
-            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600" },
-            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600" },
-            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600" },
-            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600" }
+            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500", lastMatchTime: 0 },
+            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600", lastMatchTime: 0 },
+            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0 },
+            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600", lastMatchTime: 0 },
+            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600", lastMatchTime: 0 }
         ];
 
         let teams = [];
         let totalPlayCount = 0;
         let isLocked = false;
+        let lastActionTimestamp = null;
+        let timerInterval = null;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
@@ -212,13 +224,16 @@
                     teams = data.teams || defaultTeams;
                     totalPlayCount = data.totalPlayCount !== undefined ? data.totalPlayCount : calculateTotalPlays(teams);
                     isLocked = data.isLocked || false;
+                    lastActionTimestamp = data.lastActionTimestamp || null;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     totalPlayCount = 0;
                     isLocked = false;
-                    dbRef.set({ teams, totalPlayCount, isLocked });
+                    lastActionTimestamp = null;
+                    dbRef.set({ teams, totalPlayCount, isLocked, lastActionTimestamp });
                 }
                 render();
+                startLiveTimer();
             }, (error) => {
                 console.error("Firebase read error:", error);
                 const saved = localStorage.getItem("west_smash_scores_v14");
@@ -228,17 +243,21 @@
                         teams = parsed.teams || defaultTeams;
                         totalPlayCount = parsed.totalPlayCount !== undefined ? parsed.totalPlayCount : calculateTotalPlays(teams);
                         isLocked = parsed.isLocked || false;
+                        lastActionTimestamp = parsed.lastActionTimestamp || null;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
                         totalPlayCount = 0;
                         isLocked = false;
+                        lastActionTimestamp = null;
                     }
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     totalPlayCount = 0;
                     isLocked = false;
+                    lastActionTimestamp = null;
                 }
                 render();
+                startLiveTimer();
             });
         }
 
@@ -247,11 +266,29 @@
         }
 
         function saveData() {
-            dbRef.set({ teams, totalPlayCount, isLocked }).catch((error) => {
+            dbRef.set({ teams, totalPlayCount, isLocked, lastActionTimestamp }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, totalPlayCount, isLocked }));
+                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, totalPlayCount, isLocked, lastActionTimestamp }));
             });
             updateLeaderboard();
+        }
+
+        function startLiveTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                const timerEl = document.getElementById("current-match-timer");
+                if (!lastActionTimestamp) {
+                    timerEl.textContent = "0 മിനിറ്റ്";
+                    return;
+                }
+                const now = Date.now();
+                const diffMs = now - lastActionTimestamp;
+                const minutes = Math.floor(diffMs / 60000);
+                const seconds = Math.floor((diffMs % 60000) / 1000);
+
+                timerEl.textContent = `${minutes} മിനിറ്റ് ${seconds} സെക്കൻഡ്`;
+            }, 1000);
         }
 
         function render() {
@@ -260,38 +297,46 @@
 
             teams.forEach((team, idx) => {
                 const card = document.createElement("div");
-                card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-md gap-2";
+                card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex flex-col shadow-md gap-1.5";
 
                 card.innerHTML = `
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
-                        <input type="text" 
-                               value="${escapeHtml(team.name)}" 
-                               onchange="updateTeamName(${idx}, this.value)"
-                               ${isLocked ? 'disabled' : ''}
-                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700 disabled:opacity-70"
-                               placeholder="ടീം പേര്">
-                    </div>
-
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <!-- Minus Button -->
-                        <button onclick="updateScore(${idx}, -1)" 
-                                ${isLocked ? 'disabled' : ''}
-                                class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50 disabled:opacity-40 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-
-                        <div id="score-box-${idx}"
-                             class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner">
-                            ${team.wins}
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
+                            <input type="text" 
+                                   value="${escapeHtml(team.name)}" 
+                                   onchange="updateTeamName(${idx}, this.value)"
+                                   ${isLocked ? 'disabled' : ''}
+                                   class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700 disabled:opacity-70"
+                                   placeholder="ടീം പേര്">
                         </div>
 
-                        <!-- Plus Button -->
-                        <button onclick="updateScore(${idx}, 1)" 
-                                ${isLocked ? 'disabled' : ''}
-                                class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <!-- Minus Button -->
+                            <button onclick="updateScore(${idx}, -1)" 
+                                    ${isLocked ? 'disabled' : ''}
+                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50 disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+                            <div id="score-box-${idx}"
+                                 class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner">
+                                ${team.wins}
+                            </div>
+
+                            <!-- Plus Button -->
+                            <button onclick="updateScore(${idx}, 1)" 
+                                    ${isLocked ? 'disabled' : ''}
+                                    class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Match Time Indicator for Team -->
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1">
+                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> അവസാനം കളിച്ച സമയം:</span>
+                        <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' മിനിറ്റ്' : 'രേഖപ്പെടുത്തിയിട്ടില്ല'}</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -325,7 +370,18 @@
             // Prevent negative score
             if (teams[idx].wins + delta < 0) return;
 
-            // Update Score & Adjust Total Play Count Accordingly
+            const now = Date.now();
+
+            // Calculate match time taken if previous match exists
+            if (delta > 0 && lastActionTimestamp) {
+                const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
+                teams[idx].lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
+            }
+
+            // Update timestamp
+            lastActionTimestamp = now;
+
+            // Update Score & Adjust Total Play Count
             teams[idx].wins += delta;
             totalPlayCount += delta;
             if (totalPlayCount < 0) totalPlayCount = 0;
@@ -334,7 +390,7 @@
 
             saveData();
 
-            showToast(`${teams[idx].name} - സ്കോർ അപ്ഡേറ്റ് ചെയ്ത് ലോക്ക് ചെയ്തു!`);
+            showToast(`${teams[idx].name} - സ്കോർ അപ്ഡേറ്റ് ചെയ്ത് സമയം രേഖപ്പെടുത്തി!`);
 
             const box = document.getElementById(`score-box-${idx}`);
             if (box) {
@@ -412,10 +468,14 @@
                     return;
                 }
             }
-            if (window.confirm("ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
-                teams.forEach(t => t.wins = 0);
+            if (window.confirm("ടൂർണമെന്റ് സ്കോറുകളും പ്ലേ ടൈമറും റീസെറ്റ് ചെയ്യണോ?")) {
+                teams.forEach(t => {
+                    t.wins = 0;
+                    t.lastMatchTime = 0;
+                });
                 totalPlayCount = 0;
                 isLocked = false;
+                lastActionTimestamp = null;
                 saveData();
                 render();
             }
@@ -430,7 +490,8 @@
             msg += "🏆 *Tournament Score Counter* 🏆\n\n";
 
             teams.forEach((t, i) => {
-                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം\n`;
+                let timeStr = t.lastMatchTime ? ` (${t.lastMatchTime} min)` : '';
+                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം${timeStr}\n`;
             });
 
             msg += `\n🎮 *Total Play:* ${totalPlayCount}\n`;
