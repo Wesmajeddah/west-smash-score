@@ -2,369 +2,100 @@
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEST SMASH BADMINTON CLUB - Score Counter</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font for Malayalam & English -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Manjari:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Firebase App & Database SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+    <meta name="viewport" content-width, initial-scale=1.0">
+    <title>West Smash Score</title>
     <style>
-        * {
-            font-family: 'Manjari', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
         }
-        .font-cinzel {
-            font-family: 'Cinzel', serif;
+        h1 {
+            color: #333;
         }
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #FFF099 0%, #F1C40F 40%, #B8860B 80%, #FFD700 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .gold-border {
-            border-color: rgba(212, 175, 55, 0.4);
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            font-size: 16px;
         }
-        .score-anim {
-            animation: bounce 0.18s ease-out;
+        th {
+            background-color: #4CAF50;
+            color: white;
         }
-        @keyframes bounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        /* ഒന്നാം സ്ഥാനക്കാരെ സ്പെഷ്യൽ ആയി ഹൈലൈറ്റ് ചെയ്യാൻ */
+        .rank-1 {
+            background-color: #fff8dc !important;
+            font-weight: bold;
+        }
+        .champion-tag {
+            background-color: #ffd700;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .rank-2 {
+            background-color: #f0f0f0 !important;
+        }
+        .rank-3 {
+            background-color: #faebd7 !important;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-3 sm:p-4 select-none">
+<body>
 
-    <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
-        
-        <!-- Header with Club Logo and Name -->
-        <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
-            <!-- Decorative Subtle Ring Glow -->
-            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+    <h1>West Smash Scoreboard</h1>
 
-            <!-- SVG Logo styled directly from user provided image -->
-            <div class="flex justify-center mb-1">
-                <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
-                    <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <radialGradient id="goldGrad" cx="50%" cy="30%" r="70%">
-                                <stop offset="0%" stop-color="#FFE082" />
-                                <stop offset="40%" stop-color="#D4AF37" />
-                                <stop offset="85%" stop-color="#8B6508" />
-                                <stop offset="100%" stop-color="#5B4000" />
-                            </radialGradient>
-                            <radialGradient id="bgBlue" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#1E3E62" />
-                                <stop offset="100%" stop-color="#0B192C" />
-                            </radialGradient>
-                            <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFF59D" />
-                                <stop offset="50%" stop-color="#D4AF37" />
-                                <stop offset="100%" stop-color="#996515" />
-                            </linearGradient>
-                        </defs>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player Name</th>
+                <th>Total Play</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- ഒന്നാം സ്ഥാനക്കാർ (സ്പെഷ്യൽ ടാഗ് ലൈനോടുകൂടി) -->
+            <tr class="rank-1">
+                <td>🥇 1st</td>
+                <td>
+                    അമൽ / ടീം പേര് 
+                    <br><span class="champion-tag">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് (Undefeated Champions)! 🌟</span>
+                </td>
+                <td>25</td>
+                <td>1500</td>
+            </tr>
+            <!-- രണ്ടാം സ്ഥാനക്കാർ -->
+            <tr class="rank-2">
+                <td>🥈 2nd</td>
+                <td>രാഹുൽ / ടീം പേര്</td>
+                <td>22</td>
+                <td>1350</td>
+            </tr>
+            <!-- മൂന്നാം സ്ഥാനക്കാർ -->
+            <tr class="rank-3">
+                <td>🥉 3rd</td>
+                <td>അരുൺ / ടീം പേര്</td>
+                <td>20</td>
+                <td>1200</td>
+            </tr>
+        </tbody>
+    </table>
 
-                        <!-- Outer Golden Border -->
-                        <circle cx="100" cy="100" r="96" fill="url(#goldGrad)" />
-                        <circle cx="100" cy="100" r="88" fill="url(#bgBlue)" stroke="url(#goldGrad)" stroke-width="2" />
-                        <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" />
-
-                        <!-- Curved Header Text path -->
-                        <path id="textArcTop" d="M 22 100 A 78 78 0 0 1 178 100" fill="none" />
-                        <text font-family="Cinzel, serif" font-weight="900" font-size="14" fill="#FFE082" letter-spacing="1.5">
-                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
-                                WEST SMASH
-                            </textPath>
-                        </text>
-
-                        <!-- Curved Footer Text path -->
-                        <path id="textArcBottom" d="M 178 100 A 78 78 0 0 1 22 100" fill="none" />
-                        <text font-family="Cinzel, serif" font-weight="800" font-size="11" fill="#FFE082" letter-spacing="1">
-                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
-                                BADMINTON CLUB
-                            </textPath>
-                        </text>
-
-                        <!-- Side Stars -->
-                        <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
-                        <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
-
-                        <!-- Inner Graphics: Badminton Racket, Wings W, Shuttlecock -->
-                        <g transform="translate(0, -2)">
-                            <!-- Badminton Racket -->
-                            <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
-                            <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
-
-                            <!-- Phoenix W Motif -->
-                            <path d="M 45 68 C 55 90 68 120 85 125 C 95 110 92 88 92 78 C 96 90 102 120 115 125 C 130 115 145 88 155 70 C 145 92 125 138 100 138 C 75 138 55 92 45 68 Z" fill="url(#goldGrad)" />
-
-                            <!-- Shuttlecock -->
-                            <g transform="translate(118, 52) rotate(25)">
-                                <path d="M 0 0 Q 10 -15 22 -18 L 18 8 Z" fill="url(#goldLight)" opacity="0.9" />
-                                <path d="M 0 0 Q 18 -5 26 8 L 12 14 Z" fill="url(#goldLight)" />
-                                <ellipse cx="2" cy="2" rx="4" ry="5" fill="#FFF099" />
-                            </g>
-                        </g>
-
-                        <!-- Since 2026 Banner -->
-                        <line x1="62" y1="148" x2="80" y2="148" stroke="url(#goldLight)" stroke-width="1" />
-                        <text x="100" y="151" font-family="Cinzel, serif" font-weight="700" font-size="8.5" fill="#FFF099" text-anchor="middle">SINCE 2026</text>
-                        <line x1="120" y1="148" x2="138" y2="148" stroke="url(#goldLight)" stroke-width="1" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Main Club Header -->
-            <h1 class="text-lg sm:text-xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">
-                WEST SMASH
-            </h1>
-            <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">
-                BADMINTON CLUB
-            </h2>
-            <p class="text-[11px] text-slate-300 mt-1 font-semibold">
-                ടൂർണമെന്റ് സ്കോർ കൗണ്ടർ (Win Tracker)
-            </p>
-        </div>
-
-        <!-- 5 Team Cards -->
-        <div id="teams-list" class="space-y-2.5">
-            <!-- Rendered by JS -->
-        </div>
-
-        <!-- Leader / Winner Summary Section -->
-        <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg">
-            <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-crown text-amber-400"></i> ഏറ്റവും കൂടുതൽ ജയം നേടുന്നത് (Leader)
-            </div>
-            <div id="leader-text" class="text-base sm:text-lg font-black text-white mt-1">
-                കളികൾ ലോഡ് ചെയ്യുന്നു...
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
-                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
-            </button>
-            <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
-                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
-            </button>
-        </div>
-
-    </div>
-
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-full text-xs shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
-        സ്കോർ കോപ്പി ചെയ്തു!
-    </div>
-
-    <script>
-        // Default team structure
-        const defaultTeams = [
-            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500" },
-            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600" },
-            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600" },
-            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600" },
-            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600" }
-        ];
-
-        let teams = [];
-
-        // Firebase Initialization
-        const firebaseConfig = {
-            databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('west_smash_scores');
-
-        // Load saved state from Firebase Realtime Database
-        function initData() {
-            dbRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    teams = data;
-                } else {
-                    teams = JSON.parse(JSON.stringify(defaultTeams));
-                    dbRef.set(teams);
-                }
-                render();
-            }, (error) => {
-                console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("west_smash_scores_v1");
-                if (saved) {
-                    try { teams = JSON.parse(saved); } catch(e) { teams = JSON.parse(JSON.stringify(defaultTeams)); }
-                } else {
-                    teams = JSON.parse(JSON.stringify(defaultTeams));
-                }
-                render();
-            });
-        }
-
-        function saveData() {
-            dbRef.set(teams).catch((error) => {
-                console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v1", JSON.stringify(teams));
-            });
-            updateLeaderboard();
-        }
-
-        function render() {
-            const container = document.getElementById("teams-list");
-            container.innerHTML = "";
-
-            teams.forEach((team, idx) => {
-                const card = document.createElement("div");
-                card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-md gap-2";
-
-                card.innerHTML = `
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
-                        <input type="text" 
-                               value="${escapeHtml(team.name)}" 
-                               onchange="updateTeamName(${idx}, this.value)"
-                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
-                               placeholder="ടീം പേര്">
-                    </div>
-
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="changeScore(${idx}, -1)" 
-                                class="w-9 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-950 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg border border-slate-700/80 active:scale-95 transition-all"
-                                title="സ്കോർ കുറയ്ക്കുക">
-                            <i class="fa-solid fa-minus text-xs"></i>
-                        </button>
-
-                        <div onclick="changeScore(${idx}, 1)" 
-                             id="score-box-${idx}"
-                             class="w-14 h-11 bg-slate-950 hover:bg-black rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 cursor-pointer active:scale-95 transition-all shadow-inner"
-                             title="ടാപ്പ് ചെയ്ത് ജയം കൂട്ടുക">
-                            ${team.wins}
-                        </div>
-
-                        <button onclick="changeScore(${idx}, 1)" 
-                                class="w-11 h-11 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xl shadow-md active:scale-95 transition-all"
-                                title="ജയം കൂട്ടുക">
-                            <i class="fa-solid fa-plus text-sm"></i>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            updateLeaderboard();
-        }
-
-        function changeScore(idx, delta) {
-            if (teams[idx].wins + delta >= 0) {
-                teams[idx].wins += delta;
-                saveData();
-
-                const box = document.getElementById(`score-box-${idx}`);
-                if (box) {
-                    box.textContent = teams[idx].wins;
-                    box.classList.remove("score-anim");
-                    void box.offsetWidth;
-                    box.classList.add("score-anim");
-                }
-            }
-        }
-
-        function updateTeamName(idx, val) {
-            const trimmed = val.trim();
-            teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
-            saveData();
-        }
-
-        function updateLeaderboard() {
-            const el = document.getElementById("leader-text");
-            const maxWins = Math.max(...teams.map(t => t.wins));
-
-            if (maxWins === 0) {
-                el.innerHTML = `<span class="text-slate-400 text-xs font-semibold">എല്ലാ ടീമുകൾക്കും 0 ജയം</span>`;
-                return;
-            }
-
-            const leaders = teams.filter(t => t.wins === maxWins);
-
-            if (leaders.length === 1) {
-                el.innerHTML = `
-                    <span class="text-amber-300 font-black">${escapeHtml(leaders[0].name)}</span> 
-                    <span class="text-emerald-400 text-xs sm:text-sm font-bold">(${maxWins} ജയം)</span>
-                `;
-            } else {
-                const names = leaders.map(l => `<span class="text-amber-300 font-bold">${escapeHtml(l.name)}</span>`).join(", ");
-                el.innerHTML = `
-                    ${names} <span class="text-slate-300 text-xs">(${maxWins} ജയം വീതം - തുല്യനില)</span>
-                `;
-            }
-        }
-
-        function resetScores() {
-            if (window.confirm("എല്ലാ ടീമിന്റെയും സ്കോർ റീസെറ്റ് (0) ചെയ്യണമെന്നുറപ്പാണോ?")) {
-                teams.forEach(t => t.wins = 0);
-                saveData();
-                render();
-            }
-        }
-
-        function shareWhatsApp() {
-            const maxWins = Math.max(...teams.map(t => t.wins));
-            const leaders = teams.filter(t => t.wins === maxWins && maxWins > 0);
-
-            let msg = "🏸 *WEST SMASH BADMINTON CLUB* 🏸\n";
-            msg += "🏆 *ടൂർണമെന്റ് വിൻ ട്രാക്കർ* 🏆\n\n";
-
-            teams.forEach((t, i) => {
-                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം\n`;
-            });
-
-            msg += "\n-------------------------\n";
-            if (leaders.length === 1) {
-                msg += `👑 *വിജയി / ഒന്നാം സ്ഥാനം:* ${leaders[0].name} (${maxWins} ജയം)`;
-            } else if (leaders.length > 1) {
-                msg += `👑 *ഒന്നാം സ്ഥാനത്ത് (തുല്യനില):* ${leaders.map(l => l.name).join(", ")} (${maxWins} ജയം)`;
-            } else {
-                msg += `👑 കളികൾ ആരംഭിച്ചിട്ടില്ല`;
-            }
-
-            const area = document.createElement("textarea");
-            area.value = msg;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand("copy");
-            document.body.removeChild(area);
-
-            showToast("സ്കോർ കോപ്പി ചെയ്തു! വാട്സ്ആപ്പിലേക്ക് തുറക്കുന്നു...");
-
-            const encoded = encodeURIComponent(msg);
-            setTimeout(() => {
-                window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
-            }, 400);
-        }
-
-        function showToast(text) {
-            const toast = document.getElementById("toast");
-            toast.textContent = text;
-            toast.classList.remove("opacity-0");
-            setTimeout(() => {
-                toast.classList.add("opacity-0");
-            }, 2500);
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        window.onload = initData;
-    </script>
 </body>
 </html>
