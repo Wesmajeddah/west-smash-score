@@ -210,7 +210,7 @@
                 const data = snapshot.val();
                 if (data) {
                     teams = data.teams || defaultTeams;
-                    totalPlayCount = data.totalPlayCount || 0;
+                    totalPlayCount = data.totalPlayCount !== undefined ? data.totalPlayCount : calculateTotalPlays(teams);
                     isLocked = data.isLocked || false;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -226,7 +226,7 @@
                     try { 
                         const parsed = JSON.parse(saved);
                         teams = parsed.teams || defaultTeams;
-                        totalPlayCount = parsed.totalPlayCount || 0;
+                        totalPlayCount = parsed.totalPlayCount !== undefined ? parsed.totalPlayCount : calculateTotalPlays(teams);
                         isLocked = parsed.isLocked || false;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
@@ -240,6 +240,10 @@
                 }
                 render();
             });
+        }
+
+        function calculateTotalPlays(teamsArr) {
+            return teamsArr.reduce((sum, team) => sum + team.wins, 0);
         }
 
         function saveData() {
@@ -321,10 +325,12 @@
             // Prevent negative score
             if (teams[idx].wins + delta < 0) return;
 
-            // Update & Permanently Lock
+            // Update Score & Adjust Total Play Count Accordingly
             teams[idx].wins += delta;
-            totalPlayCount += 1;
-            isLocked = true; 
+            totalPlayCount += delta;
+            if (totalPlayCount < 0) totalPlayCount = 0;
+
+            isLocked = true; // Permanently Lock after action
 
             saveData();
 
