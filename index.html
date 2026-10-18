@@ -172,7 +172,7 @@
                 </div>
             </div>
 
-            <div id="podium-text" class="text-xs text-amber-200/80 font-medium pt-1 border-t border-amber-500/20">
+            <div id="podium-text" class="text-xs text-amber-200/80 font-medium pt-1 border-t border-amber-500/20 truncate px-1">
                 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
             </div>
 
@@ -213,6 +213,7 @@
         let teams = [];
         let lastActionTimestamp = null;
         let timerInterval = null;
+        let isProcessingClick = false;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
@@ -314,7 +315,7 @@
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <!-- Minus Button (Admin Only / Decrement -> PIN Required) -->
+                            <!-- Minus Button (Admin Only) -->
                             <button onclick="handleScoreChange(${idx}, -1)" 
                                     class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
                                     title="Admin Only (Decrease score requires PIN)">
@@ -326,10 +327,10 @@
                                 ${team.wins}
                             </div>
 
-                            <!-- Plus Button (Adding new win -> NO PIN Required, anytime!) -->
+                            <!-- Plus Button -->
                             <button onclick="handleScoreChange(${idx}, 1)" 
                                     class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50"
-                                    title="Add Win (No password needed)">
+                                    title="Add Win">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -349,7 +350,10 @@
         }
 
         function handleScoreChange(idx, delta) {
-            // IF ADDING WIN (delta > 0): NO PASSWORD NEEDED AT ALL! ANYTIME!
+            if (isProcessingClick) return;
+            isProcessingClick = true;
+            setTimeout(() => { isProcessingClick = false; }, 400);
+
             if (delta > 0) {
                 const now = Date.now();
                 if (lastActionTimestamp) {
@@ -362,7 +366,6 @@
                 saveData();
                 showToast(`${teams[idx].name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
             } 
-            // IF DECREASING (Admin Only): REQUIRE ADMIN PIN!
             else if (delta < 0) {
                 const pin = prompt("Admin Only: സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
@@ -439,7 +442,7 @@
                 if (inputPin !== null) alert("തെറ്റായ PIN!");
                 return;
             }
-            if (window.confirm("എല്ലാ സ്കോറുകളും ടൈമറുകളും പൂർണ്ണമായി റീസെറ്റ് ചെയ്യണോ?")) {
+            if (window.confirm("എല്ലാ സ്കോറുകളും, ടോട്ടൽ പ്ലേ കൗണ്ടും, ടൈമറുകളും പൂർണ്ണമായി റീസെറ്റ് ചെയ്യണോ?")) {
                 teams.forEach(t => {
                     t.wins = 0;
                     t.lastMatchTime = 0;
@@ -447,6 +450,7 @@
                 lastActionTimestamp = null;
                 saveData();
                 render();
+                showToast("എല്ലാ ഡാറ്റയും റീസെറ്റ് ചെയ്തു!");
             }
         }
 
