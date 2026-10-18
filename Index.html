@@ -47,74 +47,16 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Club Logo and Name -->
-        <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
-            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-            <div class="flex justify-center mb-1">
-                <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
-                    <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <radialGradient id="goldGrad" cx="50%" cy="30%" r="70%">
-                                <stop offset="0%" stop-color="#FFE082" />
-                                <stop offset="40%" stop-color="#D4AF37" />
-                                <stop offset="85%" stop-color="#8B6508" />
-                                <stop offset="100%" stop-color="#5B4000" />
-                            </radialGradient>
-                            <radialGradient id="bgBlue" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#1E3E62" />
-                                <stop offset="100%" stop-color="#0B192C" />
-                            </radialGradient>
-                            <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFF59D" />
-                                <stop offset="50%" stop-color="#D4AF37" />
-                                <stop offset="100%" stop-color="#996515" />
-                            </linearGradient>
-                        </defs>
-
-                        <circle cx="100" cy="100" r="96" fill="url(#goldGrad)" />
-                        <circle cx="100" cy="100" r="88" fill="url(#bgBlue)" stroke="url(#goldGrad)" stroke-width="2" />
-                        <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" />
-
-                        <path id="textArcTop" d="M 22 100 A 78 78 0 0 1 178 100" fill="none" />
-                        <text font-family="Cinzel, serif" font-weight="900" font-size="14" fill="#FFE082" letter-spacing="1.5">
-                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">WEST SMASH</textPath>
-                        </text>
-
-                        <path id="textArcBottom" d="M 178 100 A 78 78 0 0 1 22 100" fill="none" />
-                        <text font-family="Cinzel, serif" font-weight="800" font-size="11" fill="#FFE082" letter-spacing="1">
-                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">BADMINTON CLUB</textPath>
-                        </text>
-
-                        <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
-                        <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
-
-                        <g transform="translate(0, -2)">
-                            <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
-                            <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
-                            <path d="M 45 68 C 55 90 68 120 85 125 C 95 110 92 88 92 78 C 96 90 102 120 115 125 C 130 115 145 88 155 70 C 145 92 125 138 100 138 C 75 138 55 92 45 68 Z" fill="url(#goldGrad)" />
-                            <g transform="translate(118, 52) rotate(25)">
-                                <path d="M 0 0 Q 10 -15 22 -18 L 18 8 Z" fill="url(#goldLight)" opacity="0.9" />
-                                <path d="M 0 0 Q 18 -5 26 8 L 12 14 Z" fill="url(#goldLight)" />
-                                <ellipse cx="2" cy="2" rx="4" ry="5" fill="#FFF099" />
-                            </g>
-                        </g>
-
-                        <line x1="62" y1="148" x2="80" y2="148" stroke="url(#goldLight)" stroke-width="1" />
-                        <text x="100" y="151" font-family="Cinzel, serif" font-weight="700" font-size="8.5" fill="#FFF099" text-anchor="middle">SINCE 2026</text>
-                        <line x1="120" y1="148" x2="138" y2="148" stroke="url(#goldLight)" stroke-width="1" />
-                    </svg>
-                </div>
-            </div>
-
-            <h1 class="text-lg sm:text-xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
+        <!-- Header with Club Name (Logo Removed) -->
+        <div class="text-center py-4 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
+            <h1 class="text-xl sm:text-2xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
             <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
             <p class="text-[11px] text-slate-300 mt-1 font-semibold">ടൂർണമെന്റ് സ്കോർ കൗണ്ടർ</p>
         </div>
 
         <!-- Lock Control Toggle -->
-        <div class="flex justify-between items-center bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs">
-            <span class="text-slate-300 font-bold">സ്കോർ എഡിറ്റിംഗ് (Lock Edit):</span>
+        <div class="flex justify-between items-center bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs">
+            <span class="text-slate-300 font-bold">സ്കോർ എഡിറ്റിംഗ് നിയന്ത്രണം:</span>
             <button id="lock-btn" onclick="toggleLock()" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-lg transition-all flex items-center gap-1">
                 <i id="lock-icon" class="fa-solid fa-lock-open"></i> <span id="lock-text">അൺലോക്ക്ഡ്</span>
             </button>
@@ -152,9 +94,9 @@
                 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
             </div>
 
-            <!-- തോട്ട ടീം വിമർശന ഭാഗം -->
+            <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
             <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1 border-t border-rose-500/20">
-                തോട്ട ടീമിനെ കണ്ടെത്തുന്നു...
+                തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
             </div>
         </div>
 
@@ -192,7 +134,7 @@
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('west_smash_scores_v4');
+        const dbRef = firebase.database().ref('west_smash_scores_v5');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -210,7 +152,7 @@
                 render();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("west_smash_scores_v4");
+                const saved = localStorage.getItem("west_smash_scores_v5");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
@@ -234,7 +176,7 @@
         function saveData() {
             dbRef.set({ teams, totalPlayCount, isLocked }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v4", JSON.stringify({ teams, totalPlayCount, isLocked }));
+                localStorage.setItem("west_smash_scores_v5", JSON.stringify({ teams, totalPlayCount, isLocked }));
             });
             updateLeaderboard();
         }
@@ -276,7 +218,7 @@
                         <div onclick="${isLocked ? '' : `changeScore(${idx}, 1)`}" 
                              id="score-box-${idx}"
                              class="w-14 h-11 bg-slate-950 hover:bg-black rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 ${isLocked ? 'cursor-not-allowed opacity-90' : 'cursor-pointer active:scale-95'} transition-all shadow-inner"
-                             title="${isLocked ? 'ലോക്ക് ചെയ്തിരിക്കുന്നു' : 'ടാപ്പ് ചെയ്ത് ജയം കൂട്ടുക'}">
+                             title="${isLocked ? 'ലോക്ക് ചെയ്തിരിക്കുന്നു' : 'ജയം മാത്രം കൂട്ടുക (Win)'}">
                             ${team.wins}
                         </div>
 
@@ -293,7 +235,6 @@
 
             document.getElementById("total-play-val").textContent = totalPlayCount;
 
-            // Lock UI controls update
             const lockBtn = document.getElementById("lock-btn");
             const lockIcon = document.getElementById("lock-icon");
             const lockText = document.getElementById("lock-text");
@@ -370,11 +311,10 @@
             if (maxWins === 0) {
                 leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
                 podiumEl.innerHTML = `2-ാം സ്ഥാനം കണക്കാക്കുന്നു...`;
-                loserEl.innerHTML = `തോട്ട ടീമിനെ കണക്കാക്കുന്നു...`;
+                loserEl.innerHTML = `തോറ്റ ടീമിനെ കണക്കാക്കുന്നു...`;
                 return;
             }
 
-            // 1st Place (Champions)
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             let leaderHtml = "";
             firstPlaces.forEach(f => {
@@ -383,7 +323,6 @@
             leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
             leaderEl.innerHTML = leaderHtml;
 
-            // 2nd Place Only
             let remaining = sorted.filter(t => t.wins < maxWins);
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
@@ -393,10 +332,9 @@
                 podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
             }
 
-            // തോട്ട ടീം (Bottom Performers / Criticism)
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോട്ട ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
@@ -437,7 +375,7 @@
 
                 const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
                 if (lowestTeams.length > 0) {
-                    msg += `🚨 *തോട്ട ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} ജയം)\n`;
+                    msg += `🚨 *തോറ്റ ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} ജയം)\n`;
                     msg += `💬 *വിമർശനം:* ഇനിയും പ്രാക്ടീസ് അത്യാവശ്യമാണ്! 🏸💥\n`;
                 }
             } else {
