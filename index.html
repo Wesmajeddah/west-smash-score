@@ -98,7 +98,7 @@
                         <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
                         <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
 
-                        <!-- Inner Graphics: Badminton Racket, Wings W, Shuttlecock -->
+                        <!-- Inner Graphics -->
                         <g transform="translate(0, -2)">
                             <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
                             <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
@@ -120,7 +120,15 @@
 
             <h1 class="text-xl sm:text-2xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
             <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
-            <p class="text-[11px] text-slate-300 mt-1 font-semibold">Tournament Score Counter</p>
+            
+            <div class="mt-2 flex items-center justify-center gap-2">
+                <span id="lock-status-text" class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-lock-open"></i> Live Active
+                </span>
+                <button id="unlock-btn" onclick="requestAdminUnlock()" class="hidden text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-md shadow">
+                    <i class="fa-solid fa-key mr-1"></i> അൺലോക്ക് ചെയ്യുക
+                </button>
+            </div>
         </div>
 
         <!-- Teams List -->
@@ -128,7 +136,7 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Play Section (Exact Display Only) -->
+        <!-- Total Play Section -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between px-4 shadow-md">
             <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
                 <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
@@ -177,6 +185,8 @@
     </div>
 
     <script>
+        const ADMIN_PIN = "1234"; // Default Security PIN for Unlock
+
         const defaultTeams = [
             { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500" },
             { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600" },
@@ -187,7 +197,7 @@
 
         let teams = [];
         let totalPlayCount = 0;
-        let activeLock = false;
+        let isLocked = false;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
@@ -201,10 +211,12 @@
                 if (data) {
                     teams = data.teams || defaultTeams;
                     totalPlayCount = data.totalPlayCount || 0;
+                    isLocked = data.isLocked || false;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     totalPlayCount = 0;
-                    dbRef.set({ teams, totalPlayCount });
+                    isLocked = false;
+                    dbRef.set({ teams, totalPlayCount, isLocked });
                 }
                 render();
             }, (error) => {
@@ -215,22 +227,25 @@
                         const parsed = JSON.parse(saved);
                         teams = parsed.teams || defaultTeams;
                         totalPlayCount = parsed.totalPlayCount || 0;
+                        isLocked = parsed.isLocked || false;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
                         totalPlayCount = 0;
+                        isLocked = false;
                     }
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     totalPlayCount = 0;
+                    isLocked = false;
                 }
                 render();
             });
         }
 
         function saveData() {
-            dbRef.set({ teams, totalPlayCount }).catch((error) => {
+            dbRef.set({ teams, totalPlayCount, isLocked }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, totalPlayCount }));
+                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, totalPlayCount, isLocked }));
             });
             updateLeaderboard();
         }
@@ -249,20 +264,29 @@
                         <input type="text" 
                                value="${escapeHtml(team.name)}" 
                                onchange="updateTeamName(${idx}, this.value)"
-                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
+                               ${isLocked ? 'disabled' : ''}
+                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700 disabled:opacity-70"
                                placeholder="ടീം പേര്">
                     </div>
 
-                    <div class="flex items-center gap-2 shrink-0">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <!-- Minus Button -->
+                        <button onclick="updateScore(${idx}, -1)" 
+                                ${isLocked ? 'disabled' : ''}
+                                class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50 disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+
                         <div id="score-box-${idx}"
-                             class="w-16 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 shadow-inner">
+                             class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner">
                             ${team.wins}
                         </div>
 
-                        <button onclick="addWin(${idx})" 
-                                id="win-btn-${idx}"
-                                class="h-11 px-3 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xs gap-1 shadow-md active:scale-95 transition-all">
-                            <i class="fa-solid fa-plus text-xs"></i> WIN
+                        <!-- Plus Button -->
+                        <button onclick="updateScore(${idx}, 1)" 
+                                ${isLocked ? 'disabled' : ''}
+                                class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
                 `;
@@ -270,27 +294,41 @@
             });
 
             document.getElementById("total-play-val").textContent = totalPlayCount;
+
+            // Lock UI Status update
+            const lockStatusEl = document.getElementById("lock-status-text");
+            const unlockBtn = document.getElementById("unlock-btn");
+
+            if (isLocked) {
+                lockStatusEl.innerHTML = '<i class="fa-solid fa-lock text-rose-400"></i> Locked (Permanently)';
+                lockStatusEl.className = "text-[11px] text-rose-400 font-semibold flex items-center gap-1";
+                unlockBtn.classList.remove("hidden");
+            } else {
+                lockStatusEl.innerHTML = '<i class="fa-solid fa-lock-open text-emerald-400"></i> Live Active';
+                lockStatusEl.className = "text-[11px] text-emerald-400 font-semibold flex items-center gap-1";
+                unlockBtn.classList.add("hidden");
+            }
+
             updateLeaderboard();
         }
 
-        function addWin(idx) {
-            if (activeLock) {
-                showToast("ദയവായി കാത്തിരിക്കുക! 2 മിനിറ്റ് ലോക്ക് active ആണ്.");
+        function updateScore(idx, delta) {
+            if (isLocked) {
+                showToast("സ്കോർ ബോർഡ് ലോക്ക് ആണ്! മാറ്റങ്ങൾ വരുത്താൻ അൺലോക്ക് ചെയ്യുക.");
                 return;
             }
             
-            activeLock = true;
-            
-            document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.setAttribute('disabled', 'true');
-            });
+            // Prevent negative score
+            if (teams[idx].wins + delta < 0) return;
 
-            teams[idx].wins += 1;
+            // Update & Permanently Lock
+            teams[idx].wins += delta;
             totalPlayCount += 1;
+            isLocked = true; 
+
             saveData();
 
-            showToast(`${teams[idx].name} - ജയം വിജയകരമായി ആഡ് ചെയ്തു!`);
+            showToast(`${teams[idx].name} - സ്കോർ അപ്ഡേറ്റ് ചെയ്ത് ലോക്ക് ചെയ്തു!`);
 
             const box = document.getElementById(`score-box-${idx}`);
             if (box) {
@@ -299,17 +337,21 @@
                 void box.offsetWidth;
                 box.classList.add("score-anim");
             }
+        }
 
-            setTimeout(() => {
-                activeLock = false;
-                document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    btn.removeAttribute('disabled');
-                });
-            }, 120000);
+        function requestAdminUnlock() {
+            const inputPin = prompt("സ്കോർ ബോർഡ് അൺലോക്ക് ചെയ്യുന്നതിനായി Admin PIN നൽകുക:");
+            if (inputPin === ADMIN_PIN) {
+                isLocked = false;
+                saveData();
+                showToast("സ്കോർ ബോർഡ് വിജയകരമായി അൺലോക്ക് ചെയ്തു!");
+            } else if (inputPin !== null) {
+                alert("തെറ്റായ PIN കോഡ്! അൺലോക്ക് ചെയ്യാൻ സാധിച്ചില്ല.");
+            }
         }
 
         function updateTeamName(idx, val) {
+            if (isLocked) return;
             const trimmed = val.trim();
             teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
             saveData();
@@ -357,13 +399,17 @@
         }
 
         function resetScores() {
-            if (activeLock) {
-                showToast("ലോക്ക് active ആയതുകൊണ്ട് ഇപ്പോൾ റീസെറ്റ് ചെയ്യാനാവില്ല!");
-                return;
+            if (isLocked) {
+                const inputPin = prompt("സ്കോറുകൾ റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
+                if (inputPin !== ADMIN_PIN) {
+                    if (inputPin !== null) alert("തെറ്റായ PIN കോഡ്!");
+                    return;
+                }
             }
-            if (window.confirm("അന്നത്തെ ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
+            if (window.confirm("ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
                 teams.forEach(t => t.wins = 0);
                 totalPlayCount = 0;
+                isLocked = false;
                 saveData();
                 render();
             }
@@ -387,38 +433,30 @@
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
             if (firstPlaces.length > 0) {
                 msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(", ")} (${maxWins} ജയം)\n`;
-                msg += `✨ *ടാഗ്‌ലൈൻ:* അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്!\n\n`;
-
-                const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
-                if (lowestTeams.length > 0) {
-                    msg += `🚨 *തോറ്റ ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} ജയം)\n`;
-                    msg += `💬 *വിമർശനം:* ഇനിയും പ്രാക്ടീസ് അത്യാവശ്യമാണ്! 🏸💥\n`;
-                }
-            } else {
-                msg += `👑 കളികൾ ആരംഭിച്ചിട്ടില്ല\n`;
             }
 
-            const area = document.createElement("textarea");
-            area.value = msg;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand("copy");
-            document.body.removeChild(area);
+            let remaining = sorted.filter(t => t.wins < maxWins && maxWins > 0);
+            if (remaining.length > 0) {
+                const secondWins = remaining[0].wins;
+                const secondPlaces = remaining.filter(t => t.wins === secondWins);
+                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(", ")} (${secondWins} ജയം)\n`;
+            }
 
-            showToast("സ്കോർ കോപ്പി ചെയ്തു! വാട്സ്ആപ്പിലേക്ക് തുറക്കുന്നു...");
+            const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
+            if (lowestTeams.length > 0) {
+                msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(", ")} needs serious practice! (${minWins} ജയം)\n`;
+            }
 
-            const encoded = encodeURIComponent(msg);
-            setTimeout(() => {
-                window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
-            }, 400);
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
         }
 
         function showToast(text) {
             const toast = document.getElementById("toast");
             toast.textContent = text;
-            toast.classList.remove("opacity-0");
+            toast.style.opacity = "1";
             setTimeout(() => {
-                toast.classList.add("opacity-0");
+                toast.style.opacity = "0";
             }, 2500);
         }
 
@@ -426,7 +464,8 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        window.onload = initData;
+        // Start App
+        initData();
     </script>
 </body>
 </html>
