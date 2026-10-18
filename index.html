@@ -314,10 +314,10 @@
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <!-- Minus Button (Amendment / Decrement -> PIN Required) -->
+                            <!-- Minus Button (Admin Only / Decrement -> PIN Required) -->
                             <button onclick="handleScoreChange(${idx}, -1)" 
                                     class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
-                                    title="Decrease score (Amendment requires PIN)">
+                                    title="Admin Only (Decrease score requires PIN)">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
 
@@ -362,11 +362,11 @@
                 saveData();
                 showToast(`${teams[idx].name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
             } 
-            // IF DECREASING / AMENDING (delta < 0): REQUIRE ADMIN PIN!
+            // IF DECREASING (Admin Only): REQUIRE ADMIN PIN!
             else if (delta < 0) {
-                const pin = prompt("ഇത് ഒരു തിരുത്തലാണ് (Amendment). സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN നൽകുക:");
+                const pin = prompt("Admin Only: സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
-                    if (pin !== null) alert("തെറ്റായ PIN! തിരുത്തൽ സാധ്യമല്ല.");
+                    if (pin !== null) alert("തെറ്റായ PIN! നടപടി റദ്ദാക്കി.");
                     return;
                 }
 
@@ -374,7 +374,7 @@
 
                 teams[idx].wins += delta;
                 saveData();
-                showToast(`${teams[idx].name} സ്കോർ തിരുത്തി (Amended)!`);
+                showToast(`${teams[idx].name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
             }
 
             const box = document.getElementById(`score-box-${idx}`);
@@ -434,7 +434,7 @@
         }
 
         function resetScores() {
-            const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
+            const inputPin = prompt("Admin Only: ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("തെറ്റായ PIN!");
                 return;
