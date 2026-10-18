@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEST SMASH BADMINTON CLUB - Score Counter</title>
+    <title>VortX BADMINTON CLUB - Score Counter</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -11,7 +11,7 @@
     <!-- Google Fonts for Malayalam & English -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Manjari:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Manjari:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase App & Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -22,8 +22,8 @@
             font-family: 'Manjari', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-cinzel {
-            font-family: 'Cinzel', serif;
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
         }
         .font-poppins {
             font-family: 'Poppins', sans-serif;
@@ -50,11 +50,11 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Original Logo Emblem and Club Name -->
+        <!-- Header with VortX Logo Emblem and Club Name -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- SVG Logo Emblem -->
+            <!-- SVG VortX Logo Emblem -->
             <div class="flex justify-center mb-1">
                 <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -81,48 +81,35 @@
                         <circle cx="100" cy="100" r="88" fill="url(#bgBlue)" stroke="url(#goldGrad)" stroke-width="2" />
                         <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" />
 
+                        <!-- VortX Vortex swirl graphics inside emblem -->
+                        <path d="M 100 40 Q 130 70 100 100 Q 70 130 100 160" fill="none" stroke="url(#goldLight)" stroke-width="4" stroke-linecap="round" />
+                        <path d="M 60 80 Q 90 100 140 90" fill="none" stroke="url(#goldLight)" stroke-width="2" opacity="0.7" />
+
+                        <!-- Center Shutter/VortX core -->
+                        <circle cx="100" cy="100" r="25" fill="url(#goldGrad)" stroke="#FFF" stroke-width="1.5" />
+                        <text x="100" y="106" font-family="Orbitron, sans-serif" font-weight="900" font-size="14" fill="#0B192C" text-anchor="middle">VX</text>
+
                         <!-- Curved Header Text path -->
-                        <path id="textArcTop" d="M 22 100 A 78 78 0 0 1 178 100" fill="none" />
-                        <text font-family="Cinzel, serif" font-weight="900" font-size="14" fill="#FFE082" letter-spacing="1.5">
+                        <path id="textArcTop" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="900" font-size="13" fill="#FFE082" letter-spacing="2">
                             <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
-                                WEST SMASH
+                                VORTX
                             </textPath>
                         </text>
 
                         <!-- Curved Footer Text path -->
-                        <path id="textArcBottom" d="M 178 100 A 78 78 0 0 1 22 100" fill="none" />
-                        <text font-family="Cinzel, serif" font-weight="800" font-size="11" fill="#FFE082" letter-spacing="1">
+                        <path id="textArcBottom" d="M 175 100 A 75 75 0 0 1 25 100" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="700" font-size="9" fill="#FFE082" letter-spacing="1">
                             <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
                                 BADMINTON CLUB
                             </textPath>
                         </text>
-
-                        <!-- Side Stars -->
-                        <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
-                        <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
-
-                        <!-- Inner Graphics -->
-                        <g transform="translate(0, -2)">
-                            <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
-                            <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
-                            <path d="M 45 68 C 55 90 68 120 85 125 C 95 110 92 88 92 78 C 96 90 102 120 115 125 C 130 115 145 88 155 70 C 145 92 125 138 100 138 C 75 138 55 92 45 68 Z" fill="url(#goldGrad)" />
-                            <g transform="translate(118, 52) rotate(25)">
-                                <path d="M 0 0 Q 10 -15 22 -18 L 18 8 Z" fill="url(#goldLight)" opacity="0.9" />
-                                <path d="M 0 0 Q 18 -5 26 8 L 12 14 Z" fill="url(#goldLight)" />
-                                <ellipse cx="2" cy="2" rx="4" ry="5" fill="#FFF099" />
-                            </g>
-                        </g>
-
-                        <!-- Since 2026 Banner -->
-                        <line x1="62" y1="148" x2="80" y2="148" stroke="url(#goldLight)" stroke-width="1" />
-                        <text x="100" y="151" font-family="Cinzel, serif" font-weight="700" font-size="8.5" fill="#FFF099" text-anchor="middle">SINCE 2026</text>
-                        <line x1="120" y1="148" x2="138" y2="148" stroke="url(#goldLight)" stroke-width="1" />
                     </svg>
                 </div>
             </div>
 
-            <h1 class="text-xl sm:text-2xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
-            <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
+            <h1 class="text-2xl sm:text-3xl font-black font-orbitron gold-gradient-text tracking-wider leading-tight">VortX</h1>
+            <h2 class="text-xs sm:text-sm font-bold font-orbitron text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
             
             <div class="mt-2 flex items-center justify-center gap-2">
                 <span id="lock-status-text" class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
@@ -459,7 +446,7 @@
             const maxWins = sorted[0].wins;
             const minWins = sorted[sorted.length - 1].wins;
 
-            let msg = "🏸 *WEST SMASH BADMINTON CLUB* 🏸\n";
+            let msg = "🏸 *VortX BADMINTON CLUB* 🏸\n";
             msg += "🏆 *Tournament Score Counter* 🏆\n\n";
 
             teams.forEach((t, i) => {
