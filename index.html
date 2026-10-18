@@ -129,7 +129,7 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Play Section & Active Timer -->
+        <!-- Total Play Section & Timers -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
             <div class="flex items-center justify-between px-2">
                 <span class="text-xs font-bold text-slate-300 flex items-center gap-2 font-poppins">
@@ -140,7 +140,7 @@
                 </span>
             </div>
             
-            <!-- Live Active Match Duration Counter with Start Match Option -->
+            <!-- Current Match Duration Counter with Start Match Option -->
             <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
                 <span class="flex items-center gap-1 text-slate-300">
                     <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
@@ -151,6 +151,14 @@
                         Start Match
                     </button>
                 </div>
+            </div>
+
+            <!-- Total Tournament Duration Counter -->
+            <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
+                <span class="flex items-center gap-1 text-slate-300">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Total Duration:
+                </span>
+                <span id="total-duration-timer" class="font-bold text-amber-400">0m 0s</span>
             </div>
         </div>
 
@@ -210,6 +218,7 @@
         ];
 
         let teams = [];
+        let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let timerInterval = null;
         let cooldownInterval = null;
@@ -234,11 +243,13 @@
                             lastClickTime: savedTeams[i] ? (savedTeams[i].lastClickTime || 0) : 0
                         };
                     });
+                    tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                     lastActionTimestamp = data.lastActionTimestamp || null;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
+                    tournamentStartTimestamp = null;
                     lastActionTimestamp = null;
-                    dbRef.set({ teams, lastActionTimestamp });
+                    dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp });
                 }
                 render();
                 startLiveTimer();
@@ -259,13 +270,16 @@
                                 lastClickTime: savedTeams[i] ? (savedTeams[i].lastClickTime || 0) : 0
                             };
                         });
+                        tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
+                        tournamentStartTimestamp = null;
                         lastActionTimestamp = null;
                     }
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
+                    tournamentStartTimestamp = null;
                     lastActionTimestamp = null;
                 }
                 render();
@@ -279,38 +293,55 @@
         }
 
         function saveData() {
-            dbRef.set({ teams, lastActionTimestamp }).catch((error) => {
+            dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, lastActionTimestamp }));
+                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
             });
             updateLeaderboard();
         }
 
         function startFirstMatch() {
-            lastActionTimestamp = Date.now();
+            const now = Date.now();
+            if (!tournamentStartTimestamp) {
+                tournamentStartTimestamp = now;
+            }
+            lastActionTimestamp = now;
             saveData();
-            showToast("Match timer started!");
+            showToast("Tournament & Match timers started!");
         }
 
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
 
             timerInterval = setInterval(() => {
-                const timerEl = document.getElementById("current-match-timer");
+                const currentTimerEl = document.getElementById("current-match-timer");
+                const totalDurationEl = document.getElementById("total-duration-timer");
                 const startBtn = document.getElementById("start-match-btn");
 
-                if (!lastActionTimestamp) {
-                    timerEl.textContent = "0m 0s";
+                if (!tournamentStartTimestamp) {
+                    currentTimerEl.textContent = "0m 0s";
+                    totalDurationEl.textContent = "0m 0s";
                     startBtn.classList.remove("hidden");
                     return;
                 }
                 
                 startBtn.classList.add("hidden");
-                const diffMs = Date.now() - lastActionTimestamp;
-                const minutes = Math.floor(diffMs / 60000);
-                const seconds = Math.floor((diffMs % 60000) / 1000);
+                
+                // Total Tournament Duration
+                const totalDiffMs = Date.now() - tournamentStartTimestamp;
+                const totalMins = Math.floor(totalDiffMs / 60000);
+                const totalSecs = Math.floor((totalDiffMs % 60000) / 1000);
+                totalDurationEl.textContent = `${totalMins}m ${totalSecs}s`;
 
-                timerEl.textContent = `${minutes}m ${seconds}s`;
+                // Current Match Duration
+                if (lastActionTimestamp) {
+                    const matchDiffMs = Date.now() - lastActionTimestamp;
+                    const matchMins = Math.floor(matchDiffMs / 60000);
+                    const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
+                    currentTimerEl.textContent = `${matchMins}m ${matchSecs}s`;
+                } else {
+                    currentTimerEl.textContent = "0m 0s";
+                }
             }, 1000);
         }
 
@@ -414,6 +445,10 @@
                     return;
                 }
                 teams[idx].lastClickTime = now;
+
+                if (!tournamentStartTimestamp) {
+                    tournamentStartTimestamp = now;
+                }
 
                 if (lastActionTimestamp) {
                     const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
@@ -525,6 +560,7 @@
                     t.lastMatchTime = 0;
                     t.lastClickTime = 0;
                 });
+                tournamentStartTimestamp = null;
                 lastActionTimestamp = null;
                 saveData();
                 render();
@@ -546,6 +582,14 @@
             });
 
             msg += `\n🎮 *Total Plays:* ${calculateTotalPlays()}\n`;
+            
+            // Calculate Total Duration text for WhatsApp
+            if (tournamentStartTimestamp) {
+                let totalDiffMs = Date.now() - tournamentStartTimestamp;
+                let totalMins = Math.floor(totalDiffMs / 60000);
+                msg += `⏱️ *Total Duration:* ${totalMins} mins\n`;
+            }
+
             msg += "-------------------------\n";
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
