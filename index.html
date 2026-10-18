@@ -126,11 +126,8 @@
             
             <div class="mt-2 flex items-center justify-center gap-2">
                 <span id="lock-status-text" class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                    <i class="fa-solid fa-lock-open"></i> Live Active
+                    <i class="fa-solid fa-lock-open"></i> Live Scoring Active
                 </span>
-                <button id="unlock-btn" onclick="requestAdminUnlock()" class="hidden text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-md shadow">
-                    <i class="fa-solid fa-key mr-1"></i> Amend (Unlock)
-                </button>
             </div>
         </div>
 
@@ -214,7 +211,6 @@
         ];
 
         let teams = [];
-        let isLocked = false;
         let lastActionTimestamp = null;
         let timerInterval = null;
 
@@ -229,13 +225,11 @@
                 const data = snapshot.val();
                 if (data) {
                     teams = data.teams || defaultTeams;
-                    isLocked = data.isLocked || false;
                     lastActionTimestamp = data.lastActionTimestamp || null;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
-                    isLocked = false;
                     lastActionTimestamp = null;
-                    dbRef.set({ teams, isLocked, lastActionTimestamp });
+                    dbRef.set({ teams, lastActionTimestamp });
                 }
                 render();
                 startLiveTimer();
@@ -246,16 +240,13 @@
                     try { 
                         const parsed = JSON.parse(saved);
                         teams = parsed.teams || defaultTeams;
-                        isLocked = parsed.isLocked || false;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
-                        isLocked = false;
                         lastActionTimestamp = null;
                     }
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
-                    isLocked = false;
                     lastActionTimestamp = null;
                 }
                 render();
@@ -268,18 +259,14 @@
         }
 
         function saveData() {
-            dbRef.set({ teams, isLocked, lastActionTimestamp }).catch((error) => {
+            dbRef.set({ teams, lastActionTimestamp }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, isLocked, lastActionTimestamp }));
+                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, lastActionTimestamp }));
             });
             updateLeaderboard();
         }
 
         function startFirstMatch() {
-            if (isLocked) {
-                alert("സ്കോർ ബോർഡ് ലോക്ക് ആണ്. അമൻഡ് ചെയ്യാൻ അഡ്മിൻ പിൻ ഉപയോഗിക്കുക.");
-                return;
-            }
             lastActionTimestamp = Date.now();
             saveData();
             showToast("Match timer started!");
@@ -322,16 +309,15 @@
                             <input type="text" 
                                    value="${escapeHtml(team.name)}" 
                                    onchange="updateTeamName(${idx}, this.value)"
-                                   ${isLocked ? 'disabled' : ''}
-                                   class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700 disabled:opacity-70"
+                                   class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
                                    placeholder="ടീം പേര്">
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <!-- Minus Button -->
+                            <!-- Minus Button (Amendment / Decrement -> PIN Required) -->
                             <button onclick="handleScoreChange(${idx}, -1)" 
-                                    ${isLocked ? 'disabled' : ''}
-                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50 disabled:opacity-40 disabled:cursor-not-allowed">
+                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
+                                    title="Decrease score (Amendment requires PIN)">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
 
@@ -340,10 +326,10 @@
                                 ${team.wins}
                             </div>
 
-                            <!-- Plus Button -->
+                            <!-- Plus Button (Adding new win -> NO PIN Required, anytime!) -->
                             <button onclick="handleScoreChange(${idx}, 1)" 
-                                    ${isLocked ? 'disabled' : ''}
-                                    class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed">
+                                    class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50"
+                                    title="Add Win (No password needed)">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -359,53 +345,37 @@
             });
 
             document.getElementById("total-play-val").textContent = calculateTotalPlays();
-
-            // Lock UI Status update
-            const lockStatusEl = document.getElementById("lock-status-text");
-            const unlockBtn = document.getElementById("unlock-btn");
-
-            if (isLocked) {
-                lockStatusEl.innerHTML = '<i class="fa-solid fa-lock text-rose-400"></i> Locked (Permanently)';
-                lockStatusEl.className = "text-[11px] text-rose-400 font-semibold flex items-center gap-1";
-                unlockBtn.classList.remove("hidden");
-            } else {
-                lockStatusEl.innerHTML = '<i class="fa-solid fa-lock-open text-emerald-400"></i> Live Active';
-                lockStatusEl.className = "text-[11px] text-emerald-400 font-semibold flex items-center gap-1";
-                unlockBtn.classList.add("hidden");
-            }
-
             updateLeaderboard();
         }
 
         function handleScoreChange(idx, delta) {
-            // Prevent scoring if locked
-            if (isLocked) {
-                showToast("സ്കോർ ബോർഡ് ലോക്ക് ആണ്! അൺലോക്ക് ചെയ്യുക.");
-                return;
+            // IF ADDING WIN (delta > 0): NO PASSWORD NEEDED AT ALL! ANYTIME!
+            if (delta > 0) {
+                const now = Date.now();
+                if (lastActionTimestamp) {
+                    const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
+                    teams[idx].lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
+                }
+                lastActionTimestamp = now;
+
+                teams[idx].wins += delta;
+                saveData();
+                showToast(`${teams[idx].name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
+            } 
+            // IF DECREASING / AMENDING (delta < 0): REQUIRE ADMIN PIN!
+            else if (delta < 0) {
+                const pin = prompt("ഇത് ഒരു തിരുത്തലാണ് (Amendment). സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN നൽകുക:");
+                if (pin !== ADMIN_PIN) {
+                    if (pin !== null) alert("തെറ്റായ PIN! തിരുത്തൽ സാധ്യമല്ല.");
+                    return;
+                }
+
+                if (teams[idx].wins + delta < 0) return;
+
+                teams[idx].wins += delta;
+                saveData();
+                showToast(`${teams[idx].name} സ്കോർ തിരുത്തി (Amended)!`);
             }
-
-            // Prevent negative wins
-            if (teams[idx].wins + delta < 0) return;
-
-            const now = Date.now();
-
-            if (delta > 0 && lastActionTimestamp) {
-                const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
-                teams[idx].lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
-            }
-
-            // Reset current timer timestamp
-            lastActionTimestamp = now;
-
-            // 1. Update score
-            teams[idx].wins += delta;
-            
-            // 2. Automatically LOCK permanently after adding score!
-            isLocked = true;
-
-            saveData();
-
-            showToast(`${teams[idx].name} സ്കോർ ചേർത്തു - ബോർഡ് ലോക്ക് ആയി!`);
 
             const box = document.getElementById(`score-box-${idx}`);
             if (box) {
@@ -416,19 +386,7 @@
             }
         }
 
-        function requestAdminUnlock() {
-            const pin = prompt("സ്കോർ ബോർഡ് അൺലോക്ക് ചെയ്ത് മാറ്റങ്ങൾ വരുത്തുന്നതിനായി Admin PIN നൽകുക:");
-            if (pin === ADMIN_PIN) {
-                isLocked = false;
-                saveData();
-                showToast("സ്കോർ ബോർഡ് അൺലോക്ക് ചെയ്തു!");
-            } else if (pin !== null) {
-                alert("തെറ്റായ PIN!");
-            }
-        }
-
         function updateTeamName(idx, val) {
-            if (isLocked) return;
             const trimmed = val.trim();
             teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
             saveData();
@@ -476,19 +434,16 @@
         }
 
         function resetScores() {
-            if (isLocked) {
-                const inputPin = prompt("സ്കോറുകൾ റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
-                if (inputPin !== ADMIN_PIN) {
-                    if (inputPin !== null) alert("തെറ്റായ PIN!");
-                    return;
-                }
+            const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
+            if (inputPin !== ADMIN_PIN) {
+                if (inputPin !== null) alert("തെറ്റായ PIN!");
+                return;
             }
-            if (window.confirm("ടൂർണമെന്റ് സ്കോറുകളും പ്ലേ ടൈമറും റീസെറ്റ് ചെയ്യണോ?")) {
+            if (window.confirm("എല്ലാ സ്കോറുകളും ടൈമറുകളും പൂർണ്ണമായി റീസെറ്റ് ചെയ്യണോ?")) {
                 teams.forEach(t => {
                     t.wins = 0;
                     t.lastMatchTime = 0;
                 });
-                isLocked = false;
                 lastActionTimestamp = null;
                 saveData();
                 render();
