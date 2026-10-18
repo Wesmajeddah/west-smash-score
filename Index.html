@@ -47,19 +47,11 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Club Name (Logo Removed) -->
+        <!-- Header with Club Name (No Logo) -->
         <div class="text-center py-4 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <h1 class="text-xl sm:text-2xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
             <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
-            <p class="text-[11px] text-slate-300 mt-1 font-semibold">ടൂർണമെന്റ് സ്കോർ കൗണ്ടർ</p>
-        </div>
-
-        <!-- Lock Control Toggle -->
-        <div class="flex justify-between items-center bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs">
-            <span class="text-slate-300 font-bold">സ്കോർ എഡിറ്റിംഗ് നിയന്ത്രണം:</span>
-            <button id="lock-btn" onclick="toggleLock()" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-lg transition-all flex items-center gap-1">
-                <i id="lock-icon" class="fa-solid fa-lock-open"></i> <span id="lock-text">അൺലോക്ക്ഡ്</span>
-            </button>
+            <p class="text-[11px] text-slate-300 mt-1 font-semibold">Tournament Score Counter</p>
         </div>
 
         <!-- Teams List -->
@@ -67,16 +59,14 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Games Played Today Section -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between px-4 shadow-md">
+        <!-- Total Play Section (English Only & Read-only) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between px-4 shadow-md">
             <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
-                <i class="fa-solid fa-gamepad text-amber-400"></i> അന്നേ ദിവസം ആകെ കളികൾ (Total Play):
+                <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
             </span>
-            <div class="flex items-center gap-2">
-                <button onclick="changeTotalPlay(-1)" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-bold text-xs lock-target">-</button>
-                <span id="total-play-val" class="text-amber-400 font-black text-base w-8 text-center">0</span>
-                <button onclick="changeTotalPlay(1)" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-bold text-xs lock-target">+</button>
-            </div>
+            <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-3 py-1 rounded-xl border border-amber-500/20 min-w-[50px] text-center">
+                0
+            </span>
         </div>
 
         <!-- Leader / Winner / Loser Summary Section -->
@@ -94,7 +84,7 @@
                 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
             </div>
 
-            <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
+            <!-- തോറ്റ ടീം വിമർശനം -->
             <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1 border-t border-rose-500/20">
                 തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
             </div>
@@ -102,7 +92,7 @@
 
         <!-- Action Buttons -->
         <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md lock-target">
+            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
             </button>
             <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
@@ -114,7 +104,7 @@
 
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-full text-xs shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
-        സ്കോർ കോപ്പി ചെയ്തു!
+        സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
 
     <script>
@@ -128,13 +118,13 @@
 
         let teams = [];
         let totalPlayCount = 0;
-        let isLocked = false;
+        let activeLock = false; // 2 മിനിറ്റ് ലോക്കിനായി
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('west_smash_scores_v5');
+        const dbRef = firebase.database().ref('west_smash_scores_v8');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -142,50 +132,38 @@
                 if (data) {
                     teams = data.teams || defaultTeams;
                     totalPlayCount = data.totalPlayCount || 0;
-                    isLocked = data.isLocked || false;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     totalPlayCount = 0;
-                    isLocked = false;
-                    dbRef.set({ teams, totalPlayCount, isLocked });
+                    dbRef.set({ teams, totalPlayCount });
                 }
                 render();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("west_smash_scores_v5");
+                const saved = localStorage.getItem("west_smash_scores_v8");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
                         teams = parsed.teams || defaultTeams;
                         totalPlayCount = parsed.totalPlayCount || 0;
-                        isLocked = parsed.isLocked || false;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
                         totalPlayCount = 0;
-                        isLocked = false;
                     }
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     totalPlayCount = 0;
-                    isLocked = false;
                 }
                 render();
             });
         }
 
         function saveData() {
-            dbRef.set({ teams, totalPlayCount, isLocked }).catch((error) => {
+            dbRef.set({ teams, totalPlayCount }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v5", JSON.stringify({ teams, totalPlayCount, isLocked }));
+                localStorage.setItem("west_smash_scores_v8", JSON.stringify({ teams, totalPlayCount }));
             });
             updateLeaderboard();
-        }
-
-        function toggleLock() {
-            isLocked = !isLocked;
-            saveData();
-            render();
-            showToast(isLocked ? "സ്കോർ എഡിറ്റിംഗ് ലോക്ക് ചെയ്തു!" : "സ്കോർ എഡിറ്റിംഗ് അൺലോക്ക് ചെയ്തു!");
         }
 
         function render() {
@@ -201,32 +179,21 @@
                         <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
                         <input type="text" 
                                value="${escapeHtml(team.name)}" 
-                               ${isLocked ? 'disabled' : ''}
                                onchange="updateTeamName(${idx}, this.value)"
-                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700 ${isLocked ? 'opacity-80 cursor-not-allowed' : ''}"
+                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
                                placeholder="ടീം പേര്">
                     </div>
 
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="changeScore(${idx}, -1)" 
-                                ${isLocked ? 'disabled' : ''}
-                                class="w-9 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-950 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg border border-slate-700/80 active:scale-95 transition-all ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}"
-                                title="സ്കോർ കുറയ്ക്കുക">
-                            <i class="fa-solid fa-minus text-xs"></i>
-                        </button>
-
-                        <div onclick="${isLocked ? '' : `changeScore(${idx}, 1)`}" 
-                             id="score-box-${idx}"
-                             class="w-14 h-11 bg-slate-950 hover:bg-black rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 ${isLocked ? 'cursor-not-allowed opacity-90' : 'cursor-pointer active:scale-95'} transition-all shadow-inner"
-                             title="${isLocked ? 'ലോക്ക് ചെയ്തിരിക്കുന്നു' : 'ജയം മാത്രം കൂട്ടുക (Win)'}">
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div id="score-box-${idx}"
+                             class="w-16 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 shadow-inner">
                             ${team.wins}
                         </div>
 
-                        <button onclick="changeScore(${idx}, 1)" 
-                                ${isLocked ? 'disabled' : ''}
-                                class="w-11 h-11 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xl shadow-md ${isLocked ? 'opacity-40 cursor-not-allowed' : 'active:scale-95'} transition-all"
-                                title="ജയം കൂട്ടുക">
-                            <i class="fa-solid fa-plus text-sm"></i>
+                        <button onclick="addWin(${idx})" 
+                                id="win-btn-${idx}"
+                                class="h-11 px-3 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xs gap-1 shadow-md active:scale-95 transition-all">
+                            <i class="fa-solid fa-plus text-xs"></i> WIN
                         </button>
                     </div>
                 `;
@@ -234,66 +201,49 @@
             });
 
             document.getElementById("total-play-val").textContent = totalPlayCount;
-
-            const lockBtn = document.getElementById("lock-btn");
-            const lockIcon = document.getElementById("lock-icon");
-            const lockText = document.getElementById("lock-text");
-
-            if (isLocked) {
-                lockBtn.className = "px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-lg transition-all flex items-center gap-1";
-                lockIcon.className = "fa-solid fa-lock";
-                lockText.textContent = "ലോക്ക്ഡ് (Locked)";
-            } else {
-                lockBtn.className = "px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-lg transition-all flex items-center gap-1";
-                lockIcon.className = "fa-solid fa-lock-open";
-                lockText.textContent = "അൺലോക്ക്ഡ്";
-            }
-
-            document.querySelectorAll('.lock-target').forEach(el => {
-                if (isLocked) {
-                    el.setAttribute('disabled', 'disabled');
-                    el.classList.add('opacity-40', 'cursor-not-allowed');
-                } else {
-                    el.removeAttribute('disabled');
-                    el.classList.remove('opacity-40', 'cursor-not-allowed');
-                }
-            });
-
             updateLeaderboard();
         }
 
-        function changeScore(idx, delta) {
-            if (isLocked) {
-                showToast("സ്കോർ എഡിറ്റിംഗ് ലോക്ക് ചെയ്തിരിക്കുന്നു!");
+        // ജയിച്ചാൽ മാത്രം സ്കോർ കൂട്ടാനും കൃത്യം 2 മിനിറ്റ് (120000 මිලිസെക്കൻഡ്) ലോക്ക് ചെയ്യാനുമുള്ള ഫങ്ഷൻ
+        function addWin(idx) {
+            if (activeLock) {
+                showToast("దయവായി കാത്തിരിക്കുക! 2 മിനിറ്റ് ലോക്ക് active ആണ്.");
                 return;
             }
-            if (teams[idx].wins + delta >= 0) {
-                teams[idx].wins += delta;
-                if (delta > 0) {
-                    totalPlayCount += 1;
-                }
-                saveData();
+            
+            activeLock = true;
+            
+            // എല്ലാ WIN ബട്ടണുകളും താൽക്കാലികമായി ഡിസേബിൾ ചെയ്യുക
+            document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.setAttribute('disabled', 'true');
+            });
 
-                const box = document.getElementById(`score-box-${idx}`);
-                if (box) {
-                    box.textContent = teams[idx].wins;
-                    box.classList.remove("score-anim");
-                    void box.offsetWidth;
-                    box.classList.add("score-anim");
-                }
-            }
-        }
+            teams[idx].wins += 1;
+            totalPlayCount += 1;
+            saveData();
 
-        function changeTotalPlay(delta) {
-            if (isLocked) return;
-            if (totalPlayCount + delta >= 0) {
-                totalPlayCount += delta;
-                saveData();
+            showToast(`${teams[idx].name} - ജയം വിജയകരമായി ആഡ് ചെയ്തു!`);
+
+            const box = document.getElementById(`score-box-${idx}`);
+            if (box) {
+                box.textContent = teams[idx].wins;
+                box.classList.remove("score-anim");
+                void box.offsetWidth;
+                box.classList.add("score-anim");
             }
+
+            // കൃത്യം 2 മിനിറ്റിനു ശേഷം (120,000 ms) വീണ്ടും ബട്ടണുകൾ വർക്ക് ചെയ്യും
+            setTimeout(() => {
+                activeLock = false;
+                document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.removeAttribute('disabled');
+                });
+            }, 120000);
         }
 
         function updateTeamName(idx, val) {
-            if (isLocked) return;
             const trimmed = val.trim();
             teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
             saveData();
@@ -315,6 +265,7 @@
                 return;
             }
 
+            // 1st Place (Champions)
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             let leaderHtml = "";
             firstPlaces.forEach(f => {
@@ -323,6 +274,7 @@
             leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
             leaderEl.innerHTML = leaderHtml;
 
+            // 2nd Place
             let remaining = sorted.filter(t => t.wins < maxWins);
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
@@ -332,6 +284,7 @@
                 podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
             }
 
+            // തോറ്റ ടീം (Bottom Performers / Criticism)
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
                 loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
@@ -341,11 +294,7 @@
         }
 
         function resetScores() {
-            if (isLocked) {
-                showToast("ലോക്ക് മാറ്റിയിട്ട് മാത്രം റീസെറ്റ് ചെയ്യുക!");
-                return;
-            }
-            if (window.confirm("എല്ലാ ടീമിന്റെയും സ്കോറും ടോട്ടൽ പ്ലേയും റീസെറ്റ് (0) ചെയ്യണമെന്നുറപ്പാണോ?")) {
+            if (window.confirm("അന്നത്തെ ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
                 teams.forEach(t => t.wins = 0);
                 totalPlayCount = 0;
                 saveData();
@@ -359,13 +308,13 @@
             const minWins = sorted[sorted.length - 1].wins;
 
             let msg = "🏸 *WEST SMASH BADMINTON CLUB* 🏸\n";
-            msg += "🏆 *ടൂർണമെന്റ് സ്കോർ ട്രാക്കർ* 🏆\n\n";
+            msg += "🏆 *Tournament Score Counter* 🏆\n\n";
 
             teams.forEach((t, i) => {
                 msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം\n`;
             });
 
-            msg += `\n🎮 *ആകെ കളികൾ (Total Play):* ${totalPlayCount}\n`;
+            msg += `\n🎮 *Total Play:* ${totalPlayCount}\n`;
             msg += "-------------------------\n";
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
