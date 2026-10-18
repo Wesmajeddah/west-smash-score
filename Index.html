@@ -47,7 +47,7 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Exact Original Logo Emblem and Club Name -->
+        <!-- Header with Exact Original Logo Emblem -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -128,7 +128,7 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Play Section (Clean Display - No Plus/Minus Buttons) -->
+        <!-- Total Play Section (Exact Value Display - No Buttons) -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between px-4 shadow-md">
             <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
                 <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
@@ -187,13 +187,13 @@
 
         let teams = [];
         let totalPlayCount = 0;
-        let activeLock = false; // 2 minute lock flag
+        let activeLock = false;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('west_smash_scores_v11');
+        const dbRef = firebase.database().ref('west_smash_scores_v13');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -209,7 +209,7 @@
                 render();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("west_smash_scores_v11");
+                const saved = localStorage.getItem("west_smash_scores_v13");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
@@ -230,7 +230,7 @@
         function saveData() {
             dbRef.set({ teams, totalPlayCount }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.getItem("west_smash_scores_v11", JSON.stringify({ teams, totalPlayCount }));
+                localStorage.setItem("west_smash_scores_v13", JSON.stringify({ teams, totalPlayCount }));
             });
             updateLeaderboard();
         }
@@ -273,7 +273,6 @@
             updateLeaderboard();
         }
 
-        // Add win score and increment total play count with a 2-minute safety lock
         function addWin(idx) {
             if (activeLock) {
                 showToast("ദയവായി കാത്തിരിക്കുക! 2 മിനിറ്റ് ലോക്ക് active ആണ്.");
@@ -282,7 +281,6 @@
             
             activeLock = true;
             
-            // Disable all WIN buttons temporarily
             document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
                 btn.setAttribute('disabled', 'true');
@@ -302,7 +300,6 @@
                 box.classList.add("score-anim");
             }
 
-            // Unlock after 2 minutes (120,000 ms)
             setTimeout(() => {
                 activeLock = false;
                 document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
@@ -330,11 +327,10 @@
             if (maxWins === 0) {
                 leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
                 podiumEl.innerHTML = `2-ാം സ്ഥാനം കണക്കാക്കുന്നു...`;
-                loserEl.innerHTML = `തോറ്റ ടീമിനെ കണക്കാക്കുന്നു...`;
+                loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
                 return;
             }
 
-            // 1st Place (Champions)
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             let leaderHtml = "";
             firstPlaces.forEach(f => {
@@ -343,7 +339,6 @@
             leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
             leaderEl.innerHTML = leaderHtml;
 
-            // 2nd Place
             let remaining = sorted.filter(t => t.wins < maxWins);
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
@@ -353,7 +348,6 @@
                 podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
             }
 
-            // Bottom Performers / Criticism
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
                 loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
@@ -397,7 +391,7 @@
 
                 const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
                 if (lowestTeams.length > 0) {
-                    msg += `🚨 *തോറ്റ ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} jayam)\n`;
+                    msg += `🚨 *തോറ്റ ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} ജയം)\n`;
                     msg += `💬 *വിമർശനം:* ഇനിയും പ്രാക്ടീസ് അത്യാവശ്യമാണ്! 🏸💥\n`;
                 }
             } else {
