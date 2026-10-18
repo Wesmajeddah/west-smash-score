@@ -50,11 +50,11 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Unique VortX Logo Emblem and Club Name -->
+        <!-- Header with Clean Professional VortX Logo Emblem -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- SVG Unique VortX Logo Emblem with SINCE 2026 -->
+            <!-- SVG Professional VortX Logo Emblem -->
             <div class="flex justify-center mb-1">
                 <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -66,8 +66,8 @@
                                 <stop offset="100%" stop-color="#5B4000" />
                             </radialGradient>
                             <radialGradient id="bgBlue" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#1E3E62" />
-                                <stop offset="100%" stop-color="#0B192C" />
+                                <stop offset="0%" stop-color="#0f172a" />
+                                <stop offset="100%" stop-color="#020617" />
                             </radialGradient>
                             <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#FFF59D" />
@@ -76,42 +76,34 @@
                             </linearGradient>
                         </defs>
 
-                        <!-- Outer Golden Border -->
+                        <!-- Outer Golden Ring -->
                         <circle cx="100" cy="100" r="96" fill="url(#goldGrad)" />
-                        <circle cx="100" cy="100" r="88" fill="url(#bgBlue)" stroke="url(#goldGrad)" stroke-width="2" />
-                        <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" />
+                        <circle cx="100" cy="100" r="90" fill="url(#bgBlue)" stroke="url(#goldLight)" stroke-width="1.5" />
+                        <circle cx="100" cy="100" r="72" fill="none" stroke="rgba(212, 175, 55, 0.3)" stroke-width="1" stroke-dasharray="2,3" />
 
-                        <!-- Curved Header Text path -->
-                        <path id="textArcTop" d="M 22 100 A 78 78 0 0 1 178 100" fill="none" />
-                        <text font-family="Orbitron, sans-serif" font-weight="900" font-size="13" fill="#FFE082" letter-spacing="2">
+                        <!-- Curved Header Text -->
+                        <path id="textArcTop" d="M 30 100 A 70 70 0 0 1 170 100" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="900" font-size="14" fill="#FFE082" letter-spacing="3">
                             <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
                                 VORTX
                             </textPath>
                         </text>
 
-                        <!-- Curved Footer Text path -->
-                        <path id="textArcBottom" d="M 178 100 A 78 78 0 0 1 22 100" fill="none" />
-                        <text font-family="Orbitron, sans-serif" font-weight="800" font-size="10" fill="#FFE082" letter-spacing="1">
+                        <!-- Curved Footer Text -->
+                        <path id="textArcBottom" d="M 170 100 A 70 70 0 0 1 30 100" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="700" font-size="8" fill="#FFE082" letter-spacing="1.5">
                             <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
-                                BADMINTON CLUB
+                                BADMINTON CLUB • SINCE 2026
                             </textPath>
                         </text>
 
-                        <!-- Side Stars -->
-                        <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
-                        <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
-
-                        <!-- Unique Center VortX & Shuttle Graphics -->
-                        <g transform="translate(0, -2)">
-                            <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
-                            <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
-                            <path d="M 45 68 C 55 90 68 120 85 125 C 95 110 92 88 92 78 C 96 90 102 120 115 125 C 130 115 145 88 155 70 C 145 92 125 138 100 138 C 75 138 55 92 45 68 Z" fill="url(#goldGrad)" />
+                        <!-- Clean Center Shuttlecock Graphic -->
+                        <g transform="translate(0, 1)">
+                            <path d="M 100 52 L 91 80 C 88 88 95 94 100 94 C 105 94 112 88 109 80 Z" fill="url(#goldGrad)" stroke="#020617" stroke-width="1.5" />
+                            <path d="M 88 72 Q 100 64 112 72" fill="none" stroke="url(#goldLight)" stroke-width="2" />
+                            <path d="M 85 79 Q 100 71 115 79" fill="none" stroke="url(#goldLight)" stroke-width="2" />
+                            <ellipse cx="100" cy="97" rx="6" ry="3.5" fill="url(#goldLight)" />
                         </g>
-
-                        <!-- Since 2026 Banner -->
-                        <line x1="60" y1="146" x2="78" y2="146" stroke="url(#goldLight)" stroke-width="1" />
-                        <text x="100" y="149" font-family="Orbitron, sans-serif" font-weight="700" font-size="8" fill="#FFF099" text-anchor="middle">SINCE 2026</text>
-                        <line x1="122" y1="146" x2="140" y2="146" stroke="url(#goldLight)" stroke-width="1" />
                     </svg>
                 </div>
             </div>
@@ -183,21 +175,11 @@
             </div>
         </div>
 
-        <!-- Separate Areas for Admin Controls & Reset -->
+        <!-- Separate Reset & WhatsApp Share Buttons -->
         <div class="grid grid-cols-2 gap-2 pt-1">
-            <!-- Admin Only Section (Decrease Score) -->
-            <button onclick="openAdminDecrease()" class="w-full bg-rose-950/70 hover:bg-rose-900 active:bg-rose-950 text-rose-200 font-bold py-3 px-3 rounded-xl border border-rose-800/60 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
-                <i class="fa-solid fa-lock text-rose-400"></i> അഡ്മിൻ തിരുത്തൽ (Admin)
-            </button>
-            
-            <!-- Tournament Reset Section -->
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
             </button>
-        </div>
-
-        <!-- WhatsApp Share Button -->
-        <div>
             <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
                 <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
             </button>
@@ -333,23 +315,21 @@
                 const now = Date.now();
                 teams.forEach((team, idx) => {
                     const btn = document.getElementById(`plus-btn-${idx}`);
-                    const badge = document.getElementById(`cooldown-badge-${idx}`);
-                    if (!btn || !badge) return;
+                    const overlay = document.getElementById(`spinner-overlay-${idx}`);
+                    if (!btn || !overlay) return;
 
                     const diff = now - (team.lastClickTime || 0);
                     if (diff < 60000) {
-                        const remainingSecs = Math.ceil((60000 - diff) / 1000);
                         btn.disabled = true;
-                        btn.classList.add("opacity-50", "cursor-not-allowed");
-                        badge.textContent = `⏳ ${remainingSecs}s`;
-                        badge.classList.remove("hidden");
+                        btn.classList.add("opacity-60", "cursor-not-allowed");
+                        overlay.classList.remove("hidden");
                     } else {
                         btn.disabled = false;
-                        btn.classList.remove("opacity-50", "cursor-not-allowed");
-                        badge.classList.add("hidden");
+                        btn.classList.remove("opacity-60", "cursor-not-allowed");
+                        overlay.classList.add("hidden");
                     }
                 });
-            }, 1000);
+            }, 500);
         }
 
         function render() {
@@ -361,7 +341,6 @@
             teams.forEach((team, idx) => {
                 const diff = now - (team.lastClickTime || 0);
                 const inCooldown = diff < 60000;
-                const remainingSecs = inCooldown ? Math.ceil((60000 - diff) / 1000) : 0;
 
                 const card = document.createElement("div");
                 card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex flex-col shadow-md gap-1.5";
@@ -378,23 +357,31 @@
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
+                            <!-- Minus Button with Admin PIN -->
+                            <button onclick="handleScoreChange(${idx}, -1)" 
+                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
+                                    title="Decrease score (Admin PIN required)">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
                             <div id="score-box-${idx}"
                                  class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
 
-                            <!-- Plus Button with Indication Badge -->
-                            <div class="relative flex flex-col items-center">
+                            <!-- Plus Button with Spinner Indicator -->
+                            <div class="relative">
                                 <button id="plus-btn-${idx}" 
                                         onclick="handleScoreChange(${idx}, 1)" 
-                                        class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 ${inCooldown ? 'opacity-50 cursor-not-allowed' : ''}"
+                                        class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 ${inCooldown ? 'opacity-60 cursor-not-allowed' : ''}"
                                         ${inCooldown ? 'disabled' : ''}
                                         title="Add Win">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
-                                <span id="cooldown-badge-${idx}" class="absolute -bottom-4 text-[9px] font-bold text-amber-400 bg-slate-950 px-1 rounded border border-amber-500/30 ${inCooldown ? '' : 'hidden'}">
-                                    ⏳ ${remainingSecs}s
-                                </span>
+                                <!-- Visual Spinner Overlay for Cooldown -->
+                                <div id="spinner-overlay-${idx}" class="absolute inset-0 bg-slate-950/80 rounded-xl flex items-center justify-center ${inCooldown ? '' : 'hidden'} pointer-events-none">
+                                    <i class="fa-solid fa-spinner animate-spin text-amber-400 text-xs"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -417,8 +404,7 @@
 
             if (delta > 0) {
                 if (teams[idx].lastClickTime && (now - teams[idx].lastClickTime < 60000)) {
-                    const remainingSecs = Math.ceil((60000 - (now - teams[idx].lastClickTime)) / 1000);
-                    showToast(`⚠️ Please wait ${remainingSecs}s before adding again!`);
+                    showToast(`⚠️ Please wait before adding again!`);
                     return;
                 }
                 teams[idx].lastClickTime = now;
@@ -432,6 +418,19 @@
                 teams[idx].wins += delta;
                 saveData();
                 showToast(`${teams[idx].name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
+            } 
+            else if (delta < 0) {
+                const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
+                if (pin !== ADMIN_PIN) {
+                    if (pin !== null) alert("തെറ്റായ PIN!");
+                    return;
+                }
+
+                if (teams[idx].wins + delta < 0) return;
+
+                teams[idx].wins += delta;
+                saveData();
+                showToast(`${teams[idx].name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
             }
 
             const box = document.getElementById(`score-box-${idx}`);
@@ -441,34 +440,6 @@
                 void box.offsetWidth;
                 box.classList.add("score-anim");
             }
-        }
-
-        function openAdminDecrease() {
-            const pin = prompt("Admin Only: സ്കോർ കുറയ്ക്കുന്നതിന് PIN (1234) നൽകുക:");
-            if (pin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
-                return;
-            }
-
-            let teamNamesPrompt = teams.map((t, i) => `${i + 1}. ${t.name} (Score: ${t.wins})`).join("\n");
-            let choice = prompt(`ഏത് ടീമിന്റെ സ്കോറാണ് കുറയ്ക്കേണ്ടത്? നമ്പര്‍ നൽകുക:\n\n${teamNamesPrompt}`);
-            
-            if (choice === null) return;
-            let teamIdx = parseInt(choice) - 1;
-
-            if (isNaN(teamIdx) || teamIdx < 0 || teamIdx >= teams.length) {
-                alert("തെറ്റായ ടീം നമ്പര്‍!");
-                return;
-            }
-
-            if (teams[teamIdx].wins <= 0) {
-                alert("ഈ ടീമിന്റെ സ്കോർ ഇതിനകം 0 ആണ്!");
-                return;
-            }
-
-            teams[teamIdx].wins -= 1;
-            saveData();
-            showToast(`${teams[teamIdx].name} സ്കോർ അഡ്മിൻ കുറച്ചു!`);
         }
 
         function updateTeamName(idx, val) {
