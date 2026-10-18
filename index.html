@@ -50,11 +50,11 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Clean Professional VortX Logo Emblem -->
+        <!-- Header with Unique Racket & Shuttle Emblem -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- SVG Professional VortX Logo Emblem -->
+            <!-- SVG Unique VortX Logo Emblem with Racket & Shuttle -->
             <div class="flex justify-center mb-1">
                 <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -97,12 +97,18 @@
                             </textPath>
                         </text>
 
-                        <!-- Clean Center Shuttlecock Graphic -->
+                        <!-- Center Icon: Racket with Shuttle -->
                         <g transform="translate(0, 1)">
-                            <path d="M 100 52 L 91 80 C 88 88 95 94 100 94 C 105 94 112 88 109 80 Z" fill="url(#goldGrad)" stroke="#020617" stroke-width="1.5" />
-                            <path d="M 88 72 Q 100 64 112 72" fill="none" stroke="url(#goldLight)" stroke-width="2" />
-                            <path d="M 85 79 Q 100 71 115 79" fill="none" stroke="url(#goldLight)" stroke-width="2" />
-                            <ellipse cx="100" cy="97" rx="6" ry="3.5" fill="url(#goldLight)" />
+                            <!-- Racket Handle -->
+                            <line x1="100" y1="120" x2="100" y2="92" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+                            <!-- Racket Oval Head -->
+                            <ellipse cx="100" cy="74" rx="16" ry="20" fill="none" stroke="url(#goldGrad)" stroke-width="2.5"/>
+                            <!-- Racket Strings (Cross grid) -->
+                            <line x1="92" y1="62" x2="108" y2="86" stroke="rgba(212,175,55,0.4)" stroke-width="1"/>
+                            <line x1="108" y1="62" x2="92" y2="86" stroke="rgba(212,175,55,0.4)" stroke-width="1"/>
+                            <line x1="100" y1="54" x2="100" y2="94" stroke="rgba(212,175,55,0.4)" stroke-width="1"/>
+                            <!-- Shuttlecock nestled on top/inside head -->
+                            <path d="M 95 62 L 91 52 C 89 48 95 44 100 44 C 105 44 111 48 109 52 L 105 62 Z" fill="#FFF" stroke="url(#goldGrad)" stroke-width="1"/>
                         </g>
                     </svg>
                 </div>
@@ -148,8 +154,8 @@
             </div>
         </div>
 
-        <!-- Leader / Winner / Loser Summary Section -->
-        <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2">
+        <!-- Leader / Winner / Podium / Loser Summary Section -->
+        <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2.5">
             <div>
                 <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
@@ -159,18 +165,18 @@
                 </div>
             </div>
 
-            <!-- 2nd Place with Dot Separator & Single Continuous Line -->
-            <div id="podium-text" class="text-xs text-amber-200/90 font-bold pt-1 border-t border-amber-500/20 overflow-x-auto whitespace-nowrap px-1">
-                2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
+            <!-- 2nd Place & 3rd Place Vertical Bullet List -->
+            <div id="podium-text" class="text-xs text-amber-200/90 font-medium pt-1.5 border-t border-amber-500/20 px-1 text-left space-y-1">
+                <div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
             </div>
 
             <!-- Fastest Win Award Section -->
-            <div id="fastest-win-text" class="text-xs text-cyan-300 font-bold pt-1 border-t border-cyan-500/20 truncate px-1">
+            <div id="fastest-win-text" class="text-xs text-cyan-300 font-bold pt-1.5 border-t border-cyan-500/20 truncate px-1 text-center">
                 ⚡ Fastest Win Award: കണക്കാക്കുന്നു...
             </div>
 
             <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
-            <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1 border-t border-rose-500/20">
+            <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1.5 border-t border-rose-500/20 text-center">
                 തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
             </div>
         </div>
@@ -460,7 +466,7 @@
 
             if (maxWins === 0) {
                 leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
-                podiumEl.innerHTML = `2-ാം സ്ഥാനം കണക്കാക്കുന്നു...`;
+                podiumEl.innerHTML = `<div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>`;
                 fastestEl.innerHTML = `⚡ Fastest Win Award: കണക്കാക്കുന്നു...`;
                 loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
                 return;
@@ -474,14 +480,21 @@
             leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
             leaderEl.innerHTML = leaderHtml;
 
-            let remaining = sorted.filter(t => t.wins < maxWins);
-            if (remaining.length > 0) {
-                const secondWins = remaining[0].wins;
-                const secondPlaces = remaining.filter(t => t.wins === secondWins);
-                podiumEl.innerHTML = `🥈 2nd Place: ${secondPlaces.map(s => escapeHtml(s.name)).join(" • ")} (${secondWins} ജയം)`;
+            let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
+            
+            let podiumHtml = "";
+            let medals = ["🥈", "🥉", "🏅"];
+            let labels = ["2-ാം സ്ഥാനം", "3-ാം സ്ഥാനം", "4-ാം സ്ഥാനം"];
+
+            if (distinctScores.length > 0) {
+                distinctScores.slice(0, 2).forEach((scoreVal, idx) => {
+                    let matchingTeams = sorted.filter(t => t.wins === scoreVal);
+                    podiumHtml += `<div class="font-semibold text-amber-200">${medals[idx]} ${labels[idx]}: <span class="text-white">${matchingTeams.map(t => escapeHtml(t.name)).join(" • ")}</span> (${scoreVal} ജയം)</div>`;
+                });
             } else {
-                podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
+                podiumHtml = `<div class="text-amber-200/80 text-center">മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!</div>`;
             }
+            podiumEl.innerHTML = podiumHtml;
 
             const teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             if (teamsWithTime.length > 0) {
@@ -494,7 +507,7 @@
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! ഘടനാപരമായ പോരാട്ടം തുടരുക! 🏸💥"</span>`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
@@ -540,11 +553,13 @@
                 msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(" • ")} (${maxWins} ജയം)\n`;
             }
 
-            let remaining = sorted.filter(t => t.wins < maxWins && maxWins > 0);
-            if (remaining.length > 0) {
-                const secondWins = remaining[0].wins;
-                const secondPlaces = remaining.filter(t => t.wins === secondWins);
-                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(" • ")} (${secondWins} ജയം)\n`;
+            let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
+            let medalsList = ["🥈 *2nd Place*", "🥉 *3rd Place*"];
+            if (distinctScores.length > 0) {
+                distinctScores.slice(0, 2).forEach((scoreVal, idx) => {
+                    let matchingTeams = sorted.filter(t => t.wins === scoreVal);
+                    msg += `${medalsList[idx]}: ${matchingTeams.map(t => t.name).join(" • ")} (${scoreVal} ജയം)\n`;
+                });
             }
 
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
