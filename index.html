@@ -50,11 +50,11 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with VortX Logo Emblem and Club Name -->
+        <!-- Header with Unique VortX Logo Emblem and Club Name -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- SVG VortX Logo Emblem -->
+            <!-- SVG Unique VortX Logo Emblem with SINCE 2026 -->
             <div class="flex justify-center mb-1">
                 <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -81,16 +81,8 @@
                         <circle cx="100" cy="100" r="88" fill="url(#bgBlue)" stroke="url(#goldGrad)" stroke-width="2" />
                         <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" />
 
-                        <!-- VortX Vortex swirl graphics inside emblem -->
-                        <path d="M 100 40 Q 130 70 100 100 Q 70 130 100 160" fill="none" stroke="url(#goldLight)" stroke-width="4" stroke-linecap="round" />
-                        <path d="M 60 80 Q 90 100 140 90" fill="none" stroke="url(#goldLight)" stroke-width="2" opacity="0.7" />
-
-                        <!-- Center Shutter/VortX core -->
-                        <circle cx="100" cy="100" r="25" fill="url(#goldGrad)" stroke="#FFF" stroke-width="1.5" />
-                        <text x="100" y="106" font-family="Orbitron, sans-serif" font-weight="900" font-size="14" fill="#0B192C" text-anchor="middle">VX</text>
-
                         <!-- Curved Header Text path -->
-                        <path id="textArcTop" d="M 25 100 A 75 75 0 0 1 175 100" fill="none" />
+                        <path id="textArcTop" d="M 22 100 A 78 78 0 0 1 178 100" fill="none" />
                         <text font-family="Orbitron, sans-serif" font-weight="900" font-size="13" fill="#FFE082" letter-spacing="2">
                             <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
                                 VORTX
@@ -98,12 +90,28 @@
                         </text>
 
                         <!-- Curved Footer Text path -->
-                        <path id="textArcBottom" d="M 175 100 A 75 75 0 0 1 25 100" fill="none" />
-                        <text font-family="Orbitron, sans-serif" font-weight="700" font-size="9" fill="#FFE082" letter-spacing="1">
+                        <path id="textArcBottom" d="M 178 100 A 78 78 0 0 1 22 100" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="800" font-size="10" fill="#FFE082" letter-spacing="1">
                             <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
                                 BADMINTON CLUB
                             </textPath>
                         </text>
+
+                        <!-- Side Stars -->
+                        <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
+                        <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
+
+                        <!-- Unique Center VortX & Shuttle Graphics -->
+                        <g transform="translate(0, -2)">
+                            <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
+                            <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
+                            <path d="M 45 68 C 55 90 68 120 85 125 C 95 110 92 88 92 78 C 96 90 102 120 115 125 C 130 115 145 88 155 70 C 145 92 125 138 100 138 C 75 138 55 92 45 68 Z" fill="url(#goldGrad)" />
+                        </g>
+
+                        <!-- Since 2026 Banner -->
+                        <line x1="60" y1="146" x2="78" y2="146" stroke="url(#goldLight)" stroke-width="1" />
+                        <text x="100" y="149" font-family="Orbitron, sans-serif" font-weight="700" font-size="8" fill="#FFF099" text-anchor="middle">SINCE 2026</text>
+                        <line x1="122" y1="146" x2="140" y2="146" stroke="url(#goldLight)" stroke-width="1" />
                     </svg>
                 </div>
             </div>
@@ -159,8 +167,14 @@
                 </div>
             </div>
 
-            <div id="podium-text" class="text-xs text-amber-200/80 font-medium pt-1 border-t border-amber-500/20 truncate px-1">
+            <!-- 2nd Place with Dot Separator & Single Continuous Line -->
+            <div id="podium-text" class="text-xs text-amber-200/90 font-bold pt-1 border-t border-amber-500/20 overflow-x-auto whitespace-nowrap px-1">
                 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
+            </div>
+
+            <!-- Fastest Win Award Section -->
+            <div id="fastest-win-text" class="text-xs text-cyan-300 font-bold pt-1 border-t border-cyan-500/20 truncate px-1">
+                ⚡ Fastest Win Award: കണക്കാക്കുന്നു...
             </div>
 
             <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
@@ -169,11 +183,21 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Separate Areas for Admin Controls & Reset -->
         <div class="grid grid-cols-2 gap-2 pt-1">
+            <!-- Admin Only Section (Decrease Score) -->
+            <button onclick="openAdminDecrease()" class="w-full bg-rose-950/70 hover:bg-rose-900 active:bg-rose-950 text-rose-200 font-bold py-3 px-3 rounded-xl border border-rose-800/60 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
+                <i class="fa-solid fa-lock text-rose-400"></i> അഡ്മിൻ തിരുത്തൽ (Admin)
+            </button>
+            
+            <!-- Tournament Reset Section -->
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
             </button>
+        </div>
+
+        <!-- WhatsApp Share Button -->
+        <div>
             <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
                 <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
             </button>
@@ -190,17 +214,17 @@
         const ADMIN_PIN = "1234"; 
 
         const defaultTeams = [
-            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500", lastMatchTime: 0 },
-            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600", lastMatchTime: 0 },
-            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0 },
-            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600", lastMatchTime: 0 },
-            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600", lastMatchTime: 0 }
+            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
         ];
 
         let teams = [];
         let lastActionTimestamp = null;
         let timerInterval = null;
-        let isProcessingClick = false;
+        let cooldownInterval = null;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
@@ -212,7 +236,16 @@
             dbRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    teams = data.teams || defaultTeams;
+                    const savedTeams = data.teams || defaultTeams;
+                    teams = defaultTeams.map((defTeam, i) => {
+                        return {
+                            ...defTeam,
+                            name: (savedTeams[i] && savedTeams[i].name) ? savedTeams[i].name : defTeam.name,
+                            wins: savedTeams[i] ? (savedTeams[i].wins || 0) : 0,
+                            lastMatchTime: savedTeams[i] ? (savedTeams[i].lastMatchTime || 0) : 0,
+                            lastClickTime: savedTeams[i] ? (savedTeams[i].lastClickTime || 0) : 0
+                        };
+                    });
                     lastActionTimestamp = data.lastActionTimestamp || null;
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -221,13 +254,23 @@
                 }
                 render();
                 startLiveTimer();
+                startCooldownTickers();
             }, (error) => {
                 console.error("Firebase read error:", error);
                 const saved = localStorage.getItem("west_smash_scores_v14");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
-                        teams = parsed.teams || defaultTeams;
+                        const savedTeams = parsed.teams || defaultTeams;
+                        teams = defaultTeams.map((defTeam, i) => {
+                            return {
+                                ...defTeam,
+                                name: (savedTeams[i] && savedTeams[i].name) ? savedTeams[i].name : defTeam.name,
+                                wins: savedTeams[i] ? (savedTeams[i].wins || 0) : 0,
+                                lastMatchTime: savedTeams[i] ? (savedTeams[i].lastMatchTime || 0) : 0,
+                                lastClickTime: savedTeams[i] ? (savedTeams[i].lastClickTime || 0) : 0
+                            };
+                        });
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
@@ -239,6 +282,7 @@
                 }
                 render();
                 startLiveTimer();
+                startCooldownTickers();
             });
         }
 
@@ -282,11 +326,43 @@
             }, 1000);
         }
 
+        function startCooldownTickers() {
+            if (cooldownInterval) clearInterval(cooldownInterval);
+
+            cooldownInterval = setInterval(() => {
+                const now = Date.now();
+                teams.forEach((team, idx) => {
+                    const btn = document.getElementById(`plus-btn-${idx}`);
+                    const badge = document.getElementById(`cooldown-badge-${idx}`);
+                    if (!btn || !badge) return;
+
+                    const diff = now - (team.lastClickTime || 0);
+                    if (diff < 60000) {
+                        const remainingSecs = Math.ceil((60000 - diff) / 1000);
+                        btn.disabled = true;
+                        btn.classList.add("opacity-50", "cursor-not-allowed");
+                        badge.textContent = `⏳ ${remainingSecs}s`;
+                        badge.classList.remove("hidden");
+                    } else {
+                        btn.disabled = false;
+                        btn.classList.remove("opacity-50", "cursor-not-allowed");
+                        badge.classList.add("hidden");
+                    }
+                });
+            }, 1000);
+        }
+
         function render() {
             const container = document.getElementById("teams-list");
             container.innerHTML = "";
 
+            const now = Date.now();
+
             teams.forEach((team, idx) => {
+                const diff = now - (team.lastClickTime || 0);
+                const inCooldown = diff < 60000;
+                const remainingSecs = inCooldown ? Math.ceil((60000 - diff) / 1000) : 0;
+
                 const card = document.createElement("div");
                 card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex flex-col shadow-md gap-1.5";
 
@@ -302,29 +378,29 @@
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <!-- Minus Button (Admin Only) -->
-                            <button onclick="handleScoreChange(${idx}, -1)" 
-                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
-                                    title="Admin Only (Decrease score requires PIN)">
-                                <i class="fa-solid fa-minus"></i>
-                            </button>
-
                             <div id="score-box-${idx}"
                                  class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
 
-                            <!-- Plus Button -->
-                            <button onclick="handleScoreChange(${idx}, 1)" 
-                                    class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50"
-                                    title="Add Win">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
+                            <!-- Plus Button with Indication Badge -->
+                            <div class="relative flex flex-col items-center">
+                                <button id="plus-btn-${idx}" 
+                                        onclick="handleScoreChange(${idx}, 1)" 
+                                        class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 ${inCooldown ? 'opacity-50 cursor-not-allowed' : ''}"
+                                        ${inCooldown ? 'disabled' : ''}
+                                        title="Add Win">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                                <span id="cooldown-badge-${idx}" class="absolute -bottom-4 text-[9px] font-bold text-amber-400 bg-slate-950 px-1 rounded border border-amber-500/30 ${inCooldown ? '' : 'hidden'}">
+                                    ⏳ ${remainingSecs}s
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Match Time Indicator -->
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-2">
                         <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> Last Match Duration:</span>
                         <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'Not recorded'}</span>
                     </div>
@@ -337,12 +413,16 @@
         }
 
         function handleScoreChange(idx, delta) {
-            if (isProcessingClick) return;
-            isProcessingClick = true;
-            setTimeout(() => { isProcessingClick = false; }, 400);
+            const now = Date.now();
 
             if (delta > 0) {
-                const now = Date.now();
+                if (teams[idx].lastClickTime && (now - teams[idx].lastClickTime < 60000)) {
+                    const remainingSecs = Math.ceil((60000 - (now - teams[idx].lastClickTime)) / 1000);
+                    showToast(`⚠️ Please wait ${remainingSecs}s before adding again!`);
+                    return;
+                }
+                teams[idx].lastClickTime = now;
+
                 if (lastActionTimestamp) {
                     const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
                     teams[idx].lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
@@ -352,19 +432,6 @@
                 teams[idx].wins += delta;
                 saveData();
                 showToast(`${teams[idx].name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
-            } 
-            else if (delta < 0) {
-                const pin = prompt("Admin Only: സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
-                if (pin !== ADMIN_PIN) {
-                    if (pin !== null) alert("തെറ്റായ PIN! നടപടി റദ്ദാക്കി.");
-                    return;
-                }
-
-                if (teams[idx].wins + delta < 0) return;
-
-                teams[idx].wins += delta;
-                saveData();
-                showToast(`${teams[idx].name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
             }
 
             const box = document.getElementById(`score-box-${idx}`);
@@ -376,6 +443,34 @@
             }
         }
 
+        function openAdminDecrease() {
+            const pin = prompt("Admin Only: സ്കോർ കുറയ്ക്കുന്നതിന് PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ PIN!");
+                return;
+            }
+
+            let teamNamesPrompt = teams.map((t, i) => `${i + 1}. ${t.name} (Score: ${t.wins})`).join("\n");
+            let choice = prompt(`ഏത് ടീമിന്റെ സ്കോറാണ് കുറയ്ക്കേണ്ടത്? നമ്പര്‍ നൽകുക:\n\n${teamNamesPrompt}`);
+            
+            if (choice === null) return;
+            let teamIdx = parseInt(choice) - 1;
+
+            if (isNaN(teamIdx) || teamIdx < 0 || teamIdx >= teams.length) {
+                alert("തെറ്റായ ടീം നമ്പര്‍!");
+                return;
+            }
+
+            if (teams[teamIdx].wins <= 0) {
+                alert("ഈ ടീമിന്റെ സ്കോർ ഇതിനകം 0 ആണ്!");
+                return;
+            }
+
+            teams[teamIdx].wins -= 1;
+            saveData();
+            showToast(`${teams[teamIdx].name} സ്കോർ അഡ്മിൻ കുറച്ചു!`);
+        }
+
         function updateTeamName(idx, val) {
             const trimmed = val.trim();
             teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
@@ -385,6 +480,7 @@
         function updateLeaderboard() {
             const leaderEl = document.getElementById("leader-text");
             const podiumEl = document.getElementById("podium-text");
+            const fastestEl = document.getElementById("fastest-win-text");
             const loserEl = document.getElementById("loser-text");
 
             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
@@ -394,6 +490,7 @@
             if (maxWins === 0) {
                 leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
                 podiumEl.innerHTML = `2-ാം സ്ഥാനം കണക്കാക്കുന്നു...`;
+                fastestEl.innerHTML = `⚡ Fastest Win Award: കണക്കാക്കുന്നു...`;
                 loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
                 return;
             }
@@ -410,34 +507,44 @@
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
                 const secondPlaces = remaining.filter(t => t.wins === secondWins);
-                podiumEl.innerHTML = `🥈 2nd Place: ${secondPlaces.map(s => escapeHtml(s.name)).join(", ")} (${secondWins} ജയം)`;
+                podiumEl.innerHTML = `🥈 2nd Place: ${secondPlaces.map(s => escapeHtml(s.name)).join(" • ")} (${secondWins} ജയം)`;
             } else {
                 podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
             }
 
+            const teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
+            if (teamsWithTime.length > 0) {
+                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
+                const fastestTeam = teamsWithTime[0];
+                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
+            } else {
+                fastestEl.innerHTML = `⚡ Fastest Win Award: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
+            }
+
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
         }
 
         function resetScores() {
-            const inputPin = prompt("Admin Only: ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN നൽകുക:");
+            const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("തെറ്റായ PIN!");
                 return;
             }
-            if (window.confirm("എല്ലാ സ്കോറുകളും, ടോട്ടൽ പ്ലേ കൗണ്ടും, ടൈമറുകളും പൂർണ്ണമായി റീസെറ്റ് ചെയ്യണോ?")) {
+            if (window.confirm("സ്കോറുകളും, ടോട്ടൽ പ്ലേയും, ടൈമറുകളും റീസെറ്റ് ചെയ്യണോ? (ടീം പേരുകൾ മാറില്ല)")) {
                 teams.forEach(t => {
                     t.wins = 0;
                     t.lastMatchTime = 0;
+                    t.lastClickTime = 0;
                 });
                 lastActionTimestamp = null;
                 saveData();
                 render();
-                showToast("എല്ലാ ഡാറ്റയും റീസെറ്റ് ചെയ്തു!");
+                showToast("സ്കോറുകൾ റീസെറ്റ് ചെയ്തു (പേരുകൾ സുരക്ഷിതം)! നന്ദി.");
             }
         }
 
@@ -459,19 +566,25 @@
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
             if (firstPlaces.length > 0) {
-                msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(", ")} (${maxWins} ജയം)\n`;
+                msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(" • ")} (${maxWins} ജയം)\n`;
             }
 
             let remaining = sorted.filter(t => t.wins < maxWins && maxWins > 0);
             if (remaining.length > 0) {
                 const secondWins = remaining[0].wins;
                 const secondPlaces = remaining.filter(t => t.wins === secondWins);
-                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(", ")} (${secondWins} ജയം)\n`;
+                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(" • ")} (${secondWins} ജയം)\n`;
+            }
+
+            let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
+            if (teamsWithTime.length > 0) {
+                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
+                msg += `⚡ *Fastest Win Award:* ${teamsWithTime[0].name} (${teamsWithTime[0].lastMatchTime} mins)\n`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
             if (lowestTeams.length > 0) {
-                msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(", ")} needs practice! (${minWins} ജയം)\n`;
+                msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(" • ")} needs practice! (${minWins} ജയം)\n`;
             }
 
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
