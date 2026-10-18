@@ -11,209 +11,422 @@
     <!-- Google Font for Malayalam & English -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Manjari:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <!-- Firebase App & Database SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
         * {
-            font-family: 'Manjari', 'Poppins', sans-serif;
+            font-family: 'Manjari', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        .custom-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF099 0%, #F1C40F 40%, #B8860B 80%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border {
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        .score-anim {
+            animation: bounce 0.18s ease-out;
+        }
+        @keyframes bounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 min-h-screen text-white flex flex-col justify-between p-4">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-3 sm:p-4 select-none">
 
-    <!-- Header / Logo Section -->
-    <header class="w-full max-w-2xl mx-auto text-center py-4">
-        <div class="flex items-center justify-center gap-3 mb-2">
-            <!-- Original SVG Logo -->
-            <svg class="w-12 h-12 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                <path d="M2 12h20"></path>
-            </svg>
-            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wider bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                WEST SMASH BADMINTON CLUB
-            </h1>
-        </div>
-        <div id="lock-status" class="text-sm font-semibold px-4 py-1.5 rounded-full inline-block bg-emerald-600/30 text-emerald-400 border border-emerald-500/30">
-            <i class="fa-solid fa-lock-open mr-1"></i> Live Active (2 Min Auto-Lock)
-        </div>
-    </header>
+    <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
+        
+        <!-- Header with Original Logo Emblem and Club Name -->
+        <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-    <!-- Main Container -->
-    <main class="w-full max-w-xl mx-auto space-y-6 my-auto">
-        <!-- Score Board Container -->
-        <div class="bg-slate-800/80 backdrop-blur-md border border-slate-700/60 rounded-3xl p-6 custom-shadow">
-            
-            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
-                <h2 class="text-lg font-bold text-yellow-400 flex items-center gap-2">
-                    <i class="fa-solid fa-trophy"></i> Live Score Board
-                </h2>
-                <div class="text-sm bg-slate-700 px-3 py-1 rounded-full text-slate-300">
-                    Total Plays: <span id="total-play-val" class="font-bold text-white">0</span>
+            <!-- SVG Logo Emblem -->
+            <div class="flex justify-center mb-1">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
+                    <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="goldGrad" cx="50%" cy="30%" r="70%">
+                                <stop offset="0%" stop-color="#FFE082" />
+                                <stop offset="40%" stop-color="#D4AF37" />
+                                <stop offset="85%" stop-color="#8B6508" />
+                                <stop offset="100%" stop-color="#5B4000" />
+                            </radialGradient>
+                            <radialGradient id="bgBlue" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#1E3E62" />
+                                <stop offset="100%" stop-color="#0B192C" />
+                            </radialGradient>
+                            <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FFF59D" />
+                                <stop offset="50%" stop-color="#D4AF37" />
+                                <stop offset="100%" stop-color="#996515" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Outer Golden Border -->
+                        <circle cx="100" cy="100" r="96" fill="url(#goldGrad)" />
+                        <circle cx="100" cy="100" r="88" fill="url(#bgBlue)" stroke="url(#goldGrad)" stroke-width="2" />
+                        <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" />
+
+                        <!-- Curved Header Text path -->
+                        <path id="textArcTop" d="M 22 100 A 78 78 0 0 1 178 100" fill="none" />
+                        <text font-family="Cinzel, serif" font-weight="900" font-size="14" fill="#FFE082" letter-spacing="1.5">
+                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
+                                WEST SMASH
+                            </textPath>
+                        </text>
+
+                        <!-- Curved Footer Text path -->
+                        <path id="textArcBottom" d="M 178 100 A 78 78 0 0 1 22 100" fill="none" />
+                        <text font-family="Cinzel, serif" font-weight="800" font-size="11" fill="#FFE082" letter-spacing="1">
+                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
+                                BADMINTON CLUB
+                            </textPath>
+                        </text>
+
+                        <!-- Side Stars -->
+                        <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
+                        <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
+
+                        <!-- Inner Graphics: Badminton Racket, Wings W, Shuttlecock -->
+                        <g transform="translate(0, -2)">
+                            <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
+                            <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
+                            <path d="M 45 68 C 55 90 68 120 85 125 C 95 110 92 88 92 78 C 96 90 102 120 115 125 C 130 115 145 88 155 70 C 145 92 125 138 100 138 C 75 138 55 92 45 68 Z" fill="url(#goldGrad)" />
+                            <g transform="translate(118, 52) rotate(25)">
+                                <path d="M 0 0 Q 10 -15 22 -18 L 18 8 Z" fill="url(#goldLight)" opacity="0.9" />
+                                <path d="M 0 0 Q 18 -5 26 8 L 12 14 Z" fill="url(#goldLight)" />
+                                <ellipse cx="2" cy="2" rx="4" ry="5" fill="#FFF099" />
+                            </g>
+                        </g>
+
+                        <!-- Since 2026 Banner -->
+                        <line x1="62" y1="148" x2="80" y2="148" stroke="url(#goldLight)" stroke-width="1" />
+                        <text x="100" y="151" font-family="Cinzel, serif" font-weight="700" font-size="8.5" fill="#FFF099" text-anchor="middle">SINCE 2026</text>
+                        <line x1="120" y1="148" x2="138" y2="148" stroke="url(#goldLight)" stroke-width="1" />
+                    </svg>
                 </div>
             </div>
 
-            <!-- Team Scores List -->
-            <div id="teams-container" class="space-y-4">
-                <!-- Dynamically Populated by JS -->
+            <h1 class="text-xl sm:text-2xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
+            <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
+            <p class="text-[11px] text-slate-300 mt-1 font-semibold">Tournament Score Counter</p>
+        </div>
+
+        <!-- Teams List -->
+        <div id="teams-list" class="space-y-2.5">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- Total Play Section (Exact Display Only) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between px-4 shadow-md">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
+            </span>
+            <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner">
+                0
+            </span>
+        </div>
+
+        <!-- Leader / Winner / Loser Summary Section -->
+        <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2">
+            <div>
+                <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
+                </div>
+                <div id="leader-text" class="text-sm sm:text-base font-black text-white mt-0.5">
+                    ലോഡ് ചെയ്യുന്നു...
+                </div>
+            </div>
+
+            <div id="podium-text" class="text-xs text-amber-200/80 font-medium pt-1 border-t border-amber-500/20">
+                2-ാം സ്ഥാനം കണക്കാക്കുന്നു...
+            </div>
+
+            <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
+            <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1 border-t border-rose-500/20">
+                തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
             </div>
         </div>
 
-        <!-- Leaderboard & Highlights Section -->
-        <div class="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-5">
-            <h3 class="text-base font-bold text-orange-400 mb-3 flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-orange-400 animate-ping"></span> Tournament Standings
-            </h3>
-            <div id="standings-container" class="space-y-2 text-sm">
-                <!-- Highlights & Criticism -->
-            </div>
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
+                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
+            </button>
+            <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
+                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
+            </button>
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="text-center py-4 text-xs text-slate-500">
-        &copy; West Smash Badminton Club | Powered by Firebase & GitHub Pages
-    </footer>
+    </div>
 
-    <!-- Firebase Logic & Interactive Scripts -->
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-full text-xs shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+        സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
+    </div>
+
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            databaseURL: "https://west-smash-scores-v14-default-rtdb.firebaseio.com/"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Team List Setup
-        let teamsData = [
-            { id: 'team1', name: 'Team Alpha', score: 0 },
-            { id: 'team2', name: 'Team Titans', score: 0 },
-            { id: 'team3', name: 'Team Smashers', score: 0 },
-            { id: 'team4', name: 'Team Strikers', score: 0 }
+        const defaultTeams = [
+            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500" },
+            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600" },
+            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600" },
+            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600" },
+            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600" }
         ];
 
+        let teams = [];
         let totalPlayCount = 0;
-        let isLocked = false;
-        let lockTimer = null;
+        let activeLock = false;
 
-        // DOM Elements
-        const teamsContainer = document.getElementById('teams-container');
-        const standingsContainer = document.getElementById('standings-container');
-        const totalPlayVal = document.getElementById('total-play-val');
-        const lockStatus = document.getElementById('lock-status');
+        const firebaseConfig = {
+            databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const dbRef = firebase.database().ref('west_smash_scores_v14');
 
-        // Render UI
-        function renderUI() {
-            // Sort teams by score descending for standings
-            let sortedTeams = [...teamsData].sort((a, b) => b.score - a.score);
+        function initData() {
+            dbRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    teams = data.teams || defaultTeams;
+                    totalPlayCount = data.totalPlayCount || 0;
+                } else {
+                    teams = JSON.parse(JSON.stringify(defaultTeams));
+                    totalPlayCount = 0;
+                    dbRef.set({ teams, totalPlayCount });
+                }
+                render();
+            }, (error) => {
+                console.error("Firebase read error:", error);
+                const saved = localStorage.getItem("west_smash_scores_v14");
+                if (saved) {
+                    try { 
+                        const parsed = JSON.parse(saved);
+                        teams = parsed.teams || defaultTeams;
+                        totalPlayCount = parsed.totalPlayCount || 0;
+                    } catch(e) { 
+                        teams = JSON.parse(JSON.stringify(defaultTeams)); 
+                        totalPlayCount = 0;
+                    }
+                } else {
+                    teams = JSON.parse(JSON.stringify(defaultTeams));
+                    totalPlayCount = 0;
+                }
+                render();
+            });
+        }
 
-            // Render Teams Controls (Minus and Plus buttons)
-            teamsContainer.innerHTML = teamsData.map(team => `
-                <div class="flex items-center justify-between bg-slate-700/40 border border-slate-600/50 p-3 rounded-xl">
-                    <span class="font-semibold text-base">${team.name}</span>
-                    <div class="flex items-center gap-3">
-                        <button onclick="updateScore('${team.id}', -1)" ${isLocked ? 'disabled' : ''} 
-                            class="w-9 h-9 flex items-center justify-center bg-red-600/80 hover:bg-red-500 active:scale-95 disabled:opacity-40 rounded-lg text-white font-bold transition shadow">
-                            <i class="fa-solid fa-minus text-xs"></i>
-                        </button>
-                        <span class="text-xl font-bold w-8 text-center">${team.score}</span>
-                        <button onclick="updateScore('${team.id}', 1)" ${isLocked ? 'disabled' : ''} 
-                            class="w-9 h-9 flex items-center justify-center bg-emerald-600/80 hover:bg-emerald-500 active:scale-95 disabled:opacity-40 rounded-lg text-white font-bold transition shadow">
-                            <i class="fa-solid fa-plus text-xs"></i>
+        function saveData() {
+            dbRef.set({ teams, totalPlayCount }).catch((error) => {
+                console.error("Firebase write error:", error);
+                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, totalPlayCount }));
+            });
+            updateLeaderboard();
+        }
+
+        function render() {
+            const container = document.getElementById("teams-list");
+            container.innerHTML = "";
+
+            teams.forEach((team, idx) => {
+                const card = document.createElement("div");
+                card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-md gap-2";
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
+                        <input type="text" 
+                               value="${escapeHtml(team.name)}" 
+                               onchange="updateTeamName(${idx}, this.value)"
+                               class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
+                               placeholder="ടീം പേര്">
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div id="score-box-${idx}"
+                             class="w-16 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 shadow-inner">
+                            ${team.wins}
+                        </div>
+
+                        <button onclick="addWin(${idx})" 
+                                id="win-btn-${idx}"
+                                class="h-11 px-3 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xs gap-1 shadow-md active:scale-95 transition-all">
+                            <i class="fa-solid fa-plus text-xs"></i> WIN
                         </button>
                     </div>
-                </div>
-            `).join('');
-
-            totalPlayVal.innerText = totalPlayCount;
-
-            // Render Standings (1st Undefeated Champion, 2nd, and Losers Criticism)
-            let standingsHTML = '';
-            if (sortedTeams.length > 0) {
-                // 1st Place (Undefeated Champion)
-                standingsHTML += `
-                    <div class="flex items-center justify-between bg-yellow-500/20 border border-yellow-500/40 p-2.5 rounded-xl text-yellow-300 font-bold">
-                        <span><i class="fa-solid fa-crown mr-1"></i> 1st Place (Undefeated Champions): ${sortedTeams[0].name}</span>
-                        <span>${sortedTeams[0].score} Pts</span>
-                    </div>`;
-            }
-            if (sortedTeams.length > 1) {
-                // 2nd Place
-                standingsHTML += `
-                    <div class="flex items-center justify-between bg-slate-700/50 border border-slate-600 p-2 rounded-lg text-slate-200">
-                        <span><i class="fa-solid fa-medal mr-1 text-slate-400"></i> 2nd Place: ${sortedTeams[1].name}</span>
-                        <span>${sortedTeams[1].score} Pts</span>
-                    </div>`;
-            }
-            // Loser Team Criticism (Last Place)
-            if (sortedTeams.length > 2) {
-                let lastTeam = sortedTeams[sortedTeams.length - 1];
-                standingsHTML += `
-                    <div class="flex items-center justify-between bg-red-950/40 border border-red-900/50 p-2 rounded-lg text-red-300 text-xs mt-2">
-                        <span><i class="fa-solid fa-triangle-exclamation mr-1"></i> Critical Note: ${lastTeam.name} needs serious practice and better coordination!</span>
-                        <span>${lastTeam.score} Pts</span>
-                    </div>`;
-            }
-            standingsContainer.innerHTML = standingsHTML;
-        }
-
-        // Score Update Function (+1 or -1)
-        window.updateScore = function(teamId, delta) {
-            if (isLocked) return;
-
-            teamsData = teamsData.map(team => {
-                if (team.id === teamId) {
-                    let newScore = team.score + delta;
-                    return { ...team, score: newScore < 0 ? 0 : newScore };
-                }
-                return team;
+                `;
+                container.appendChild(card);
             });
 
+            document.getElementById("total-play-val").textContent = totalPlayCount;
+            updateLeaderboard();
+        }
+
+        function addWin(idx) {
+            if (activeLock) {
+                showToast("ദയവായി കാത്തിരിക്കുക! 2 മിനിറ്റ് ലോക്ക് active ആണ്.");
+                return;
+            }
+            
+            activeLock = true;
+            
+            document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.setAttribute('disabled', 'true');
+            });
+
+            teams[idx].wins += 1;
             totalPlayCount += 1;
+            saveData();
 
-            // Push to Firebase
-            db.ref('west_smash_scores_v14').set({
-                teams: teamsData,
-                totalPlay: totalPlayCount
-            });
+            showToast(`${teams[idx].name} - ജയം വിജയകരമായി ആഡ് ചെയ്തു!`);
 
-            triggerLockSystem();
-        };
+            const box = document.getElementById(`score-box-${idx}`);
+            if (box) {
+                box.textContent = teams[idx].wins;
+                box.classList.remove("score-anim");
+                void box.offsetWidth;
+                box.classList.add("score-anim");
+            }
 
-        // 2-Minute Automatic Locking System
-        function triggerLockSystem() {
-            isLocked = true;
-            lockStatus.className = "text-sm font-semibold px-4 py-1.5 rounded-full inline-block bg-red-600/30 text-red-400 border border-red-500/30";
-            lockStatus.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Locked (2 Min Cooldown)';
-
-            if (lockTimer) clearTimeout(lockTimer);
-
-            lockTimer = setTimeout(() => {
-                isLocked = false;
-                lockStatus.className = "text-sm font-semibold px-4 py-1.5 rounded-full inline-block bg-emerald-600/30 text-emerald-400 border border-emerald-500/30";
-                lockStatus.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Live Active (2 Min Auto-Lock)';
-                renderUI();
-            }, 120000); // 2 Minutes = 120,000 ms
-
-            renderUI();
+            setTimeout(() => {
+                activeLock = false;
+                document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.removeAttribute('disabled');
+                });
+            }, 120000);
         }
 
-        // Real-time Firebase Listener
-        db.ref('west_smash_scores_v14').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                if (data.teams) teamsData = data.teams;
-                if (data.totalPlay !== undefined) totalPlayCount = data.totalPlay;
-                renderUI();
+        function updateTeamName(idx, val) {
+            const trimmed = val.trim();
+            teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
+            saveData();
+        }
+
+        function updateLeaderboard() {
+            const leaderEl = document.getElementById("leader-text");
+            const podiumEl = document.getElementById("podium-text");
+            const loserEl = document.getElementById("loser-text");
+
+            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
+            const maxWins = sorted[0].wins;
+            const minWins = sorted[sorted.length - 1].wins;
+
+            if (maxWins === 0) {
+                leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
+                podiumEl.innerHTML = `2-ാം സ്ഥാനം കണക്കാക്കുന്നു...`;
+                loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
+                return;
             }
-        });
+
+            const firstPlaces = sorted.filter(t => t.wins === maxWins);
+            let leaderHtml = "";
+            firstPlaces.forEach(f => {
+                leaderHtml += `<div class="text-amber-300 font-black text-base">⭐ ${escapeHtml(f.name)} (${maxWins} ജയം) ⭐</div>`;
+            });
+            leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
+            leaderEl.innerHTML = leaderHtml;
+
+            let remaining = sorted.filter(t => t.wins < maxWins);
+            if (remaining.length > 0) {
+                const secondWins = remaining[0].wins;
+                const secondPlaces = remaining.filter(t => t.wins === secondWins);
+                podiumEl.innerHTML = `🥈 2nd Place: ${secondPlaces.map(s => escapeHtml(s.name)).join(", ")} (${secondWins} ജയം)`;
+            } else {
+                podiumEl.innerHTML = `മറ്റ് ടീമുകൾക്ക് ഒപ്പത്തിനൊപ്പം പോരാട്ടം!`;
+            }
+
+            const lowestTeams = sorted.filter(t => t.wins === minWins);
+            if (lowestTeams.length > 0 && minWins < maxWins) {
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(", ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! 🏸💥"</span>`;
+            } else {
+                loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
+            }
+        }
+
+        function resetScores() {
+            if (activeLock) {
+                showToast("ലോക്ക് active ആയതുകൊണ്ട് ഇപ്പോൾ റീസെറ്റ് ചെയ്യാനാവില്ല!");
+                return;
+            }
+            if (window.confirm("അന്നത്തെ ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
+                teams.forEach(t => t.wins = 0);
+                totalPlayCount = 0;
+                saveData();
+                render();
+            }
+        }
+
+        function shareWhatsApp() {
+            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
+            const maxWins = sorted[0].wins;
+            const minWins = sorted[sorted.length - 1].wins;
+
+            let msg = "🏸 *WEST SMASH BADMINTON CLUB* 🏸\n";
+            msg += "🏆 *Tournament Score Counter* 🏆\n\n";
+
+            teams.forEach((t, i) => {
+                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം\n`;
+            });
+
+            msg += `\n🎮 *Total Play:* ${totalPlayCount}\n`;
+            msg += "-------------------------\n";
+
+            const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
+            if (firstPlaces.length > 0) {
+                msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(", ")} (${maxWins} ജയം)\n`;
+                msg += `✨ *ടാഗ്‌ലൈൻ:* അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്!\n\n`;
+
+                const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
+                if (lowestTeams.length > 0) {
+                    msg += `🚨 *തോറ്റ ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} ജയം)\n`;
+                    msg += `💬 *വിമർശനം:* ഇനിയും പ്രാക്ടീസ് അത്യാവശ്യമാണ്! 🏸💥\n`;
+                }
+            } else {
+                msg += `👑 കളികൾ ആരംഭിച്ചിട്ടില്ല\n`;
+            }
+
+            const area = document.createElement("textarea");
+            area.value = msg;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            document.body.removeChild(area);
+
+            showToast("സ്കോർ കോപ്പി ചെയ്തു! വാട്സ്ആപ്പിലേക്ക് തുറക്കുന്നു...");
+
+            const encoded = encodeURIComponent(msg);
+            setTimeout(() => {
+                window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+            }, 400);
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById("toast");
+            toast.textContent = text;
+            toast.classList.remove("opacity-0");
+            setTimeout(() => {
+                toast.classList.add("opacity-0");
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        window.onload = initData;
     </script>
 </body>
 </html>
