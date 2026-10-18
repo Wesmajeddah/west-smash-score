@@ -114,7 +114,7 @@
             // Sort teams by score descending for standings
             let sortedTeams = [...teamsData].sort((a, b) => b.score - a.score);
 
-            // Render Teams Controls (+ and - buttons included)
+            // Render Teams Controls (Minus and Plus buttons)
             teamsContainer.innerHTML = teamsData.map(team => `
                 <div class="flex items-center justify-between bg-slate-700/40 border border-slate-600/50 p-3 rounded-xl">
                     <span class="font-semibold text-base">${team.name}</span>
