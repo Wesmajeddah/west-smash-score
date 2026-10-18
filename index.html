@@ -98,7 +98,7 @@
                         <polygon points="25,100 28,96 32,100 28,104" fill="url(#goldLight)" />
                         <polygon points="175,100 172,96 168,100 172,104" fill="url(#goldLight)" />
 
-                        <!-- Inner Graphics: Badminton Racket, Wings W, Shuttlecock -->
+                        <!-- Inner Graphics -->
                         <g transform="translate(0, -2)">
                             <path d="M 75 55 Q 88 42 98 55 Q 88 68 75 55 Z" fill="none" stroke="url(#goldLight)" stroke-width="2" />
                             <line x1="86.5" y1="61.5" x2="110" y2="85" stroke="url(#goldLight)" stroke-width="2" />
@@ -120,7 +120,9 @@
 
             <h1 class="text-xl sm:text-2xl font-black font-cinzel gold-gradient-text tracking-wide leading-tight">WEST SMASH</h1>
             <h2 class="text-xs sm:text-sm font-bold font-cinzel text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
-            <p class="text-[11px] text-slate-300 mt-1 font-semibold">Tournament Score Counter</p>
+            <p id="lock-status-text" class="text-[11px] text-emerald-400 mt-1 font-semibold">
+                <i class="fa-solid fa-lock-open mr-1"></i> Live Active (2 Min Auto-Lock)
+            </p>
         </div>
 
         <!-- Teams List -->
@@ -128,7 +130,7 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Play Section (Exact Display Only) -->
+        <!-- Total Play Section -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between px-4 shadow-md">
             <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
                 <i class="fa-solid fa-gamepad text-amber-400"></i> Total Play :
@@ -253,16 +255,22 @@
                                placeholder="ടീം പേര്">
                     </div>
 
-                    <div class="flex items-center gap-2 shrink-0">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <!-- Minus Button -->
+                        <button onclick="updateScore(${idx}, -1)" 
+                                class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+
                         <div id="score-box-${idx}"
-                             class="w-16 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-xl text-amber-400 border border-amber-500/40 shadow-inner">
+                             class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner">
                             ${team.wins}
                         </div>
 
-                        <button onclick="addWin(${idx})" 
-                                id="win-btn-${idx}"
-                                class="h-11 px-3 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:bg-amber-700 text-slate-950 rounded-xl flex items-center justify-center font-black text-xs gap-1 shadow-md active:scale-95 transition-all">
-                            <i class="fa-solid fa-plus text-xs"></i> WIN
+                        <!-- Plus Button -->
+                        <button onclick="updateScore(${idx}, 1)" 
+                                class="w-8 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50">
+                            <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
                 `;
@@ -273,24 +281,24 @@
             updateLeaderboard();
         }
 
-        function addWin(idx) {
+        function updateScore(idx, delta) {
             if (activeLock) {
                 showToast("ദയവായി കാത്തിരിക്കുക! 2 മിനിറ്റ് ലോക്ക് active ആണ്.");
                 return;
             }
             
-            activeLock = true;
-            
-            document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.setAttribute('disabled', 'true');
-            });
+            // Prevent negative score
+            if (teams[idx].wins + delta < 0) return;
 
-            teams[idx].wins += 1;
+            activeLock = true;
+            document.getElementById("lock-status-text").innerHTML = '<i class="fa-solid fa-lock mr-1 text-rose-400"></i> Locked (2 Min Cooldown)';
+            document.getElementById("lock-status-text").className = "text-[11px] text-rose-400 mt-1 font-semibold";
+
+            teams[idx].wins += delta;
             totalPlayCount += 1;
             saveData();
 
-            showToast(`${teams[idx].name} - ജയം വിജയകരമായി ആഡ് ചെയ്തു!`);
+            showToast(`${teams[idx].name} - സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!`);
 
             const box = document.getElementById(`score-box-${idx}`);
             if (box) {
@@ -302,10 +310,8 @@
 
             setTimeout(() => {
                 activeLock = false;
-                document.querySelectorAll('[id^="win-btn-"]').forEach(btn => {
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    btn.removeAttribute('disabled');
-                });
+                document.getElementById("lock-status-text").innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Live Active (2 Min Auto-Lock)';
+                document.getElementById("lock-status-text").className = "text-[11px] text-emerald-400 mt-1 font-semibold";
             }, 120000);
         }
 
@@ -361,7 +367,7 @@
                 showToast("ലോക്ക് active ആയതുകൊണ്ട് ഇപ്പോൾ റീസെറ്റ് ചെയ്യാനാവില്ല!");
                 return;
             }
-            if (window.confirm("അന്നത്തെ ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
+            if (window.confirm("ടൂർണമെന്റ് സ്കോറുകളും Total Play-യും റീസെറ്റ് ചെയ്യണോ?")) {
                 teams.forEach(t => t.wins = 0);
                 totalPlayCount = 0;
                 saveData();
@@ -387,38 +393,30 @@
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
             if (firstPlaces.length > 0) {
                 msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(", ")} (${maxWins} ജയം)\n`;
-                msg += `✨ *ടാഗ്‌ലൈൻ:* അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്!\n\n`;
-
-                const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
-                if (lowestTeams.length > 0) {
-                    msg += `🚨 *തോറ്റ ടീം:* ${lowestTeams.map(l => l.name).join(", ")} (${minWins} ജയം)\n`;
-                    msg += `💬 *വിമർശനം:* ഇനിയും പ്രാക്ടീസ് അത്യാവശ്യമാണ്! 🏸💥\n`;
-                }
-            } else {
-                msg += `👑 കളികൾ ആരംഭിച്ചിട്ടില്ല\n`;
             }
 
-            const area = document.createElement("textarea");
-            area.value = msg;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand("copy");
-            document.body.removeChild(area);
+            let remaining = sorted.filter(t => t.wins < maxWins && maxWins > 0);
+            if (remaining.length > 0) {
+                const secondWins = remaining[0].wins;
+                const secondPlaces = remaining.filter(t => t.wins === secondWins);
+                msg += `🥈 *2nd Place:* ${secondPlaces.map(s => s.name).join(", ")} (${secondWins} ജയം)\n`;
+            }
 
-            showToast("സ്കോർ കോപ്പി ചെയ്തു! വാട്സ്ആപ്പിലേക്ക് തുറക്കുന്നു...");
+            const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
+            if (lowestTeams.length > 0) {
+                msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(", ")} needs serious practice! (${minWins} ജയം)\n`;
+            }
 
-            const encoded = encodeURIComponent(msg);
-            setTimeout(() => {
-                window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
-            }, 400);
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
         }
 
         function showToast(text) {
             const toast = document.getElementById("toast");
             toast.textContent = text;
-            toast.classList.remove("opacity-0");
+            toast.style.opacity = "1";
             setTimeout(() => {
-                toast.classList.add("opacity-0");
+                toast.style.opacity = "0";
             }, 2500);
         }
 
@@ -426,7 +424,8 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        window.onload = initData;
+        // Start App
+        initData();
     </script>
 </body>
 </html>
