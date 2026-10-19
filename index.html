@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Manjari:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Manjari:wght@400;700;900&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -19,7 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
-            font-family: 'Manjari', sans-serif;
+            font-family: 'Poppins', 'Manjari', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
@@ -320,7 +320,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v30') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v31') : null;
 
         function launchApp() {
             const gate = document.getElementById("startup-gate");
@@ -582,7 +582,7 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-2 h-7 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
                             ${specialBadgeHtml}
-                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-xs sm:text-sm font-extrabold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name">
+                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-xs sm:text-sm font-bold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name">
                                 <span class="truncate">${escapeHtml(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
@@ -660,7 +660,6 @@
                 render();
                 showToast(`${team.name} വിജയം ചേർത്തു! 🏸`);
             } else if (delta < 0) {
-                // Minus requires Admin PIN verification
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
                     if (pin !== null) alert("തെറ്റായ PIN!");
@@ -793,7 +792,7 @@
             }
         }
 
-        // Full Capture Screenshot Preview & Share (Fixed height & scale for full capture)
+        // Full Capture Screenshot Preview & Share
         function shareWhatsAppImage() {
             showToast("📸 സ്കോർ കാർഡ് ഫുൾ സ്ക്രീൻഷോട്ട് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
@@ -801,13 +800,11 @@
             const previewContainer = document.getElementById("preview-container");
             
             html2canvas(captureElement, {
-                scale: 2,
+                scale: 3,
                 useCORS: true,
                 backgroundColor: "#030712",
-                width: captureElement.offsetWidth,
-                height: captureElement.scrollHeight,
-                windowWidth: document.documentElement.clientWidth,
-                windowHeight: captureElement.scrollHeight
+                logging: false,
+                letterRendering: true
             }).then(canvas => {
                 previewContainer.innerHTML = "";
                 const previewImg = document.createElement('img');
@@ -837,7 +834,7 @@
                             let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഇമേജ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്. വാട്സാപ്പിൽ ഫോട്ടോ ആയി ഷെയർ ചെയ്യാം!";
                             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
                         }
-                    }, 2000); // 2 Seconds Preview Hold
+                    }, 2000);
                 });
             }).catch(err => {
                 console.error("Image generation error:", err);
