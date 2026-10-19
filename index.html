@@ -365,7 +365,7 @@
 
         const randomColorsList = ["#38BDF8", "#F472B6", "#4ADE80", "#FACC15", "#C084FC", "#FB923C", "#2DD4BF"];
 
-        // Immediate render to guarantee teams list displays right away
+        // Force render immediately using default teams so interface appears instantly
         renderHeaderTitle();
         render();
 
@@ -376,7 +376,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v76');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v77');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -425,7 +425,7 @@
                             if(gate) gate.classList.add("hidden");
                         }
                     } else {
-                        // If firebase has no proper teams, initialize with defaultTeams safely
+                        // Force push default teams to firebase if empty or invalid
                         teams = JSON.parse(JSON.stringify(defaultTeams));
                         saveData();
                     }
@@ -673,7 +673,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
