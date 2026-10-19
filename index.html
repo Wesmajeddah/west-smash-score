@@ -58,7 +58,6 @@
         .leaf-anim {
             animation: leafPulse 2s infinite ease-in-out;
         }
-        /* Date Badge Soft Glow Animation */
         @keyframes dateGlow {
             0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.3); }
             50% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 0.7); }
@@ -276,6 +275,7 @@
         let lastActionTimestamp = null;
         let timerInterval = null;
         let cooldownInterval = null;
+        let isDataLoaded = false;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
@@ -305,8 +305,8 @@
                             lastClickTime: found ? (found.lastClickTime || 0) : 0
                         };
                     });
-                    tournamentStartTimestamp = data.tournamentStartTimestamp || null;
-                    lastActionTimestamp = data.lastActionTimestamp || null;
+                    tournamentStartTimestamp = data.tournamentStartTimestamp !== undefined ? data.tournamentStartTimestamp : null;
+                    lastActionTimestamp = data.lastActionTimestamp !== undefined ? data.lastActionTimestamp : null;
                     tournamentHistory = data.tournamentHistory || [];
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -316,6 +316,7 @@
                     dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
                 }
                 
+                isDataLoaded = true;
                 checkSessionExpiry();
                 renderUIState();
                 render();
@@ -325,6 +326,7 @@
             }, (error) => {
                 console.error("Firebase read error:", error);
                 teams = JSON.parse(JSON.stringify(defaultTeams));
+                isDataLoaded = true;
                 renderUIState();
                 render();
                 updateHistorySummaryText();
@@ -489,6 +491,10 @@
         }
 
         function startFirstMatch() {
+            if (!isDataLoaded) {
+                showToast("⏳ ഡാറ്റ ലോഡ് ആകുന്നു, ദയവായി കാത്തിരിക്കൂ...");
+                return;
+            }
             const now = Date.now();
             tournamentStartTimestamp = now;
             lastActionTimestamp = now;
