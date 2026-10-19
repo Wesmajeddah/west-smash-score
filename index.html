@@ -17,6 +17,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <!-- html2canvas for Image Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Canvas Confetti for Fireworks/Celebration Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -39,52 +41,63 @@
             overflow: visible;
         }
 
-        /* Swash 'W' Base Mixed Gold Color + Flipping Zoom with Random Accent */
+        /* Swash 'W' Base Mixed Gold Color + Very Slow Delayed Vertical Flip */
         .special-w {
             font-family: 'Great Vibes', cursive;
             font-size: 1.45em;
             display: inline-block;
             transform: translateY(3px);
-            color: #F59E0B; /* Single Uniform Mixed Gold Base */
+            color: #F59E0B;
             font-weight: 900;
             transform-style: preserve-3d;
-            animation: slowVerticalFlipHeaderW 6s infinite ease-in-out;
+            animation: slowVerticalFlipHeaderW 10s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes slowVerticalFlipHeaderW {
-            0%, 75%, 100% { 
+            0%, 80%, 100% { 
                 transform: translateY(3px) rotateX(0deg) scale(1); 
                 color: #F59E0B; 
                 text-shadow: none;
             }
-            82%, 92% { 
+            88%, 95% { 
                 transform: translateY(3px) rotateX(360deg) scale(1.35); 
-                color: #38BDF8; /* Special Random Color on Flip */
+                color: #38BDF8; 
                 text-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
             }
         }
 
-        /* Individual Letters in ESMA - Uniform Base Mixed Gold + Random Pop Zoom on Flip */
+        /* Individual Letters in ESMA - Very Slow & Delayed Vertical Flip */
         .animated-letter {
             display: inline-block;
             transform-style: preserve-3d;
             font-weight: 800;
-            color: #F59E0B; /* Single Base Mixed Gold Tone for normal state */
-            animation: slowVerticalFlip 6s infinite ease-in-out;
+            color: #F59E0B;
+            animation: slowVerticalFlip 10s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes slowVerticalFlip {
-            0%, 75%, 100% { 
+            0%, 80%, 100% { 
                 transform: rotateX(0deg) scale(1); 
                 color: #F59E0B; 
                 text-shadow: none; 
             }
-            82%, 92% { 
+            88%, 95% { 
                 transform: rotateX(360deg) scale(1.35); 
-                color: var(--rand-color, #EC4899); /* Special Random Zoom Color */
+                color: var(--rand-color, #EC4899); 
                 text-shadow: 0 0 16px var(--rand-color, rgba(236, 72, 153, 0.9)); 
             }
         }
 
         .gold-border { border: 1.5px solid rgba(212, 175, 55, 0.4); }
+        
+        /* Special Border Glow for First Place Champions Name */
+        .champions-special-border {
+            border: 2px dashed #F59E0B;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.35), inset 0 0 8px rgba(245, 158, 11, 0.15);
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
         .winner-card {
             background: #090d16 !important;
             border: 1.5px solid #d4af37 !important;
@@ -146,7 +159,7 @@
 
             <div class="pt-0.5 pb-1">
                 <div id="header-title-container" class="wesma-title leading-tight">
-                    <!-- Rendered by JS with Uniform Base & Flip Zoom Colors -->
+                    <!-- Rendered by JS -->
                 </div>
                 <h2 class="text-xs font-medium text-slate-300 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
             </div>
@@ -193,8 +206,8 @@
                     <div class="text-xs font-semibold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
                     </div>
-                    <!-- Guaranteed Single Line Champions Text -->
-                    <div id="leader-text" class="text-xs sm:text-sm font-bold text-amber-300 mt-1 uppercase tracking-wider whitespace-nowrap overflow-x-auto px-2">
+                    <!-- Champions Box with Special Border -->
+                    <div id="leader-text" class="champions-special-border text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider">
                         ലോഡ് ചെയ്യുന്നു...
                     </div>
                 </div>
@@ -246,7 +259,7 @@
         </div>
     </div>
 
-    <!-- Custom Variety Popup for Team Name Editing -->
+    <!-- Custom Name Editing Popup Modal -->
     <div id="custom-name-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
             <div class="w-10 h-10 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-sm">
@@ -271,7 +284,7 @@
         </div>
     </div>
 
-    <!-- WhatsApp App Choice Modal -->
+    <!-- WhatsApp Choice Modal -->
     <div id="whatsapp-choice-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-2xl shadow-2xl p-5 text-center space-y-3">
             <h3 class="text-sm font-semibold text-amber-300">വാട്സാപ്പ് തിരഞ്ഞെടുക്കുക</h3>
@@ -290,7 +303,7 @@
         </div>
     </div>
 
-    <!-- Screenshot Preview & Crop Modal -->
+    <!-- Screenshot Preview & Download Modal -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
             <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
@@ -337,7 +350,7 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-full text-xs shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
         സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
@@ -353,6 +366,26 @@
             { id: 5, name: "FAHAD & MUJEEB", wins: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
         ];
 
+        // Motivational Comments for Winning (+1)
+        const winMotivationalComments = [
+            "ഗംഭീര പ്രകടനം! വിജയം തുടരട്ടെ! 🏆",
+            "തകർപ്പൻ ജയം! ടീം വർക്കിന്റെ വിജയം! 🔥",
+            "വിജയക്കുതിപ്പ് തുടരുന്നു! അടിപൊളി! 🎉",
+            "ക്ലാസ്സ് പ്രകടനം! ശരിക്കും ചാമ്പ്യൻസ് തന്നെ! ⭐",
+            "അതിശയകരമായ ജയം! നിങ്ങൾ വേറെ ലെവൽ! 💪",
+            "മാച്ച് വിന്നേഴ്സ്! ആവേശം കൊടുമുടിയിൽ! 🏸"
+        ];
+
+        // Constructive Criticism Comments for Loss / Minus (-1)
+        const lossCriticismComments = [
+            "ശ്രദ്ധിക്കൂ! ഈ പോക്ക് അപകടമാണ്! ⚠️",
+            "പോരായ്മകൾ തിരുത്തി അടുത്ത മാച്ചിൽ തിരിച്ചുവരൂ! 💪",
+            "ശ്രദ്ധ കേന്ദ്രീകരിക്കൂ, കളി കൈവിട്ടു പോകുന്നു! 🛑",
+            "വീഴ്ചകളിൽ നിന്ന് പാഠം പഠിക്കൂ! പോരാടൂ! 💥",
+            "കൂടുതൽ പ്ലാനിംഗ് വേണം! വേഗത്തിൽ റിക്കവർ ചെയ്യൂ! 🎯",
+            "വിട്ടുകൊടുക്കരുത്! ഇനിയും അവസരങ്ങളുണ്ട്! ⚡"
+        ];
+
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
         let tournamentStartTimestamp = null;
@@ -364,10 +397,8 @@
         let editingTeamId = null;
         let currentShareMode = 'text';
 
-        // Vibrant pop colors specifically for letter flip zoom
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
-        // Immediate render ensures interface is 100% visible instantly
         renderHeaderTitle();
         render();
 
@@ -378,7 +409,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v80');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v83');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -398,6 +429,32 @@
                 saveData();
             }
             render();
+        }
+
+        function triggerWinCelebration() {
+            if (typeof confetti === 'function') {
+                // Fireworks / Celebration Burst
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                    confetti({
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+                }, 200);
+            }
         }
 
         function initData() {
@@ -450,7 +507,7 @@
             let esmaStr = "ESMA";
             let esmaHtml = esmaStr.split('').map((char, idx) => {
                 let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (1 + idx * 0.8).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (1.5 + idx * 1.5).toFixed(1) }s;">${escapeHtml(char)}</span>`;
             }).join('');
 
             headerContainer.innerHTML = wHtml + esmaHtml;
@@ -474,7 +531,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx1) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (Math.random() * 3).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (Math.random() * 4).toFixed(1) }s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -483,7 +540,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx2) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (3.5 + Math.random() * 3).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (4.5 + Math.random() * 4).toFixed(1) }s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -501,7 +558,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (delayOffset + Math.random() * 3).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (delayOffset + Math.random() * 4).toFixed(1) }s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -725,24 +782,24 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <!-- 1. Play Display -->
+                            <!-- Play Display -->
                             <div class="w-7 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700" title="Total Played">
                                 <span class="text-[7px] text-slate-400 font-light leading-none">Play</span>
                                 <span class="text-xs text-amber-300 font-semibold">${playedCount}</span>
                             </div>
                             
-                            <!-- 2. Minus Button (-) -->
+                            <!-- Minus Button (-) -->
                             <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-12 bg-rose-950 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 active:scale-95 transition-all" title="Minus (-1 with PIN)">
                                 <i class="fa-solid fa-minus text-[10px]"></i>
                             </button>
                             
-                            <!-- 3. Win/Loss Box -->
+                            <!-- Win/Loss Box -->
                             <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30 min-w-[42px]">
                                 <span class="text-xs text-amber-400 font-semibold">${team.wins} <span class="text-[8px] text-amber-200 font-light">Win</span></span>
                                 <span class="text-[10px] text-rose-400 font-semibold">${losses} <span class="text-[7px] text-rose-200 font-light">Loss</span></span>
                             </div>
                             
-                            <!-- 4. Plus Button (+) - Max Zoomed Size -->
+                            <!-- Plus Button (+) -->
                             <div class="relative">
                                 <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-11 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-lg active:scale-95 transition-all" title="Win +1">
                                     <i class="fa-solid fa-plus text-base font-bold"></i>
@@ -792,7 +849,13 @@
                 autoSaveToHistory();
                 saveData();
                 render();
-                showToast(`${team.name} വിജയം ചേർത്തു! 🏸`);
+
+                // Trigger Screen Fireworks / Celebration Animation
+                triggerWinCelebration();
+
+                // Random Motivation Comment for Winner (+1)
+                const randMotiv = winMotivationalComments[Math.floor(Math.random() * winMotivationalComments.length)];
+                showToast(`${team.name}: ${randMotiv}`);
             } else if (delta < 0) {
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
@@ -804,7 +867,10 @@
                     if (team.played > team.wins) team.played = Math.max(team.wins, team.played - 1);
                     saveData();
                     render();
-                    showToast(`${team.name} സ്കോർ കുറച്ചു! ⚠️`);
+
+                    // Random Criticism Comment for Minus (-1)
+                    const randCrit = lossCriticismComments[Math.floor(Math.random() * lossCriticismComments.length)];
+                    showToast(`${team.name}: ${randCrit}`);
                 } else {
                     showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
                 }
@@ -873,9 +939,14 @@
             }
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
-            // Single Line Display (Strictly No Wrapping)
-            let leaderNames = firstPlaces.map(f => `⭐ ${formatPlainName(f.name)} (${maxWins} ജയം)`).join(" • ");
-            leaderEl.innerHTML = `<span>${leaderNames}</span>`;
+            
+            // Champions Layout Logic
+            if (firstPlaces.length === 1) {
+                leaderEl.innerHTML = `<div class="whitespace-nowrap overflow-x-auto py-0.5">⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം) ⭐</div>`;
+            } else {
+                let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം)</div>`).join('');
+                leaderEl.innerHTML = `<div class="flex flex-col space-y-0.5">${multiHtml}</div>`;
+            }
 
             let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
             let podiumHtml = "";
@@ -1016,7 +1087,7 @@
             toast.style.opacity = "1";
             setTimeout(() => {
                 toast.style.opacity = "0";
-            }, 2500);
+            }, 3000);
         }
 
         function escapeHtml(str) {
