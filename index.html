@@ -278,7 +278,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v18') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v20') : null;
 
         function initData() {
             const dateBadge = document.getElementById("header-date-badge");
