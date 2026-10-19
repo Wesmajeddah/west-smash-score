@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -22,7 +22,6 @@
             font-family: 'Poppins', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-orbitron { font-family: 'Orbitron', sans-serif; }
         .gold-gradient-text {
             background: linear-gradient(135deg, #FFE082 0%, #D4AF37 40%, #B8860B 80%, #FFD700 100%);
             -webkit-background-clip: text;
@@ -59,27 +58,16 @@
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
             <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
                 <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="copperGradGate" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FFE082" />
-                            <stop offset="50%" stop-color="#D4AF37" />
-                            <stop offset="100%" stop-color="#A67C1E" />
-                        </linearGradient>
-                        <radialGradient id="bgDarkGate" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#0f172a" />
-                            <stop offset="100%" stop-color="#020617" />
-                        </radialGradient>
-                    </defs>
-                    <circle cx="100" cy="100" r="96" fill="url(#copperGradGate)" />
-                    <circle cx="100" cy="100" r="90" fill="url(#bgDarkGate)" stroke="url(#copperGradGate)" stroke-width="1.5" />
-                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="url(#copperGradGate)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="100" cy="100" r="96" fill="#D4AF37" />
+                    <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#D4AF37" stroke-width="1.5" />
+                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div>
-                <h2 class="text-xl font-black font-orbitron gold-gradient-text">WESMA BADMINTON</h2>
+                <h2 class="text-xl font-black gold-gradient-text tracking-wider">WESMA BADMINTON</h2>
                 <p class="text-[11px] text-slate-400 mt-1">ടൂർണമെന്റ് ആരംഭിക്കാൻ താഴെള്ള ബട്ടൺ അമർത്തുക</p>
             </div>
-            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-3 rounded-xl shadow-lg shadow-amber-500/20 text-sm tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
+            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black py-3 rounded-xl shadow-lg text-sm tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-play"></i> START TOURNAMENT
             </button>
         </div>
@@ -109,8 +97,8 @@
                 </div>
             </div>
 
-            <h1 class="text-xl sm:text-2xl font-black font-orbitron gold-gradient-text tracking-wider leading-none">WESMA</h1>
-            <h2 class="text-[8px] sm:text-[9px] font-bold font-orbitron text-amber-200/70 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
+            <h1 class="text-xl sm:text-2xl font-black gold-gradient-text tracking-wider leading-none">WESMA</h1>
+            <h2 class="text-[8px] sm:text-[9px] font-bold text-amber-200/70 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
         </div>
 
         <!-- Main Content Area -->
@@ -174,7 +162,7 @@
             <!-- History Summary Section -->
             <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-2.5 space-y-1.5 shadow-xl">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 font-orbitron">
+                    <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                         <i class="fa-solid fa-clock-history text-amber-400"></i> MATCH HISTORY
                     </span>
                     <button onclick="openHistoryModal()" class="text-[11px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1">
@@ -205,7 +193,7 @@
     <!-- Screenshot Preview Modal -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-3 text-center space-y-2">
-            <div class="text-xs font-bold text-amber-300 flex items-center justify-center gap-1.5 font-orbitron">
+            <div class="text-xs font-bold text-amber-300 flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-camera text-emerald-400 animate-pulse"></i> സ്കോർ കാർഡ് സ്ക്രീൻഷോട്ട് റെഡിയാകുന്നു...
             </div>
             <div id="preview-container" class="w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 max-h-[65vh] flex items-center justify-center p-1">
@@ -219,7 +207,7 @@
     <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm sm:max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-                <h3 class="text-sm font-extrabold gold-gradient-text flex items-center gap-2 font-orbitron">
+                <h3 class="text-sm font-extrabold gold-gradient-text flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-amber-400"></i> SESSION TOURNAMENT LOGS
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
@@ -275,7 +263,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v32') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v34') : null;
 
         function launchApp() {
             const gate = document.getElementById("startup-gate");
@@ -491,7 +479,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -736,7 +724,7 @@
             }
         }
 
-        // Full Capture Screenshot Preview & Share
+        // Optimized Full Capture Screenshot Preview & Share
         function shareWhatsAppImage() {
             showToast("📸 സ്കോർ കാർഡ് ഫുൾ സ്ക്രീൻഷോട്ട് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
@@ -744,10 +732,12 @@
             const previewContainer = document.getElementById("preview-container");
             
             html2canvas(captureElement, {
-                scale: 2,
+                scale: 3,
                 useCORS: true,
                 backgroundColor: "#030712",
-                logging: false
+                logging: false,
+                letterRendering: true,
+                windowWidth: captureElement.scrollWidth
             }).then(canvas => {
                 previewContainer.innerHTML = "";
                 const previewImg = document.createElement('img');
