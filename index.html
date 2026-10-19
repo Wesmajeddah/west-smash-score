@@ -65,13 +65,12 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-2 sm:p-3 select-none">
     
     <!-- Printable Share Area Container -->
-    <div id="capture-area" class="w-full max-w-sm sm:max-w-md my-auto space-y-2 bg-slate-950 p-1 rounded-2xl">
+    <div id="capture-area" class="w-full max-w-sm sm:max-w-md my-auto space-y-2 bg-slate-950 p-2 rounded-2xl">
         
         <!-- Header with Compact Wesma Logo Emblem & Live Date Badge -->
         <div class="text-center py-2 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0.5">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
             
-            <!-- Top Compact Date Badge with Animation -->
             <div class="flex justify-between items-center px-1 pb-1">
                 <span class="text-[9px] font-poppins text-slate-400 font-semibold tracking-wider flex items-center gap-1">
                     <i class="fa-solid fa-circle text-[5px] text-emerald-400 animate-pulse"></i> LIVE
@@ -185,7 +184,7 @@
                 </div>
             </div>
 
-            <!-- History Section -->
+            <!-- History Summary Section -->
             <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-2.5 space-y-1.5 shadow-xl">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 font-orbitron">
@@ -216,13 +215,13 @@
         </div>
     </div>
 
-    <!-- Screenshot Preview Modal (Appears for 2 seconds before Share Selector) -->
+    <!-- Screenshot Preview Modal (2 Seconds View) -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-3 text-center space-y-2">
             <div class="text-xs font-bold text-amber-300 flex items-center justify-center gap-1.5 font-orbitron">
                 <i class="fa-solid fa-camera text-emerald-400 animate-pulse"></i> സ്കോർ കാർഡ് സ്ക്രീൻഷോട്ട് റെഡിയാകുന്നു...
             </div>
-            <div id="preview-container" class="w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 max-h-[60vh] flex items-center justify-center p-1">
+            <div id="preview-container" class="w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 max-h-[65vh] flex items-center justify-center p-1">
                 <!-- Captured Image Preview will render here -->
             </div>
             <div class="text-[10px] text-slate-400 italic">വാട്സാപ്പ് തിരഞ്ഞെടുക്കാനുള്ള വിൻഡോ ഉടൻ തുറക്കുന്നു...</div>
@@ -241,7 +240,7 @@
                 </button>
             </div>
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
-                <!-- Dynamically Rendered History Cards -->
+                <!-- Rendered History Cards -->
             </div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
                 <button onclick="clearHistory()" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 font-bold py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1.5">
@@ -290,7 +289,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v22') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v26') : null;
 
         function initData() {
             const dateBadge = document.getElementById("header-date-badge");
@@ -477,18 +476,18 @@
             cooldownInterval = setInterval(() => {
                 const now = Date.now();
                 teams.forEach((team) => {
-                    const btn = document.getElementById(`plus-btn-${team.id}`);
+                    const plusBtn = document.getElementById(`plus-btn-${team.id}`);
                     const overlay = document.getElementById(`cool-overlay-${team.id}`);
                     const countdownEl = document.getElementById(`cool-countdown-${team.id}`);
-                    if (!btn || !overlay) return;
+                    if (!plusBtn || !overlay) return;
                     const diff = now - (team.lastClickTime || 0);
                     if (diff < 60000) {
                         const remainingSecs = Math.ceil((60000 - diff) / 1000);
-                        btn.disabled = true;
+                        plusBtn.disabled = true;
                         overlay.classList.remove("hidden");
                         if (countdownEl) countdownEl.textContent = `${remainingSecs}s`;
                     } else {
-                        btn.disabled = false;
+                        plusBtn.disabled = false;
                         overlay.classList.add("hidden");
                     }
                 });
@@ -549,26 +548,29 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 relative">
-                            <!-- Played Match Update Button -->
+                            <!-- 1. Played Match Update Button (Left) -->
                             <button onclick="handlePlayedChange(${team.id}, 1)" class="w-7 h-10 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-300 rounded-xl flex flex-col items-center justify-center font-bold text-[10px] shadow-md active:scale-95 transition-all border border-slate-700" title="Add Played Match (+1 Played)">
                                 <span class="text-[8px] text-slate-400 leading-none">Play</span>
                                 <span class="font-black text-xs text-amber-300">${playedCount}</span>
                             </button>
-                            <!-- Wins & Losses Auto Calculated Box -->
+                            
+                            <!-- 2. Wins & Losses Auto Calculated Box (Middle) -->
                             <div class="flex flex-col items-center justify-center bg-slate-950 rounded-xl px-2 py-1 border border-amber-500/30 shadow-inner">
                                 <span class="text-xs font-black text-amber-400 font-poppins">${team.wins} <span class="text-[9px] text-amber-200">Win</span></span>
                                 <span class="text-[10px] font-bold text-rose-400 font-poppins">${losses} <span class="text-[8px] text-rose-200">Loss</span></span>
                             </div>
-                            <!-- Minus Button (-) -->
-                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900/80 hover:bg-rose-800 active:bg-rose-950 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-700/50" title="Reduce Win (-1)">
+                            
+                            <!-- 3. Minus Button (-) placed AFTER Play & Win/Loss columns -->
+                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900/80 hover:bg-rose-800 active:bg-rose-950 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-700/50" title="Reduce Win (-1 with PIN)">
                                 <i class="fa-solid fa-minus text-[9px]"></i>
                             </button>
-                            <!-- Plus Button (+) with Cooldown -->
+                            
+                            <!-- 4. Plus Button (+) with Cooldown Lock (Rightmost) -->
                             <div class="relative">
                                 <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win (+1)">
                                     <i class="fa-solid fa-plus text-[10px]"></i>
                                 </button>
-                                <!-- Cool-down Indicator Overlay -->
+                                <!-- Cool-down Indicator Overlay for Plus Button -->
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-xl flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
                                     <div class="flex flex-col items-center justify-center">
                                         <span class="text-[9px] leaf-anim">🍃</span>
@@ -618,6 +620,12 @@
                 render();
                 showToast(`${team.name} വിജയം ചേർത്തു! 🏸`);
             } else if (delta < 0) {
+                // Minus requires Admin PIN verification
+                const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
+                if (pin !== ADMIN_PIN) {
+                    if (pin !== null) alert("തെറ്റായ PIN!");
+                    return;
+                }
                 if (team.wins > 0) {
                     team.wins += delta;
                     if (team.played > team.wins) {
@@ -745,9 +753,9 @@
             }
         }
 
-        // WhatsApp Image Share with 2-Second Screenshot Preview Window
+        // Full Capture Screenshot Preview & Share
         function shareWhatsAppImage() {
-            showToast("📸 സ്കോർ കാർഡ് സ്ക്രീൻഷോട്ട് തയ്യാറാക്കുന്നു...");
+            showToast("📸 സ്കോർ കാർഡ് ഫുൾ സ്ക്രീൻഷോട്ട് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const previewModal = document.getElementById("preview-modal");
             const previewContainer = document.getElementById("preview-container");
@@ -755,13 +763,14 @@
             html2canvas(captureElement, {
                 scale: 2,
                 useCORS: true,
-                backgroundColor: "#030712"
+                backgroundColor: "#030712",
+                windowWidth: captureElement.scrollWidth,
+                windowHeight: captureElement.scrollHeight
             }).then(canvas => {
-                // Show 2-Second Preview Like a Screenshot Card
                 previewContainer.innerHTML = "";
                 const previewImg = document.createElement('img');
                 previewImg.src = canvas.toDataURL("image/png");
-                previewImg.className = "rounded-lg max-h-[50vh] object-contain shadow-lg";
+                previewImg.className = "rounded-lg max-h-[55vh] w-auto object-contain shadow-lg";
                 previewContainer.appendChild(previewImg);
                 previewModal.classList.remove("hidden");
 
@@ -786,7 +795,7 @@
                             let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഇമേജ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്. വാട്സാപ്പിൽ ഫോട്ടോ ആയി ഷെയർ ചെയ്യാം!";
                             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
                         }
-                    }, 2000); // 2 Seconds Delay Preview
+                    }, 2000); // 2 Seconds Preview Hold
                 });
             }).catch(err => {
                 console.error("Image generation error:", err);
