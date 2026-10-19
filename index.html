@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VortX BADMINTON CLUB - Score Counter</title>
+    <title>WESMA BADMINTON CLUB - Score Counter</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -29,7 +29,7 @@
             font-family: 'Poppins', sans-serif;
         }
         .gold-gradient-text {
-            background: linear-gradient(135deg, #FFF099 0%, #F1C40F 40%, #B8860B 80%, #FFD700 100%);
+            background: linear-gradient(135deg, #FFE082 0%, #D4AF37 40%, #B8860B 80%, #FFD700 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -50,71 +50,62 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Unique Racket & Shuttle Emblem -->
+        <!-- Header with Wesma Badminton Club Custom Logo & Branding -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- SVG Unique VortX Logo Emblem with Racket & Shuttle -->
+            <!-- SVG Wesma Custom Logo Emblem (Inspired from Image) -->
             <div class="flex justify-center mb-1">
-                <div class="w-20 h-20 sm:w-24 sm:h-24 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
+                <div class="w-24 h-24 sm:w-28 sm:h-28 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <radialGradient id="goldGrad" cx="50%" cy="30%" r="70%">
+                            <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#FFE082" />
-                                <stop offset="40%" stop-color="#D4AF37" />
-                                <stop offset="85%" stop-color="#8B6508" />
-                                <stop offset="100%" stop-color="#5B4000" />
-                            </radialGradient>
-                            <radialGradient id="bgBlue" cx="50%" cy="50%" r="50%">
+                                <stop offset="50%" stop-color="#D4AF37" />
+                                <stop offset="100%" stop-color="#A67C1E" />
+                            </linearGradient>
+                            <radialGradient id="bgDark" cx="50%" cy="50%" r="50%">
                                 <stop offset="0%" stop-color="#0f172a" />
                                 <stop offset="100%" stop-color="#020617" />
                             </radialGradient>
-                            <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFF59D" />
-                                <stop offset="50%" stop-color="#D4AF37" />
-                                <stop offset="100%" stop-color="#996515" />
-                            </linearGradient>
                         </defs>
 
-                        <!-- Outer Golden Ring -->
-                        <circle cx="100" cy="100" r="96" fill="url(#goldGrad)" />
-                        <circle cx="100" cy="100" r="90" fill="url(#bgBlue)" stroke="url(#goldLight)" stroke-width="1.5" />
-                        <circle cx="100" cy="100" r="72" fill="none" stroke="rgba(212, 175, 55, 0.3)" stroke-width="1" stroke-dasharray="2,3" />
+                        <!-- Outer Shield/Emblem Base -->
+                        <circle cx="100" cy="100" r="96" fill="url(#copperGrad)" />
+                        <circle cx="100" cy="100" r="90" fill="url(#bgDark)" stroke="url(#copperGrad)" stroke-width="1.5" />
 
-                        <!-- Curved Header Text -->
-                        <path id="textArcTop" d="M 30 100 A 70 70 0 0 1 170 100" fill="none" />
-                        <text font-family="Orbitron, sans-serif" font-weight="900" font-size="14" fill="#FFE082" letter-spacing="3">
-                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
-                                VORTX
-                            </textPath>
-                        </text>
-
-                        <!-- Curved Footer Text -->
-                        <path id="textArcBottom" d="M 170 100 A 70 70 0 0 1 30 100" fill="none" />
-                        <text font-family="Orbitron, sans-serif" font-weight="700" font-size="8" fill="#FFE082" letter-spacing="1.5">
-                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
-                                BADMINTON CLUB • SINCE 2026
-                            </textPath>
-                        </text>
-
-                        <!-- Center Icon: Racket with Shuttle -->
-                        <g transform="translate(0, 1)">
-                            <!-- Racket Handle -->
-                            <line x1="100" y1="120" x2="100" y2="92" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
-                            <!-- Racket Oval Head -->
-                            <ellipse cx="100" cy="74" rx="16" ry="20" fill="none" stroke="url(#goldGrad)" stroke-width="2.5"/>
-                            <!-- Racket Strings (Cross grid) -->
-                            <line x1="92" y1="62" x2="108" y2="86" stroke="rgba(212,175,55,0.4)" stroke-width="1"/>
-                            <line x1="108" y1="62" x2="92" y2="86" stroke="rgba(212,175,55,0.4)" stroke-width="1"/>
-                            <line x1="100" y1="54" x2="100" y2="94" stroke="rgba(212,175,55,0.4)" stroke-width="1"/>
-                            <!-- Shuttlecock nestled on top/inside head -->
-                            <path d="M 95 62 L 91 52 C 89 48 95 44 100 44 C 105 44 111 48 109 52 L 105 62 Z" fill="#FFF" stroke="url(#goldGrad)" stroke-width="1"/>
+                        <!-- Wesma 'W' Monogram combined with Shuttlecock -->
+                        <g transform="translate(0, -6)">
+                            <!-- Stylized 'W' -->
+                            <path d="M 52 75 L 72 125 L 90 95 L 108 125 L 128 75" fill="none" stroke="url(#copperGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Shuttlecock on top of W -->
+                            <g transform="translate(100, 52) scale(0.9)">
+                                <path d="M -12 12 L -8 2 C -5 -3 5 -3 8 2 L 12 12 Z" fill="#FFF" stroke="url(#copperGrad)" stroke-width="1.5"/>
+                                <path d="M -10 6 Q 0 2 10 6" fill="none" stroke="url(#copperGrad)" stroke-width="1.5"/>
+                                <ellipse cx="0" cy="14" rx="6" ry="2.5" fill="url(#copperGrad)"/>
+                            </g>
                         </g>
+
+                        <!-- Curved Header Text: WESMA -->
+                        <path id="textArcTop" d="M 35 118 A 68 68 0 0 1 165 118" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="900" font-size="16" fill="#FFE082" letter-spacing="4">
+                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
+                                WESMA
+                            </textPath>
+                        </text>
+
+                        <!-- Curved Footer Text: JEDDAH • SINCE 2026 -->
+                        <path id="textArcBottom" d="M 165 118 A 68 68 0 0 1 35 118" fill="none" />
+                        <text font-family="Orbitron, sans-serif" font-weight="700" font-size="7.5" fill="#FFE082" letter-spacing="1">
+                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
+                                JEDDAH • SINCE 2026
+                            </textPath>
+                        </text>
                     </svg>
                 </div>
             </div>
 
-            <h1 class="text-2xl sm:text-3xl font-black font-orbitron gold-gradient-text tracking-wider leading-tight">VortX</h1>
+            <h1 class="text-2xl sm:text-3xl font-black font-orbitron gold-gradient-text tracking-wider leading-tight">WESMA</h1>
             <h2 class="text-xs sm:text-sm font-bold font-orbitron text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
             
             <div class="mt-2 flex items-center justify-center gap-2">
@@ -227,7 +218,7 @@
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('west_smash_scores_v14');
+        const dbRef = firebase.database().ref('wesma_badminton_scores_v1');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -256,7 +247,7 @@
                 startCooldownTickers();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("west_smash_scores_v14");
+                const saved = localStorage.getItem("wesma_badminton_scores_v1");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
@@ -295,7 +286,7 @@
         function saveData() {
             dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("west_smash_scores_v14", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
+                localStorage.setItem("wesma_badminton_scores_v1", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
             });
             updateLeaderboard();
         }
@@ -573,7 +564,7 @@
             const maxWins = sorted[0].wins;
             const minWins = sorted[sorted.length - 1].wins;
 
-            let msg = "🏸 *VortX BADMINTON CLUB* 🏸\n";
+            let msg = "🏸 *WESMA BADMINTON CLUB* 🏸\n";
             msg += "🏆 *Tournament Score Counter* 🏆\n\n";
 
             teams.forEach((t, i) => {
