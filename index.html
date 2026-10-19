@@ -58,19 +58,38 @@
         .leaf-anim {
             animation: leafPulse 2s infinite ease-in-out;
         }
+        /* Date Badge Soft Glow Animation */
+        @keyframes dateGlow {
+            0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 0.7); }
+            100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.3); }
+        }
+        .date-animated {
+            animation: dateGlow 3s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-2 sm:p-3 select-none">
     
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-2">
         
-        <!-- Header with Compact Wesma Logo Emblem -->
-        <div class="text-center py-2.5 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
+        <!-- Header with Compact Wesma Logo Emblem & Live Date Badge -->
+        <div class="text-center py-2 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0.5">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
             
-            <!-- Compact SVG Wesma Custom Logo Emblem -->
+            <!-- Top Compact Date Badge with Animation -->
+            <div class="flex justify-between items-center px-1 pb-1">
+                <span class="text-[9px] font-poppins text-slate-400 font-semibold tracking-wider flex items-center gap-1">
+                    <i class="fa-solid fa-circle text-[5px] text-emerald-400 animate-pulse"></i> LIVE
+                </span>
+                <span id="header-date-badge" class="text-[9px] font-poppins bg-slate-950/85 text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-500/40 shadow-inner date-animated">
+                    <!-- Loaded via JS -->
+                </span>
+            </div>
+
+            <!-- SVG Logo -->
             <div class="flex justify-center mb-0.5">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 relative drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 relative drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -106,12 +125,14 @@
                 </div>
             </div>
 
+            <!-- Big Main Header WESMA -->
             <h1 class="text-xl sm:text-2xl font-black font-orbitron gold-gradient-text tracking-wider leading-none">WESMA</h1>
-            <h2 class="text-[10px] sm:text-xs font-bold font-orbitron text-amber-200/80 tracking-widest uppercase">BADMINTON CLUB</h2>
+            <!-- Small Sub-header BADMINTON CLUB -->
+            <h2 class="text-[8px] sm:text-[9px] font-bold font-orbitron text-amber-200/70 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
             
             <!-- Welcome Screen Start Match Button -->
             <div id="top-timer-container" class="pt-1.5">
-                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-2.5 px-3 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
+                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-2 px-3 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
                     <i class="fa-solid fa-play text-xs"></i> START TOURNAMENT TIMER (കളി ആരംഭിക്കുക)
                 </button>
             </div>
@@ -263,6 +284,13 @@
         const dbRef = firebase.database().ref('wesma_badminton_scores_v9');
 
         function initData() {
+            // Set Header Date with Animation
+            const dateBadge = document.getElementById("header-date-badge");
+            if(dateBadge) {
+                const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[8px] mr-1 text-amber-400"></i> ${todayStr}`;
+            }
+
             dbRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -409,10 +437,14 @@
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
+                        let losses = Math.max(0, item.totalPlays - t.wins);
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-[11px] text-slate-300 py-0.5 border-b border-slate-900">
                                 <span>${i + 1}. ${escapeHtml(t.name)}</span>
-                                <span class="font-bold text-amber-400">${t.wins} ജയം</span>
+                                <div class="flex gap-2 font-poppins">
+                                    <span class="font-bold text-amber-400">${t.wins} Win</span>
+                                    <span class="font-bold text-rose-400">${losses} Loss</span>
+                                </div>
                             </div>
                         `;
                     });
@@ -522,7 +554,8 @@
             container.innerHTML = "";
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
+            const totalPlays = calculateTotalPlays();
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -538,6 +571,8 @@
                 const isWinner = (team.wins === maxWins && maxWins > 0);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
                 const isLoser = (team.wins === minWins && minWins < maxWins);
+                
+                const losses = Math.max(0, totalPlays - team.wins);
                 
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
@@ -587,16 +622,21 @@
                         </div>
                     </div>
                     
+                    <!-- Bottom Info Section showing both Wins & Losses -->
                     <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-1">
-                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> Last Match Duration:</span>
-                        <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'Not recorded'}</span>
+                        <span class="flex items-center gap-1.5 font-bold">
+                            <span class="text-amber-400 flex items-center gap-1"><i class="fa-solid fa-trophy text-[9px]"></i> ${team.wins} Win</span>
+                            <span class="text-slate-600">•</span>
+                            <span class="text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-xmark text-[9px]"></i> ${losses} Loss</span>
+                        </span>
+                        <span class="font-bold text-amber-300/90">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'No time'}</span>
                     </div>
                 `;
                 container.appendChild(card);
             });
             
             const totalPlayEl = document.getElementById("total-play-val");
-            if(totalPlayEl) totalPlayEl.textContent = calculateTotalPlays();
+            if(totalPlayEl) totalPlayEl.textContent = totalPlays;
             updateLeaderboard();
         }
 
@@ -737,13 +777,16 @@
             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sorted[0].wins;
             const minWins = sorted[sorted.length - 1].wins;
+            const totalPlays = calculateTotalPlays();
+
             let msg = "🏸 *WESMA BADMINTON CLUB* 🏸\n";
             msg += "🏆 *Tournament Score Counter* 🏆\n\n";
             sorted.forEach((t, i) => {
+                let losses = Math.max(0, totalPlays - t.wins);
                 let timeStr = t.lastMatchTime ? ` (${t.lastMatchTime} mins)` : '';
-                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം${timeStr}\n`;
+                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം | *${losses}* തോൽവി${timeStr}\n`;
             });
-            msg += `\n🎮 *Total Plays:* ${calculateTotalPlays()}\n`;
+            msg += `\n🎮 *Total Plays:* ${totalPlays}\n`;
             if (tournamentStartTimestamp) {
                 let totalDiffMs = Date.now() - tournamentStartTimestamp;
                 let totalMins = Math.floor(totalDiffMs / 60000);
