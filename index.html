@@ -41,7 +41,7 @@
             overflow: visible;
         }
 
-        /* Swash 'W' Base Mixed Gold Color + Very Slow Delayed Random Vertical Flip */
+        /* Swash 'W' Base Mixed Gold Color + Extremely Slow & Random Vertical Flip */
         .special-w {
             font-family: 'Great Vibes', cursive;
             font-size: 1.45em;
@@ -50,36 +50,36 @@
             color: #F59E0B;
             font-weight: 900;
             transform-style: preserve-3d;
-            animation: slowVerticalFlipHeaderW 12s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            animation: ultraSlowFlipHeaderW 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
-        @keyframes slowVerticalFlipHeaderW {
-            0%, 82%, 100% { 
+        @keyframes ultraSlowFlipHeaderW {
+            0%, 85%, 100% { 
                 transform: translateY(3px) rotateX(0deg) scale(1); 
                 color: #F59E0B; 
                 text-shadow: none;
             }
-            90%, 96% { 
+            92%, 97% { 
                 transform: translateY(3px) rotateX(360deg) scale(1.35); 
-                color: #38BDF8; 
-                text-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
+                color: var(--w-rand-color, #38BDF8); 
+                text-shadow: 0 0 16px var(--w-rand-color, rgba(56, 189, 248, 0.9));
             }
         }
 
-        /* Individual Letters in ESMA - Very Slow & Random Delayed Vertical Flip */
+        /* Individual Letters in ESMA - Extremely Slow & Random Vertical Flip */
         .animated-letter {
             display: inline-block;
             transform-style: preserve-3d;
             font-weight: 800;
             color: #F59E0B;
-            animation: slowVerticalFlip 12s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            animation: ultraSlowFlip 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
-        @keyframes slowVerticalFlip {
-            0%, 82%, 100% { 
+        @keyframes ultraSlowFlip {
+            0%, 85%, 100% { 
                 transform: rotateX(0deg) scale(1); 
                 color: #F59E0B; 
                 text-shadow: none; 
             }
-            90%, 96% { 
+            92%, 97% { 
                 transform: rotateX(360deg) scale(1.35); 
                 color: var(--rand-color, #EC4899); 
                 text-shadow: 0 0 16px var(--rand-color, rgba(236, 72, 153, 0.9)); 
@@ -303,23 +303,26 @@
         </div>
     </div>
 
-    <!-- Screenshot Preview & Download Modal -->
+    <!-- Screenshot Preview, Download & Direct Share Modal -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
             <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-crop text-emerald-400"></i> സ്കോർ കാർഡ് റെഡിയಾಗಿದೆ (Full View)
+                <i class="fa-solid fa-crop text-emerald-400"></i> സ്കോർ കാർഡ് പ്രിവ്യൂ (Full View)
             </div>
-            <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[50vh] flex items-center justify-center p-2">
+            <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[48vh] flex items-center justify-center p-2">
                 <!-- Captured Image Preview -->
             </div>
-            <div class="text-[10px] text-slate-400 font-light">ഫുൾ നെയിമും ഡീറ്റെയിൽസും ഉൾപ്പെടുത്തിയാണ് ഫോട്ടോ തയ്യാറാക്കിയിരിക്കുന്നത്.</div>
+            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഷെയർ ചെയ്യാം.</div>
             
-            <div class="grid grid-cols-2 gap-2 pt-1">
-                <button onclick="closePreviewModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
+            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                <button onclick="closePreviewModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-[11px]">
                     അടയ്ക്കുക
                 </button>
-                <button id="download-img-btn" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl text-xs shadow">
-                    ഫോട്ടോ ഡൗൺലോഡ്
+                <button id="download-img-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
+                </button>
+                <button id="share-img-btn" class="bg-cyan-700 hover:bg-cyan-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-share-nodes"></i> ഷെയർ
                 </button>
             </div>
         </div>
@@ -350,7 +353,7 @@
         </div>
     </div>
 
-    <!-- Prominent Center Pop-up Toast Notification with Longer Display Duration -->
+    <!-- Prominent Center Pop-up Toast Notification with Extended 8-Second Display Duration -->
     <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
@@ -397,6 +400,7 @@
         let editingTeamId = null;
         let currentShareMode = 'text';
         let audioContext = null;
+        let currentCapturedBlob = null;
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
@@ -410,7 +414,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v85');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v86');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -419,7 +423,6 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             initData();
-            // Unlock Web Audio Context on first touch
             document.body.addEventListener('click', initAudioContext, { once: true });
             document.body.addEventListener('touchstart', initAudioContext, { once: true });
         });
@@ -448,13 +451,12 @@
             render();
         }
 
-        // Web Audio API for Fireworks Crackling Sound
+        // Web Audio API for Fireworks Sound
         function playFireworksSound() {
             initAudioContext();
             if (!audioContext) return;
 
             try {
-                // 1. Launch/Boom Sound
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
                 osc.type = 'triangle';
@@ -467,7 +469,6 @@
                 osc.start();
                 osc.stop(audioContext.currentTime + 0.35);
 
-                // 2. Crackling Noise
                 setTimeout(() => {
                     if (!audioContext) return;
                     const bufferSize = audioContext.sampleRate * 0.45;
@@ -489,7 +490,7 @@
                     noise.start();
                 }, 120);
             } catch(e) {
-                console.log("Audio play suppressed or unsupported", e);
+                console.log("Audio play error", e);
             }
         }
 
@@ -562,23 +563,34 @@
             startCooldownTickers();
         }
 
-        // Header Title Render with Delayed Random Letter Flip
+        // Header Title Render with Very Slow & Completely Random Letter Flip
         function renderHeaderTitle() {
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            let wHtml = `<span class="special-w">W</span>`;
-            let esmaStr = "ESMA";
-            
-            // Randomize delay offsets for staggered letter flips
-            let delays = [2.0, 4.5, 7.0, 9.5].sort(() => Math.random() - 0.5);
+            // Randomize order of letters (W, E, S, M, A)
+            let letters = [
+                { char: 'W', isW: true },
+                { char: 'E', isW: false },
+                { char: 'S', isW: false },
+                { char: 'M', isW: false },
+                { char: 'A', isW: false }
+            ];
 
-            let esmaHtml = esmaStr.split('').map((char, idx) => {
+            // Assign randomized delays between 2s and 14s
+            let delays = [2.0, 5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
+
+            let titleHtml = "";
+            letters.forEach((item, idx) => {
                 let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(char)}</span>`;
-            }).join('');
+                if (item.isW) {
+                    titleHtml += `<span class="special-w" style="--w-rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">W</span>`;
+                } else {
+                    titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
+                }
+            });
 
-            headerContainer.innerHTML = wHtml + esmaHtml;
+            headerContainer.innerHTML = titleHtml;
         }
 
         function formatSingleLetterAnimatedName(nameStr) {
@@ -599,7 +611,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx1) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (1 + Math.random() * 5).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (1 + Math.random() * 6).toFixed(1) }s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -608,7 +620,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx2) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (6 + Math.random() * 5).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (7 + Math.random() * 6).toFixed(1) }s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -626,7 +638,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (delayOffset + Math.random() * 5).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (delayOffset + Math.random() * 6).toFixed(1) }s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -1083,7 +1095,8 @@
 
             let url = "";
             if (type === 'business') {
-                url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                // Direct WhatsApp Business Deep Link Protocol
+                url = `whatsapp://send?text=${encodeURIComponent(text)}`;
             } else {
                 url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
             }
@@ -1096,8 +1109,8 @@
             const previewModal = document.getElementById("preview-modal");
             const previewContainer = document.getElementById("preview-container");
             const downloadBtn = document.getElementById("download-img-btn");
+            const shareBtn = document.getElementById("share-img-btn");
             
-            // Full Canvas Capture without cropping or blurring
             html2canvas(captureElement, {
                 scale: 3,
                 useCORS: true,
@@ -1119,7 +1132,10 @@
                 previewModal.classList.remove("hidden");
 
                 canvas.toBlob(blob => {
+                    currentCapturedBlob = blob;
                     const fileUrl = URL.createObjectURL(blob);
+                    
+                    // Download Action
                     downloadBtn.onclick = function() {
                         const link = document.createElement('a');
                         link.href = fileUrl;
@@ -1128,14 +1144,22 @@
                         showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
                     };
 
-                    let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഫോട്ടോ തയ്യാറായിട്ടുണ്ട്. കാണൂ!";
-                    let url = "";
-                    if (type === 'business') {
-                        url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-                    } else {
-                        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                    }
-                    window.open(url, '_blank');
+                    // Direct Share Action (Supports WhatsApp, Telegram, Files, etc.)
+                    shareBtn.onclick = function() {
+                        if (navigator.share && currentCapturedBlob) {
+                            const file = new File([currentCapturedBlob], 'WESMA_Full_Scorecard.png', { type: 'image/png' });
+                            navigator.share({
+                                title: 'WESMA BADMINTON SCORECARD',
+                                text: '🏸 WESMA Badminton Club - Tournament Scorecard',
+                                files: [file]
+                            }).catch(err => console.log('Share error', err));
+                        } else {
+                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഫോട്ടോ ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
+                            let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                        }
+                    };
+
                 });
             }).catch(err => {
                 console.error("Image generation error:", err);
@@ -1172,12 +1196,12 @@
             toast.style.opacity = "1";
             toast.style.transform = "translate(-50%, -50%) scale(1)";
             
-            // Extended 5 seconds display duration for easy reading
+            // Extended 8 seconds display duration for easy reading
             if (toastTimeout) clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 toast.style.opacity = "0";
                 toast.style.transform = "translate(-50%, -50%) scale(0.9)";
-            }, 5000);
+            }, 8000);
         }
 
         function escapeHtml(str) {
