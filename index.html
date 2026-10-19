@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Rajdhani & Monoton -->
+    <!-- Google Fonts: Cinzel & Monoton -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Monoton&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -19,26 +19,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Cinzel', serif;
             background-color: #030712;
             color: #e2e8f0;
             -webkit-tap-highlight-color: transparent;
-            font-size: 16px; /* Increased base zoom size */
+            font-size: 15px;
         }
         
         /* Wesma Header Unique Font */
         .wesma-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            letter-spacing: 2px;
-            font-size: 2.1rem;
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            letter-spacing: 3px;
+            font-size: 2rem;
             background: linear-gradient(135deg, #38BDF8 0%, #818CF8 50%, #C084FC 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
         }
 
-        /* Special Font & Non-Gold Color for 'W' */
+        /* Special Font for 'W' */
         .special-w {
             font-family: 'Monoton', cursive;
             font-size: 1.25em;
@@ -58,7 +58,7 @@
         }
         @keyframes slowVerticalFlip {
             0%, 75%, 100% { transform: rotateX(0deg) scale(1); color: #F8FAFC; text-shadow: none; }
-            82%, 92% { transform: rotateX(360deg) scale(1.2); color: #38BDF8; text-shadow: 0 0 12px rgba(56, 189, 248, 0.9); }
+            82%, 92% { transform: rotateX(360deg) scale(1.15); color: #38BDF8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.9); }
         }
 
         .gold-gradient-text {
@@ -90,7 +90,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-3 select-none">
+<body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
@@ -103,35 +103,34 @@
                 </svg>
             </div>
             <div>
-                <h2 class="text-base font-bold text-amber-300 tracking-wider">WESMA BADMINTON</h2>
+                <h2 class="text-sm font-bold text-amber-300 tracking-wider">WESMA BADMINTON</h2>
                 <p class="text-xs text-slate-400 font-light mt-1 tracking-widest text-amber-200 uppercase">WELCOME TO TOURNAMENT</p>
             </div>
-            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-sm tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
+            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-play"></i> START TOURNAMENT
             </button>
         </div>
     </div>
     
-    <!-- Printable Share Area Container (Zoomed & Logo-free Header) -->
-    <div id="capture-area" class="w-full max-w-md my-auto space-y-3 bg-slate-950 p-3 rounded-2xl">
+    <!-- Printable Share Area Container (Max Zoomed & Full Name Visibility) -->
+    <div id="capture-area" class="w-full max-w-lg my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
-        <!-- Header (Logo Removed, Moved Up) -->
-        <div class="text-center py-3 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
+        <!-- Header (Logo Removed, Clean & Elegant) -->
+        <div class="text-center py-2.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
             <div class="flex justify-between items-center px-1 pb-1">
-                <span class="text-[10px] text-slate-400 font-light tracking-wider flex items-center gap-1">
-                    <i class="fa-solid fa-circle text-[6px] text-emerald-400 animate-pulse"></i> LIVE
+                <span class="text-[9px] text-slate-400 font-light tracking-wider flex items-center gap-1">
+                    <i class="fa-solid fa-circle text-[5px] text-emerald-400 animate-pulse"></i> LIVE
                 </span>
-                <span id="header-date-badge" class="text-[10px] bg-slate-950 text-amber-300 font-light px-2.5 py-0.5 rounded-full border border-amber-500/40 shadow-inner">
+                <span id="header-date-badge" class="text-[9px] bg-slate-950 text-amber-300 font-light px-2.5 py-0.5 rounded-full border border-amber-500/40 shadow-inner">
                     <!-- Loaded via JS -->
                 </span>
             </div>
 
-            <!-- Wesma on top with special W, Badminton on bottom -->
-            <div class="pt-1">
+            <div class="pt-0.5">
                 <h1 class="wesma-title leading-none"><span class="special-w">W</span>ESMA</h1>
-                <h2 class="text-sm font-bold text-slate-200 tracking-[0.3em] uppercase mt-1">BADMINTON CLUB</h2>
+                <h2 class="text-xs font-bold text-slate-200 tracking-[0.25em] uppercase mt-1">BADMINTON CLUB</h2>
             </div>
-            <p class="text-[9px] font-light text-amber-200/70 tracking-[0.2em] uppercase pt-0.5">Tournament Scoreboard</p>
+            <p class="text-[8px] font-light text-amber-200/70 tracking-[0.2em] uppercase pt-0.5">Tournament Scoreboard</p>
         </div>
 
         <!-- Main Content Area -->
@@ -143,24 +142,24 @@
             </div>
 
             <!-- Total Play Section & Timers -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 space-y-1.5 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
                         <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
                     </span>
-                    <span id="total-play-val" class="text-amber-400 font-bold text-sm bg-slate-950 px-3 py-1 rounded-lg border border-amber-500/20 min-w-[50px] text-center shadow-inner">
+                    <span id="total-play-val" class="text-amber-400 font-bold text-xs bg-slate-950 px-3 py-0.5 rounded-lg border border-amber-500/20 min-w-[45px] text-center shadow-inner">
                         0
                     </span>
                 </div>
                 
-                <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
+                <div class="text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1.5 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
                         <i class="fa-solid fa-stopwatch text-emerald-400 text-xs"></i> Current Match Duration:
                     </span>
                     <span id="current-match-timer" class="text-emerald-400 text-xs font-bold">0m 0s</span>
                 </div>
 
-                <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
+                <div class="text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1.5 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
                         <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration:
                     </span>
@@ -169,40 +168,40 @@
             </div>
 
             <!-- Leaderboard Summary Section -->
-            <div class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
+            <div class="bg-slate-900 border gold-border rounded-xl p-2.5 text-center shadow-lg space-y-2">
                 <div>
                     <div class="text-xs font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
                     </div>
-                    <div id="leader-text" class="text-sm font-bold text-amber-200 mt-1 uppercase tracking-wide">
+                    <div id="leader-text" class="text-xs font-bold text-amber-200 mt-1 uppercase tracking-wide">
                         ലോഡ് ചെയ്യുന്നു...
                     </div>
                 </div>
 
-                <div id="podium-text" class="text-xs font-light text-amber-200/90 pt-2 border-t border-amber-500/20 px-1 text-left space-y-1">
+                <div id="podium-text" class="text-[11px] font-light text-amber-200/90 pt-1.5 border-t border-amber-500/20 px-1 text-left space-y-1">
                     <div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
                 </div>
 
-                <div id="fastest-win-text" class="text-xs font-light text-cyan-300 pt-2 border-t border-cyan-500/20 truncate px-1 text-center uppercase">
+                <div id="fastest-win-text" class="text-[11px] font-light text-cyan-300 pt-1.5 border-t border-cyan-500/20 truncate px-1 text-center uppercase">
                     ⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും
                 </div>
 
-                <div id="loser-text" class="text-xs font-light text-rose-300 pt-2 border-t border-rose-500/20 text-center uppercase">
+                <div id="loser-text" class="text-[11px] font-light text-rose-300 pt-1.5 border-t border-rose-500/20 text-center uppercase">
                     തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
                 </div>
             </div>
 
             <!-- History Summary Section -->
-            <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-3 space-y-2 shadow-xl">
+            <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 space-y-1.5 shadow-xl">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                         <i class="fa-solid fa-clock-history text-amber-400"></i> MATCH HISTORY
                     </span>
-                    <button onclick="openHistoryModal()" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-1">
+                    <button onclick="openHistoryModal()" class="text-[11px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-1">
                         <i class="fa-solid fa-folder-open"></i> ഹിസ്റ്ററി
                     </button>
                 </div>
-                <div id="history-summary-text" class="text-xs text-slate-400 font-light italic text-center py-1">
+                <div id="history-summary-text" class="text-[10px] text-slate-400 font-light italic text-center py-0.5">
                     സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.
                 </div>
             </div>
@@ -211,19 +210,19 @@
 
     </div>
 
-    <!-- Outside Capture Area: Reset & Share Buttons -->
-    <div class="w-full max-w-md pt-2 space-y-2">
-        <div class="grid grid-cols-2 gap-2">
-            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-3 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-2 text-sm transition-all active:scale-95 shadow-md">
-                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
+    <!-- Outside Capture Area: Compact Reset & Share Buttons -->
+    <div class="w-full max-w-lg pt-1.5 space-y-1.5">
+        <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-2 px-1 rounded-xl border border-slate-700 flex items-center justify-center gap-1 text-[11px] transition-all active:scale-95 shadow-md">
+                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ്
             </button>
-            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-800 hover:bg-cyan-700 text-white font-light py-3 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm transition-all active:scale-95 border border-cyan-500/30" title="Direct WhatsApp Text Share">
-                <i class="fa-solid fa-comment-sms text-cyan-200"></i> വാട്സാപ്പ് ടെക്സ്റ്റ്
+            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-[11px] transition-all active:scale-95 border border-cyan-500/30">
+                <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ്
+            </button>
+            <button onclick="openWhatsAppChoiceModal('image')" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-2 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-[11px] transition-all active:scale-95 border border-emerald-500/30">
+                <i class="fa-brands fa-whatsapp text-emerald-100"></i> ഫോട്ടോ
             </button>
         </div>
-        <button onclick="openWhatsAppChoiceModal('image')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-3.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm transition-all active:scale-95 border border-emerald-500/30">
-            <i class="fa-brands fa-whatsapp text-lg text-emerald-100"></i> ഫോട്ടോ ആയി ഷെയർ (Image Share)
-        </button>
     </div>
 
     <!-- Custom Variety Popup for Team Name Editing -->
@@ -294,7 +293,7 @@
 
     <!-- History Popup Modal -->
     <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-sm sm:max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="text-xs font-bold text-amber-300 flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-amber-400"></i> TOURNAMENT LOGS
@@ -353,7 +352,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v61');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v62');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -379,7 +378,7 @@
             const dateBadge = document.getElementById("header-date-badge");
             if(dateBadge) {
                 const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[10px] mr-1 text-amber-400"></i> ${todayStr}`;
+                dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[9px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
             render();
@@ -415,13 +414,11 @@
             startCooldownTickers();
         }
 
-        // Formats team name: only ONE random letter from Part 1 and ONE from Part 2 rotates with delayed timing
         function formatSingleLetterAnimatedName(nameStr) {
             let upperName = nameStr.toUpperCase();
             let parts = upperName.split('&');
             
             if (parts.length < 2) {
-                // Fallback if no '&'
                 return formatPartSingleAnim(upperName, 0);
             }
 
@@ -657,13 +654,13 @@
                 
                 if (isWinner) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="text-[10px] bg-amber-400 text-slate-950 font-bold px-2 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-crown text-[8px]"></i> 1st</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
                 } else if (isFastest) {
                     extraCardClass = "fastest-card";
-                    specialBadgeHtml = `<span class="text-[10px] bg-cyan-500 text-slate-950 font-bold px-2 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-bolt text-[8px]"></i> Fast</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-bold px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
                 } else if (isLoser) {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="text-[10px] bg-rose-900 text-rose-200 font-bold px-2 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-exclamation text-[8px]"></i> Last</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-bold px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
                 }
 
                 const card = document.createElement("div");
@@ -671,17 +668,17 @@
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2 flex-1 min-w-0">
-                            <span class="w-2 h-7 rounded-md ${team.badgeBg} shrink-0"></span>
+                            <span class="w-2 h-8 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-sm font-bold text-slate-100 tracking-wide cursor-pointer truncate w-full flex items-center justify-between hover:text-amber-300" title="Click to edit">
-                                <span class="truncate">${formatSingleLetterAnimatedName(team.name)}</span>
-                                <i class="fa-solid fa-pen text-[10px] text-slate-400 shrink-0 ml-2"></i>
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold text-slate-100 tracking-wide cursor-pointer truncate w-full flex items-center justify-between hover:text-amber-300" title="Click to edit">
+                                <span class="truncate pr-1">${formatSingleLetterAnimatedName(team.name)}</span>
+                                <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0"></i>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
                             <!-- 1. Play Display -->
                             <div class="w-7 h-10 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700" title="Total Played">
-                                <span class="text-[8px] text-slate-400 font-light leading-none">Play</span>
+                                <span class="text-[7px] text-slate-400 font-light leading-none">Play</span>
                                 <span class="text-xs text-amber-300 font-bold">${playedCount}</span>
                             </div>
                             
@@ -691,9 +688,9 @@
                             </button>
                             
                             <!-- 3. Win/Loss Box -->
-                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30">
-                                <span class="text-xs text-amber-400 font-bold">${team.wins} <span class="text-[9px] text-amber-200 font-light">Win</span></span>
-                                <span class="text-[10px] text-rose-400 font-bold">${losses} <span class="text-[8px] text-rose-200 font-light">Loss</span></span>
+                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30 min-w-[42px]">
+                                <span class="text-xs text-amber-400 font-bold">${team.wins} <span class="text-[8px] text-amber-200 font-light">Win</span></span>
+                                <span class="text-[10px] text-rose-400 font-bold">${losses} <span class="text-[7px] text-rose-200 font-light">Loss</span></span>
                             </div>
                             
                             <!-- 4. Plus Button (+) -->
@@ -703,8 +700,8 @@
                                 </button>
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-lg flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
                                     <div class="flex flex-col items-center justify-center">
-                                        <span class="text-[10px] leaf-anim">🍃</span>
-                                        <span id="cool-countdown-${team.id}" class="text-[9px] text-emerald-400 font-bold">60s</span>
+                                        <span class="text-[9px] leaf-anim">🍃</span>
+                                        <span id="cool-countdown-${team.id}" class="text-[8px] text-emerald-400 font-bold">60s</span>
                                     </div>
                                 </div>
                             </div>
