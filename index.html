@@ -376,7 +376,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v75');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v76');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -413,8 +413,8 @@
                     const data = snapshot.val();
                     if (data && data.teams && Array.isArray(data.teams) && data.teams.length > 0) {
                         teams = defaultTeams.map((defTeam) => {
-                            const found = data.teams.find(st => st.id === defTeam.id);
-                            return found ? { ...defTeam, ...found } : defTeam;
+                            const found = data.teams.find(st => st && st.id === defTeam.id);
+                            return found && found.name ? { ...defTeam, ...found } : defTeam;
                         });
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
@@ -425,6 +425,8 @@
                             if(gate) gate.classList.add("hidden");
                         }
                     } else {
+                        // If firebase has no proper teams, initialize with defaultTeams safely
+                        teams = JSON.parse(JSON.stringify(defaultTeams));
                         saveData();
                     }
                     render();
@@ -454,7 +456,7 @@
         }
 
         function formatSingleLetterAnimatedName(nameStr) {
-            let upperName = nameStr.toUpperCase();
+            let upperName = (nameStr || "").toUpperCase();
             let parts = upperName.split('&');
             
             if (parts.length < 2) {
