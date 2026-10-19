@@ -288,7 +288,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v10') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v11') : null;
 
         function initData() {
             // Set Header Date with Animation
@@ -505,7 +505,7 @@
             lastActionTimestamp = now;
             renderUIState();
             saveData();
-            render();
+            render(); // Forced immediate rendering of teams list
             showToast("🚀 Tournament Session Timer Started (1.5 Hours)!");
         }
 
@@ -566,7 +566,7 @@
             container.innerHTML = "";
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             const totalPlays = calculateTotalPlays();
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
