@@ -30,14 +30,6 @@
             -webkit-text-fill-color: transparent;
         }
         .gold-border { border-color: rgba(212, 175, 55, 0.4); }
-        .pulse-glow {
-            animation: pulseGlow 2s infinite;
-        }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
         .winner-card {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
             border: 1.5px solid #d4af37 !important;
@@ -257,7 +249,7 @@
 
     <script>
         const ADMIN_PIN = "1234";
-        const SESSION_LIMIT_MS = 90 * 60 * 1000; // 1.5 Hours in milliseconds
+        const SESSION_LIMIT_MS = 90 * 60 * 1000; // 1.5 Hours
         
         const defaultTeams = [
             { id: 1, name: "Shafeer & Faisal", wins: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
@@ -269,8 +261,8 @@
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
-        let tournamentStartTimestamp = null;
-        let lastActionTimestamp = null;
+        let tournamentStartTimestamp = Date.now();
+        let lastActionTimestamp = Date.now();
         let timerInterval = null;
         let cooldownInterval = null;
         let isFirebaseConnected = false;
@@ -286,93 +278,51 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v17') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v18') : null;
 
         function initData() {
-            // Set Header Date with Animation
             const dateBadge = document.getElementById("header-date-badge");
             if(dateBadge) {
                 const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[8px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
+            // Render default data instantly so screen is never blank
+            render();
+
             if (dbRef) {
                 dbRef.on('value', (snapshot) => {
                     const data = snapshot.val();
-                    if (data) {
-                        const savedTeams = data.teams || defaultTeams;
+                    if (data && data.teams) {
                         teams = defaultTeams.map((defTeam) => {
-                            const found = savedTeams.find(st => st.id === defTeam.id);
-                            return {
-                                ...defTeam,
-                                name: (found && found.name) ? found.name : defTeam.name,
-                                wins: found ? (found.wins || 0) : 0,
-                                played: found ? (found.played || 0) : 0,
-                                lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
-                                lastClickTime: found ? (found.lastClickTime || 0) : 0
-                            };
+                            const found = data.teams.find(st => st.id === defTeam.id);
+                            return found ? { ...defTeam, ...found } : defTeam;
                         });
-                        tournamentStartTimestamp = data.tournamentStartTimestamp !== undefined ? data.tournamentStartTimestamp : null;
-                        lastActionTimestamp = data.lastActionTimestamp !== undefined ? data.lastActionTimestamp : null;
+                        tournamentStartTimestamp = data.tournamentStartTimestamp || Date.now();
+                        lastActionTimestamp = data.lastActionTimestamp || Date.now();
                         tournamentHistory = data.tournamentHistory || [];
                     } else {
                         teams = JSON.parse(JSON.stringify(defaultTeams));
-                        tournamentStartTimestamp = Date.now(); // Always start live timer immediately
+                        tournamentStartTimestamp = Date.now();
                         lastActionTimestamp = Date.now();
                         tournamentHistory = [];
                         dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
                     }
                     
-                    checkSessionExpiry();
                     render();
                     updateHistorySummaryText();
                 }, (error) => {
                     console.error("Firebase read error:", error);
                     render();
                 });
-            } else {
-                tournamentStartTimestamp = Date.now();
-                lastActionTimestamp = Date.now();
-                render();
             }
 
             startLiveTimer();
             startCooldownTickers();
         }
 
-        function checkSessionExpiry() {
-            if (tournamentStartTimestamp) {
-                const elapsed = Date.now() - tournamentStartTimestamp;
-                if (elapsed >= SESSION_LIMIT_MS) {
-                    archiveCurrentSession("1.5 Hours Auto-Session Break");
-                }
-            }
-        }
-
-        function archiveCurrentSession(reason) {
-            const totalPlays = calculateTotalPlays();
-            if (totalPlays > 0) {
-                const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', { 
-                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-                });
-                const record = {
-                    id: Date.now(),
-                    date: dateStr,
-                    teams: JSON.parse(JSON.stringify(teams)),
-                    totalPlays: totalPlays,
-                    durationMinutes: Math.round((Date.now() - (tournamentStartTimestamp || Date.now())) / 60000)
-                };
-                tournamentHistory.unshift(record);
-            }
-            teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
-            tournamentStartTimestamp = Date.now();
-            lastActionTimestamp = Date.now();
-            saveData();
-            showToast(`ℹ️ ${reason}: സെഷൻ പൂർത്തിയായി ഹിസ്റ്ററിയിലേക്ക് മാറ്റി.`);
-        }
-
         function calculateTotalPlays() {
-            return teams.reduce((sum, team) => sum + team.wins, 0);
+            return teams.reduce((sum, team) => sum + (team.wins || 0), 0);
         }
 
         function saveData() {
@@ -489,7 +439,6 @@
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                checkSessionExpiry();
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
                 
@@ -539,6 +488,7 @@
             const container = document.getElementById("teams-list");
             if(!container) return;
             container.innerHTML = "";
+            
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
             const minWins = sortedTeams[sortedTeams.length - 1].wins;
@@ -582,7 +532,7 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-2 h-7 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
                             ${specialBadgeHtml}
-                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-xs sm:text-sm font-extrabold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name (Admin PIN required)">
+                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-xs sm:text-sm font-extrabold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name">
                                 <span class="truncate">${escapeHtml(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
@@ -602,7 +552,7 @@
                                 <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
                                     <i class="fa-solid fa-plus text-[10px]"></i>
                                 </button>
-                                <!-- Cool-down Indicator Overlay over plus button -->
+                                <!-- Cool-down Indicator Overlay -->
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-xl flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
                                     <div class="flex flex-col items-center justify-center">
                                         <span class="text-[9px] leaf-anim">🍃</span>
@@ -613,7 +563,6 @@
                         </div>
                     </div>
                     
-                    <!-- Bottom Info Section showing Last Match Duration -->
                     <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-1">
                         <span class="text-slate-400 italic">ടീമിന്റെ ജയ-തോൽവി ലൈവ് സ്റ്റാറ്റ്സ്</span>
                         <span class="font-bold text-amber-300/90">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'No time'}</span>
@@ -758,12 +707,15 @@
                 return;
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്ത് ഹിസ്റ്ററിയിലേക്ക് മാറ്റണോ?")) {
-                archiveCurrentSession("Manual Admin Reset");
+                teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
+                tournamentStartTimestamp = Date.now();
+                lastActionTimestamp = Date.now();
+                saveData();
                 render();
+                showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
             }
         }
 
-        // Generate Image Snapshot and Share via WhatsApp
         function shareWhatsAppImage() {
             showToast("📸 സ്കോർ കാർഡ് ഫോട്ടോ തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
