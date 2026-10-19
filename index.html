@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Orbitron:wght@600;800;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Orbitron:wght@600;800&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -23,7 +23,11 @@
             font-weight: 400;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-cinzel { font-family: 'Cinzel Decorative', cursive; }
+        .font-great-vibes { 
+            font-family: 'Great Vibes', cursive !important; 
+            font-size: 1.35rem !important;
+            letter-spacing: 0.5px;
+        }
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
         .gold-gradient-text {
             background: linear-gradient(135deg, #FFE082 0%, #D4AF37 40%, #B8860B 80%, #FFD700 100%);
@@ -52,21 +56,11 @@
         .leaf-anim {
             animation: leafPulse 2s infinite ease-in-out;
         }
-        @keyframes nameGlow {
-            0% { text-shadow: 0 0 2px rgba(255,255,255,0.2); }
-            50% { text-shadow: 0 0 8px rgba(212,175,55,0.6); }
-            100% { text-shadow: 0 0 2px rgba(255,255,255,0.2); }
-        }
-        .animated-team-name {
-            animation: nameGlow 3s infinite ease-in-out;
-            font-family: 'Cinzel Decorative', cursive !important;
-            letter-spacing: 0.5px;
-        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-2 sm:p-3 select-none">
 
-    <!-- Startup Gate Modal (Mandatory Start) -->
+    <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
             <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
@@ -154,7 +148,7 @@
                     <div class="text-[11px] text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5 font-orbitron">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
                     </div>
-                    <div id="leader-text" class="text-sm text-white mt-0.5 font-cinzel">
+                    <div id="leader-text" class="text-sm text-white mt-0.5 font-great-vibes text-amber-200">
                         ലോഡ് ചെയ്യുന്നു...
                     </div>
                 </div>
@@ -197,10 +191,13 @@
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 py-2.5 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
             </button>
-            <button onclick="shareWhatsAppImage()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-orbitron py-2.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
-                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> ഫോട്ടോ ആയി ഷെയർ
+            <button onclick="shareWhatsAppText()" class="w-full bg-cyan-700 hover:bg-cyan-600 text-white font-orbitron py-2.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-cyan-400/30" title="Direct WhatsApp Text Share">
+                <i class="fa-solid fa-comment-sms text-cyan-200"></i> വാട്സാപ്പ് ടെക്സ്റ്റ്
             </button>
         </div>
+        <button onclick="shareWhatsAppImage()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-orbitron py-3 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
+            <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> ഫോട്ടോ ആയി ഷെയർ (Image Share)
+        </button>
     </div>
 
     <!-- Screenshot Preview Modal -->
@@ -276,7 +273,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v38') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v42') : null;
 
         function launchApp() {
             const gate = document.getElementById("startup-gate");
@@ -331,7 +328,7 @@
         }
 
         function calculateTotalPlays() {
-            return teams.reduce((sum, team) => sum + (team.wins || 0), 0);
+            return teams.reduce((sum, team) => sum + (team.played || 0), 0);
         }
 
         function saveData() {
@@ -501,7 +498,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -542,20 +539,20 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-2 h-7 rounded-lg ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm text-amber-100 cursor-pointer truncate w-full flex items-center justify-between hover:text-amber-300 animated-team-name font-cinzel" title="Click to edit">
+                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="text-sm sm:text-base text-amber-200 cursor-pointer truncate w-full flex items-center justify-between hover:text-amber-300 font-great-vibes" title="Click to edit">
                                 <span class="truncate">${escapeHtml(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 relative">
-                            <!-- 1. Play Button -->
-                            <button onclick="handlePlayedChange(${team.id}, 1)" class="w-7 h-10 bg-slate-800 text-slate-300 rounded-xl flex flex-col items-center justify-center text-[10px] border border-slate-700" title="Play +1">
+                            <!-- 1. Play Display (Automatic Count) -->
+                            <div class="w-7 h-10 bg-slate-800 text-slate-300 rounded-xl flex flex-col items-center justify-center text-[10px] border border-slate-700" title="Total Played">
                                 <span class="text-[8px] text-slate-400 leading-none font-orbitron">Play</span>
                                 <span class="text-xs text-amber-300 font-orbitron">${playedCount}</span>
-                            </button>
+                            </div>
                             
                             <!-- 2. Minus Button (-) -->
-                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900 text-white rounded-xl flex items-center justify-center text-xs border border-rose-700" title="Minus (-1 with PIN)">
+                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900 text-white rounded-xl flex items-center justify-center text-xs border border-rose-700 active:scale-95 transition-all" title="Minus (-1 with PIN)">
                                 <i class="fa-solid fa-minus text-[9px]"></i>
                             </button>
                             
@@ -567,7 +564,7 @@
                             
                             <!-- 4. Plus Button (+) -->
                             <div class="relative">
-                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 text-white rounded-xl flex items-center justify-center text-xs border border-emerald-500" title="Win +1">
+                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 text-white rounded-xl flex items-center justify-center text-xs border border-emerald-500 active:scale-95 transition-all" title="Win +1">
                                     <i class="fa-solid fa-plus text-[10px]"></i>
                                 </button>
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-xl flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
@@ -634,22 +631,6 @@
             }
         }
 
-        function handlePlayedChange(id, delta) {
-            const team = teams.find(t => t.id === id);
-            if (!team) return;
-            const pin = prompt("ആകെ കളിച്ച മത്സരങ്ങളുടെ എണ്ണം കൂട്ടുന്നതിന് Admin PIN (1234) നൽകുക:");
-            if (pin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
-                return;
-            }
-            team.played = (team.played || 0) + delta;
-            if (team.played < team.wins) team.played = team.wins;
-            autoSaveToHistory();
-            saveData();
-            render();
-            showToast(`${team.name} പ്ലേ കൗണ്ട് അപ്ഡേറ്റ് ചെയ്തു!`);
-        }
-
         function requestEditTeamName(id, currentName) {
             const pin = prompt("ടീമിന്റെ പേര് മാറ്റുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (pin !== ADMIN_PIN) {
@@ -695,7 +676,7 @@
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             let leaderHtml = "";
             firstPlaces.forEach(f => {
-                leaderHtml += `<div class="text-amber-300 text-sm font-cinzel">⭐ ${escapeHtml(f.name)} (${maxWins} ജയം) ⭐</div>`;
+                leaderHtml += `<div class="text-amber-300 text-base font-great-vibes">⭐ ${escapeHtml(f.name)} (${maxWins} ജയം) ⭐</div>`;
             });
             leaderEl.innerHTML = leaderHtml;
 
@@ -717,17 +698,35 @@
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
                 const fastestTeam = teamsWithTime[0];
-                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-cinzel">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
+                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-great-vibes text-sm">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
             } else {
                 fastestEl.innerHTML = `⚡ Fastest Win Award: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="text-rose-200 font-cinzel">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം)`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="text-rose-200 font-great-vibes text-sm">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം)`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
+        }
+
+        // Option 2: Direct WhatsApp Text Share Function
+        function shareWhatsAppText() {
+            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
+            let text = "🏸 *WESMA BADMINTON CLUB - LIVE SCORES* 🏸\n\n";
+            
+            sorted.forEach((t, i) => {
+                let played = Math.max(t.played || 0, t.wins);
+                let losses = Math.max(0, played - t.wins);
+                text += `${i + 1}. *${t.name}* \n   🏆 Wins: ${t.wins} | ❌ Losses: ${losses} | 🎮 Plays: ${played}\n\n`;
+            });
+
+            text += `🏆 *Champions:* ${sorted[0].wins > 0 ? sorted[0].name : 'Pending'}\n`;
+            text += `⚡ *Total Plays:* ${calculateTotalPlays()}\n`;
+            text += `📅 *Date:* ${new Date().toLocaleDateString('en-GB')}`;
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function resetScores() {
@@ -746,7 +745,7 @@
             }
         }
 
-        // Optimized Full Capture Screenshot Preview & Share
+        // Option 1: Image Capture & Share
         function shareWhatsAppImage() {
             showToast("📸 സ്കോർ കാർഡ് ഫുൾ സ്ക്രീൻഷോട്ട് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
