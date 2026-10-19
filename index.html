@@ -112,7 +112,7 @@
                 <!-- Rendered by JS -->
             </div>
 
-            <!-- Total Play Section & Timers -->
+            <!-- Total Play Section & Timers (Smaller Timer Font applied here) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
@@ -125,16 +125,16 @@
                 
                 <div class="text-xs text-slate-400 bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
-                        <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
+                        <i class="fa-solid fa-stopwatch text-emerald-400 text-[11px]"></i> Current Match Duration:
                     </span>
-                    <span id="current-match-timer" class="text-emerald-400 text-xs font-orbitron font-light">0m 0s</span>
+                    <span id="current-match-timer" class="text-emerald-400 text-[10px] font-orbitron font-light">0m 0s</span>
                 </div>
 
                 <div class="text-xs text-slate-400 bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
-                        <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Session Duration:
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-[11px]"></i> Session Duration:
                     </span>
-                    <span id="total-duration-timer" class="text-amber-400 text-xs font-orbitron font-light">0m 0s</span>
+                    <span id="total-duration-timer" class="text-amber-400 text-[10px] font-orbitron font-light">0m 0s</span>
                 </div>
             </div>
 
@@ -194,6 +194,31 @@
         <button onclick="shareWhatsAppImage()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-orbitron font-light py-3.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-500/30">
             <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> ഫോട്ടോ ആയി ഷെയർ (Image Share)
         </button>
+    </div>
+
+    <!-- Custom Variety Popup for Team Name Editing -->
+    <div id="custom-name-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
+            <div class="w-10 h-10 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-sm">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <h3 class="text-sm font-orbitron font-medium gold-gradient-text">ടീം പേര് മാറ്റുക</h3>
+            <p class="text-[11px] text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ പേര് നൽകുക</p>
+            
+            <div class="space-y-2 pt-1">
+                <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 font-orbitron focus:outline-none focus:border-amber-500">
+                <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര്" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-amber-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
+                <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-orbitron font-medium py-2 rounded-xl text-xs shadow">
+                    സേവ് ചെയ്യുക
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- WhatsApp App Choice Modal -->
@@ -276,19 +301,26 @@
         let timerInterval = null;
         let cooldownInterval = null;
         let isFirebaseConnected = false;
+        let dbRef = null;
+        let editingTeamId = null;
 
-        const firebaseConfig = {
-            databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
-        };
-        
         try {
-            firebase.initializeApp(firebaseConfig);
-            isFirebaseConnected = true;
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp({
+                        databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
+                    });
+                }
+                dbRef = firebase.database().ref('wesma_badminton_scores_v52');
+                isFirebaseConnected = true;
+            }
         } catch (e) {
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v50') : null;
+        document.addEventListener("DOMContentLoaded", () => {
+            initData();
+        });
 
         function launchApp() {
             const gate = document.getElementById("startup-gate");
@@ -308,7 +340,6 @@
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[9px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
-            // Immediately render default teams on startup
             render();
 
             if (dbRef) {
@@ -336,8 +367,6 @@
                     console.error("Firebase read error:", error);
                     render();
                 });
-            } else {
-                render();
             }
 
             startLiveTimer();
@@ -556,7 +585,7 @@
                         <div class="flex items-center gap-2 flex-1 min-w-0">
                             <span class="w-2 h-7 rounded-lg ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="text-sm font-light text-slate-200 cursor-pointer truncate w-full flex items-center justify-between hover:text-amber-300" title="Click to edit">
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-sm font-light text-slate-200 cursor-pointer truncate w-full flex items-center justify-between hover:text-amber-300" title="Click to edit">
                                 <span class="truncate">${escapeHtml(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1.5"></i>
                             </div>
@@ -648,26 +677,45 @@
             }
         }
 
-        function requestEditTeamName(id, currentName) {
-            const pin = prompt("ടീമിന്റെ പേര് മാറ്റുന്നതിന് Admin PIN (1234) നൽകുക:");
-            if (pin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
-                return;
-            }
-            const newName = prompt("പുതിയ ടീം പേര് നൽകുക:", currentName);
-            if (newName !== null) {
-                updateTeamName(id, newName);
-            }
+        function openCustomNameModal(id, currentName) {
+            editingTeamId = id;
+            const modal = document.getElementById("custom-name-modal");
+            const nameInput = document.getElementById("edit-team-name-input");
+            const pinInput = document.getElementById("edit-admin-pin");
+            if(nameInput) nameInput.value = currentName;
+            if(pinInput) pinInput.value = "";
+            if(modal) modal.classList.remove("hidden");
         }
 
-        function updateTeamName(id, val) {
-            const team = teams.find(t => t.id === id);
-            if (!team) return;
-            const trimmed = val.trim();
-            team.name = trimmed !== "" ? trimmed : "Team";
-            autoSaveToHistory();
-            saveData();
-            showToast("ടീമിന്റെ പേര് മാറ്റിയിട്ടുണ്ട്!");
+        function closeCustomNameModal() {
+            const modal = document.getElementById("custom-name-modal");
+            if(modal) modal.classList.add("hidden");
+            editingTeamId = null;
+        }
+
+        function submitCustomTeamName() {
+            const pinInput = document.getElementById("edit-admin-pin").value;
+            const nameInput = document.getElementById("edit-team-name-input").value.trim();
+
+            if (pinInput !== ADMIN_PIN) {
+                alert("തെറ്റായ Admin PIN!");
+                return;
+            }
+
+            if (!nameInput) {
+                alert("ദയവായി ഒരു ടീം പേര് നൽകുക!");
+                return;
+            }
+
+            const team = teams.find(t => t.id === editingTeamId);
+            if (team) {
+                team.name = nameInput;
+                autoSaveToHistory();
+                saveData();
+                render();
+                showToast("ടീമിന്റെ പേര് മാറ്റിയിട്ടുണ്ട്!");
+            }
+            closeCustomNameModal();
         }
 
         function updateLeaderboard() {
@@ -842,8 +890,6 @@
         function escapeHtml(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
-
-        initData();
     </script>
 </body>
 </html>
