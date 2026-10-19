@@ -289,7 +289,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v26') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v28') : null;
 
         function initData() {
             const dateBadge = document.getElementById("header-date-badge");
@@ -548,22 +548,22 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 relative">
-                            <!-- 1. Played Match Update Button (Left) -->
+                            <!-- 1. Play Button (Left) -->
                             <button onclick="handlePlayedChange(${team.id}, 1)" class="w-7 h-10 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-300 rounded-xl flex flex-col items-center justify-center font-bold text-[10px] shadow-md active:scale-95 transition-all border border-slate-700" title="Add Played Match (+1 Played)">
                                 <span class="text-[8px] text-slate-400 leading-none">Play</span>
                                 <span class="font-black text-xs text-amber-300">${playedCount}</span>
                             </button>
                             
-                            <!-- 2. Wins & Losses Auto Calculated Box (Middle) -->
+                            <!-- 2. Minus Button (-) placed before Win Box -->
+                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900/80 hover:bg-rose-800 active:bg-rose-950 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-700/50" title="Reduce Win (-1 with PIN)">
+                                <i class="fa-solid fa-minus text-[9px]"></i>
+                            </button>
+                            
+                            <!-- 3. Win/Loss Box -->
                             <div class="flex flex-col items-center justify-center bg-slate-950 rounded-xl px-2 py-1 border border-amber-500/30 shadow-inner">
                                 <span class="text-xs font-black text-amber-400 font-poppins">${team.wins} <span class="text-[9px] text-amber-200">Win</span></span>
                                 <span class="text-[10px] font-bold text-rose-400 font-poppins">${losses} <span class="text-[8px] text-rose-200">Loss</span></span>
                             </div>
-                            
-                            <!-- 3. Minus Button (-) placed AFTER Play & Win/Loss columns -->
-                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900/80 hover:bg-rose-800 active:bg-rose-950 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-700/50" title="Reduce Win (-1 with PIN)">
-                                <i class="fa-solid fa-minus text-[9px]"></i>
-                            </button>
                             
                             <!-- 4. Plus Button (+) with Cooldown Lock (Rightmost) -->
                             <div class="relative">
