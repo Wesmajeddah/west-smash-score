@@ -50,11 +50,11 @@
 
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
-        <!-- Header with Perfectly Aligned Wesma Logo Emblem -->
+        <!-- Header with Wesma Logo Emblem -->
         <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- SVG Wesma Custom Logo Emblem with Correct Alignment -->
+            <!-- SVG Wesma Custom Logo Emblem -->
             <div class="flex justify-center mb-1">
                 <div class="w-24 h-24 sm:w-28 sm:h-28 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -75,11 +75,9 @@
                         <circle cx="100" cy="100" r="90" fill="url(#bgDark)" stroke="url(#copperGrad)" stroke-width="1.5" />
                         <circle cx="100" cy="100" r="74" fill="none" stroke="rgba(212, 175, 55, 0.25)" stroke-width="1" stroke-dasharray="2,3" />
 
-                        <!-- Wesma 'W' Monogram combined with Shuttlecock (Centered) -->
+                        <!-- Wesma 'W' Monogram combined with Shuttlecock -->
                         <g transform="translate(0, 2)">
-                            <!-- Stylized 'W' -->
                             <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="url(#copperGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-                            <!-- Shuttlecock on top of W -->
                             <g transform="translate(100, 50) scale(0.85)">
                                 <path d="M -10 12 L -7 2 C -4 -2 4 -2 7 2 L 10 12 Z" fill="#FFF" stroke="url(#copperGrad)" stroke-width="1.5"/>
                                 <path d="M -9 6 Q 0 3 9 6" fill="none" stroke="url(#copperGrad)" stroke-width="1.5"/>
@@ -87,7 +85,7 @@
                             </g>
                         </g>
 
-                        <!-- Corrected Curved Header Text: WESMA -->
+                        <!-- Curved Header Text: WESMA -->
                         <path id="textArcTop" d="M 28 100 A 72 72 0 0 1 172 100" fill="none" />
                         <text font-family="Orbitron, sans-serif" font-weight="900" font-size="15" fill="#FFE082" letter-spacing="4">
                             <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
@@ -95,7 +93,7 @@
                             </textPath>
                         </text>
 
-                        <!-- Corrected Curved Footer Text: JEDDAH • SINCE 2026 -->
+                        <!-- Curved Footer Text: JEDDAH • SINCE 2026 -->
                         <path id="textArcBottom" d="M 172 100 A 72 72 0 0 1 28 100" fill="none" />
                         <text font-family="Orbitron, sans-serif" font-weight="700" font-size="7.5" fill="#FFE082" letter-spacing="1.5">
                             <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
@@ -116,7 +114,7 @@
             </div>
         </div>
 
-        <!-- Teams List -->
+        <!-- Teams List (Auto Sorted by Score) -->
         <div id="teams-list" class="space-y-2.5">
             <!-- Rendered by JS -->
         </div>
@@ -158,7 +156,7 @@
         <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2.5">
             <div>
                 <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
+                    <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)[span_2](start_span)[span_2](end_span)
                 </div>
                 <div id="leader-text" class="text-sm sm:text-base font-black text-white mt-0.5">
                     ലോഡ് ചെയ്യുന്നു...
@@ -172,7 +170,7 @@
 
             <!-- Fastest Win Award Section -->
             <div id="fastest-win-text" class="text-xs text-cyan-300 font-bold pt-1.5 border-t border-cyan-500/20 truncate px-1 text-center">
-                ⚡ Fastest Win Award: കണക്കാക്കുന്നു...
+                ⚡ Fastest Win Award: കണക്കാക്കുന്നു...[span_3](start_span)[span_3](end_span)
             </div>
 
             <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
@@ -184,10 +182,10 @@
         <!-- Separate Reset & WhatsApp Share Buttons -->
         <div class="grid grid-cols-2 gap-2 pt-1">
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
-                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
+                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)[span_4](start_span)[span_4](end_span)
             </button>
             <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
-                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
+                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ[span_5](start_span)[span_5](end_span)
             </button>
         </div>
 
@@ -199,7 +197,7 @@
     </div>
 
     <script>
-        const ADMIN_PIN = "1234"; 
+        const ADMIN_PIN = "1234";[span_6](start_span)[span_6](end_span)
 
         const defaultTeams = [
             { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
@@ -219,7 +217,7 @@
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('wesma_badminton_scores_v1');
+        const dbRef = firebase.database().ref('wesma_badminton_scores_v2');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -227,12 +225,13 @@
                 if (data) {
                     const savedTeams = data.teams || defaultTeams;
                     teams = defaultTeams.map((defTeam, i) => {
+                        const found = savedTeams.find(st => st.id === defTeam.id);
                         return {
                             ...defTeam,
-                            name: (savedTeams[i] && savedTeams[i].name) ? savedTeams[i].name : defTeam.name,
-                            wins: savedTeams[i] ? (savedTeams[i].wins || 0) : 0,
-                            lastMatchTime: savedTeams[i] ? (savedTeams[i].lastMatchTime || 0) : 0,
-                            lastClickTime: savedTeams[i] ? (savedTeams[i].lastClickTime || 0) : 0
+                            name: (found && found.name) ? found.name : defTeam.name,
+                            wins: found ? (found.wins || 0) : 0,
+                            lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
+                            lastClickTime: found ? (found.lastClickTime || 0) : 0
                         };
                     });
                     tournamentStartTimestamp = data.tournamentStartTimestamp || null;
@@ -248,18 +247,19 @@
                 startCooldownTickers();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("wesma_badminton_scores_v1");
+                const saved = localStorage.getItem("wesma_badminton_scores_v2");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
                         const savedTeams = parsed.teams || defaultTeams;
                         teams = defaultTeams.map((defTeam, i) => {
+                            const found = savedTeams.find(st => st.id === defTeam.id);
                             return {
                                 ...defTeam,
-                                name: (savedTeams[i] && savedTeams[i].name) ? savedTeams[i].name : defTeam.name,
-                                wins: savedTeams[i] ? (savedTeams[i].wins || 0) : 0,
-                                lastMatchTime: savedTeams[i] ? (savedTeams[i].lastMatchTime || 0) : 0,
-                                lastClickTime: savedTeams[i] ? (savedTeams[i].lastClickTime || 0) : 0
+                                name: (found && found.name) ? found.name : defTeam.name,
+                                wins: found ? (found.wins || 0) : 0,
+                                lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
+                                lastClickTime: found ? (found.lastClickTime || 0) : 0
                             };
                         });
                         tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
@@ -287,7 +287,7 @@
         function saveData() {
             dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("wesma_badminton_scores_v1", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
+                localStorage.setItem("wesma_badminton_scores_v2", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
             });
             updateLeaderboard();
         }
@@ -342,9 +342,9 @@
 
             cooldownInterval = setInterval(() => {
                 const now = Date.now();
-                teams.forEach((team, idx) => {
-                    const btn = document.getElementById(`plus-btn-${idx}`);
-                    const overlay = document.getElementById(`spinner-overlay-${idx}`);
+                teams.forEach((team) => {
+                    const btn = document.getElementById(`plus-btn-${team.id}`);
+                    const overlay = document.getElementById(`spinner-overlay-${team.id}`);
                     if (!btn || !overlay) return;
 
                     const diff = now - (team.lastClickTime || 0);
@@ -365,9 +365,11 @@
             const container = document.getElementById("teams-list");
             container.innerHTML = "";
 
+            // Sort teams dynamically: Highest wins first (Top), Lowest wins last (Bottom)
+            let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const now = Date.now();
 
-            teams.forEach((team, idx) => {
+            sortedTeams.forEach((team) => {
                 const diff = now - (team.lastClickTime || 0);
                 const inCooldown = diff < 60000;
 
@@ -380,35 +382,35 @@
                             <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
                             <input type="text" 
                                    value="${escapeHtml(team.name)}" 
-                                   onchange="updateTeamName(${idx}, this.value)"
+                                   onchange="updateTeamName(${team.id}, this.value)"
                                    class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
                                    placeholder="ടീം പേര്">
                         </div>
 
                         <div class="flex items-center gap-1.5 shrink-0">
                             <!-- Minus Button with Admin PIN -->
-                            <button onclick="handleScoreChange(${idx}, -1)" 
+                            <button onclick="handleScoreChange(${team.id}, -1)" 
                                     class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
                                     title="Decrease score (Admin PIN required)">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
 
-                            <div id="score-box-${idx}"
+                            <div id="score-box-${team.id}"
                                  class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
 
                             <!-- Plus Button with Spinner Indicator -->
                             <div class="relative">
-                                <button id="plus-btn-${idx}" 
-                                        onclick="handleScoreChange(${idx}, 1)" 
+                                <button id="plus-btn-${team.id}" 
+                                        onclick="handleScoreChange(${team.id}, 1)" 
                                         class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 ${inCooldown ? 'opacity-60 cursor-not-allowed' : ''}"
                                         ${inCooldown ? 'disabled' : ''}
                                         title="Add Win">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
                                 <!-- Visual Spinner Overlay for Cooldown -->
-                                <div id="spinner-overlay-${idx}" class="absolute inset-0 bg-slate-950/80 rounded-xl flex items-center justify-center ${inCooldown ? '' : 'hidden'} pointer-events-none">
+                                <div id="spinner-overlay-${team.id}" class="absolute inset-0 bg-slate-950/80 rounded-xl flex items-center justify-center ${inCooldown ? '' : 'hidden'} pointer-events-none">
                                     <i class="fa-solid fa-spinner animate-spin text-amber-400 text-xs"></i>
                                 </div>
                             </div>
@@ -428,15 +430,18 @@
             updateLeaderboard();
         }
 
-        function handleScoreChange(idx, delta) {
+        function handleScoreChange(id, delta) {
+            const team = teams.find(t => t.id === id);
+            if (!team) return;
+
             const now = Date.now();
 
             if (delta > 0) {
-                if (teams[idx].lastClickTime && (now - teams[idx].lastClickTime < 60000)) {
+                if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
                     showToast(`⚠️ Please wait before adding again!`);
                     return;
                 }
-                teams[idx].lastClickTime = now;
+                team.lastClickTime = now;
 
                 if (!tournamentStartTimestamp) {
                     tournamentStartTimestamp = now;
@@ -444,13 +449,14 @@
 
                 if (lastActionTimestamp) {
                     const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
-                    teams[idx].lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
+                    team.lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
                 }
                 lastActionTimestamp = now;
 
-                teams[idx].wins += delta;
+                team.wins += delta;
                 saveData();
-                showToast(`${teams[idx].name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
+                render();
+                showToast(`${team.name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
             } 
             else if (delta < 0) {
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -459,25 +465,20 @@
                     return;
                 }
 
-                if (teams[idx].wins + delta < 0) return;
+                if (team.wins + delta < 0) return;
 
-                teams[idx].wins += delta;
+                team.wins += delta;
                 saveData();
-                showToast(`${teams[idx].name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
-            }
-
-            const box = document.getElementById(`score-box-${idx}`);
-            if (box) {
-                box.textContent = teams[idx].wins;
-                box.classList.remove("score-anim");
-                void box.offsetWidth;
-                box.classList.add("score-anim");
+                render();
+                showToast(`${team.name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
             }
         }
 
-        function updateTeamName(idx, val) {
+        function updateTeamName(id, val) {
+            const team = teams.find(t => t.id === id);
+            if (!team) return;
             const trimmed = val.trim();
-            teams[idx].name = trimmed !== "" ? trimmed : `Team ${idx + 1}`;
+            team.name = trimmed !== "" ? trimmed : `Team`;
             saveData();
         }
 
@@ -494,7 +495,7 @@
             if (maxWins === 0) {
                 leaderEl.innerHTML = `<span class="text-slate-400 text-xs font-semibold">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
                 podiumEl.innerHTML = `<div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>`;
-                fastestEl.innerHTML = `⚡ Fastest Win Award: കണക്കാക്കുന്നു...`;
+                fastestEl.innerHTML = `⚡ Fastest Win Award: കണക്കാക്കുന്നു...[span_7](start_span)[span_7](end_span)`;
                 loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
                 return;
             }
@@ -527,9 +528,9 @@
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
                 const fastestTeam = teamsWithTime[0];
-                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
+                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)[span_8](start_span)[span_8](end_span)`;
             } else {
-                fastestEl.innerHTML = `⚡ Fastest Win Award: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
+                fastestEl.innerHTML = `⚡ Fastest Win Award: കളികൾക്ക് ശേഷം ലഭ്യമാകും[span_9](start_span)[span_9](end_span)`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
@@ -541,12 +542,12 @@
         }
 
         function resetScores() {
-            const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");[span_10](start_span)[span_10](end_span)
             if (inputPin !== ADMIN_PIN) {
-                if (inputPin !== null) alert("തെറ്റായ PIN!");
+                if (inputPin !== null) alert("തെറ്റായ PIN!");[span_11](start_span)[span_11](end_span)
                 return;
             }
-            if (window.confirm("സ്കോറുകളും, ടോട്ടൽ പ്ലേയും, ടൈമറുകളും റീസെറ്റ് ചെയ്യണോ? (ടീം പേരുകൾ മാറില്ല)")) {
+            if (window.confirm("സ്കോറുകളും, ടോട്ടൽ പ്ലേയും, ടൈമറുകളും റീസെറ്റ് ചെയ്യണോ? (ടീം പേരുകൾ മാറില്ല)")) {[span_12](start_span)[span_12](end_span)
                 teams.forEach(t => {
                     t.wins = 0;
                     t.lastMatchTime = 0;
@@ -556,7 +557,7 @@
                 lastActionTimestamp = null;
                 saveData();
                 render();
-                showToast("സ്കോറുകൾ റീസെറ്റ് ചെയ്തു (പേരുകൾ സുരക്ഷിതം)! നന്ദി.");
+                showToast("സ്കോറുകൾ റീസെറ്റ് ചെയ്തു (പേരുകൾ സുരക്ഷിതം)! നന്ദി.");[span_13](start_span)[span_13](end_span)
             }
         }
 
@@ -568,14 +569,13 @@
             let msg = "🏸 *WESMA BADMINTON CLUB* 🏸\n";
             msg += "🏆 *Tournament Score Counter* 🏆\n\n";
 
-            teams.forEach((t, i) => {
+            sorted.forEach((t, i) => {
                 let timeStr = t.lastMatchTime ? ` (${t.lastMatchTime} mins)` : '';
                 msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം${timeStr}\n`;
             });
 
             msg += `\n🎮 *Total Plays:* ${calculateTotalPlays()}\n`;
             
-            // Calculate Total Duration text for WhatsApp
             if (tournamentStartTimestamp) {
                 let totalDiffMs = Date.now() - tournamentStartTimestamp;
                 let totalMins = Math.floor(totalDiffMs / 60000);
