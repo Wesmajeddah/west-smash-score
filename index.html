@@ -269,7 +269,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v46') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v47') : null;
 
         function launchApp() {
             const gate = document.getElementById("startup-gate");
@@ -288,6 +288,7 @@
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[7px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
+            // Immediately render default teams so screen is never empty
             render();
 
             if (dbRef) {
