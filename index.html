@@ -187,13 +187,32 @@
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-3 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
             </button>
-            <button onclick="shareWhatsAppText()" class="w-full bg-cyan-800 hover:bg-cyan-700 text-white font-orbitron font-light py-3 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-cyan-500/30" title="Direct WhatsApp Text Share">
+            <button onclick="openWhatsAppChoiceModal()" class="w-full bg-cyan-800 hover:bg-cyan-700 text-white font-orbitron font-light py-3 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-cyan-500/30" title="Direct WhatsApp Text Share">
                 <i class="fa-solid fa-comment-sms text-cyan-200"></i> വാട്സാപ്പ് ടെക്സ്റ്റ്
             </button>
         </div>
         <button onclick="shareWhatsAppImage()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-orbitron font-light py-3.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-500/30">
             <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> ഫോട്ടോ ആയി ഷെയർ (Image Share)
         </button>
+    </div>
+
+    <!-- WhatsApp App Choice Modal -->
+    <div id="whatsapp-choice-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-2xl shadow-2xl p-5 text-center space-y-3">
+            <h3 class="text-sm font-orbitron font-medium gold-gradient-text">വാട്സാപ്പ് തിരഞ്ഞെടുക്കുക</h3>
+            <p class="text-xs text-slate-400 font-light">ഏത് ആപ്പിലേക്കാണ് ടെക്സ്റ്റ് അയക്കേണ്ടത്?</p>
+            <div class="space-y-2 pt-2">
+                <button onclick="shareWhatsAppText('normal')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-orbitron font-light py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp (רגുലർ)
+                </button>
+                <button onclick="shareWhatsAppText('business')" class="w-full bg-teal-800 hover:bg-teal-700 text-white font-orbitron font-light py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Business
+                </button>
+                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Screenshot Preview Modal -->
@@ -269,7 +288,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v49') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v50') : null;
 
         function launchApp() {
             const gate = document.getElementById("startup-gate");
@@ -279,6 +298,7 @@
                 lastActionTimestamp = Date.now();
                 saveData();
             }
+            render();
         }
 
         function initData() {
@@ -288,7 +308,7 @@
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[9px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
-            // Immediately render default teams so screen is never empty
+            // Immediately render default teams on startup
             render();
 
             if (dbRef) {
@@ -308,7 +328,6 @@
                             if(gate) gate.classList.add("hidden");
                         }
                     } else {
-                        // If firebase data is empty, ensure default teams are saved
                         saveData();
                     }
                     render();
@@ -317,6 +336,8 @@
                     console.error("Firebase read error:", error);
                     render();
                 });
+            } else {
+                render();
             }
 
             startLiveTimer();
@@ -707,7 +728,18 @@
             }
         }
 
-        function shareWhatsAppText() {
+        function openWhatsAppChoiceModal() {
+            const modal = document.getElementById("whatsapp-choice-modal");
+            if(modal) modal.classList.remove("hidden");
+        }
+
+        function closeWhatsAppChoiceModal() {
+            const modal = document.getElementById("whatsapp-choice-modal");
+            if(modal) modal.classList.add("hidden");
+        }
+
+        function shareWhatsAppText(type) {
+            closeWhatsAppChoiceModal();
             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
             let text = "🏸 *WESMA BADMINTON CLUB - LIVE SCORES* 🏸\n\n";
             
@@ -721,7 +753,13 @@
             text += `⚡ *Total Plays:* ${calculateTotalPlays()}\n`;
             text += `📅 *Date:* ${new Date().toLocaleDateString('en-GB')}`;
 
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            let url = "";
+            if(type === 'business') {
+                url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            } else {
+                url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            }
+            window.open(url, '_blank');
         }
 
         function resetScores() {
