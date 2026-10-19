@@ -63,6 +63,37 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-2 sm:p-3 select-none">
+
+    <!-- Startup Gate Modal (Appears first until started) -->
+    <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
+            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
+                <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="copperGradGate" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFE082" />
+                            <stop offset="50%" stop-color="#D4AF37" />
+                            <stop offset="100%" stop-color="#A67C1E" />
+                        </linearGradient>
+                        <radialGradient id="bgDarkGate" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#0f172a" />
+                            <stop offset="100%" stop-color="#020617" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="100" cy="100" r="96" fill="url(#copperGradGate)" />
+                    <circle cx="100" cy="100" r="90" fill="url(#bgDarkGate)" stroke="url(#copperGradGate)" stroke-width="1.5" />
+                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="url(#copperGradGate)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-xl font-black font-orbitron gold-gradient-text">WESMA BADMINTON</h2>
+                <p class="text-[11px] text-slate-400 mt-1">ടൂർണമെന്റ് ആരംഭിക്കാൻ താഴെള്ള ബട്ടൺ അമർത്തുക</p>
+            </div>
+            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-3 rounded-xl shadow-lg shadow-amber-500/20 text-sm tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> START TOURNAMENT
+            </button>
+        </div>
+    </div>
     
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-sm sm:max-w-md my-auto space-y-2 bg-slate-950 p-2 rounded-2xl">
@@ -289,7 +320,16 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v28') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v29') : null;
+
+        function launchApp() {
+            const gate = document.getElementById("startup-gate");
+            if(gate) gate.classList.add("hidden");
+            if (!tournamentStartTimestamp) {
+                tournamentStartTimestamp = Date.now();
+                saveData();
+            }
+        }
 
         function initData() {
             const dateBadge = document.getElementById("header-date-badge");
