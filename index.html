@@ -131,16 +131,9 @@
             <h1 class="text-xl sm:text-2xl font-black font-orbitron gold-gradient-text tracking-wider leading-none">WESMA</h1>
             <!-- Small Sub-header BADMINTON CLUB -->
             <h2 class="text-[8px] sm:text-[9px] font-bold font-orbitron text-amber-200/70 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
-            
-            <!-- Welcome Screen Start Match Button -->
-            <div id="top-timer-container" class="pt-1.5">
-                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-2 px-3 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
-                    <i class="fa-solid fa-play text-xs"></i> START TOURNAMENT TIMER (കളി ആരംഭിക്കുക)
-                </button>
-            </div>
         </div>
 
-        <!-- Dynamic Main Tournament Content Area -->
+        <!-- Dynamic Main Tournament Content Area (Always Visible) -->
         <div id="main-content-area" class="space-y-2.5">
             
             <!-- Teams List -->
@@ -293,7 +286,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v16') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v17') : null;
 
         function initData() {
             // Set Header Date with Animation
@@ -324,23 +317,22 @@
                         tournamentHistory = data.tournamentHistory || [];
                     } else {
                         teams = JSON.parse(JSON.stringify(defaultTeams));
-                        tournamentStartTimestamp = null;
-                        lastActionTimestamp = null;
+                        tournamentStartTimestamp = Date.now(); // Always start live timer immediately
+                        lastActionTimestamp = Date.now();
                         tournamentHistory = [];
                         dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
                     }
                     
                     checkSessionExpiry();
-                    renderUIState();
                     render();
                     updateHistorySummaryText();
                 }, (error) => {
                     console.error("Firebase read error:", error);
-                    renderUIState();
                     render();
                 });
             } else {
-                renderUIState();
+                tournamentStartTimestamp = Date.now();
+                lastActionTimestamp = Date.now();
                 render();
             }
 
@@ -373,19 +365,10 @@
                 tournamentHistory.unshift(record);
             }
             teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
-            tournamentStartTimestamp = null;
-            lastActionTimestamp = null;
+            tournamentStartTimestamp = Date.now();
+            lastActionTimestamp = Date.now();
             saveData();
             showToast(`ℹ️ ${reason}: സെഷൻ പൂർത്തിയായി ഹിസ്റ്ററിയിലേക്ക് മാറ്റി.`);
-        }
-
-        function renderUIState() {
-            const timerContainer = document.getElementById("top-timer-container");
-            if (tournamentStartTimestamp) {
-                if(timerContainer) timerContainer.classList.add("hidden");
-            } else {
-                if(timerContainer) timerContainer.classList.remove("hidden");
-            }
         }
 
         function calculateTotalPlays() {
@@ -503,16 +486,6 @@
             }
         }
 
-        function startFirstMatch() {
-            const now = Date.now();
-            tournamentStartTimestamp = now;
-            lastActionTimestamp = now;
-            renderUIState();
-            saveData();
-            render();
-            showToast("🚀 Tournament Session Timer Started (1.5 Hours)!");
-        }
-
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -521,9 +494,7 @@
                 const totalDurationEl = document.getElementById("total-duration-timer");
                 
                 if (!tournamentStartTimestamp) {
-                    if(currentTimerEl) currentTimerEl.textContent = "0m 0s";
-                    if(totalDurationEl) totalDurationEl.textContent = "0m 0s";
-                    return;
+                    tournamentStartTimestamp = Date.now();
                 }
                 const totalDiffMs = Date.now() - tournamentStartTimestamp;
                 const totalMins = Math.floor(totalDiffMs / 60000);
@@ -570,7 +541,7 @@
             container.innerHTML = "";
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -668,7 +639,6 @@
                 team.lastClickTime = now;
                 if (!tournamentStartTimestamp) {
                     tournamentStartTimestamp = now;
-                    renderUIState();
                 }
                 if (lastActionTimestamp) {
                     const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
@@ -789,7 +759,6 @@
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്ത് ഹിസ്റ്ററിയിലേക്ക് മാറ്റണോ?")) {
                 archiveCurrentSession("Manual Admin Reset");
-                renderUIState();
                 render();
             }
         }
