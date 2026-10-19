@@ -141,7 +141,7 @@
         </div>
 
         <!-- Dynamic Main Tournament Content Area -->
-        <div id="main-content-area" class="space-y-2.5 hidden">
+        <div id="main-content-area" class="space-y-2.5">
             
             <!-- Teams List -->
             <div id="teams-list" class="space-y-2">
@@ -293,7 +293,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v14') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v16') : null;
 
         function initData() {
             // Set Header Date with Animation
@@ -380,14 +380,11 @@
         }
 
         function renderUIState() {
-            const mainContent = document.getElementById("main-content-area");
             const timerContainer = document.getElementById("top-timer-container");
             if (tournamentStartTimestamp) {
-                mainContent.classList.remove("hidden");
-                timerContainer.classList.add("hidden");
+                if(timerContainer) timerContainer.classList.add("hidden");
             } else {
-                mainContent.classList.add("hidden");
-                timerContainer.classList.remove("hidden");
+                if(timerContainer) timerContainer.classList.remove("hidden");
             }
         }
 
@@ -454,7 +451,8 @@
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
-                        let losses = Math.max(0, (t.played || t.wins) - t.wins);
+                        let playedCount = Math.max(t.played || 0, t.wins);
+                        let losses = Math.max(0, playedCount - t.wins);
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-[11px] text-slate-300 py-0.5 border-b border-slate-900">
                                 <span>${i + 1}. ${escapeHtml(t.name)}</span>
@@ -809,7 +807,6 @@
                 canvas.toBlob(blob => {
                     const file = new File([blob], "WESMA_Scores.png", { type: "image/png" });
                     
-                    // Check if Web Share API is supported (Supported in mobile browsers)
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
                             files: [file],
@@ -817,7 +814,6 @@
                             text: '🏸 WESMA Badminton Club - Live Score Card 🏆'
                         }).catch(error => console.log('Sharing error:', error));
                     } else {
-                        // Fallback: Download Image directly and open WhatsApp text link
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(blob);
                         link.download = 'WESMA_Badminton_Score.png';
