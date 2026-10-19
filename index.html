@@ -217,7 +217,7 @@
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('wesma_badminton_scores_v3');
+        const dbRef = firebase.database().ref('wesma_badminton_scores_v4');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -247,7 +247,7 @@
                 startCooldownTickers();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("wesma_badminton_scores_v3");
+                const saved = localStorage.getItem("wesma_badminton_scores_v4");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
@@ -287,7 +287,7 @@
         function saveData() {
             dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("wesma_badminton_scores_v3", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
+                localStorage.setItem("wesma_badminton_scores_v4", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
             });
             updateLeaderboard();
         }
@@ -319,13 +319,11 @@
                 
                 startBtn.classList.add("hidden");
                 
-                // Total Tournament Duration
                 const totalDiffMs = Date.now() - tournamentStartTimestamp;
                 const totalMins = Math.floor(totalDiffMs / 60000);
                 const totalSecs = Math.floor((totalDiffMs % 60000) / 1000);
                 totalDurationEl.textContent = `${totalMins}m ${totalSecs}s`;
 
-                // Current Match Duration
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
                     const matchMins = Math.floor(matchDiffMs / 60000);
@@ -437,7 +435,7 @@
 
             if (delta > 0) {
                 if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
-                    showToast(`⚠️ Please wait before adding again!`);
+                    showToast("⚠️ Please wait before adding again!");
                     return;
                 }
                 team.lastClickTime = now;
@@ -477,7 +475,7 @@
             const team = teams.find(t => t.id === id);
             if (!team) return;
             const trimmed = val.trim();
-            team.name = trimmed !== "" ? trimmed : `Team`;
+            team.name = trimmed !== "" ? trimmed : "Team";
             saveData();
         }
 
