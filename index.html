@@ -269,19 +269,26 @@
             { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
         ];
 
-        let teams = [];
+        let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let timerInterval = null;
         let cooldownInterval = null;
-        let isDataLoaded = false;
+        let isFirebaseConnected = false;
 
         const firebaseConfig = {
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
-        firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('wesma_badminton_scores_v9');
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            isFirebaseConnected = true;
+        } catch (e) {
+            console.error("Firebase init error:", e);
+        }
+
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v10') : null;
 
         function initData() {
             // Set Header Date with Animation
@@ -291,48 +298,48 @@
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[8px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
-            dbRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    const savedTeams = data.teams || defaultTeams;
-                    teams = defaultTeams.map((defTeam) => {
-                        const found = savedTeams.find(st => st.id === defTeam.id);
-                        return {
-                            ...defTeam,
-                            name: (found && found.name) ? found.name : defTeam.name,
-                            wins: found ? (found.wins || 0) : 0,
-                            lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
-                            lastClickTime: found ? (found.lastClickTime || 0) : 0
-                        };
-                    });
-                    tournamentStartTimestamp = data.tournamentStartTimestamp !== undefined ? data.tournamentStartTimestamp : null;
-                    lastActionTimestamp = data.lastActionTimestamp !== undefined ? data.lastActionTimestamp : null;
-                    tournamentHistory = data.tournamentHistory || [];
-                } else {
-                    teams = JSON.parse(JSON.stringify(defaultTeams));
-                    tournamentStartTimestamp = null;
-                    lastActionTimestamp = null;
-                    tournamentHistory = [];
-                    dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
-                }
-                
-                isDataLoaded = true;
-                checkSessionExpiry();
+            if (dbRef) {
+                dbRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        const savedTeams = data.teams || defaultTeams;
+                        teams = defaultTeams.map((defTeam) => {
+                            const found = savedTeams.find(st => st.id === defTeam.id);
+                            return {
+                                ...defTeam,
+                                name: (found && found.name) ? found.name : defTeam.name,
+                                wins: found ? (found.wins || 0) : 0,
+                                lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
+                                lastClickTime: found ? (found.lastClickTime || 0) : 0
+                            };
+                        });
+                        tournamentStartTimestamp = data.tournamentStartTimestamp !== undefined ? data.tournamentStartTimestamp : null;
+                        lastActionTimestamp = data.lastActionTimestamp !== undefined ? data.lastActionTimestamp : null;
+                        tournamentHistory = data.tournamentHistory || [];
+                    } else {
+                        teams = JSON.parse(JSON.stringify(defaultTeams));
+                        tournamentStartTimestamp = null;
+                        lastActionTimestamp = null;
+                        tournamentHistory = [];
+                        dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
+                    }
+                    
+                    checkSessionExpiry();
+                    renderUIState();
+                    render();
+                    updateHistorySummaryText();
+                }, (error) => {
+                    console.error("Firebase read error:", error);
+                    renderUIState();
+                    render();
+                });
+            } else {
                 renderUIState();
                 render();
-                updateHistorySummaryText();
-                startLiveTimer();
-                startCooldownTickers();
-            }, (error) => {
-                console.error("Firebase read error:", error);
-                teams = JSON.parse(JSON.stringify(defaultTeams));
-                isDataLoaded = true;
-                renderUIState();
-                render();
-                updateHistorySummaryText();
-                startLiveTimer();
-                startCooldownTickers();
-            });
+            }
+
+            startLiveTimer();
+            startCooldownTickers();
         }
 
         function checkSessionExpiry() {
@@ -383,9 +390,11 @@
         }
 
         function saveData() {
-            dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }).catch((error) => {
-                console.error("Firebase write error:", error);
-            });
+            if (dbRef) {
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }).catch((error) => {
+                    console.error("Firebase write error:", error);
+                });
+            }
             updateLeaderboard();
         }
 
@@ -491,15 +500,12 @@
         }
 
         function startFirstMatch() {
-            if (!isDataLoaded) {
-                showToast("⏳ ഡാറ്റ ലോഡ് ആകുന്നു, ദയവായി കാത്തിരിക്കൂ...");
-                return;
-            }
             const now = Date.now();
             tournamentStartTimestamp = now;
             lastActionTimestamp = now;
             renderUIState();
             saveData();
+            render();
             showToast("🚀 Tournament Session Timer Started (1.5 Hours)!");
         }
 
