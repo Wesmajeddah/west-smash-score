@@ -112,7 +112,7 @@
                 <!-- Rendered by JS -->
             </div>
 
-            <!-- Total Play Section & Timers (Smaller Timer Font applied here) -->
+            <!-- Total Play Section & Timers (Smaller Timer Font) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
@@ -228,7 +228,7 @@
             <p class="text-xs text-slate-400 font-light">ഏത് ആപ്പിലേക്കാണ് ടെക്സ്റ്റ് അയക്കേണ്ടത്?</p>
             <div class="space-y-2 pt-2">
                 <button onclick="shareWhatsAppText('normal')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-orbitron font-light py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
-                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp (רגുലർ)
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp (റഗുലർ)
                 </button>
                 <button onclick="shareWhatsAppText('business')" class="w-full bg-teal-800 hover:bg-teal-700 text-white font-orbitron font-light py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
                     <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Business
@@ -304,6 +304,9 @@
         let dbRef = null;
         let editingTeamId = null;
 
+        // Force immediate render on script load to guarantee UI is never empty
+        render();
+
         try {
             if (typeof firebase !== 'undefined') {
                 if (!firebase.apps.length) {
@@ -311,7 +314,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v52');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v53');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -544,7 +547,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
