@@ -38,18 +38,18 @@
             text-transform: uppercase;
         }
 
-        /* Thicker Swash 'W' with New Elegant Color Tone */
+        /* Thicker Swash 'W' with Elegant Coffee Brown Color Tone */
         .special-w {
             font-family: 'Great Vibes', cursive;
-            font-size: 1.75em;
+            font-size: 1.85em;
             display: inline-block;
             transform: translateY(4px);
-            background: linear-gradient(135deg, #38BDF8 0%, #6366F1 50%, #A855F7 100%);
+            background: linear-gradient(135deg, #F59E0B 0%, #B45309 40%, #78350F 80%, #451A03 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.7));
+            filter: drop-shadow(0 0 10px rgba(120, 53, 15, 0.8));
             font-weight: 900;
-            -webkit-text-stroke: 0.4px rgba(255, 255, 255, 0.4);
+            -webkit-text-stroke: 0.6px rgba(255, 220, 150, 0.6);
         }
 
         /* Slow Delayed Single Letter Vertical Flip Animation with Random Colors */
@@ -168,7 +168,7 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Summary Section (Champions Only Bold with Elegant Color Tone) -->
+            <!-- Leaderboard Summary Section -->
             <div class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
                 <div>
                     <div class="text-xs font-semibold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
@@ -346,6 +346,7 @@
 
         const randomColorsList = ["#38BDF8", "#F472B6", "#4ADE80", "#FACC15", "#C084FC", "#FB923C", "#2DD4BF"];
 
+        // Immediate render to ensure teams list is always present
         render();
 
         try {
@@ -355,7 +356,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v67');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v70');
                 isFirebaseConnected = true;
             }
         } catch (e) {
