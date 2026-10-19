@@ -350,8 +350,8 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-full text-xs shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+    <!-- Prominent Center Pop-up Toast Notification -->
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-4 rounded-2xl text-sm shadow-[0_0_30px_rgba(245,158,11,0.5)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
 
@@ -409,7 +409,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v83');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v84');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -431,9 +431,57 @@
             render();
         }
 
+        // Web Audio API for Realistic Fireworks Sound Effect
+        function playFireworksSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const audioCtx = new AudioContext();
+
+                // 1. Initial Launch / Pop Sound
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+
+                // 2. Crackling Explosion Noise
+                setTimeout(() => {
+                    const bufferSize = audioCtx.sampleRate * 0.4;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+                    noise.connect(noiseGain);
+                    noiseGain.connect(audioCtx.destination);
+                    noise.start();
+                }, 100);
+            } catch(e) {
+                console.log("Audio play suppressed or unsupported", e);
+            }
+        }
+
         function triggerWinCelebration() {
+            // Play Audio Effect
+            playFireworksSound();
+
             if (typeof confetti === 'function') {
-                // Fireworks / Celebration Burst
+                // Fireworks / Celebration Burst Animation
                 confetti({
                     particleCount: 80,
                     spread: 70,
@@ -850,12 +898,12 @@
                 saveData();
                 render();
 
-                // Trigger Screen Fireworks / Celebration Animation
+                // Trigger Screen Fireworks + Sound Effect
                 triggerWinCelebration();
 
-                // Random Motivation Comment for Winner (+1)
+                // Random Motivation Comment Pop-up for Winner (+1)
                 const randMotiv = winMotivationalComments[Math.floor(Math.random() * winMotivationalComments.length)];
-                showToast(`${team.name}: ${randMotiv}`);
+                showToast(`🏆 ${team.name}\n${randMotiv}`);
             } else if (delta < 0) {
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
@@ -868,9 +916,9 @@
                     saveData();
                     render();
 
-                    // Random Criticism Comment for Minus (-1)
+                    // Random Criticism Comment Pop-up for Minus (-1)
                     const randCrit = lossCriticismComments[Math.floor(Math.random() * lossCriticismComments.length)];
-                    showToast(`${team.name}: ${randCrit}`);
+                    showToast(`⚠️ ${team.name}\n${randCrit}`);
                 } else {
                     showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
                 }
@@ -1080,14 +1128,19 @@
             }
         }
 
+        let toastTimeout = null;
         function showToast(text) {
             const toast = document.getElementById("toast");
             if(!toast) return;
-            toast.textContent = text;
+            toast.innerText = text;
             toast.style.opacity = "1";
-            setTimeout(() => {
+            toast.style.transform = "translate(-50%, -50%) scale(1)";
+            
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
                 toast.style.opacity = "0";
-            }, 3000);
+                toast.style.transform = "translate(-50%, -50%) scale(0.9)";
+            }, 3200);
         }
 
         function escapeHtml(str) {
