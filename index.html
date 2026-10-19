@@ -125,7 +125,7 @@
             <h2 class="text-[8px] sm:text-[9px] font-bold font-orbitron text-amber-200/70 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
         </div>
 
-        <!-- Dynamic Main Tournament Content Area (Always Visible) -->
+        <!-- Dynamic Main Tournament Content Area -->
         <div id="main-content-area" class="space-y-2.5">
             
             <!-- Teams List -->
@@ -216,6 +216,19 @@
         </div>
     </div>
 
+    <!-- Screenshot Preview Modal (Appears for 2 seconds before Share Selector) -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-3 text-center space-y-2">
+            <div class="text-xs font-bold text-amber-300 flex items-center justify-center gap-1.5 font-orbitron">
+                <i class="fa-solid fa-camera text-emerald-400 animate-pulse"></i> സ്കോർ കാർഡ് സ്ക്രീൻഷോട്ട് റെഡിയാകുന്നു...
+            </div>
+            <div id="preview-container" class="w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 max-h-[60vh] flex items-center justify-center p-1">
+                <!-- Captured Image Preview will render here -->
+            </div>
+            <div class="text-[10px] text-slate-400 italic">വാട്സാപ്പ് തിരഞ്ഞെടുക്കാനുള്ള വിൻഡോ ഉടൻ തുറക്കുന്നു...</div>
+        </div>
+    </div>
+
     <!-- History Popup Modal -->
     <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm sm:max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
@@ -230,7 +243,6 @@
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
                 <!-- Dynamically Rendered History Cards -->
             </div>
-            <!-- Modal Footer with Clear History & Close Buttons -->
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
                 <button onclick="clearHistory()" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 font-bold py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-trash-can"></i> ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുക
@@ -278,7 +290,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v20') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v22') : null;
 
         function initData() {
             const dateBadge = document.getElementById("header-date-badge");
@@ -287,7 +299,6 @@
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[8px] mr-1 text-amber-400"></i> ${todayStr}`;
             }
 
-            // Render default data instantly so screen is never blank
             render();
 
             if (dbRef) {
@@ -537,19 +548,24 @@
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 shrink-0 relative">
+                        <div class="flex items-center gap-1 shrink-0 relative">
                             <!-- Played Match Update Button -->
                             <button onclick="handlePlayedChange(${team.id}, 1)" class="w-7 h-10 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-300 rounded-xl flex flex-col items-center justify-center font-bold text-[10px] shadow-md active:scale-95 transition-all border border-slate-700" title="Add Played Match (+1 Played)">
                                 <span class="text-[8px] text-slate-400 leading-none">Play</span>
                                 <span class="font-black text-xs text-amber-300">${playedCount}</span>
                             </button>
                             <!-- Wins & Losses Auto Calculated Box -->
-                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-xl px-2.5 py-1 border border-amber-500/30 shadow-inner">
+                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-xl px-2 py-1 border border-amber-500/30 shadow-inner">
                                 <span class="text-xs font-black text-amber-400 font-poppins">${team.wins} <span class="text-[9px] text-amber-200">Win</span></span>
                                 <span class="text-[10px] font-bold text-rose-400 font-poppins">${losses} <span class="text-[8px] text-rose-200">Loss</span></span>
                             </div>
+                            <!-- Minus Button (-) -->
+                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-900/80 hover:bg-rose-800 active:bg-rose-950 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-700/50" title="Reduce Win (-1)">
+                                <i class="fa-solid fa-minus text-[9px]"></i>
+                            </button>
+                            <!-- Plus Button (+) with Cooldown -->
                             <div class="relative">
-                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
+                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win (+1)">
                                     <i class="fa-solid fa-plus text-[10px]"></i>
                                 </button>
                                 <!-- Cool-down Indicator Overlay -->
@@ -580,6 +596,7 @@
             const team = teams.find(t => t.id === id);
             if (!team) return;
             const now = Date.now();
+            
             if (delta > 0) {
                 if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
                     showToast("⚠️ ദയവായി കുറച്ചുസമയം കാത്തിരിക്കൂ!");
@@ -600,6 +617,18 @@
                 saveData();
                 render();
                 showToast(`${team.name} വിജയം ചേർത്തു! 🏸`);
+            } else if (delta < 0) {
+                if (team.wins > 0) {
+                    team.wins += delta;
+                    if (team.played > team.wins) {
+                        team.played = Math.max(team.wins, team.played - 1);
+                    }
+                    saveData();
+                    render();
+                    showToast(`${team.name} സ്കോർ കുറച്ചു! ⚠️`);
+                } else {
+                    showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
+                }
             }
         }
 
@@ -716,36 +745,52 @@
             }
         }
 
+        // WhatsApp Image Share with 2-Second Screenshot Preview Window
         function shareWhatsAppImage() {
-            showToast("📸 സ്കോർ കാർഡ് ഫോട്ടോ തയ്യാറാക്കുന്നു...");
+            showToast("📸 സ്കോർ കാർഡ് സ്ക്രീൻഷോട്ട് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
+            const previewModal = document.getElementById("preview-modal");
+            const previewContainer = document.getElementById("preview-container");
             
             html2canvas(captureElement, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: "#030712"
             }).then(canvas => {
+                // Show 2-Second Preview Like a Screenshot Card
+                previewContainer.innerHTML = "";
+                const previewImg = document.createElement('img');
+                previewImg.src = canvas.toDataURL("image/png");
+                previewImg.className = "rounded-lg max-h-[50vh] object-contain shadow-lg";
+                previewContainer.appendChild(previewImg);
+                previewModal.classList.remove("hidden");
+
                 canvas.toBlob(blob => {
                     const file = new File([blob], "WESMA_Scores.png", { type: "image/png" });
                     
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: 'WESMA Badminton Club',
-                            text: '🏸 WESMA Badminton Club - Live Score Card 🏆'
-                        }).catch(error => console.log('Sharing error:', error));
-                    } else {
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = 'WESMA_Badminton_Score.png';
-                        link.click();
+                    setTimeout(() => {
+                        previewModal.classList.add("hidden");
                         
-                        let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഇമേജ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്. വാട്സാപ്പിൽ ഫോട്ടോ ആയി ഷെയർ ചെയ്യാം!";
-                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-                    }
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            navigator.share({
+                                files: [file],
+                                title: 'WESMA Badminton Club',
+                                text: '🏸 WESMA Badminton Club - Live Score Card 🏆'
+                            }).catch(error => console.log('Sharing error:', error));
+                        } else {
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = 'WESMA_Badminton_Score.png';
+                            link.click();
+                            
+                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഇമേജ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്. വാട്സാപ്പിൽ ഫോട്ടോ ആയി ഷെയർ ചെയ്യാം!";
+                            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                        }
+                    }, 2000); // 2 Seconds Delay Preview
                 });
             }).catch(err => {
                 console.error("Image generation error:", err);
+                previewModal.classList.add("hidden");
                 showToast("⚠️ ഫോട്ടോ തയ്യാറാക്കുന്നതിൽ ചെറിയ തടസ്സമുണ്ടായി.");
             });
         }
