@@ -33,14 +33,18 @@
             letter-spacing: 2px;
             font-size: 1.8rem;
             text-transform: uppercase;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            overflow: visible;
         }
 
         /* Thicker Swash 'W' with Elegant Coffee Brown Color Tone & Flipping Animation */
         .special-w {
             font-family: 'Great Vibes', cursive;
-            font-size: 1.35em;
+            font-size: 1.4em;
             display: inline-block;
-            transform: translateY(4px);
+            transform: translateY(3px);
             background: linear-gradient(135deg, #F59E0B 0%, #B45309 40%, #78350F 80%, #451A03 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -51,9 +55,9 @@
             animation: slowVerticalFlipHeaderW 6s infinite ease-in-out;
         }
         @keyframes slowVerticalFlipHeaderW {
-            0%, 75%, 100% { transform: translateY(4px) rotateX(0deg) scale(1); filter: drop-shadow(0 0 10px rgba(120, 53, 15, 0.8)); }
+            0%, 75%, 100% { transform: translateY(3px) rotateX(0deg) scale(1); filter: drop-shadow(0 0 10px rgba(120, 53, 15, 0.8)); }
             82%, 92% { 
-                transform: translateY(4px) rotateX(360deg) scale(1.15); 
+                transform: translateY(3px) rotateX(360deg) scale(1.15); 
                 filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.9)); 
             }
         }
@@ -140,10 +144,10 @@
                 </span>
             </div>
 
-            <div class="pt-0.5">
-                <h1 id="header-title-container" class="wesma-title leading-tight">
+            <div class="pt-0.5 pb-1">
+                <div id="header-title-container" class="wesma-title leading-tight">
                     <!-- Rendered by JS with Flipping Letters -->
-                </h1>
+                </div>
                 <h2 class="text-xs font-medium text-slate-300 tracking-[0.25em] uppercase mt-0.5">BADMINTON CLUB</h2>
             </div>
             <p class="text-[9px] font-light text-amber-200/70 tracking-[0.2em] uppercase">Tournament Scoreboard</p>
@@ -361,7 +365,7 @@
 
         const randomColorsList = ["#38BDF8", "#F472B6", "#4ADE80", "#FACC15", "#C084FC", "#FB923C", "#2DD4BF"];
 
-        // Initial render to ensure teams list and header are populated immediately
+        // Immediate render to guarantee teams list displays right away
         renderHeaderTitle();
         render();
 
@@ -372,7 +376,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v73');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v75');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -439,10 +443,7 @@
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            // 'W' with coffee brown color & special flip animation
             let wHtml = `<span class="special-w">W</span>`;
-            
-            // 'ESMA' with animated letters & random colors on flip
             let esmaStr = "ESMA";
             let esmaHtml = esmaStr.split('').map((char, idx) => {
                 let randomColor = randomColorsList[Math.floor(Math.random() * randomColorsList.length)];
@@ -990,7 +991,7 @@
         function resetScores() {
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (inputPin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
+                if (inputPin !== null) alert("തെറ്റായ PIN!");
                 return;
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്യണോ?")) {
