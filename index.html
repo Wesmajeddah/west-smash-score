@@ -50,13 +50,13 @@
             background: linear-gradient(135deg, rgba(225, 29, 72, 0.12) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
             border: 1.5px solid rgba(225, 29, 72, 0.5) !important;
         }
-        @keyframes calmAura {
-            0% { box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2), 0 0 8px rgba(6, 182, 212, 0.3); }
-            50% { box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.4), 0 0 18px rgba(6, 182, 212, 0.6); }
-            100% { box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2), 0 0 8px rgba(6, 182, 212, 0.3); }
+        @keyframes leafPulse {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            50% { transform: scale(1.15) rotate(15deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
         }
-        .calm-aura {
-            animation: calmAura 2.5s infinite ease-in-out;
+        .leaf-anim {
+            animation: leafPulse 2s infinite ease-in-out;
         }
     </style>
 </head>
@@ -396,7 +396,11 @@
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
                     let sortedTeams = [...item.teams].sort((a, b) => b.wins - a.wins);
-                    let winnerTeam = sortedTeams[0];
+                    let maxWins = sortedTeams[0].wins;
+                    let winnerTeams = sortedTeams.filter(t => t.wins === maxWins && maxWins > 0);
+                    let winnersNames = winnerTeams.map(w => escapeHtml(w.name)).join(" • ");
+                    if (!winnersNames) winnersNames = "No Wins";
+
                     const card = document.createElement("div");
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
                     let teamsListHtml = "";
@@ -411,7 +415,7 @@
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
                             <div>
-                                <div class="text-xs font-bold text-amber-300">Session #${tournamentHistory.length - idx} • 👑 ${escapeHtml(winnerTeam.name)}</div>
+                                <div class="text-xs font-bold text-amber-300">Session #${tournamentHistory.length - idx} • 👑 ${winnersNames}</div>
                                 <div class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar"></i> ${item.date} (${item.durationMinutes || 0} mins)</div>
                             </div>
                             <span class="text-[10px] bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded border border-amber-500/20">
@@ -542,33 +546,31 @@
                                 <i class="fa-solid fa-pen text-[10px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 shrink-0">
+                        <div class="flex items-center gap-1.5 shrink-0 relative">
                             <button onclick="handleScoreChange(${team.id}, -1)" class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50" title="Decrease score (Admin PIN required)">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
                             <div id="score-box-${team.id}" class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
-                            <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
+                            <div class="relative">
+                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                                <!-- Cool-down Indicator Overlay over plus button -->
+                                <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-xl flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <span class="text-[10px] leaf-anim">🍃</span>
+                                        <span id="cool-countdown-${team.id}" class="text-[9px] font-black font-poppins text-emerald-400">60s</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-2">
                         <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> Last Match Duration:</span>
                         <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'Not recorded'}</span>
-                    </div>
-
-                    <!-- Calming Rest Overlay for Cooldown -->
-                    <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm rounded-2xl flex items-center justify-between px-3 border border-emerald-500/30 calm-aura ${inCooldown ? '' : 'hidden'} z-20">
-                        <div class="flex items-center gap-2 text-emerald-300 font-bold text-xs">
-                            <span class="text-base">🌸</span>
-                            <span>സൂപ്പർ പ്ലേ! വിഭ്രാന്തിയില്ലാതെ വിശ്രമിക്കൂ... 🍃</span>
-                        </div>
-                        <div id="cool-countdown-${team.id}" class="text-xs font-black font-poppins bg-emerald-950 text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-500/40 shadow-inner">
-                            60s
-                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -585,7 +587,7 @@
             const now = Date.now();
             if (delta > 0) {
                 if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
-                    showToast("⚠️ ദയവായി കുറച്ചുസമയം വിശ്രമിക്കൂ!");
+                    showToast("⚠️ ദയവായി കുറച്ചുസമയം കാത്തിരിക്കൂ!");
                     return;
                 }
                 team.lastClickTime = now;
