@@ -8,67 +8,66 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts for Malayalam & English -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Manjari:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase App & Database SDKs -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
     <style>
         * {
             font-family: 'Manjari', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
-        .font-poppins {
-            font-family: 'Poppins', sans-serif;
-        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
         .gold-gradient-text {
             background: linear-gradient(135deg, #FFE082 0%, #D4AF37 40%, #B8860B 80%, #FFD700 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .gold-border {
-            border-color: rgba(212, 175, 55, 0.4);
-        }
-        .score-anim {
-            animation: bounce 0.18s ease-out;
-        }
-        @keyframes bounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
+        .gold-border { border-color: rgba(212, 175, 55, 0.4); }
         .pulse-glow {
             animation: pulseGlow 2s infinite;
         }
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
-        .pop-in {
-            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .winner-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+            border: 1.5px solid #d4af37 !important;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
         }
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .fastest-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+            border: 1.5px solid rgba(6, 182, 212, 0.7) !important;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25) !important;
+        }
+        .loser-card {
+            background: linear-gradient(135deg, rgba(225, 29, 72, 0.12) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+            border: 1.5px solid rgba(225, 29, 72, 0.5) !important;
+        }
+        @keyframes calmAura {
+            0% { box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2), 0 0 8px rgba(6, 182, 212, 0.3); }
+            50% { box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.4), 0 0 18px rgba(6, 182, 212, 0.6); }
+            100% { box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2), 0 0 8px rgba(6, 182, 212, 0.3); }
+        }
+        .calm-aura {
+            animation: calmAura 2.5s infinite ease-in-out;
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-3 sm:p-4 select-none">
-
+    
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
         <!-- Header with Wesma Logo Emblem -->
-        <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden space-y-2">
+        <div class="text-center py-4 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden space-y-2">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
+            
             <!-- SVG Wesma Custom Logo Emblem -->
             <div class="flex justify-center mb-1">
                 <div class="w-24 h-24 sm:w-28 sm:h-28 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
@@ -84,13 +83,9 @@
                                 <stop offset="100%" stop-color="#020617" />
                             </radialGradient>
                         </defs>
-
-                        <!-- Outer Shield/Emblem Base -->
                         <circle cx="100" cy="100" r="96" fill="url(#copperGrad)" />
                         <circle cx="100" cy="100" r="90" fill="url(#bgDark)" stroke="url(#copperGrad)" stroke-width="1.5" />
                         <circle cx="100" cy="100" r="74" fill="none" stroke="rgba(212, 175, 55, 0.25)" stroke-width="1" stroke-dasharray="2,3" />
-
-                        <!-- Wesma 'W' Monogram combined with Shuttlecock -->
                         <g transform="translate(0, 2)">
                             <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="url(#copperGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
                             <g transform="translate(100, 50) scale(0.85)">
@@ -99,21 +94,13 @@
                                 <ellipse cx="0" cy="14" rx="5" ry="2" fill="url(#copperGrad)"/>
                             </g>
                         </g>
-
-                        <!-- Curved Header Text: WESMA -->
                         <path id="textArcTop" d="M 28 100 A 72 72 0 0 1 172 100" fill="none" />
                         <text font-family="Orbitron, sans-serif" font-weight="900" font-size="15" fill="#FFE082" letter-spacing="4">
-                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">
-                                WESMA
-                            </textPath>
+                            <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">WESMA</textPath>
                         </text>
-
-                        <!-- Curved Footer Text: JEDDAH • SINCE 2026 -->
                         <path id="textArcBottom" d="M 172 100 A 72 72 0 0 1 28 100" fill="none" />
                         <text font-family="Orbitron, sans-serif" font-weight="700" font-size="7.5" fill="#FFE082" letter-spacing="1.5">
-                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">
-                                JEDDAH • SINCE 2026
-                            </textPath>
+                            <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">JEDDAH • SINCE 2026</textPath>
                         </text>
                     </svg>
                 </div>
@@ -122,172 +109,117 @@
             <h1 class="text-2xl sm:text-3xl font-black font-orbitron gold-gradient-text tracking-wider leading-tight">WESMA</h1>
             <h2 class="text-xs sm:text-sm font-bold font-orbitron text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
             
-            <!-- Special Top Menu Start Match / Timer Trigger Button -->
-            <div id="top-timer-container" class="pt-1">
-                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-2.5 px-4 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
+            <!-- Welcome Screen Start Match Button -->
+            <div id="top-timer-container" class="pt-2">
+                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-3 px-4 rounded-xl shadow-lg text-xs sm:text-sm flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
                     <i class="fa-solid fa-play text-sm"></i> START TOURNAMENT TIMER (കളി ആരംഭിക്കുക)
                 </button>
             </div>
         </div>
 
-        <!-- Teams List (Auto Sorted by Score) -->
-        <div id="teams-list" class="space-y-2.5">
-            <!-- Rendered by JS -->
-        </div>
-
-        <!-- Total Play Section & Timers Display -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
-            <div class="flex items-center justify-between px-2">
-                <span class="text-xs font-bold text-slate-300 flex items-center gap-2 font-poppins">
-                    <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
-                </span>
-                <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner font-poppins">
-                    0
-                </span>
-            </div>
+        <!-- Dynamic Main Tournament Content Area -->
+        <div id="main-content-area" class="space-y-3 hidden">
             
-            <!-- Current Match Duration Counter -->
-            <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
-                <span class="flex items-center gap-1 text-slate-300">
-                    <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
-                </span>
-                <span id="current-match-timer" class="font-bold text-emerald-400 text-xs">0m 0s</span>
+            <!-- Teams List -->
+            <div id="teams-list" class="space-y-2.5">
+                <!-- Rendered by JS -->
             </div>
 
-            <!-- Total Tournament Duration Counter -->
-            <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
-                <span class="flex items-center gap-1 text-slate-300">
-                    <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Total Duration:
-                </span>
-                <span id="total-duration-timer" class="font-bold text-amber-400 text-xs">0m 0s</span>
-            </div>
-        </div>
-
-        <!-- Leader / Winner / Podium / Loser Summary Section -->
-        <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2.5">
-            <div>
-                <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
+            <!-- Total Play Section & Timers Display -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
+                <div class="flex items-center justify-between px-2">
+                    <span class="text-xs font-bold text-slate-300 flex items-center gap-2 font-poppins">
+                        <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
+                    </span>
+                    <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner font-poppins">
+                        0
+                    </span>
                 </div>
-                <div id="leader-text" class="text-sm sm:text-base font-black text-white mt-0.5">
-                    ലോഡ് ചെയ്യുന്നു...
+                
+                <!-- Current Match Duration Counter -->
+                <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
+                    <span class="flex items-center gap-1 text-slate-300">
+                        <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
+                    </span>
+                    <span id="current-match-timer" class="font-bold text-emerald-400 text-xs">0m 0s</span>
+                </div>
+
+                <!-- Total Tournament Duration Counter -->
+                <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
+                    <span class="flex items-center gap-1 text-slate-300">
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Session Duration (Max 1.5h):
+                    </span>
+                    <span id="total-duration-timer" class="font-bold text-amber-400 text-xs">0m 0s</span>
                 </div>
             </div>
 
-            <!-- 2nd Place & 3rd Place Vertical Bullet List -->
-            <div id="podium-text" class="text-xs text-amber-200/90 font-medium pt-1.5 border-t border-amber-500/20 px-1 text-left space-y-1">
-                <div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
+            <!-- Leaderboard Summary Section -->
+            <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2.5">
+                <div>
+                    <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
+                    </div>
+                    <div id="leader-text" class="text-sm sm:text-base font-black text-white mt-0.5">
+                        ലോഡ് ചെയ്യുന്നു...
+                    </div>
+                </div>
+
+                <div id="podium-text" class="text-xs text-amber-200/90 font-medium pt-1.5 border-t border-amber-500/20 px-1 text-left space-y-1">
+                    <div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
+                </div>
+
+                <div id="fastest-win-text" class="text-xs text-cyan-300 font-bold pt-1.5 border-t border-cyan-500/20 truncate px-1 text-center">
+                    ⚡ Fastest Win Award: കണക്കാക്കുന്നു...
+                </div>
+
+                <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1.5 border-t border-rose-500/20 text-center">
+                    തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
+                </div>
             </div>
 
-            <!-- Fastest Win Award Section -->
-            <div id="fastest-win-text" class="text-xs text-cyan-300 font-bold pt-1.5 border-t border-cyan-500/20 truncate px-1 text-center">
-                ⚡ Fastest Win Award: കണക്കാക്കുന്നു...
+            <!-- History Section -->
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-3 space-y-2 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 font-orbitron">
+                        <i class="fa-solid fa-clock-history text-amber-400"></i> MATCH HISTORY
+                    </span>
+                    <button onclick="openHistoryModal()" class="text-[11px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1">
+                        <i class="fa-solid fa-folder-open"></i> ഹിസ്റ്ററി കാണുക
+                    </button>
+                </div>
+                <div id="history-summary-text" class="text-[11px] text-slate-400 italic text-center py-1">
+                    സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.
+                </div>
             </div>
 
-            <!-- തോറ്റ ടീം വിമർശന ഭാഗം -->
-            <div id="loser-text" class="text-xs text-rose-300 font-semibold pt-1.5 border-t border-rose-500/20 text-center">
-                തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
-            </div>
-        </div>
-
-        <!-- Special Match History Section -->
-        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-3 space-y-2 shadow-xl">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 font-orbitron">
-                    <i class="fa-solid fa-clock-history text-amber-400"></i> MATCH HISTORY
-                </span>
-                <button onclick="openHistoryModal()" class="text-[11px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1">
-                    <i class="fa-solid fa-folder-open"></i> ഹിസ്റ്ററി കാണുക
+            <!-- Reset & Share Buttons -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
+                    <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
+                </button>
+                <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
+                    <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
                 </button>
             </div>
-            <div id="history-summary-text" class="text-[11px] text-slate-400 italic text-center py-1">
-                സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.
-            </div>
-        </div>
 
-        <!-- Separate Reset & WhatsApp Share Buttons -->
-        <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
-                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
-            </button>
-            <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
-                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
-            </button>
         </div>
 
     </div>
 
-    <!-- WINNER SPECIAL CELEBRATION MODAL -->
-    <div id="winner-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border-2 border-amber-400/80 w-full max-w-xs sm:max-w-sm rounded-3xl p-5 shadow-2xl text-center space-y-4 pop-in relative overflow-hidden">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl"></div>
-            
-            <!-- Trophy Graphic Emblem -->
-            <div class="relative flex justify-center">
-                <div class="w-20 h-20 bg-amber-500/20 rounded-full border border-amber-400/50 flex items-center justify-center text-4xl shadow-inner">
-                    🏆
-                </div>
-            </div>
-
-            <div class="space-y-1">
-                <span class="text-[10px] font-black uppercase font-orbitron tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">MATCH WINNER!</span>
-                <h3 id="winner-modal-name" class="text-xl font-black text-white gold-gradient-text pt-2"></h3>
-                <p id="winner-modal-score" class="text-xs text-amber-200/90 font-bold"></p>
-            </div>
-
-            <p class="text-xs text-slate-300 italic">"അവിശ്വസനീയ പ്രകടനം! തുടർച്ചയായ വിജയങ്ങളോടെ ടൂർണമെന്റിൽ മുന്നേറുന്നു! 🏸✨"</p>
-
-            <button onclick="closeWinnerModal()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg active:scale-95 transition-all">
-                വളരെ സന്തോഷം (Continue)
-            </button>
-        </div>
-    </div>
-
-    <!-- LOSER SPECIAL WARNING MODAL -->
-    <div id="loser-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gradient-to-b from-slate-900 via-rose-950/50 to-slate-900 border-2 border-rose-500/80 w-full max-w-xs sm:max-w-sm rounded-3xl p-5 shadow-2xl text-center space-y-4 pop-in relative overflow-hidden">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-rose-500/20 rounded-full blur-2xl"></div>
-            
-            <!-- Warning Fire Emblem -->
-            <div class="relative flex justify-center">
-                <div class="w-20 h-20 bg-rose-500/20 rounded-full border border-rose-500/50 flex items-center justify-center text-4xl shadow-inner">
-                    🚨
-                </div>
-            </div>
-
-            <div class="space-y-1">
-                <span class="text-[10px] font-black uppercase font-orbitron tracking-widest text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/30">LOWEST SCORE ALERT</span>
-                <h3 id="loser-modal-name" class="text-xl font-black text-rose-200 pt-2"></h3>
-                <p id="loser-modal-score" class="text-xs text-rose-300/90 font-bold"></p>
-            </div>
-
-            <p class="text-xs text-rose-200/90 italic">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! തകർപ്പൻ തിരിച്ചുവരവിനായി ശ്രമിക്കൂ! 🏸💥"</p>
-
-            <button onclick="closeLoserModal()" class="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-black py-2.5 rounded-xl text-xs shadow-lg active:scale-95 transition-all">
-                പോരാട്ടം തുടരും (Fight Back)
-            </button>
-        </div>
-    </div>
-
-    <!-- Special Interactive History Popup Modal -->
+    <!-- History Popup Modal -->
     <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm sm:max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <!-- Modal Header -->
             <div class="p-3 bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="text-sm font-extrabold gold-gradient-text flex items-center gap-2 font-orbitron">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> PAST TOURNAMENTS LOG
+                    <i class="fa-solid fa-trophy text-amber-400"></i> SESSION TOURNAMENT LOGS
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
-            <!-- Modal Content (History Items) -->
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
                 <!-- Dynamically Rendered History Cards -->
             </div>
-
-            <!-- Modal Footer -->
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-center">
                 <button onclick="closeHistoryModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2 rounded-xl text-xs">
                     അടയ്ക്കുക (Close)
@@ -302,8 +234,9 @@
     </div>
 
     <script>
-        const ADMIN_PIN = "1234"; 
-
+        const ADMIN_PIN = "1234";
+        const SESSION_LIMIT_MS = 90 * 60 * 1000; // 1.5 Hours in milliseconds
+        
         const defaultTeams = [
             { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
             { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0 },
@@ -323,7 +256,7 @@
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('wesma_badminton_scores_v8');
+        const dbRef = firebase.database().ref('wesma_badminton_scores_v9');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
@@ -350,47 +283,65 @@
                     tournamentHistory = [];
                     dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
                 }
+                
+                checkSessionExpiry();
+                renderUIState();
                 render();
                 updateHistorySummaryText();
                 startLiveTimer();
                 startCooldownTickers();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("wesma_badminton_scores_v8");
-                if (saved) {
-                    try { 
-                        const parsed = JSON.parse(saved);
-                        const savedTeams = parsed.teams || defaultTeams;
-                        teams = defaultTeams.map((defTeam) => {
-                            const found = savedTeams.find(st => st.id === defTeam.id);
-                            return {
-                                ...defTeam,
-                                name: (found && found.name) ? found.name : defTeam.name,
-                                wins: found ? (found.wins || 0) : 0,
-                                lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
-                                lastClickTime: found ? (found.lastClickTime || 0) : 0
-                            };
-                        });
-                        tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
-                        lastActionTimestamp = parsed.lastActionTimestamp || null;
-                        tournamentHistory = parsed.tournamentHistory || [];
-                    } catch(e) { 
-                        teams = JSON.parse(JSON.stringify(defaultTeams)); 
-                        tournamentStartTimestamp = null;
-                        lastActionTimestamp = null;
-                        tournamentHistory = [];
-                    }
-                } else {
-                    teams = JSON.parse(JSON.stringify(defaultTeams));
-                    tournamentStartTimestamp = null;
-                    lastActionTimestamp = null;
-                    tournamentHistory = [];
-                }
+                teams = JSON.parse(JSON.stringify(defaultTeams));
+                renderUIState();
                 render();
                 updateHistorySummaryText();
                 startLiveTimer();
                 startCooldownTickers();
             });
+        }
+
+        function checkSessionExpiry() {
+            if (tournamentStartTimestamp) {
+                const elapsed = Date.now() - tournamentStartTimestamp;
+                if (elapsed >= SESSION_LIMIT_MS) {
+                    archiveCurrentSession("1.5 Hours Auto-Session Break");
+                }
+            }
+        }
+
+        function archiveCurrentSession(reason) {
+            const totalPlays = calculateTotalPlays();
+            if (totalPlays > 0) {
+                const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', { 
+                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                });
+                const record = {
+                    id: Date.now(),
+                    date: dateStr,
+                    teams: JSON.parse(JSON.stringify(teams)),
+                    totalPlays: totalPlays,
+                    durationMinutes: Math.round((Date.now() - (tournamentStartTimestamp || Date.now())) / 60000)
+                };
+                tournamentHistory.unshift(record);
+            }
+            teams.forEach(t => { t.wins = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
+            tournamentStartTimestamp = null;
+            lastActionTimestamp = null;
+            saveData();
+            showToast(`ℹ️ ${reason}: സെഷൻ പൂർത്തിയായി ഹിസ്റ്ററിയിലേക്ക് മാറ്റി.`);
+        }
+
+        function renderUIState() {
+            const mainContent = document.getElementById("main-content-area");
+            const timerContainer = document.getElementById("top-timer-container");
+            if (tournamentStartTimestamp) {
+                mainContent.classList.remove("hidden");
+                timerContainer.classList.add("hidden");
+            } else {
+                mainContent.classList.add("hidden");
+                timerContainer.classList.remove("hidden");
+            }
         }
 
         function calculateTotalPlays() {
@@ -400,24 +351,24 @@
         function saveData() {
             dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("wesma_badminton_scores_v8", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }));
             });
             updateLeaderboard();
         }
 
         function autoSaveToHistory() {
             const totalPlays = calculateTotalPlays();
-            if (totalPlays === 0) return;
-
-            const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            if (totalPlays === 0 || !tournamentStartTimestamp) return;
+            const dateStr = new Date(tournamentStartTimestamp).toLocaleDateString('en-GB', { 
+                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+            });
             const record = {
-                id: Date.now(),
+                id: tournamentStartTimestamp,
                 date: dateStr,
                 teams: JSON.parse(JSON.stringify(teams)),
-                totalPlays: totalPlays
+                totalPlays: totalPlays,
+                durationMinutes: Math.round((Date.now() - tournamentStartTimestamp) / 60000)
             };
-
-            if (tournamentHistory.length > 0 && tournamentHistory[0].totalPlays === totalPlays) {
+            if (tournamentHistory.length > 0 && tournamentHistory[0].id === tournamentStartTimestamp) {
                 tournamentHistory[0] = record;
             } else {
                 tournamentHistory.unshift(record);
@@ -429,48 +380,25 @@
             const summaryEl = document.getElementById("history-summary-text");
             if (!summaryEl) return;
             if (tournamentHistory.length > 0) {
-                summaryEl.textContent = `ആകെ ${tournamentHistory.length} കളികളുടെ റെക്കോർഡുകൾ സേവ് ചെയ്തിട്ടുണ്ട്.`;
+                summaryEl.textContent = `ആകെ ${tournamentHistory.length} സെഷനുകളുടെ റെക്കോർഡുകൾ സേവ് ചെയ്തിട്ടുണ്ട്.`;
             } else {
                 summaryEl.textContent = `സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.`;
             }
-        }
-
-        function triggerWinnerModal(team) {
-            document.getElementById("winner-modal-name").textContent = team.name;
-            document.getElementById("winner-modal-score").textContent = `സ്കോർ: ${team.wins} വിജയങ്ങൾ`;
-            document.getElementById("winner-modal").classList.remove("hidden");
-        }
-
-        function closeWinnerModal() {
-            document.getElementById("winner-modal").classList.add("hidden");
-        }
-
-        function triggerLoserModal(team) {
-            document.getElementById("loser-modal-name").textContent = team.name;
-            document.getElementById("loser-modal-score").textContent = `നിലവിലെ സ്കോർ: ${team.wins} വിജയങ്ങൾ മാത്രം`;
-            document.getElementById("loser-modal").classList.remove("hidden");
-        }
-
-        function closeLoserModal() {
-            document.getElementById("loser-modal").classList.add("hidden");
         }
 
         function openHistoryModal() {
             const modal = document.getElementById("history-modal");
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
-
             if (!tournamentHistory || tournamentHistory.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 text-center py-6">സേവ് ചെയ്ത കളികളുടെ ഡാറ്റ ലഭ്യമല്ല.</div>`;
+                container.innerHTML = `<div class="text-slate-500 text-center py-6">സേവ് ചെയ്ത സെഷൻ ഡാറ്റ ലഭ്യമല്ല.</div>`;
             } else {
                 container.innerHTML = "";
-                tournamentHistory.forEach((item) => {
+                tournamentHistory.forEach((item, idx) => {
                     let sortedTeams = [...item.teams].sort((a, b) => b.wins - a.wins);
                     let winnerTeam = sortedTeams[0];
-
                     const card = document.createElement("div");
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
-
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
                         teamsListHtml += `
@@ -480,12 +408,11 @@
                             </div>
                         `;
                     });
-
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
                             <div>
-                                <div class="text-xs font-bold text-amber-300">👑 ${escapeHtml(winnerTeam.name)}</div>
-                                <div class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar"></i> ${item.date}</div>
+                                <div class="text-xs font-bold text-amber-300">Session #${tournamentHistory.length - idx} • 👑 ${escapeHtml(winnerTeam.name)}</div>
+                                <div class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar"></i> ${item.date} (${item.durationMinutes || 0} mins)</div>
                             </div>
                             <span class="text-[10px] bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded border border-amber-500/20">
                                 Total Plays: ${item.totalPlays}
@@ -498,7 +425,6 @@
                     container.appendChild(card);
                 });
             }
-
             modal.classList.remove("hidden");
         }
 
@@ -509,65 +435,58 @@
 
         function startFirstMatch() {
             const now = Date.now();
-            if (!tournamentStartTimestamp) {
-                tournamentStartTimestamp = now;
-            }
+            tournamentStartTimestamp = now;
             lastActionTimestamp = now;
+            renderUIState();
             saveData();
-            showToast("🚀 Tournament Timer Started!");
+            showToast("🚀 Tournament Session Timer Started (1.5 Hours)!");
         }
 
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
-
             timerInterval = setInterval(() => {
+                checkSessionExpiry();
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
-                const timerContainer = document.getElementById("top-timer-container");
-
+                
                 if (!tournamentStartTimestamp) {
-                    currentTimerEl.textContent = "0m 0s";
-                    totalDurationEl.textContent = "0m 0s";
-                    if(timerContainer) timerContainer.classList.remove("hidden");
+                    if(currentTimerEl) currentTimerEl.textContent = "0m 0s";
+                    if(totalDurationEl) totalDurationEl.textContent = "0m 0s";
                     return;
                 }
-                
-                if(timerContainer) timerContainer.classList.add("hidden");
-                
                 const totalDiffMs = Date.now() - tournamentStartTimestamp;
                 const totalMins = Math.floor(totalDiffMs / 60000);
                 const totalSecs = Math.floor((totalDiffMs % 60000) / 1000);
-                totalDurationEl.textContent = `${totalMins}m ${totalSecs}s`;
+                if(totalDurationEl) totalDurationEl.textContent = `${totalMins}m ${totalSecs}s`;
 
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
                     const matchMins = Math.floor(matchDiffMs / 60000);
                     const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
-                    currentTimerEl.textContent = `${matchMins}m ${matchSecs}s`;
+                    if(currentTimerEl) currentTimerEl.textContent = `${matchMins}m ${matchSecs}s`;
                 } else {
-                    currentTimerEl.textContent = "0m 0s";
+                    if(currentTimerEl) currentTimerEl.textContent = "0m 0s";
                 }
             }, 1000);
         }
 
         function startCooldownTickers() {
             if (cooldownInterval) clearInterval(cooldownInterval);
-
             cooldownInterval = setInterval(() => {
                 const now = Date.now();
                 teams.forEach((team) => {
                     const btn = document.getElementById(`plus-btn-${team.id}`);
-                    const overlay = document.getElementById(`spinner-overlay-${team.id}`);
+                    const overlay = document.getElementById(`cool-overlay-${team.id}`);
+                    const countdownEl = document.getElementById(`cool-countdown-${team.id}`);
                     if (!btn || !overlay) return;
-
                     const diff = now - (team.lastClickTime || 0);
                     if (diff < 60000) {
+                        const remainingSecs = Math.ceil((60000 - diff) / 1000);
                         btn.disabled = true;
-                        btn.classList.add("opacity-60", "cursor-not-allowed");
                         overlay.classList.remove("hidden");
+                        if (countdownEl) countdownEl.textContent = `${remainingSecs}s`;
                     } else {
                         btn.disabled = false;
-                        btn.classList.remove("opacity-60", "cursor-not-allowed");
                         overlay.classList.add("hidden");
                     }
                 });
@@ -576,129 +495,138 @@
 
         function render() {
             const container = document.getElementById("teams-list");
+            if(!container) return;
             container.innerHTML = "";
-
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
-            const now = Date.now();
+            const maxWins = sortedTeams[0].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            
+            let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
+            let fastestTeamId = null;
+            if (teamsWithTime.length > 0) {
+                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
+                fastestTeamId = teamsWithTime[0].id;
+            }
 
+            const now = Date.now();
             sortedTeams.forEach((team) => {
                 const diff = now - (team.lastClickTime || 0);
                 const inCooldown = diff < 60000;
+                const isWinner = (team.wins === maxWins && maxWins > 0);
+                const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
+                const isLoser = (team.wins === minWins && minWins < maxWins);
+                
+                let specialBadgeHtml = "";
+                let extraCardClass = "";
+                
+                if (isWinner) {
+                    extraCardClass = "winner-card";
+                    specialBadgeHtml = `<span class="text-[10px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.5 rounded flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-crown text-[9px]"></i> 1st</span>`;
+                } else if (isFastest) {
+                    extraCardClass = "fastest-card";
+                    specialBadgeHtml = `<span class="text-[10px] bg-cyan-500 text-slate-950 font-black px-1.5 py-0.5 rounded flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-bolt text-[9px]"></i> Fastest</span>`;
+                } else if (isLoser) {
+                    extraCardClass = "loser-card";
+                    specialBadgeHtml = `<span class="text-[10px] bg-rose-900/80 text-rose-300 font-bold px-1.5 py-0.5 rounded border border-rose-700/50 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-exclamation text-[9px]"></i> Last</span>`;
+                }
 
                 const card = document.createElement("div");
-                card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex flex-col shadow-md gap-1.5";
-
+                card.className = `relative overflow-hidden bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-2.5 flex flex-col shadow-md gap-1.5 transition-all ${extraCardClass}`;
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
-                            <input type="text" 
-                                   value="${escapeHtml(team.name)}" 
-                                   onchange="updateTeamName(${team.id}, this.value)"
-                                   class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 focus:bg-slate-800 focus:px-2 focus:py-1 focus:rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 w-full truncate border-b border-dashed border-slate-700"
-                                   placeholder="ടീം പേര്">
+                            ${specialBadgeHtml}
+                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name (Admin PIN required)">
+                                <span class="truncate">${escapeHtml(team.name)}</span>
+                                <i class="fa-solid fa-pen text-[10px] text-slate-400 shrink-0 ml-1"></i>
+                            </div>
                         </div>
-
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <!-- Minus Button with Admin PIN -->
-                            <button onclick="handleScoreChange(${team.id}, -1)" 
-                                    class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50"
-                                    title="Decrease score (Admin PIN required)">
+                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50" title="Decrease score (Admin PIN required)">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
-
-                            <div id="score-box-${team.id}"
-                                 class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
+                            <div id="score-box-${team.id}" class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
-
-                            <!-- Plus Button with Spinner Indicator -->
-                            <div class="relative">
-                                <button id="plus-btn-${team.id}" 
-                                        onclick="handleScoreChange(${team.id}, 1)" 
-                                        class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50 ${inCooldown ? 'opacity-60 cursor-not-allowed' : ''}"
-                                        ${inCooldown ? 'disabled' : ''}
-                                        title="Add Win">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
-                                <!-- Visual Spinner Overlay for Cooldown -->
-                                <div id="spinner-overlay-${team.id}" class="absolute inset-0 bg-slate-950/80 rounded-xl flex items-center justify-center ${inCooldown ? '' : 'hidden'} pointer-events-none">
-                                    <i class="fa-solid fa-spinner animate-spin text-amber-400 text-xs"></i>
-                                </div>
-                            </div>
+                            <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Match Time Indicator -->
+                    
                     <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-2">
                         <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> Last Match Duration:</span>
                         <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'Not recorded'}</span>
                     </div>
+
+                    <!-- Calming Rest Overlay for Cooldown -->
+                    <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm rounded-2xl flex items-center justify-between px-3 border border-emerald-500/30 calm-aura ${inCooldown ? '' : 'hidden'} z-20">
+                        <div class="flex items-center gap-2 text-emerald-300 font-bold text-xs">
+                            <span class="text-base">🌸</span>
+                            <span>സൂപ്പർ പ്ലേ! വിഭ്രാന്തിയില്ലാതെ വിശ്രമിക്കൂ... 🍃</span>
+                        </div>
+                        <div id="cool-countdown-${team.id}" class="text-xs font-black font-poppins bg-emerald-950 text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-500/40 shadow-inner">
+                            60s
+                        </div>
+                    </div>
                 `;
                 container.appendChild(card);
             });
-
-            document.getElementById("total-play-val").textContent = calculateTotalPlays();
+            
+            const totalPlayEl = document.getElementById("total-play-val");
+            if(totalPlayEl) totalPlayEl.textContent = calculateTotalPlays();
             updateLeaderboard();
         }
 
         function handleScoreChange(id, delta) {
             const team = teams.find(t => t.id === id);
             if (!team) return;
-
             const now = Date.now();
-
             if (delta > 0) {
                 if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
-                    showToast("⚠️ Please wait before adding again!");
+                    showToast("⚠️ ദയവായി കുറച്ചുസമയം വിശ്രമിക്കൂ!");
                     return;
                 }
                 team.lastClickTime = now;
-
                 if (!tournamentStartTimestamp) {
                     tournamentStartTimestamp = now;
+                    renderUIState();
                 }
-
                 if (lastActionTimestamp) {
                     const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
                     team.lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
                 }
                 lastActionTimestamp = now;
-
                 team.wins += delta;
-                
-                // Trigger Special Winner Modal Celebration
-                let sortedBefore = [...teams].sort((a, b) => b.wins - a.wins);
-                if (team.wins >= sortedBefore[0].wins) {
-                    triggerWinnerModal(team);
-                }
-
                 autoSaveToHistory();
                 saveData();
                 render();
-                showToast(`${team.name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
-            } 
-            else if (delta < 0) {
+                showToast(`${team.name} വിജയം ചേർത്തു! 🏸`);
+            } else if (delta < 0) {
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
                     if (pin !== null) alert("തെറ്റായ PIN!");
                     return;
                 }
-
                 if (team.wins + delta < 0) return;
-
                 team.wins += delta;
-
-                // Trigger Special Warning Modal for Lowest Score Team
-                let sortedAfter = [...teams].sort((a, b) => a.wins - b.wins);
-                if (team.id === sortedAfter[0].id) {
-                    triggerLoserModal(team);
-                }
-
                 autoSaveToHistory();
                 saveData();
                 render();
                 showToast(`${team.name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
+            }
+        }
+
+        function requestEditTeamName(id, currentName) {
+            const pin = prompt("ടീമിന്റെ പേര് മാറ്റുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ PIN!");
+                return;
+            }
+            const newName = prompt("പുതിയ ടീം പേര് നൽകുക:", currentName);
+            if (newName !== null) {
+                updateTeamName(id, newName);
             }
         }
 
@@ -709,6 +637,7 @@
             team.name = trimmed !== "" ? trimmed : "Team";
             autoSaveToHistory();
             saveData();
+            showToast("ടീമിന്റെ പേര് മാറ്റിയിട്ടുണ്ട്!");
         }
 
         function updateLeaderboard() {
@@ -716,6 +645,8 @@
             const podiumEl = document.getElementById("podium-text");
             const fastestEl = document.getElementById("fastest-win-text");
             const loserEl = document.getElementById("loser-text");
+
+            if(!leaderEl) return;
 
             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sorted[0].wins;
@@ -738,11 +669,9 @@
             leaderEl.innerHTML = leaderHtml;
 
             let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
-            
             let podiumHtml = "";
             let medals = ["🥈", "🥉", "🏅"];
             let labels = ["2-ാം സ്ഥാനം", "3-ാം സ്ഥാനം", "4-ാം സ്ഥാനം"];
-
             if (distinctScores.length > 0) {
                 distinctScores.slice(0, 2).forEach((scoreVal, idx) => {
                     let matchingTeams = sorted.filter(t => t.wins === scoreVal);
@@ -757,7 +686,7 @@
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
                 const fastestTeam = teamsWithTime[0];
-                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
+                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins) <br><span class="text-[10px] italic text-cyan-400 font-normal">"ഏറ്റവും വേഗത്തിൽ വിജയം കൈവരിച്ച സ്പെഷ്യൽ സൂപ്പർ സ്റ്റാർസ്! 🏆💥"</span>`;
             } else {
                 fastestEl.innerHTML = `⚡ Fastest Win Award: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
             }
@@ -776,17 +705,10 @@
                 if (inputPin !== null) alert("തെറ്റായ PIN!");
                 return;
             }
-            if (window.confirm("സ്കോറുകളും, ടോട്ടൽ പ്ലേയും, ടൈമറുകളും റീസെറ്റ് ചെയ്യണോ? (ടീം പേരുകൾ മാറില്ല)")) {
-                teams.forEach(t => {
-                    t.wins = 0;
-                    t.lastMatchTime = 0;
-                    t.lastClickTime = 0;
-                });
-                tournamentStartTimestamp = null;
-                lastActionTimestamp = null;
-                saveData();
+            if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്ത് ഹിസ്റ്ററിയിലേക്ക് മാറ്റണോ?")) {
+                archiveCurrentSession("Manual Admin Reset");
+                renderUIState();
                 render();
-                showToast("സ്കോറുകൾ റീസെറ്റ് ചെയ്തു (പേരുകൾ സുരക്ഷിതം)! നന്ദി.");
             }
         }
 
@@ -794,30 +716,28 @@
             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sorted[0].wins;
             const minWins = sorted[sorted.length - 1].wins;
-
             let msg = "🏸 *WESMA BADMINTON CLUB* 🏸\n";
             msg += "🏆 *Tournament Score Counter* 🏆\n\n";
-
             sorted.forEach((t, i) => {
                 let timeStr = t.lastMatchTime ? ` (${t.lastMatchTime} mins)` : '';
                 msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം${timeStr}\n`;
             });
-
             msg += `\n🎮 *Total Plays:* ${calculateTotalPlays()}\n`;
-            
             if (tournamentStartTimestamp) {
                 let totalDiffMs = Date.now() - tournamentStartTimestamp;
                 let totalMins = Math.floor(totalDiffMs / 60000);
-                msg += `⏱️ *Total Duration:* ${totalMins} mins\n`;
+                msg += `⏱️ *Session Duration:* ${totalMins} mins\n`;
             }
-
             msg += "-------------------------\n";
-
             const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
             if (firstPlaces.length > 0) {
                 msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(" • ")} (${maxWins} ജയം)\n`;
             }
-
+            let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
+            if (teamsWithTime.length > 0) {
+                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
+                msg += `⚡ *Fastest Win Award:* ${teamsWithTime[0].name} (${teamsWithTime[0].lastMatchTime} mins)\n`;
+            }
             let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
             let medalsList = ["🥈 *2nd Place*", "🥉 *3rd Place*"];
             if (distinctScores.length > 0) {
@@ -826,24 +746,17 @@
                     msg += `${medalsList[idx]}: ${matchingTeams.map(t => t.name).join(" • ")} (${scoreVal} ജയം)\n`;
                 });
             }
-
-            let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
-            if (teamsWithTime.length > 0) {
-                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
-                msg += `⚡ *Fastest Win Award:* ${teamsWithTime[0].name} (${teamsWithTime[0].lastMatchTime} mins)\n`;
-            }
-
             const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
             if (lowestTeams.length > 0) {
                 msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(" • ")} needs practice! (${minWins} ജയം)\n`;
             }
-
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
         }
 
         function showToast(text) {
             const toast = document.getElementById("toast");
+            if(!toast) return;
             toast.textContent = text;
             toast.style.opacity = "1";
             setTimeout(() => {
@@ -855,7 +768,6 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        // Start App
         initData();
     </script>
 </body>
