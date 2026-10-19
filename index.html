@@ -60,17 +60,17 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-3 sm:p-4 select-none">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-2 sm:p-3 select-none">
     
-    <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
+    <div class="w-full max-w-sm sm:max-w-md my-auto space-y-2">
         
-        <!-- Header with Wesma Logo Emblem -->
-        <div class="text-center py-4 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden space-y-2">
-            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <!-- Header with Compact Wesma Logo Emblem -->
+        <div class="text-center py-2.5 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
+            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
             
-            <!-- SVG Wesma Custom Logo Emblem -->
-            <div class="flex justify-center mb-1">
-                <div class="w-24 h-24 sm:w-28 sm:h-28 relative drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)]">
+            <!-- Compact SVG Wesma Custom Logo Emblem -->
+            <div class="flex justify-center mb-0.5">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 relative drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]">
                     <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -106,38 +106,38 @@
                 </div>
             </div>
 
-            <h1 class="text-2xl sm:text-3xl font-black font-orbitron gold-gradient-text tracking-wider leading-tight">WESMA</h1>
-            <h2 class="text-xs sm:text-sm font-bold font-orbitron text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
+            <h1 class="text-xl sm:text-2xl font-black font-orbitron gold-gradient-text tracking-wider leading-none">WESMA</h1>
+            <h2 class="text-[10px] sm:text-xs font-bold font-orbitron text-amber-200/80 tracking-widest uppercase">BADMINTON CLUB</h2>
             
             <!-- Welcome Screen Start Match Button -->
-            <div id="top-timer-container" class="pt-2">
-                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-3 px-4 rounded-xl shadow-lg text-xs sm:text-sm flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
-                    <i class="fa-solid fa-play text-sm"></i> START TOURNAMENT TIMER (കളി ആരംഭിക്കുക)
+            <div id="top-timer-container" class="pt-1.5">
+                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-2.5 px-3 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
+                    <i class="fa-solid fa-play text-xs"></i> START TOURNAMENT TIMER (കളി ആരംഭിക്കുക)
                 </button>
             </div>
         </div>
 
         <!-- Dynamic Main Tournament Content Area -->
-        <div id="main-content-area" class="space-y-3 hidden">
+        <div id="main-content-area" class="space-y-2.5 hidden">
             
             <!-- Teams List -->
-            <div id="teams-list" class="space-y-2.5">
+            <div id="teams-list" class="space-y-2">
                 <!-- Rendered by JS -->
             </div>
 
             <!-- Total Play Section & Timers Display -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 space-y-1.5 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-bold text-slate-300 flex items-center gap-2 font-poppins">
                         <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
                     </span>
-                    <span id="total-play-val" class="text-amber-400 font-black text-lg bg-slate-950 px-4 py-1 rounded-xl border border-amber-500/20 min-w-[60px] text-center shadow-inner font-poppins">
+                    <span id="total-play-val" class="text-amber-400 font-black text-base bg-slate-950 px-3 py-0.5 rounded-xl border border-amber-500/20 min-w-[50px] text-center shadow-inner font-poppins">
                         0
                     </span>
                 </div>
                 
                 <!-- Current Match Duration Counter -->
-                <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
+                <div class="text-[11px] text-slate-400 bg-slate-950/60 p-1.5 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
                     <span class="flex items-center gap-1 text-slate-300">
                         <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
                     </span>
@@ -145,7 +145,7 @@
                 </div>
 
                 <!-- Total Tournament Duration Counter -->
-                <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
+                <div class="text-[11px] text-slate-400 bg-slate-950/60 p-1.5 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
                     <span class="flex items-center gap-1 text-slate-300">
                         <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Session Duration (Max 1.5h):
                     </span>
@@ -154,7 +154,7 @@
             </div>
 
             <!-- Leaderboard Summary Section -->
-            <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-3 text-center shadow-lg space-y-2.5">
+            <div class="bg-gradient-to-r from-amber-500/15 via-blue-900/40 to-amber-500/15 border gold-border rounded-2xl p-2.5 text-center shadow-lg space-y-2">
                 <div>
                     <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Undefeated Champions)
@@ -178,7 +178,7 @@
             </div>
 
             <!-- History Section -->
-            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-3 space-y-2 shadow-xl">
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-2.5 space-y-1.5 shadow-xl">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 font-orbitron">
                         <i class="fa-solid fa-clock-history text-amber-400"></i> MATCH HISTORY
@@ -187,17 +187,17 @@
                         <i class="fa-solid fa-folder-open"></i> ഹിസ്റ്ററി കാണുക
                     </button>
                 </div>
-                <div id="history-summary-text" class="text-[11px] text-slate-400 italic text-center py-1">
+                <div id="history-summary-text" class="text-[11px] text-slate-400 italic text-center py-0.5">
                     സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.
                 </div>
             </div>
 
             <!-- Reset & Share Buttons -->
-            <div class="grid grid-cols-2 gap-2 pt-1">
-                <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
+            <div class="grid grid-cols-2 gap-2 pt-0.5">
+                <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-2.5 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
                     <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
                 </button>
-                <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-3 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
+                <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-2.5 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
                     <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
                 </button>
             </div>
@@ -220,8 +220,12 @@
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
                 <!-- Dynamically Rendered History Cards -->
             </div>
-            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-center">
-                <button onclick="closeHistoryModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2 rounded-xl text-xs">
+            <!-- Modal Footer with Clear History & Close Buttons -->
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
+                <button onclick="clearHistory()" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 font-bold py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i> ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുക
+                </button>
+                <button onclick="closeHistoryModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2 rounded-xl text-xs">
                     അടയ്ക്കുക (Close)
                 </button>
             </div>
@@ -437,6 +441,21 @@
             if (modal) modal.classList.add("hidden");
         }
 
+        function clearHistory() {
+            const pin = prompt("ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ PIN!");
+                return;
+            }
+            if (window.confirm("സേവ് ചെയ്തിട്ടുള്ള എല്ലാ ഹിസ്റ്ററി ഡാറ്റയും പൂർണ്ണമായി നീക്കം ചെയ്യണോ?")) {
+                tournamentHistory = [];
+                saveData();
+                updateHistorySummaryText();
+                openHistoryModal();
+                showToast("ഹിസ്റ്ററി പൂർണ്ണമായി ക്ലിയർ ചെയ്തു!");
+            }
+        }
+
         function startFirstMatch() {
             const now = Date.now();
             tournamentStartTimestamp = now;
@@ -539,36 +558,36 @@
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
-                            <span class="w-2.5 h-8 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
+                            <span class="w-2 h-7 rounded-lg ${team.badgeBg} shrink-0 shadow-sm"></span>
                             ${specialBadgeHtml}
-                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-sm sm:text-base font-extrabold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name (Admin PIN required)">
+                            <div onclick="requestEditTeamName(${team.id}, '${escapeHtml(team.name)}')" class="bg-transparent text-xs sm:text-sm font-extrabold text-slate-100 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer truncate w-full flex items-center justify-between border border-transparent hover:border-slate-700" title="Click to edit team name (Admin PIN required)">
                                 <span class="truncate">${escapeHtml(team.name)}</span>
-                                <i class="fa-solid fa-pen text-[10px] text-slate-400 shrink-0 ml-1"></i>
+                                <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-8 h-11 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50" title="Decrease score (Admin PIN required)">
-                                <i class="fa-solid fa-minus"></i>
+                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50" title="Decrease score (Admin PIN required)">
+                                <i class="fa-solid fa-minus text-[10px]"></i>
                             </button>
-                            <div id="score-box-${team.id}" class="w-12 h-11 bg-slate-950 rounded-xl flex items-center justify-center font-black text-lg text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
+                            <div id="score-box-${team.id}" class="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center font-black text-base text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
                                 ${team.wins}
                             </div>
                             <div class="relative">
-                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-10 h-11 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
-                                    <i class="fa-solid fa-plus"></i>
+                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
+                                    <i class="fa-solid fa-plus text-[10px]"></i>
                                 </button>
                                 <!-- Cool-down Indicator Overlay over plus button -->
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-xl flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
                                     <div class="flex flex-col items-center justify-center">
-                                        <span class="text-[10px] leaf-anim">🍃</span>
-                                        <span id="cool-countdown-${team.id}" class="text-[9px] font-black font-poppins text-emerald-400">60s</span>
+                                        <span class="text-[9px] leaf-anim">🍃</span>
+                                        <span id="cool-countdown-${team.id}" class="text-[8px] font-black font-poppins text-emerald-400">60s</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-2">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-1">
                         <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-amber-400"></i> Last Match Duration:</span>
                         <span class="font-bold text-amber-300">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'Not recorded'}</span>
                     </div>
@@ -665,9 +684,9 @@
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             let leaderHtml = "";
             firstPlaces.forEach(f => {
-                leaderHtml += `<div class="text-amber-300 font-black text-base">⭐ ${escapeHtml(f.name)} (${maxWins} ജയം) ⭐</div>`;
+                leaderHtml += `<div class="text-amber-300 font-black text-sm sm:text-base">⭐ ${escapeHtml(f.name)} (${maxWins} ജയം) ⭐</div>`;
             });
-            leaderHtml += `<div class="text-[11px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
+            leaderHtml += `<div class="text-[10px] text-amber-400 font-bold mt-0.5">🌟 അൺഡിഫീറ്റഡ് ചാമ്പ്യൻസ് & മാസ്റ്റർ സ്മാഷേഴ്സ്! 🌟</div>`;
             leaderEl.innerHTML = leaderHtml;
 
             let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
@@ -688,14 +707,14 @@
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
                 const fastestTeam = teamsWithTime[0];
-                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins) <br><span class="text-[10px] italic text-cyan-400 font-normal">"ഏറ്റവും വേഗത്തിൽ വിജയം കൈവരിച്ച സ്പെഷ്യൽ സൂപ്പർ സ്റ്റാർസ്! 🏆💥"</span>`;
+                fastestEl.innerHTML = `⚡ Fastest Win Award: <span class="text-cyan-200 font-black">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins) <br><span class="text-[9px] italic text-cyan-400 font-normal">"ഏറ്റവും വേഗത്തിൽ വിജയം കൈവരിച്ച സ്പെഷ്യൽ സൂപ്പർ സ്റ്റാർസ്! 🏆💥"</span>`;
             } else {
                 fastestEl.innerHTML = `⚡ Fastest Win Award: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[10px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! ഘടനാപരമായ പോരാട്ടം തുടരുക! 🏸💥"</span>`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[9px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! ഘടനാപരമായ പോരാട്ടം തുടരുക! 🏸💥"</span>`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
