@@ -44,6 +44,21 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pop-in {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-3 sm:p-4 select-none">
@@ -51,7 +66,7 @@
     <div class="w-full max-w-sm sm:max-w-md my-auto space-y-3">
         
         <!-- Header with Wesma Logo Emblem -->
-        <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden">
+        <div class="text-center py-3 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-2xl relative overflow-hidden space-y-2">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
             <!-- SVG Wesma Custom Logo Emblem -->
@@ -107,10 +122,11 @@
             <h1 class="text-2xl sm:text-3xl font-black font-orbitron gold-gradient-text tracking-wider leading-tight">WESMA</h1>
             <h2 class="text-xs sm:text-sm font-bold font-orbitron text-amber-200/90 tracking-widest uppercase">BADMINTON CLUB</h2>
             
-            <div class="mt-2 flex items-center justify-center gap-2">
-                <span id="lock-status-text" class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                    <i class="fa-solid fa-lock-open"></i> Live Scoring Active
-                </span>
+            <!-- Special Top Menu Start Match / Timer Trigger Button -->
+            <div id="top-timer-container" class="pt-1">
+                <button id="start-match-btn" onclick="startFirstMatch()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black py-2.5 px-4 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 border border-emerald-400/40 pulse-glow transition-all active:scale-95">
+                    <i class="fa-solid fa-play text-sm"></i> START TOURNAMENT TIMER (കളി ആരംഭിക്കുക)
+                </button>
             </div>
         </div>
 
@@ -119,7 +135,7 @@
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Total Play Section & Timers -->
+        <!-- Total Play Section & Timers Display -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-md">
             <div class="flex items-center justify-between px-2">
                 <span class="text-xs font-bold text-slate-300 flex items-center gap-2 font-poppins">
@@ -130,17 +146,12 @@
                 </span>
             </div>
             
-            <!-- Current Match Duration Counter with Start Match Option -->
+            <!-- Current Match Duration Counter -->
             <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2 rounded-xl flex items-center justify-between border border-slate-800 font-poppins">
                 <span class="flex items-center gap-1 text-slate-300">
                     <i class="fa-solid fa-stopwatch text-emerald-400"></i> Current Match Duration:
                 </span>
-                <div class="flex items-center gap-2">
-                    <span id="current-match-timer" class="font-bold text-emerald-400">0m 0s</span>
-                    <button id="start-match-btn" onclick="startFirstMatch()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded font-bold">
-                        Start Match
-                    </button>
-                </div>
+                <span id="current-match-timer" class="font-bold text-emerald-400 text-xs">0m 0s</span>
             </div>
 
             <!-- Total Tournament Duration Counter -->
@@ -148,7 +159,7 @@
                 <span class="flex items-center gap-1 text-slate-300">
                     <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Total Duration:
                 </span>
-                <span id="total-duration-timer" class="font-bold text-amber-400">0m 0s</span>
+                <span id="total-duration-timer" class="font-bold text-amber-400 text-xs">0m 0s</span>
             </div>
         </div>
 
@@ -179,6 +190,21 @@
             </div>
         </div>
 
+        <!-- Special Match History Section -->
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-3 space-y-2 shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 font-orbitron">
+                    <i class="fa-solid fa-clock-history text-amber-400"></i> MATCH HISTORY
+                </span>
+                <button onclick="openHistoryModal()" class="text-[11px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1">
+                    <i class="fa-solid fa-folder-open"></i> ഹിസ്റ്ററി കാണുക
+                </button>
+            </div>
+            <div id="history-summary-text" class="text-[11px] text-slate-400 italic text-center py-1">
+                സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.
+            </div>
+        </div>
+
         <!-- Separate Reset & WhatsApp Share Buttons -->
         <div class="grid grid-cols-2 gap-2 pt-1">
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-3 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
@@ -189,6 +215,85 @@
             </button>
         </div>
 
+    </div>
+
+    <!-- WINNER SPECIAL CELEBRATION MODAL -->
+    <div id="winner-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border-2 border-amber-400/80 w-full max-w-xs sm:max-w-sm rounded-3xl p-5 shadow-2xl text-center space-y-4 pop-in relative overflow-hidden">
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl"></div>
+            
+            <!-- Trophy Graphic Emblem -->
+            <div class="relative flex justify-center">
+                <div class="w-20 h-20 bg-amber-500/20 rounded-full border border-amber-400/50 flex items-center justify-center text-4xl shadow-inner">
+                    🏆
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-[10px] font-black uppercase font-orbitron tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">MATCH WINNER!</span>
+                <h3 id="winner-modal-name" class="text-xl font-black text-white gold-gradient-text pt-2"></h3>
+                <p id="winner-modal-score" class="text-xs text-amber-200/90 font-bold"></p>
+            </div>
+
+            <p class="text-xs text-slate-300 italic">"അവിശ്വസനീയ പ്രകടനം! തുടർച്ചയായ വിജയങ്ങളോടെ ടൂർണമെന്റിൽ മുന്നേറുന്നു! 🏸✨"</p>
+
+            <button onclick="closeWinnerModal()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg active:scale-95 transition-all">
+                വളരെ സന്തോഷം (Continue)
+            </button>
+        </div>
+    </div>
+
+    <!-- LOSER SPECIAL WARNING MODAL -->
+    <div id="loser-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gradient-to-b from-slate-900 via-rose-950/50 to-slate-900 border-2 border-rose-500/80 w-full max-w-xs sm:max-w-sm rounded-3xl p-5 shadow-2xl text-center space-y-4 pop-in relative overflow-hidden">
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-rose-500/20 rounded-full blur-2xl"></div>
+            
+            <!-- Warning Fire Emblem -->
+            <div class="relative flex justify-center">
+                <div class="w-20 h-20 bg-rose-500/20 rounded-full border border-rose-500/50 flex items-center justify-center text-4xl shadow-inner">
+                    🚨
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-[10px] font-black uppercase font-orbitron tracking-widest text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/30">LOWEST SCORE ALERT</span>
+                <h3 id="loser-modal-name" class="text-xl font-black text-rose-200 pt-2"></h3>
+                <p id="loser-modal-score" class="text-xs text-rose-300/90 font-bold"></p>
+            </div>
+
+            <p class="text-xs text-rose-200/90 italic">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! തകർപ്പൻ തിരിച്ചുവരവിനായി ശ്രമിക്കൂ! 🏸💥"</p>
+
+            <button onclick="closeLoserModal()" class="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-black py-2.5 rounded-xl text-xs shadow-lg active:scale-95 transition-all">
+                പോരാട്ടം തുടരും (Fight Back)
+            </button>
+        </div>
+    </div>
+
+    <!-- Special Interactive History Popup Modal -->
+    <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm sm:max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <!-- Modal Header -->
+            <div class="p-3 bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="text-sm font-extrabold gold-gradient-text flex items-center gap-2 font-orbitron">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> PAST TOURNAMENTS LOG
+                </h3>
+                <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-lg flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (History Items) -->
+            <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
+                <!-- Dynamically Rendered History Cards -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-center">
+                <button onclick="closeHistoryModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2 rounded-xl text-xs">
+                    അടയ്ക്കുക (Close)
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Notification Toast -->
@@ -208,6 +313,7 @@
         ];
 
         let teams = [];
+        let tournamentHistory = [];
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let timerInterval = null;
@@ -217,14 +323,14 @@
             databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('wesma_badminton_scores_v4');
+        const dbRef = firebase.database().ref('wesma_badminton_scores_v8');
 
         function initData() {
             dbRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     const savedTeams = data.teams || defaultTeams;
-                    teams = defaultTeams.map((defTeam, i) => {
+                    teams = defaultTeams.map((defTeam) => {
                         const found = savedTeams.find(st => st.id === defTeam.id);
                         return {
                             ...defTeam,
@@ -236,23 +342,26 @@
                     });
                     tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                     lastActionTimestamp = data.lastActionTimestamp || null;
+                    tournamentHistory = data.tournamentHistory || [];
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     tournamentStartTimestamp = null;
                     lastActionTimestamp = null;
-                    dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp });
+                    tournamentHistory = [];
+                    dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory });
                 }
                 render();
+                updateHistorySummaryText();
                 startLiveTimer();
                 startCooldownTickers();
             }, (error) => {
                 console.error("Firebase read error:", error);
-                const saved = localStorage.getItem("wesma_badminton_scores_v4");
+                const saved = localStorage.getItem("wesma_badminton_scores_v8");
                 if (saved) {
                     try { 
                         const parsed = JSON.parse(saved);
                         const savedTeams = parsed.teams || defaultTeams;
-                        teams = defaultTeams.map((defTeam, i) => {
+                        teams = defaultTeams.map((defTeam) => {
                             const found = savedTeams.find(st => st.id === defTeam.id);
                             return {
                                 ...defTeam,
@@ -264,17 +373,21 @@
                         });
                         tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
+                        tournamentHistory = parsed.tournamentHistory || [];
                     } catch(e) { 
                         teams = JSON.parse(JSON.stringify(defaultTeams)); 
                         tournamentStartTimestamp = null;
                         lastActionTimestamp = null;
+                        tournamentHistory = [];
                     }
                 } else {
                     teams = JSON.parse(JSON.stringify(defaultTeams));
                     tournamentStartTimestamp = null;
                     lastActionTimestamp = null;
+                    tournamentHistory = [];
                 }
                 render();
+                updateHistorySummaryText();
                 startLiveTimer();
                 startCooldownTickers();
             });
@@ -285,11 +398,113 @@
         }
 
         function saveData() {
-            dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp }).catch((error) => {
+            dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }).catch((error) => {
                 console.error("Firebase write error:", error);
-                localStorage.setItem("wesma_badminton_scores_v4", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp }));
+                localStorage.setItem("wesma_badminton_scores_v8", JSON.stringify({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }));
             });
             updateLeaderboard();
+        }
+
+        function autoSaveToHistory() {
+            const totalPlays = calculateTotalPlays();
+            if (totalPlays === 0) return;
+
+            const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const record = {
+                id: Date.now(),
+                date: dateStr,
+                teams: JSON.parse(JSON.stringify(teams)),
+                totalPlays: totalPlays
+            };
+
+            if (tournamentHistory.length > 0 && tournamentHistory[0].totalPlays === totalPlays) {
+                tournamentHistory[0] = record;
+            } else {
+                tournamentHistory.unshift(record);
+            }
+            updateHistorySummaryText();
+        }
+
+        function updateHistorySummaryText() {
+            const summaryEl = document.getElementById("history-summary-text");
+            if (!summaryEl) return;
+            if (tournamentHistory.length > 0) {
+                summaryEl.textContent = `ആകെ ${tournamentHistory.length} കളികളുടെ റെക്കോർഡുകൾ സേവ് ചെയ്തിട്ടുണ്ട്.`;
+            } else {
+                summaryEl.textContent = `സേവ് ചെയ്ത ടൂർണമെന്റ് വിവരങ്ങൾ അറിയാൻ മുകളിലെ ബട്ടൺ അമർത്തുക.`;
+            }
+        }
+
+        function triggerWinnerModal(team) {
+            document.getElementById("winner-modal-name").textContent = team.name;
+            document.getElementById("winner-modal-score").textContent = `സ്കോർ: ${team.wins} വിജയങ്ങൾ`;
+            document.getElementById("winner-modal").classList.remove("hidden");
+        }
+
+        function closeWinnerModal() {
+            document.getElementById("winner-modal").classList.add("hidden");
+        }
+
+        function triggerLoserModal(team) {
+            document.getElementById("loser-modal-name").textContent = team.name;
+            document.getElementById("loser-modal-score").textContent = `നിലവിലെ സ്കോർ: ${team.wins} വിജയങ്ങൾ മാത്രം`;
+            document.getElementById("loser-modal").classList.remove("hidden");
+        }
+
+        function closeLoserModal() {
+            document.getElementById("loser-modal").classList.add("hidden");
+        }
+
+        function openHistoryModal() {
+            const modal = document.getElementById("history-modal");
+            const container = document.getElementById("modal-history-content");
+            if (!modal || !container) return;
+
+            if (!tournamentHistory || tournamentHistory.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-center py-6">സേവ് ചെയ്ത കളികളുടെ ഡാറ്റ ലഭ്യമല്ല.</div>`;
+            } else {
+                container.innerHTML = "";
+                tournamentHistory.forEach((item) => {
+                    let sortedTeams = [...item.teams].sort((a, b) => b.wins - a.wins);
+                    let winnerTeam = sortedTeams[0];
+
+                    const card = document.createElement("div");
+                    card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
+
+                    let teamsListHtml = "";
+                    sortedTeams.forEach((t, i) => {
+                        teamsListHtml += `
+                            <div class="flex justify-between items-center text-[11px] text-slate-300 py-0.5 border-b border-slate-900">
+                                <span>${i + 1}. ${escapeHtml(t.name)}</span>
+                                <span class="font-bold text-amber-400">${t.wins} ജയം</span>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <div>
+                                <div class="text-xs font-bold text-amber-300">👑 ${escapeHtml(winnerTeam.name)}</div>
+                                <div class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar"></i> ${item.date}</div>
+                            </div>
+                            <span class="text-[10px] bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded border border-amber-500/20">
+                                Total Plays: ${item.totalPlays}
+                            </span>
+                        </div>
+                        <div class="pt-1">
+                            ${teamsListHtml}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            modal.classList.remove("hidden");
+        }
+
+        function closeHistoryModal() {
+            const modal = document.getElementById("history-modal");
+            if (modal) modal.classList.add("hidden");
         }
 
         function startFirstMatch() {
@@ -299,7 +514,7 @@
             }
             lastActionTimestamp = now;
             saveData();
-            showToast("Tournament & Match timers started!");
+            showToast("🚀 Tournament Timer Started!");
         }
 
         function startLiveTimer() {
@@ -308,16 +523,16 @@
             timerInterval = setInterval(() => {
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
-                const startBtn = document.getElementById("start-match-btn");
+                const timerContainer = document.getElementById("top-timer-container");
 
                 if (!tournamentStartTimestamp) {
                     currentTimerEl.textContent = "0m 0s";
                     totalDurationEl.textContent = "0m 0s";
-                    startBtn.classList.remove("hidden");
+                    if(timerContainer) timerContainer.classList.remove("hidden");
                     return;
                 }
                 
-                startBtn.classList.add("hidden");
+                if(timerContainer) timerContainer.classList.add("hidden");
                 
                 const totalDiffMs = Date.now() - tournamentStartTimestamp;
                 const totalMins = Math.floor(totalDiffMs / 60000);
@@ -451,6 +666,14 @@
                 lastActionTimestamp = now;
 
                 team.wins += delta;
+                
+                // Trigger Special Winner Modal Celebration
+                let sortedBefore = [...teams].sort((a, b) => b.wins - a.wins);
+                if (team.wins >= sortedBefore[0].wins) {
+                    triggerWinnerModal(team);
+                }
+
+                autoSaveToHistory();
                 saveData();
                 render();
                 showToast(`${team.name} വിജയം വിജയകരമായി ചേർത്തു! 🏸`);
@@ -465,6 +688,14 @@
                 if (team.wins + delta < 0) return;
 
                 team.wins += delta;
+
+                // Trigger Special Warning Modal for Lowest Score Team
+                let sortedAfter = [...teams].sort((a, b) => a.wins - b.wins);
+                if (team.id === sortedAfter[0].id) {
+                    triggerLoserModal(team);
+                }
+
+                autoSaveToHistory();
                 saveData();
                 render();
                 showToast(`${team.name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
@@ -476,6 +707,7 @@
             if (!team) return;
             const trimmed = val.trim();
             team.name = trimmed !== "" ? trimmed : "Team";
+            autoSaveToHistory();
             saveData();
         }
 
