@@ -15,6 +15,8 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- html2canvas for Image Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             font-family: 'Manjari', sans-serif;
@@ -70,7 +72,8 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between items-center p-2 sm:p-3 select-none">
     
-    <div class="w-full max-w-sm sm:max-w-md my-auto space-y-2">
+    <!-- Printable Share Area Container -->
+    <div id="capture-area" class="w-full max-w-sm sm:max-w-md my-auto space-y-2 bg-slate-950 p-1 rounded-2xl">
         
         <!-- Header with Compact Wesma Logo Emblem & Live Date Badge -->
         <div class="text-center py-2 px-3 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0.5">
@@ -212,18 +215,20 @@
                 </div>
             </div>
 
-            <!-- Reset & Share Buttons -->
-            <div class="grid grid-cols-2 gap-2 pt-0.5">
-                <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-2.5 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
-                    <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
-                </button>
-                <button onclick="shareWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-2.5 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
-                    <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> വാട്സ്ആപ്പിൽ ഷെയർ
-                </button>
-            </div>
-
         </div>
 
+    </div>
+
+    <!-- Outside Capture Area: Reset & Share Buttons -->
+    <div class="w-full max-w-sm sm:max-w-md pt-2 space-y-2">
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-slate-300 font-bold py-2.5 px-3 rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow-md">
+                <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ് (Reset)
+            </button>
+            <button onclick="shareWhatsAppImage()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black py-2.5 px-3 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-emerald-400/30">
+                <i class="fa-brands fa-whatsapp text-sm text-emerald-100"></i> ഫോട്ടോ ആയി ഷെയർ
+            </button>
+        </div>
     </div>
 
     <!-- History Popup Modal -->
@@ -262,11 +267,11 @@
         const SESSION_LIMIT_MS = 90 * 60 * 1000; // 1.5 Hours in milliseconds
         
         const defaultTeams = [
-            { id: 1, name: "Shafeer & Faisal", wins: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 2, name: "Musthafa & Junaid", wins: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 3, name: "Ashraf & Anwar", wins: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 4, name: "Aneesh & Anas", wins: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 5, name: "Fahad & Mujeeb", wins: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
+            { id: 1, name: "Shafeer & Faisal", wins: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 2, name: "Musthafa & Junaid", wins: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 3, name: "Ashraf & Anwar", wins: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 4, name: "Aneesh & Anas", wins: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0 },
+            { id: 5, name: "Fahad & Mujeeb", wins: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
         ];
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -288,7 +293,7 @@
             console.error("Firebase init error:", e);
         }
 
-        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v11') : null;
+        const dbRef = isFirebaseConnected ? firebase.database().ref('wesma_badminton_scores_v14') : null;
 
         function initData() {
             // Set Header Date with Animation
@@ -309,6 +314,7 @@
                                 ...defTeam,
                                 name: (found && found.name) ? found.name : defTeam.name,
                                 wins: found ? (found.wins || 0) : 0,
+                                played: found ? (found.played || 0) : 0,
                                 lastMatchTime: found ? (found.lastMatchTime || 0) : 0,
                                 lastClickTime: found ? (found.lastClickTime || 0) : 0
                             };
@@ -366,7 +372,7 @@
                 };
                 tournamentHistory.unshift(record);
             }
-            teams.forEach(t => { t.wins = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
+            teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             saveData();
@@ -448,7 +454,7 @@
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
-                        let losses = Math.max(0, item.totalPlays - t.wins);
+                        let losses = Math.max(0, (t.played || t.wins) - t.wins);
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-[11px] text-slate-300 py-0.5 border-b border-slate-900">
                                 <span>${i + 1}. ${escapeHtml(t.name)}</span>
@@ -505,7 +511,7 @@
             lastActionTimestamp = now;
             renderUIState();
             saveData();
-            render(); // Forced immediate rendering of teams list
+            render();
             showToast("🚀 Tournament Session Timer Started (1.5 Hours)!");
         }
 
@@ -566,8 +572,7 @@
             container.innerHTML = "";
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
-            const totalPlays = calculateTotalPlays();
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -584,7 +589,8 @@
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
                 const isLoser = (team.wins === minWins && minWins < maxWins);
                 
-                const losses = Math.max(0, totalPlays - team.wins);
+                const playedCount = Math.max(team.played || 0, team.wins);
+                const losses = Math.max(0, playedCount - team.wins);
                 
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
@@ -613,11 +619,15 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-10 bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-300 rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-rose-800/50" title="Decrease score (Admin PIN required)">
-                                <i class="fa-solid fa-minus text-[10px]"></i>
+                            <!-- Played Match Update Button -->
+                            <button onclick="handlePlayedChange(${team.id}, 1)" class="w-7 h-10 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-300 rounded-xl flex flex-col items-center justify-center font-bold text-[10px] shadow-md active:scale-95 transition-all border border-slate-700" title="Add Played Match (+1 Played)">
+                                <span class="text-[8px] text-slate-400 leading-none">Play</span>
+                                <span class="font-black text-xs text-amber-300">${playedCount}</span>
                             </button>
-                            <div id="score-box-${team.id}" class="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center font-black text-base text-amber-400 border border-amber-500/40 shadow-inner font-poppins">
-                                ${team.wins}
+                            <!-- Wins & Losses Auto Calculated Box -->
+                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-xl px-2.5 py-1 border border-amber-500/30 shadow-inner">
+                                <span class="text-xs font-black text-amber-400 font-poppins">${team.wins} <span class="text-[9px] text-amber-200">Win</span></span>
+                                <span class="text-[10px] font-bold text-rose-400 font-poppins">${losses} <span class="text-[8px] text-rose-200">Loss</span></span>
                             </div>
                             <div class="relative">
                                 <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-9 h-10 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md active:scale-95 transition-all border border-emerald-500/50" title="Add Win">
@@ -634,13 +644,9 @@
                         </div>
                     </div>
                     
-                    <!-- Bottom Info Section showing both Wins & Losses -->
+                    <!-- Bottom Info Section showing Last Match Duration -->
                     <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/60 px-1 font-poppins mt-1">
-                        <span class="flex items-center gap-1.5 font-bold">
-                            <span class="text-amber-400 flex items-center gap-1"><i class="fa-solid fa-trophy text-[9px]"></i> ${team.wins} Win</span>
-                            <span class="text-slate-600">•</span>
-                            <span class="text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-xmark text-[9px]"></i> ${losses} Loss</span>
-                        </span>
+                        <span class="text-slate-400 italic">ടീമിന്റെ ജയ-തോൽവി ലൈവ് സ്റ്റാറ്റ്സ്</span>
                         <span class="font-bold text-amber-300/90">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'No time'}</span>
                     </div>
                 `;
@@ -648,7 +654,7 @@
             });
             
             const totalPlayEl = document.getElementById("total-play-val");
-            if(totalPlayEl) totalPlayEl.textContent = totalPlays;
+            if(totalPlayEl) totalPlayEl.textContent = calculateTotalPlays();
             updateLeaderboard();
         }
 
@@ -672,23 +678,28 @@
                 }
                 lastActionTimestamp = now;
                 team.wins += delta;
+                team.played = (team.played || 0) + 1;
                 autoSaveToHistory();
                 saveData();
                 render();
                 showToast(`${team.name} വിജയം ചേർത്തു! 🏸`);
-            } else if (delta < 0) {
-                const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
-                if (pin !== ADMIN_PIN) {
-                    if (pin !== null) alert("തെറ്റായ PIN!");
-                    return;
-                }
-                if (team.wins + delta < 0) return;
-                team.wins += delta;
-                autoSaveToHistory();
-                saveData();
-                render();
-                showToast(`${team.name} സ്കോർ അഡ്മിൻ വഴി തിരുത്തി!`);
             }
+        }
+
+        function handlePlayedChange(id, delta) {
+            const team = teams.find(t => t.id === id);
+            if (!team) return;
+            const pin = prompt("ആകെ കളിച്ച മത്സരങ്ങളുടെ എണ്ണം കൂട്ടുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ PIN!");
+                return;
+            }
+            team.played = (team.played || 0) + delta;
+            if (team.played < team.wins) team.played = team.wins;
+            autoSaveToHistory();
+            saveData();
+            render();
+            showToast(`${team.name} കളിച്ച കളികളുടെ എണ്ണം അപ്ഡേറ്റ് ചെയ്തു!`);
         }
 
         function requestEditTeamName(id, currentName) {
@@ -766,7 +777,7 @@
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[9px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! ഘടനാപരമായ പോരാട്ടം തുടരുക! 🏸💥"</span>`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="font-bold text-rose-200">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം) <br><span class="text-[9px] italic text-rose-400 font-normal">"ഇനിയും കഠിനാധ്വാനവും പ്രാക്ടീസും അത്യാവശ്യമാണ്! ഘടനാപരമായ പോരാട്ടം തുടരുക! 💥"</span>`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
@@ -785,49 +796,41 @@
             }
         }
 
-        function shareWhatsApp() {
-            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
-            const maxWins = sorted[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
-            const totalPlays = calculateTotalPlays();
-
-            let msg = "🏸 *WESMA BADMINTON CLUB* 🏸\n";
-            msg += "🏆 *Tournament Score Counter* 🏆\n\n";
-            sorted.forEach((t, i) => {
-                let losses = Math.max(0, totalPlays - t.wins);
-                let timeStr = t.lastMatchTime ? ` (${t.lastMatchTime} mins)` : '';
-                msg += `${i + 1}. ${t.name} : *${t.wins}* ജയം | *${losses}* തോൽവി${timeStr}\n`;
-            });
-            msg += `\n🎮 *Total Plays:* ${totalPlays}\n`;
-            if (tournamentStartTimestamp) {
-                let totalDiffMs = Date.now() - tournamentStartTimestamp;
-                let totalMins = Math.floor(totalDiffMs / 60000);
-                msg += `⏱️ *Session Duration:* ${totalMins} mins\n`;
-            }
-            msg += "-------------------------\n";
-            const firstPlaces = sorted.filter(t => t.wins === maxWins && maxWins > 0);
-            if (firstPlaces.length > 0) {
-                msg += `👑 *1st Place (ചാമ്പ്യന്മാർ):* ${firstPlaces.map(f => f.name).join(" • ")} (${maxWins} ജയം)\n`;
-            }
-            let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
-            if (teamsWithTime.length > 0) {
-                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
-                msg += `⚡ *Fastest Win Award:* ${teamsWithTime[0].name} (${teamsWithTime[0].lastMatchTime} mins)\n`;
-            }
-            let distinctScores = [...new Set(sorted.map(t => t.wins))].filter(w => w < maxWins);
-            let medalsList = ["🥈 *2nd Place*", "🥉 *3rd Place*"];
-            if (distinctScores.length > 0) {
-                distinctScores.slice(0, 2).forEach((scoreVal, idx) => {
-                    let matchingTeams = sorted.filter(t => t.wins === scoreVal);
-                    msg += `${medalsList[idx]}: ${matchingTeams.map(t => t.name).join(" • ")} (${scoreVal} ജയം)\n`;
+        // Generate Image Snapshot and Share via WhatsApp
+        function shareWhatsAppImage() {
+            showToast("📸 സ്കോർ കാർഡ് ഫോട്ടോ തയ്യാറാക്കുന്നു...");
+            const captureElement = document.getElementById("capture-area");
+            
+            html2canvas(captureElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#030712"
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], "WESMA_Scores.png", { type: "image/png" });
+                    
+                    // Check if Web Share API is supported (Supported in mobile browsers)
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'WESMA Badminton Club',
+                            text: '🏸 WESMA Badminton Club - Live Score Card 🏆'
+                        }).catch(error => console.log('Sharing error:', error));
+                    } else {
+                        // Fallback: Download Image directly and open WhatsApp text link
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'WESMA_Badminton_Score.png';
+                        link.click();
+                        
+                        let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഇമേജ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്. വാട്സാപ്പിൽ ഫോട്ടോ ആയി ഷെയർ ചെയ്യാം!";
+                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                    }
                 });
-            }
-            const lowestTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
-            if (lowestTeams.length > 0) {
-                msg += `🚨 *Critical Note:* ${lowestTeams.map(l => l.name).join(" • ")} needs practice! (${minWins} ജയം)\n`;
-            }
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-            window.open(url, '_blank');
+            }).catch(err => {
+                console.error("Image generation error:", err);
+                showToast("⚠️ ഫോട്ടോ തയ്യാറാക്കുന്നതിൽ ചെറിയ തടസ്സമുണ്ടായി.");
+            });
         }
 
         function showToast(text) {
