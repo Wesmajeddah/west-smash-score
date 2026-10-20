@@ -521,10 +521,10 @@
         
         const defaultTeams = [
             { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, matchInterval: 0 },
-            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 }
+            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, matchInterval: 0 },
+            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, matchInterval: 0 },
+            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, matchInterval: 0 },
+            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, matchInterval: 0 }
         ];
 
         const winMotivationalComments = [
@@ -748,7 +748,6 @@
             triggerHapticFeedback([60, 40, 80]);
         }
 
-        // Admin PIN Protected END MATCH Function
         function requestAdminForEndMatch() {
             triggerHapticFeedback([40]);
             const pin = prompt("END MATCH ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -759,7 +758,6 @@
             manualFinishMatch();
         }
 
-        // Admin PIN Protected Recovery Function
         function requestAdminForRecovery() {
             triggerHapticFeedback([40]);
             const pin = prompt("മിസ്സ് ആയ ഡാറ്റ റിക്കവർ ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -767,8 +765,6 @@
                 if (pin !== null) alert("തെറ്റായ Admin PIN!");
                 return;
             }
-            
-            // Try loading from local storage backup or history
             loadLocalBackup();
             render();
             showToast("🔄 ഡാറ്റ വിജയകരമായി റിക്കവർ ചെയ്തു!");
@@ -1353,7 +1349,6 @@
             updateLeaderboard();
         }
 
-        // Winner Stays Rotation Logic with Defeated Team Picker & Time Gap Calculation
         function handleScoreChange(id, delta) {
             const team = teams.find(t => t.id === id);
             if (!team) return;
