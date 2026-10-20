@@ -227,27 +227,27 @@
                 </div>
             </div>
 
-            <!-- Match History Section -->
-            <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs text-amber-300 flex items-center gap-1 font-semibold">
-                        <i class="fa-solid fa-clock-history text-amber-400"></i> HISTORY
-                    </span>
-                    <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[160px] sm:max-w-[220px]">
-                        സെഷൻ റെക്കോർഡുകൾ ലഭ്യമാണ്.
-                    </span>
-                </div>
-                <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 shrink-0">
-                    <i class="fa-solid fa-folder-open"></i> കാണുക
-                </button>
-            </div>
-
         </div>
 
     </div>
 
-    <!-- Outside Capture Area: Compact Reset & Share Buttons -->
+    <!-- Outside Capture Area: Match History Section & Action Buttons -->
     <div class="w-full max-w-xl pt-2 space-y-2">
+        <!-- Match History Section (Moved outside capture-area so it won't appear in shared photo) -->
+        <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-amber-300 flex items-center gap-1 font-semibold">
+                    <i class="fa-solid fa-clock-history text-amber-400"></i> HISTORY
+                </span>
+                <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[160px] sm:max-w-[220px]">
+                    സെഷൻ റെക്കോർഡുകൾ ലഭ്യമാണ്.
+                </span>
+            </div>
+            <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 shrink-0">
+                <i class="fa-solid fa-folder-open"></i> കാണുക
+            </button>
+        </div>
+
         <div class="grid grid-cols-3 gap-2">
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-2.5 px-1 rounded-xl border border-slate-700 flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ്
@@ -891,26 +891,27 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
+                // Badges styled to stay 100% visible and un-truncated in screenshots
                 if (isWinner) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-semibold px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-semibold px-1.5 py-0.5 rounded flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
                 } else if (isFastest) {
                     extraCardClass = "fastest-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-semibold px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-semibold px-1.5 py-0.5 rounded flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
                 } else if (isLoser) {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-semibold px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-semibold px-1.5 py-0.5 rounded flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
                 }
 
                 const card = document.createElement("div");
                 card.className = `relative bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col shadow-md gap-2 ${extraCardClass}`;
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-1 min-w-0 overflow-visible">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer w-full flex items-center justify-between hover:text-amber-300 py-1" title="Click to edit">
-                                <span class="leading-snug break-words pr-1">${formatSingleLetterAnimatedName(team.name)}</span>
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer w-full flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit">
+                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
