@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter & Great Vibes (for W swash style) -->
+    <!-- Google Fonts: Inter & Great Vibes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <!-- html2canvas for Image Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Canvas Confetti for Celebration Effect -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -28,7 +27,7 @@
             font-size: 15px;
         }
         
-        /* Wesma Header Unique Style - Solid Base Mixed Gold Tone */
+        /* Wesma Header Unique Style */
         .wesma-title {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
@@ -41,7 +40,6 @@
             overflow: visible;
         }
 
-        /* Swash 'W' Base Mixed Gold Color + Extremely Slow & Random Vertical Flip */
         .special-w {
             font-family: 'Great Vibes', cursive;
             font-size: 1.35em;
@@ -65,7 +63,6 @@
             }
         }
 
-        /* Individual Letters in ESMA - Extremely Slow & Random Vertical Flip */
         .animated-letter {
             display: inline-block;
             transform-style: preserve-3d;
@@ -88,7 +85,6 @@
 
         .gold-border { border: 1.5px solid rgba(212, 175, 55, 0.4); }
         
-        /* Unique Glowing Gold Pulse Animation for Champions Box */
         .champions-special-border {
             border: 2px solid #F59E0B;
             box-shadow: 0 0 18px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(245, 158, 11, 0.25);
@@ -106,7 +102,6 @@
             50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.8), inset 0 0 18px rgba(245, 158, 11, 0.4); }
         }
 
-        /* Badges High Precision Clarity Styling */
         .rank-badge {
             display: inline-flex !important;
             align-items: center !important;
@@ -148,7 +143,28 @@
             animation: leafPulse 2s infinite ease-in-out;
         }
 
-        /* Clean Static Watermark Style */
+        /* Fun Dancing Animation Effects */
+        @keyframes danceBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-12px) rotate(-10deg) scale(1.1); }
+            50% { transform: translateY(0) rotate(10deg) scale(0.95); }
+            75% { transform: translateY(-8px) rotate(-5deg) scale(1.05); }
+        }
+        .dance-animation {
+            display: inline-block;
+            animation: danceBounce 0.8s infinite ease-in-out;
+        }
+
+        @keyframes discoGlow {
+            0% { filter: drop-shadow(0 0 8px #f59e0b); }
+            33% { filter: drop-shadow(0 0 12px #10b981); }
+            66% { filter: drop-shadow(0 0 12px #3b82f6); }
+            100% { filter: drop-shadow(0 0 8px #f59e0b); }
+        }
+        .disco-effect {
+            animation: discoGlow 1.5s infinite linear;
+        }
+
         .static-watermark {
             color: #f59e0b;
             font-weight: 700;
@@ -225,19 +241,9 @@
                     <span id="current-match-timer" class="text-emerald-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
 
-                <!-- Match Summary Box (Appears when match ends) -->
-                <div id="match-summary-box" class="hidden text-xs text-cyan-300 bg-cyan-950/40 p-2.5 rounded-lg border border-cyan-500/30 space-y-1">
-                    <div class="font-semibold flex items-center gap-1 text-cyan-200">
-                        <i class="fa-solid fa-flag-checkered text-cyan-400"></i> MATCH FINISHED SUMMARY:
-                    </div>
-                    <div id="match-summary-text" class="text-[11px] text-slate-300 font-light leading-relaxed">
-                        <!-- Summary generated dynamically -->
-                    </div>
-                </div>
-
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
-                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration:
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration (Max 1h 30m):
                     </span>
                     <span id="total-duration-timer" class="text-amber-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
@@ -249,7 +255,6 @@
                     <div class="text-xs font-semibold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
                     </div>
-                    <!-- Champions Box with Special Golden Pulse Animation -->
                     <div id="leader-text" class="champions-special-border text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider flex items-center justify-center gap-2">
                         <span class="text-amber-400 animate-pulse">👑</span>
                         <span id="champion-name-span" class="relative z-20">ലോഡ് ചെയ്യുന്നു...</span>
@@ -275,32 +280,32 @@
 
     </div>
 
-    <!-- Outside Capture Area: Match Control & Action Buttons (2-Column Grid Layout) -->
+    <!-- Outside Capture Area: Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         
-        <!-- Two Column Control Options: END MATCH & PREVIEW MATCH -->
-        <div class="grid grid-cols-2 gap-2">
-            <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-800 to-rose-950 hover:from-rose-700 hover:to-rose-900 text-white font-bold py-2.5 px-2 rounded-xl border border-rose-500/40 flex items-center justify-center gap-1.5 text-[11px] shadow-lg transition-all active:scale-95 tracking-wide uppercase">
-                <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
-            </button>
-            <button onclick="generateAndShareImage('normal')" class="w-full bg-gradient-to-r from-emerald-800 to-teal-900 hover:from-emerald-700 hover:to-teal-800 text-white font-bold py-2.5 px-2 rounded-xl border border-emerald-500/40 flex items-center justify-center gap-1.5 text-[11px] shadow-lg transition-all active:scale-95 tracking-wide uppercase">
-                <i class="fa-solid fa-image text-emerald-300"></i> PREVIEW MATCH
-            </button>
-        </div>
+        <!-- Action Options: END MATCH -->
+        <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-800 via-rose-900 to-amber-900 hover:from-rose-700 hover:to-amber-800 text-white font-bold py-3 px-3 rounded-xl border border-rose-500/50 flex items-center justify-center gap-2 text-xs shadow-xl transition-all active:scale-95 tracking-widest uppercase">
+            <i class="fa-solid fa-flag-checkered text-amber-300 text-sm"></i> END MATCH
+        </button>
 
-        <!-- Match History Section -->
+        <!-- Match History & Sound Options Section -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2">
                 <span class="text-xs text-amber-300 flex items-center gap-1 font-semibold">
                     <i class="fa-solid fa-clock-history text-amber-400"></i> HISTORY
                 </span>
-                <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[160px] sm:max-w-[220px]">
-                    സെഷൻ റെക്കോർഡുകൾ ലഭ്യമാണ്.
+                <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[120px] sm:max-w-[180px]">
+                    സെഷൻ റെക്കോർഡുകൾ.
                 </span>
             </div>
-            <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 shrink-0">
-                <i class="fa-solid fa-folder-open"></i> കാണുക
-            </button>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="openSoundSettingsModal()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-2 py-1 rounded-lg border border-amber-500/30 flex items-center gap-1">
+                    <i class="fa-solid fa-volume-high text-amber-400"></i> സൗണ്ട്
+                </button>
+                <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1">
+                    <i class="fa-solid fa-folder-open"></i> കാണുക
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
@@ -313,25 +318,70 @@
         </div>
     </div>
 
-    <!-- Special Compact Winner Appreciation & Match Finish Modal -->
+    <!-- Special End Match Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
-            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-                <span class="text-xs font-extrabold text-amber-300 uppercase tracking-widest flex items-center gap-1.5">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> MATCH FINISH SUMMARY
-                </span>
-                <button onclick="closeFinishMatchModal()" class="w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
+            
+            <!-- Custom Modal Header with WESMA Details -->
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col items-center justify-center relative">
+                <button onclick="closeFinishMatchModal()" class="absolute right-3 top-3 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
+                <div class="text-base font-black text-amber-400 tracking-widest uppercase">WESMA</div>
+                <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB SINCE 2026</div>
+                <div id="modal-header-date" class="text-[8px] text-slate-400 font-light mt-0.5"></div>
             </div>
             
             <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs">
                 <!-- Content injected dynamically via JavaScript -->
             </div>
 
-            <div class="p-2.5 bg-slate-950 border-t border-slate-800 flex justify-center">
-                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-1.5 rounded-xl text-xs uppercase tracking-wider shadow">
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
+                <button onclick="generateAndShareImage('normal')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-image"></i> പ്രിവ്യൂ കാർഡ്
+                </button>
+                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow">
                     CLOSE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sound & Haptic Settings Modal -->
+    <div id="sound-settings-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-4">
+            <div class="w-10 h-10 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-sm">
+                <i class="fa-solid fa-music"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-amber-300">സൗണ്ട് & വൈബ്രേഷൻ സെറ്റിംഗ്സ്</h3>
+                <p class="text-xs text-slate-400 font-light mt-0.5">സൗണ്ട് ടൈപ്പ് മാറ്റാനും ലോക്ക് ചെയ്യാനും അഡ്മിൻ പിൻ (1234) ആവശ്യമാണ്</p>
+            </div>
+            
+            <div class="space-y-3 text-left">
+                <div class="space-y-1">
+                    <label class="text-[11px] text-slate-300 font-semibold">സൗണ്ട് ടൈപ്പ് (Sound Option):</label>
+                    <select id="sound-type-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-500">
+                        <option value="chime">🎵 Classic Chime (ഡിഫോൾട്ട്)</option>
+                        <option value="band">🥁 Band / Drum Beat</option>
+                        <option value="whistle">🎷 Referee Whistle</option>
+                        <option value="bell">🔔 Arena Bell</option>
+                        <option value="beep">⚡ Digital Beep</option>
+                        <option value="muted">🔇 MUTE (ശബ്ദമില്ല)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1 pt-1">
+                    <input type="password" id="sound-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="closeSoundSettingsModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
+                <button onclick="saveSoundSettings()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow">
+                    സേവ് & ലോക്ക്
                 </button>
             </div>
         </div>
@@ -440,11 +490,11 @@
         const ADMIN_PIN = "1234";
         
         const defaultTeams = [
-            { id: 1, name: "SHAFEER & FAISAL", wins: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 3, name: "ASHRAF & ANWAR", wins: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 4, name: "ANEESH & ANAS", wins: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0 },
-            { id: 5, name: "FAHAD & MUJEEB", wins: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
+            { id: 1, name: "SHAFEER & FAISAL", wins: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 3, name: "ASHRAF & ANWAR", wins: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 4, name: "ANEESH & ANAS", wins: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 5, name: "FAHAD & MUJEEB", wins: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 }
         ];
 
         const winMotivationalComments = [
@@ -477,7 +527,8 @@
         let currentShareMode = 'text';
         let audioContext = null;
         let currentCapturedBlob = null;
-        let isMatchManuallyFinished = false;
+        let globalClickSequence = 0;
+        let selectedSoundSetting = 'chime'; // chime, band, whistle, bell, beep, muted
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
@@ -491,7 +542,8 @@
                         tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                         tournamentHistory = parsed.tournamentHistory || [];
-                        isMatchManuallyFinished = parsed.isMatchManuallyFinished || false;
+                        globalClickSequence = parsed.globalClickSequence || 0;
+                        selectedSoundSetting = parsed.selectedSoundSetting || 'chime';
                         
                         if (tournamentStartTimestamp) {
                             const elapsed = Date.now() - tournamentStartTimestamp;
@@ -545,89 +597,161 @@
             }
         }
 
+        function triggerHapticFeedback(pattern = [50]) {
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(pattern);
+            }
+        }
+
         function launchApp() {
             initAudioContext();
+            triggerHapticFeedback([40, 60, 40]);
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.add("hidden");
             
             if (!tournamentStartTimestamp || (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000)) {
-                teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
+                teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
                 tournamentStartTimestamp = Date.now();
                 lastActionTimestamp = Date.now();
-                isMatchManuallyFinished = false;
+                globalClickSequence = 0;
                 saveData();
             }
             render();
         }
 
         function resetTournamentStateForNewSession() {
-            teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
+            teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
-            isMatchManuallyFinished = false;
+            globalClickSequence = 0;
             localStorage.removeItem('wesma_local_backup_v1');
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.remove("hidden");
         }
 
+        // Custom Sound Generator Supporting Multiple Sounds
         function playUniqueChimeSound() {
+            if (selectedSoundSetting === 'muted') return;
             initAudioContext();
             if (!audioContext) return;
 
             try {
                 const now = audioContext.currentTime;
-                const osc1 = audioContext.createOscillator();
-                const osc2 = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
 
-                osc1.type = 'sine';
-                osc2.type = 'triangle';
+                if (selectedSoundSetting === 'band') {
+                    // Band / Drum Beat Sound
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.3);
+                    gain.gain.setValueAtTime(0.8, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (selectedSoundSetting === 'whistle') {
+                    // Referee Whistle Sound
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(2800, now);
+                    osc.frequency.setValueAtTime(3100, now + 0.1);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (selectedSoundSetting === 'bell') {
+                    // Arena Bell Sound
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, now);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.8);
+                } else if (selectedSoundSetting === 'beep') {
+                    // Digital Beep Sound
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(1046.5, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else {
+                    // Classic Chime (Default)
+                    const osc1 = audioContext.createOscillator();
+                    const osc2 = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
 
-                osc1.frequency.setValueAtTime(523.25, now);
-                osc2.frequency.setValueAtTime(783.99, now);
+                    osc1.type = 'sine';
+                    osc2.type = 'triangle';
 
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                    osc1.frequency.setValueAtTime(523.25, now);
+                    osc2.frequency.setValueAtTime(783.99, now);
 
-                osc1.connect(gainNode);
-                osc2.connect(gainNode);
-                gainNode.connect(audioContext.destination);
+                    gainNode.gain.setValueAtTime(0.3, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
 
-                osc1.start(now);
-                osc2.start(now);
+                    osc1.connect(gainNode);
+                    osc2.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
 
-                osc1.stop(now + 0.6);
-                osc2.stop(now + 0.6);
+                    osc1.start(now);
+                    osc2.start(now);
+
+                    osc1.stop(now + 0.6);
+                    osc2.stop(now + 0.6);
+                }
             } catch(e) {
-                console.log("Audio chime error", e);
+                console.log("Audio play error", e);
             }
         }
 
+        // Variety Dance Champion Celebration Effect
         function triggerWinCelebration() {
             playUniqueChimeSound();
+            triggerHapticFeedback([60, 40, 80]);
+        }
 
-            if (typeof confetti === 'function') {
-                confetti({
-                    particleCount: 85,
-                    spread: 75,
-                    origin: { y: 0.6 }
-                });
-                
-                setTimeout(() => {
-                    confetti({
-                        particleCount: 55,
-                        angle: 60,
-                        spread: 60,
-                        origin: { x: 0 }
-                    });
-                    confetti({
-                        particleCount: 55,
-                        angle: 120,
-                        spread: 60,
-                        origin: { x: 1 }
-                    });
-                }, 200);
+        function openSoundSettingsModal() {
+            const modal = document.getElementById("sound-settings-modal");
+            const select = document.getElementById("sound-type-select");
+            const pin = document.getElementById("sound-admin-pin");
+            if (select) select.value = selectedSoundSetting;
+            if (pin) pin.value = "";
+            if (modal) modal.classList.remove("hidden");
+        }
+
+        function closeSoundSettingsModal() {
+            const modal = document.getElementById("sound-settings-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        function saveSoundSettings() {
+            const pin = document.getElementById("sound-admin-pin").value;
+            const selectVal = document.getElementById("sound-type-select").value;
+
+            if (pin !== ADMIN_PIN) {
+                alert("തെറ്റായ Admin PIN!");
+                return;
             }
+
+            selectedSoundSetting = selectVal;
+            saveData();
+            closeSoundSettingsModal();
+            playUniqueChimeSound();
+            showToast("🔊 സൗണ്ട് സെറ്റിംഗ്സ് അപ്ഡേറ്റ് ചെയ്ത് ലോക്ക് ചെയ്തു!");
         }
 
         function initData() {
@@ -651,7 +775,8 @@
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
-                        isMatchManuallyFinished = data.isMatchManuallyFinished || false;
+                        globalClickSequence = data.globalClickSequence || 0;
+                        selectedSoundSetting = data.selectedSoundSetting || 'chime';
                         
                         if (tournamentStartTimestamp) {
                             const elapsed = Date.now() - tournamentStartTimestamp;
@@ -768,7 +893,8 @@
                     tournamentStartTimestamp,
                     lastActionTimestamp,
                     tournamentHistory,
-                    isMatchManuallyFinished
+                    globalClickSequence,
+                    selectedSoundSetting
                 };
                 localStorage.setItem('wesma_local_backup_v1', JSON.stringify(payload));
             } catch(e) {
@@ -779,7 +905,7 @@
         function saveData() {
             saveLocalBackup();
             if (dbRef) {
-                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, isMatchManuallyFinished }).catch((error) => {
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, selectedSoundSetting }).catch((error) => {
                     console.error("Firebase write error:", error);
                 });
             }
@@ -807,9 +933,9 @@
             if (tournamentHistory.length > 0) {
                 const latestHistory = tournamentHistory[0];
                 const timeDifferenceMs = Math.abs(Date.now() - latestHistory.id);
-                const ninetyMinutesMs = 90 * 60 * 1000;
+                const oneHourMs = 60 * 60 * 1000;
 
-                if (timeDifferenceMs < ninetyMinutesMs) {
+                if (timeDifferenceMs < oneHourMs) {
                     tournamentHistory[0] = record;
                 } else {
                     tournamentHistory.unshift(record);
@@ -832,6 +958,7 @@
         }
 
         function openHistoryModal() {
+            triggerHapticFeedback([30]);
             const modal = document.getElementById("history-modal");
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
@@ -886,6 +1013,7 @@
         }
 
         function clearHistory() {
+            triggerHapticFeedback([50]);
             const pin = prompt("ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (pin !== ADMIN_PIN) {
                 if (pin !== null) alert("തെറ്റായ PIN!");
@@ -900,26 +1028,19 @@
             }
         }
 
-        // Live Timer updated with 10 Minutes Inactivity Auto Reset & Save
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
-                const summaryBox = document.getElementById("match-summary-box");
-                const summaryText = document.getElementById("match-summary-text");
                 
                 if (!tournamentStartTimestamp) {
                     if(totalDurationEl) totalDurationEl.textContent = "0h 0m 0s";
                     if(currentTimerEl) currentTimerEl.textContent = "0h 0m 0s";
-                    if(summaryBox) summaryBox.classList.add("hidden");
                     return;
                 }
 
-                let isMatchFinished = isMatchManuallyFinished;
-
-                // Check 10 Minutes (10 * 60 * 1000 ms = 600,000 ms) Inactivity Condition for Auto Reset
-                if (!isMatchFinished && lastActionTimestamp) {
+                if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
                     if (matchDiffMs > 10 * 60 * 1000 && calculateTotalPlays() > 0) {
                         autoSaveToHistory();
@@ -929,13 +1050,11 @@
                     }
                 }
 
-                // Session Duration Logic
-                const sessionEffectiveTime = isMatchFinished ? lastActionTimestamp : Date.now();
-                const elapsedTotal = sessionEffectiveTime - tournamentStartTimestamp;
-                
+                const elapsedTotal = Date.now() - tournamentStartTimestamp;
                 if (elapsedTotal >= 90 * 60 * 1000) {
+                    autoSaveToHistory();
                     resetTournamentStateForNewSession();
-                    showToast("⏳ 1.5 മണിക്കൂർ കഴിഞ്ഞു! പുതിയ കളിക്കായി റീസെറ്റ് ചെയ്തു.");
+                    showToast("⏳ 1.5 മണിക്കൂർ കഴിഞ്ഞു! കളി സേവ് ആയി റീസെറ്റ് ചെയ്തു.");
                     return;
                 }
 
@@ -944,53 +1063,37 @@
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
                 if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s`;
 
-                // Current Match Duration & Summary Logic
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
-                    const matchHours = Math.floor(matchDiffMs / 3600000);
-                    const matchMins = Math.floor((matchDiffMs % 3600000) / 60000);
+                    const matchMins = Math.floor(matchDiffMs / 60000);
                     const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
-                    
-                    if (isMatchFinished) {
-                        if(currentTimerEl) currentTimerEl.textContent = "Match Finished";
-                        
-                        if(summaryBox && summaryText) {
-                            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
-                            let champion = sorted[0].wins > 0 ? sorted[0].name : "ആരുമില്ല";
-                            let totalPlays = calculateTotalPlays();
-                            summaryText.innerHTML = `കളി അവസാനിച്ചു.<br>• ആകെ കളികൾ: <b>${totalPlays}</b><br>• ചാമ്പ്യൻ: <b>${champion}</b> (${sorted[0].wins} ജയം)<br>• സമയം: <b>${totalHours}h ${totalMins}m ${totalSecs}s</b>`;
-                            summaryBox.classList.remove("hidden");
-                        }
-                    } else {
-                        if(summaryBox) summaryBox.classList.add("hidden");
-                        if (matchHours > 0) {
-                            if(currentTimerEl) currentTimerEl.textContent = `${matchHours}h ${matchMins}m ${matchSecs}s`;
-                        } else {
-                            if(currentTimerEl) currentTimerEl.textContent = `${matchMins}m ${matchSecs}s`;
-                        }
-                    }
+                    if(currentTimerEl) currentTimerEl.textContent = `${matchMins}m ${matchSecs}s`;
                 } else {
-                    if(summaryBox) summaryBox.classList.add("hidden");
                     if(currentTimerEl) currentTimerEl.textContent = "0h 0m 0s";
                 }
             }, 1000);
         }
 
-        // Special Option Function: MATCH FINISH (English Only, Compact Design & Winner Special Popup)
+        // END MATCH Function with Dancing Champion Animation
         function manualFinishMatch() {
+            triggerHapticFeedback([100, 50, 100]);
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0) {
                 showToast("⚠️ നിലവിൽ മത്സരങ്ങളൊന്നും നടന്നിട്ടില്ല!");
                 return;
             }
 
-            isMatchManuallyFinished = true;
             autoSaveToHistory();
             saveData();
 
             const modal = document.getElementById("finish-match-modal");
             const container = document.getElementById("finish-match-modal-content");
+            const dateHeader = document.getElementById("modal-header-date");
             if (!modal || !container) return;
+
+            if (dateHeader) {
+                dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
 
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
@@ -1000,10 +1103,8 @@
             let elapsedTotal = (lastActionTimestamp && tournamentStartTimestamp) ? (lastActionTimestamp - tournamentStartTimestamp) : 0;
             let totalHours = Math.floor(elapsedTotal / 3600000);
             let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
-            let totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
 
             let championName = sorted[0].wins > 0 ? sorted[0].name : "NO WINNER";
-            let championWins = sorted[0].wins;
 
             let teamsTableHtml = "";
             sorted.forEach((t, i) => {
@@ -1021,25 +1122,35 @@
             });
 
             container.innerHTML = `
-                <!-- Winner Special Appreciation Box -->
-                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3 rounded-xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center">
-                    <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        🏆 TOURNAMENT WINNER 🏆
+                <!-- Dancing Champion Animated Winner Box -->
+                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2 text-center relative overflow-hidden">
+                    <div class="flex items-center justify-center gap-2">
+                        <!-- Fun Dancing Trophy Cartoon Emoji -->
+                        <span class="text-3xl dance-animation disco-effect">🕺</span>
+                        <span class="text-3xl dance-animation disco-effect" style="animation-delay: 0.2s;">🏆</span>
+                        <span class="text-3xl dance-animation disco-effect" style="animation-delay: 0.4s;">💃</span>
                     </div>
-                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
+
+                    <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        ✨ TOURNAMENT CHAMPIONS ✨
+                    </div>
+
+                    <div class="text-base font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
-                    <div class="text-[11px] text-emerald-300 font-semibold italic">
-                        "ഗംഭീര പ്രകടനം! തകർപ്പൻ വിജയത്തിന് അഭിനന്ദനങ്ങൾ! 🎉"
+
+                    <div class="text-xs text-emerald-300 font-semibold italic">
+                        "തകർപ്പൻ ജയം! ടീം വേറെ ലെവൽ പ്രകടനം! 🎉"
                     </div>
+
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30">
-                        Total Plays: <b class="text-white">${totalPlays}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m ${totalSecs}s</b>
+                        Total Plays: <b class="text-white">${totalPlays}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
                     </div>
                 </div>
 
                 <div class="space-y-1 text-left pt-1">
                     <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-list-check text-amber-400"></i> FINAL TEAM SCORES:
+                        <i class="fa-solid fa-list-check text-amber-400"></i> FINAL SCORES:
                     </div>
                     <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
                         <table class="w-full text-left border-collapse">
@@ -1188,8 +1299,8 @@
                     </div>
                     
                     <div class="flex items-center justify-between text-[10px] text-slate-400 font-light pt-1.5 border-t border-slate-800/60 px-1">
-                        <span class="italic">Live Status</span>
-                        <span class="text-amber-300 font-semibold">${team.lastMatchTime ? team.lastMatchTime + ' mins' : 'No time'}</span>
+                        <span class="italic">Match Rotation Status</span>
+                        <span class="text-amber-300 font-semibold">Order: #${team.clickOrder || 0} | Interval: ${team.matchInterval || 0}m</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1210,16 +1321,25 @@
                     showToast("⚠️ ദയവായി കുറച്ചുസമയം കാത്തിരിക്കൂ!");
                     return;
                 }
-                team.lastClickTime = now;
-                if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
+                
                 if (lastActionTimestamp) {
                     const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
-                    team.lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
+                    team.matchInterval = durationMinutes > 0 ? durationMinutes : 1;
+                    team.lastMatchTime = team.matchInterval;
+                } else {
+                    team.matchInterval = 0;
                 }
+
+                globalClickSequence += 1;
+                team.clickOrder = globalClickSequence;
+                team.lastClickTime = now;
+                
+                if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
                 lastActionTimestamp = now;
-                isMatchManuallyFinished = false; // Resume match if point added
+                
                 team.wins += delta;
                 team.played = (team.played || 0) + 1;
+                
                 autoSaveToHistory();
                 saveData();
                 render();
@@ -1227,8 +1347,9 @@
                 triggerWinCelebration();
 
                 const randMotiv = winMotivationalComments[Math.floor(Math.random() * winMotivationalComments.length)];
-                showToast(`🏆 ${team.name}\n${randMotiv}`);
+                showToast(`🏆 ${team.name}\nWin #${team.wins} (Match Order: #${team.clickOrder})\n${randMotiv}`);
             } else if (delta < 0) {
+                triggerHapticFeedback([40]);
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
                 if (pin !== ADMIN_PIN) {
                     if (pin !== null) alert("തെറ്റായ PIN!");
@@ -1249,6 +1370,7 @@
         }
 
         function openCustomNameModal(id, currentName) {
+            triggerHapticFeedback([30]);
             editingTeamId = id;
             const modal = document.getElementById("custom-name-modal");
             const nameInput = document.getElementById("edit-team-name-input");
@@ -1357,6 +1479,7 @@
         }
 
         function openWhatsAppChoiceModal(mode) {
+            triggerHapticFeedback([30]);
             currentShareMode = mode;
             const modal = document.getElementById("whatsapp-choice-modal");
             if(modal) modal.classList.remove("hidden");
@@ -1400,7 +1523,7 @@
         }
 
         function generateAndShareImage(type) {
-            showToast("📸 മാച്ച് പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
+            showToast("📸 പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const shareHeader = document.getElementById("share-header-banner");
             const previewModal = document.getElementById("preview-modal");
@@ -1439,21 +1562,21 @@
                     downloadBtn.onclick = function() {
                         const link = document.createElement('a');
                         link.href = fileUrl;
-                        link.download = 'WESMA_Match_Preview.png';
+                        link.download = 'WESMA_Match_Card.png';
                         link.click();
                         showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
                     };
 
                     shareBtn.onclick = function() {
                         if (navigator.share && currentCapturedBlob) {
-                            const file = new File([currentCapturedBlob], 'WESMA_Match_Preview.png', { type: 'image/png' });
+                            const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
                             navigator.share({
                                 title: 'WESMA BADMINTON SCORECARD',
-                                text: '🏸 WESMA Badminton Club - Match Preview Scorecard',
+                                text: '🏸 WESMA Badminton Club - Match Scorecard',
                                 files: [file]
                             }).catch(err => console.log('Share error', err));
                         } else {
-                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് പ്രിവ്യൂ ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
+                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
                             let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                             window.open(url, '_blank');
                         }
@@ -1463,7 +1586,7 @@
             }).catch(err => {
                 if (shareHeader) shareHeader.style.display = "block";
                 console.error("Image generation error:", err);
-                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ ചെറിയ തടസ്സമുണ്ടായി.");
+                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
             });
         }
 
@@ -1473,6 +1596,7 @@
         }
 
         function resetScores() {
+            triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("തെറ്റായ PIN!");
