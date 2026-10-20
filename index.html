@@ -225,10 +225,10 @@
                     <span id="current-match-timer" class="text-emerald-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
 
-                <!-- Match Summary Box (Appears when match ends / inactive for > 10 mins) -->
+                <!-- Match Summary Box (Appears when match ends) -->
                 <div id="match-summary-box" class="hidden text-xs text-cyan-300 bg-cyan-950/40 p-2.5 rounded-lg border border-cyan-500/30 space-y-1">
                     <div class="font-semibold flex items-center gap-1 text-cyan-200">
-                        <i class="fa-solid fa-flag-checkered text-cyan-400"></i> കളി അവസാനിച്ചു - മാച്ച് സമ്മറി:
+                        <i class="fa-solid fa-flag-checkered text-cyan-400"></i> MATCH FINISHED SUMMARY:
                     </div>
                     <div id="match-summary-text" class="text-[11px] text-slate-300 font-light leading-relaxed">
                         <!-- Summary generated dynamically -->
@@ -275,12 +275,18 @@
 
     </div>
 
-    <!-- Outside Capture Area: Match History Section & Action Buttons -->
+    <!-- Outside Capture Area: Match Control & Action Buttons (2-Column Grid Layout) -->
     <div class="w-full max-w-xl pt-2 space-y-2">
-        <!-- Special Finish Match Button -->
-        <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-700 via-rose-800 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-bold py-3 px-3 rounded-xl border border-rose-500/50 flex items-center justify-center gap-2 text-xs shadow-xl transition-all active:scale-95 tracking-wider uppercase">
-            <i class="fa-solid fa-flag-checkered text-amber-300 text-sm"></i> കളി അവസാനിച്ചു (FINISH MATCH)
-        </button>
+        
+        <!-- Two Column Control Options: END MATCH & PREVIEW MATCH -->
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-800 to-rose-950 hover:from-rose-700 hover:to-rose-900 text-white font-bold py-2.5 px-2 rounded-xl border border-rose-500/40 flex items-center justify-center gap-1.5 text-[11px] shadow-lg transition-all active:scale-95 tracking-wide uppercase">
+                <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
+            </button>
+            <button onclick="generateAndShareImage('normal')" class="w-full bg-gradient-to-r from-emerald-800 to-teal-900 hover:from-emerald-700 hover:to-teal-800 text-white font-bold py-2.5 px-2 rounded-xl border border-emerald-500/40 flex items-center justify-center gap-1.5 text-[11px] shadow-lg transition-all active:scale-95 tracking-wide uppercase">
+                <i class="fa-solid fa-image text-emerald-300"></i> PREVIEW MATCH
+            </button>
+        </div>
 
         <!-- Match History Section -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
@@ -297,36 +303,35 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2">
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-2.5 px-1 rounded-xl border border-slate-700 flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ്
             </button>
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30">
-                <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ്
-            </button>
-            <button onclick="openWhatsAppChoiceModal('image')" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-semibold py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-emerald-500/30">
-                <i class="fa-brands fa-whatsapp text-emerald-100"></i> ഫോട്ടോ
+                <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
             </button>
         </div>
     </div>
 
-    <!-- Manual Finish Match Detailed Summary Modal -->
+    <!-- Special Compact Winner Appreciation & Match Finish Modal -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-                <h3 class="text-xs font-bold text-amber-300 flex items-center gap-2 uppercase tracking-wide">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> ടൂർണമെന്റ് ഫൈനൽ റിസൾട്ട്
-                </h3>
-                <button onclick="closeFinishMatchModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
+                <span class="text-xs font-extrabold text-amber-300 uppercase tracking-widest flex items-center gap-1.5">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> MATCH FINISH SUMMARY
+                </span>
+                <button onclick="closeFinishMatchModal()" class="w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
+            
             <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs">
                 <!-- Content injected dynamically via JavaScript -->
             </div>
-            <div class="p-3 bg-slate-950 border-t border-slate-800 flex justify-end">
-                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs">
-                    അടയ്ക്കുക
+
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 flex justify-center">
+                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-1.5 rounded-xl text-xs uppercase tracking-wider shadow">
+                    CLOSE
                 </button>
             </div>
         </div>
@@ -385,7 +390,7 @@
             <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[48vh] flex items-center justify-center p-2">
                 <!-- Captured Image Preview -->
             </div>
-            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഷെയർ ചെയ്യാം.</div>
+            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഗ്രൂപ്പിലേക്ക് ഷെയർ ചെയ്യാം.</div>
             
             <div class="grid grid-cols-3 gap-1.5 pt-1">
                 <button onclick="closePreviewModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-[11px]">
@@ -895,7 +900,7 @@
             }
         }
 
-        // Live Timer updated with 10 Minutes Inactivity or Manual Finish Condition
+        // Live Timer updated with 10 Minutes Inactivity Auto Reset & Save
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -913,11 +918,14 @@
 
                 let isMatchFinished = isMatchManuallyFinished;
 
-                // Check 10 Minutes (10 * 60 * 1000 ms = 600,000 ms) Inactivity Condition
+                // Check 10 Minutes (10 * 60 * 1000 ms = 600,000 ms) Inactivity Condition for Auto Reset
                 if (!isMatchFinished && lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
                     if (matchDiffMs > 10 * 60 * 1000 && calculateTotalPlays() > 0) {
-                        isMatchFinished = true;
+                        autoSaveToHistory();
+                        resetTournamentStateForNewSession();
+                        showToast("⏳ 10 മിനിറ്റിൽ പുതിയ പോയിന്റുകളൊന്നും വരാത്തതിനാൽ കളി ഓട്ടോ റീസെറ്റായി ഹിസ്റ്ററിയിൽ സേവായി!");
+                        return;
                     }
                 }
 
@@ -944,13 +952,13 @@
                     const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
                     
                     if (isMatchFinished) {
-                        if(currentTimerEl) currentTimerEl.textContent = "കളി അവസാനിച്ചു (Match Finished)";
+                        if(currentTimerEl) currentTimerEl.textContent = "Match Finished";
                         
                         if(summaryBox && summaryText) {
                             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
                             let champion = sorted[0].wins > 0 ? sorted[0].name : "ആരുമില്ല";
                             let totalPlays = calculateTotalPlays();
-                            summaryText.innerHTML = `കളി അവസാനിച്ചു.<br>• ആകെ കളികൾ: <b>${totalPlays}</b><br>• നിലവിലെ ചാമ്പ്യൻ: <b>${champion}</b> (${sorted[0].wins} ജയം)<br>• അവസാനിച്ചപ്പോഴുള്ള സെഷൻ സമയം: <b>${totalHours}h ${totalMins}m ${totalSecs}s</b>`;
+                            summaryText.innerHTML = `കളി അവസാനിച്ചു.<br>• ആകെ കളികൾ: <b>${totalPlays}</b><br>• ചാമ്പ്യൻ: <b>${champion}</b> (${sorted[0].wins} ജയം)<br>• സമയം: <b>${totalHours}h ${totalMins}m ${totalSecs}s</b>`;
                             summaryBox.classList.remove("hidden");
                         }
                     } else {
@@ -968,7 +976,7 @@
             }, 1000);
         }
 
-        // Special Option Function: Finish Match Manually & Show Full Summary
+        // Special Option Function: MATCH FINISH (English Only, Compact Design & Winner Special Popup)
         function manualFinishMatch() {
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0) {
@@ -977,6 +985,7 @@
             }
 
             isMatchManuallyFinished = true;
+            autoSaveToHistory();
             saveData();
 
             const modal = document.getElementById("finish-match-modal");
@@ -993,40 +1002,53 @@
             let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
             let totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
 
-            let champion = sorted[0].wins > 0 ? sorted[0].name : "ആരുമില്ല";
+            let championName = sorted[0].wins > 0 ? sorted[0].name : "NO WINNER";
+            let championWins = sorted[0].wins;
 
             let teamsTableHtml = "";
             sorted.forEach((t, i) => {
                 let played = Math.max(t.played || 0, t.wins);
                 let losses = Math.max(0, played - t.wins);
+                let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
-                    <tr class="border-b border-slate-800/80 text-center text-slate-200">
-                        <td class="py-2 px-1 text-left font-semibold text-amber-300">${i + 1}. ${escapeHtml(t.name)}</td>
-                        <td class="py-2 px-1 font-semibold text-slate-100">${played}</td>
-                        <td class="py-2 px-1 font-bold text-emerald-400">${t.wins}</td>
-                        <td class="py-2 px-1 font-bold text-rose-400">${losses}</td>
+                    <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
+                        <td class="py-1.5 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '👑' : ''}</td>
+                        <td class="py-1.5 px-1">${played}</td>
+                        <td class="py-1.5 px-1 font-bold text-emerald-400">${t.wins}</td>
+                        <td class="py-1.5 px-1 font-bold text-rose-400">${losses}</td>
                     </tr>
                 `;
             });
 
             container.innerHTML = `
-                <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 space-y-1 text-center">
-                    <div class="text-amber-400 font-bold text-sm">👑 ചാമ്പ്യന്മാർ: ${escapeHtml(champion)}</div>
-                    <div class="text-slate-400 text-[11px] font-light">ആകെ കളിച്ച മത്സരങ്ങൾ: <b class="text-white">${totalPlays}</b> | ആകെ സമയം: <b class="text-amber-300">${totalHours}h ${totalMins}m ${totalSecs}s</b></div>
+                <!-- Winner Special Appreciation Box -->
+                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3 rounded-xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center">
+                    <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        🏆 TOURNAMENT WINNER 🏆
+                    </div>
+                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
+                        ${escapeHtml(championName)}
+                    </div>
+                    <div class="text-[11px] text-emerald-300 font-semibold italic">
+                        "ഗംഭീര പ്രകടനം! തകർപ്പൻ വിജയത്തിന് അഭിനന്ദനങ്ങൾ! 🎉"
+                    </div>
+                    <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30">
+                        Total Plays: <b class="text-white">${totalPlays}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m ${totalSecs}s</b>
+                    </div>
                 </div>
 
-                <div class="space-y-1 pt-1">
-                    <div class="text-xs font-semibold text-amber-300 flex items-center gap-1">
-                        <i class="fa-solid fa-list-check text-amber-400"></i> വിശദമായ ടീം സ്കോറുകൾ:
+                <div class="space-y-1 text-left pt-1">
+                    <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
+                        <i class="fa-solid fa-list-check text-amber-400"></i> FINAL TEAM SCORES:
                     </div>
                     <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-slate-800 text-[10px] text-slate-400 uppercase text-center">
-                                    <th class="py-1.5 px-1 text-left">ടീം</th>
-                                    <th class="py-1.5 px-1">കളിച്ചത്</th>
-                                    <th class="py-1.5 px-1">ജയിച്ചത്</th>
-                                    <th class="py-1.5 px-1">തോറ്റത്</th>
+                                <tr class="border-b border-slate-800 text-[9px] text-slate-400 uppercase text-center">
+                                    <th class="py-1 px-1 text-left">TEAM</th>
+                                    <th class="py-1 px-1">PLAYED</th>
+                                    <th class="py-1 px-1">WON</th>
+                                    <th class="py-1 px-1">LOST</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1378,7 +1400,7 @@
         }
 
         function generateAndShareImage(type) {
-            showToast("📸 ഫുൾ സ്കോർ കാർഡ് ഫോട്ടോ തയ്യാറാക്കുന്നു...");
+            showToast("📸 മാച്ച് പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const shareHeader = document.getElementById("share-header-banner");
             const previewModal = document.getElementById("preview-modal");
@@ -1417,21 +1439,21 @@
                     downloadBtn.onclick = function() {
                         const link = document.createElement('a');
                         link.href = fileUrl;
-                        link.download = 'WESMA_Full_Scorecard.png';
+                        link.download = 'WESMA_Match_Preview.png';
                         link.click();
                         showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
                     };
 
                     shareBtn.onclick = function() {
                         if (navigator.share && currentCapturedBlob) {
-                            const file = new File([currentCapturedBlob], 'WESMA_Full_Scorecard.png', { type: 'image/png' });
+                            const file = new File([currentCapturedBlob], 'WESMA_Match_Preview.png', { type: 'image/png' });
                             navigator.share({
                                 title: 'WESMA BADMINTON SCORECARD',
-                                text: '🏸 WESMA Badminton Club - Tournament Scorecard',
+                                text: '🏸 WESMA Badminton Club - Match Preview Scorecard',
                                 files: [file]
                             }).catch(err => console.log('Share error', err));
                         } else {
-                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഫോട്ടോ ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
+                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് പ്രിവ്യൂ ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
                             let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                             window.open(url, '_blank');
                         }
@@ -1441,7 +1463,7 @@
             }).catch(err => {
                 if (shareHeader) shareHeader.style.display = "block";
                 console.error("Image generation error:", err);
-                showToast("⚠️ ഫോട്ടോ തയ്യാറാക്കുന്നതിൽ ചെറിയ തടസ്സമുണ്ടായി.");
+                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ ചെറിയ തടസ്സമുണ്ടായി.");
             });
         }
 
