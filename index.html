@@ -406,6 +406,29 @@
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
+        // Check LocalStorage on Load to restore state if browser accidentally closed
+        function loadLocalBackup() {
+            try {
+                const localData = localStorage.getItem('wesma_local_backup_v1');
+                if (localData) {
+                    const parsed = JSON.parse(localData);
+                    if (parsed && parsed.teams) {
+                        teams = parsed.teams;
+                        tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
+                        lastActionTimestamp = parsed.lastActionTimestamp || null;
+                        tournamentHistory = parsed.tournamentHistory || [];
+                        if (tournamentStartTimestamp) {
+                            const gate = document.getElementById("startup-gate");
+                            if(gate) gate.classList.add("hidden");
+                        }
+                    }
+                }
+            } catch(e) {
+                console.log("Localstorage load error", e);
+            }
+        }
+
+        loadLocalBackup();
         renderHeaderTitle();
         render();
 
@@ -544,9 +567,14 @@
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
+                        saveLocalBackup(); // Sync with local storage backup
                     } else {
-                        teams = JSON.parse(JSON.stringify(defaultTeams));
-                        saveData();
+                        // If firebase is empty, fallback to local backup if available
+                        const localData = localStorage.getItem('wesma_local_backup_v1');
+                        if (!localData) {
+                            teams = JSON.parse(JSON.stringify(defaultTeams));
+                            saveData();
+                        }
                     }
                     render();
                     updateHistorySummaryText();
@@ -643,7 +671,22 @@
             return teams.reduce((sum, team) => sum + (team.played || 0), 0);
         }
 
+        function saveLocalBackup() {
+            try {
+                const payload = {
+                    teams,
+                    tournamentStartTimestamp,
+                    lastActionTimestamp,
+                    tournamentHistory
+                };
+                localStorage.setItem('wesma_local_backup_v1', JSON.stringify(payload));
+            } catch(e) {
+                console.log("LocalStorage save error", e);
+            }
+        }
+
         function saveData() {
+            saveLocalBackup(); // Save locally first so data is never lost on back/refresh
             if (dbRef) {
                 dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }).catch((error) => {
                     console.error("Firebase write error:", error);
@@ -1190,6 +1233,7 @@
                 teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
                 tournamentStartTimestamp = Date.now();
                 lastActionTimestamp = Date.now();
+                localStorage.removeItem('wesma_local_backup_v1'); // Clear backup on explicit reset
                 saveData();
                 render();
                 showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
