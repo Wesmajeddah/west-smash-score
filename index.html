@@ -96,6 +96,8 @@
             border-radius: 0.75rem;
             padding: 0.5rem;
             margin-top: 0.5rem;
+            overflow: visible !important;
+            word-break: break-word;
         }
 
         .winner-card {
@@ -542,11 +544,6 @@
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
-                        
-                        if (tournamentStartTimestamp) {
-                            const gate = document.getElementById("startup-gate");
-                            if(gate) gate.classList.add("hidden");
-                        }
                     } else {
                         teams = JSON.parse(JSON.stringify(defaultTeams));
                         saveData();
@@ -568,7 +565,6 @@
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            // Randomize order of letters (W, E, S, M, A)
             let letters = [
                 { char: 'W', isW: true },
                 { char: 'E', isW: false },
@@ -577,7 +573,6 @@
                 { char: 'A', isW: false }
             ];
 
-            // Assign randomized delays between 2s and 14s
             let delays = [2.0, 5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
 
             let titleHtml = "";
@@ -657,24 +652,39 @@
             updateLeaderboard();
         }
 
+        // Logic updated for 1.5 Hours (90 Mins) limit per session record
         function autoSaveToHistory() {
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0 || !tournamentStartTimestamp) return;
+
             const dateStr = new Date(tournamentStartTimestamp).toLocaleDateString('en-GB', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
             });
+
+            const currentDurationMinutes = Math.round((Date.now() - tournamentStartTimestamp) / 60000);
+
             const record = {
                 id: tournamentStartTimestamp,
                 date: dateStr,
                 teams: JSON.parse(JSON.stringify(teams)),
                 totalPlays: totalPlays,
-                durationMinutes: Math.round((Date.now() - tournamentStartTimestamp) / 60000)
+                durationMinutes: currentDurationMinutes
             };
-            if (tournamentHistory.length > 0 && tournamentHistory[0].id === tournamentStartTimestamp) {
-                tournamentHistory[0] = record;
+
+            if (tournamentHistory.length > 0) {
+                const latestHistory = tournamentHistory[0];
+                const timeDifferenceMs = Math.abs(Date.now() - latestHistory.id);
+                const ninetyMinutesMs = 90 * 60 * 1000;
+
+                if (timeDifferenceMs < ninetyMinutesMs) {
+                    tournamentHistory[0] = record;
+                } else {
+                    tournamentHistory.unshift(record);
+                }
             } else {
                 tournamentHistory.unshift(record);
             }
+
             updateHistorySummaryText();
         }
 
@@ -1020,11 +1030,11 @@
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             
-            // Champions Layout Logic
+            // Champions Layout Logic - Fixes blur and truncation in screenshot preview
             if (firstPlaces.length === 1) {
-                leaderEl.innerHTML = `<div class="whitespace-nowrap overflow-x-auto py-0.5">⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം) ⭐</div>`;
+                leaderEl.innerHTML = `<div class="w-full break-words py-0.5">⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം) ⭐</div>`;
             } else {
-                let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം)</div>`).join('');
+                let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0 break-words">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം)</div>`).join('');
                 leaderEl.innerHTML = `<div class="flex flex-col space-y-0.5">${multiHtml}</div>`;
             }
 
@@ -1095,7 +1105,6 @@
 
             let url = "";
             if (type === 'business') {
-                // Direct WhatsApp Business Deep Link Protocol
                 url = `whatsapp://send?text=${encodeURIComponent(text)}`;
             } else {
                 url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
@@ -1135,7 +1144,6 @@
                     currentCapturedBlob = blob;
                     const fileUrl = URL.createObjectURL(blob);
                     
-                    // Download Action
                     downloadBtn.onclick = function() {
                         const link = document.createElement('a');
                         link.href = fileUrl;
@@ -1144,7 +1152,6 @@
                         showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
                     };
 
-                    // Direct Share Action (Supports WhatsApp, Telegram, Files, etc.)
                     shareBtn.onclick = function() {
                         if (navigator.share && currentCapturedBlob) {
                             const file = new File([currentCapturedBlob], 'WESMA_Full_Scorecard.png', { type: 'image/png' });
@@ -1196,7 +1203,6 @@
             toast.style.opacity = "1";
             toast.style.transform = "translate(-50%, -50%) scale(1)";
             
-            // Extended 8 seconds display duration for easy reading
             if (toastTimeout) clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 toast.style.opacity = "0";
