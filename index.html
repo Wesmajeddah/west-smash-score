@@ -122,8 +122,18 @@
             animation: leafPulse 2s infinite ease-in-out;
         }
 
-        /* Class to hide elements specifically during html2canvas screenshot capture */
-        .no-capture { display: flex; }
+        /* Animated Small Watermark Style */
+        .animated-watermark {
+            background: linear-gradient(90deg, #f59e0b, #fef08a, #38bdf8, #f59e0b);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: watermarkShine 4s linear infinite;
+        }
+        @keyframes watermarkShine {
+            to { background-position: 200% center; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
@@ -151,7 +161,17 @@
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
-        <!-- Header (Hidden in screenshot capture via .no-capture class) -->
+        <!-- Small Animated Watermark Badge Header for Screenshot Identification -->
+        <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase animated-watermark flex items-center gap-1.5">
+                <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
+            </span>
+            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider">
+                <!-- Loaded via JS -->
+            </span>
+        </div>
+
+        <!-- Header Banner (Hidden during image capture for maximum score visibility) -->
         <div id="share-header-banner" class="text-center py-2.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
             <div class="flex justify-between items-center px-1">
                 <span class="text-[10px] text-slate-400 font-light tracking-wider flex items-center gap-1">
@@ -236,7 +256,7 @@
 
     <!-- Outside Capture Area: Match History Section & Action Buttons -->
     <div class="w-full max-w-xl pt-2 space-y-2">
-        <!-- Match History Section (Moved outside capture-area so it won't appear in shared photo) -->
+        <!-- Match History Section -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2">
                 <span class="text-xs text-amber-300 flex items-center gap-1 font-semibold">
@@ -358,7 +378,7 @@
         </div>
     </div>
 
-    <!-- Prominent Center Pop-up Toast Notification (Click/Touch to Dismiss added) -->
+    <!-- Prominent Center Pop-up Toast Notification -->
     <div id="toast" onclick="dismissToast()" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90 cursor-pointer">
         സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
@@ -551,9 +571,14 @@
 
         function initData() {
             const dateBadge = document.getElementById("header-date-badge");
+            const dateBadgeSmall = document.getElementById("header-date-badge-small");
+            const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            
             if(dateBadge) {
-                const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                 dateBadge.innerHTML = `<i class="fa-regular fa-calendar text-[10px] mr-1 text-amber-400"></i> ${todayStr}`;
+            }
+            if(dateBadgeSmall) {
+                dateBadgeSmall.innerHTML = `${todayStr}`;
             }
 
             renderHeaderTitle();
@@ -894,26 +919,26 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
-                // Perfectly aligned badges using flex items-center without vertical displacement
+                // Perfectly aligned inline-flex badges to fix vertical offset in screenshots
                 if (isWinner) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-semibold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm self-center"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 h-5 leading-none shadow-sm"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
                 } else if (isFastest) {
                     extraCardClass = "fastest-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-semibold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm self-center"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-bold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 h-5 leading-none shadow-sm"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
                 } else if (isLoser) {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-semibold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm self-center"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-bold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 h-5 leading-none shadow-sm"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
                 }
 
                 const card = document.createElement("div");
                 card.className = `relative bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col shadow-md gap-2 ${extraCardClass}`;
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-1 min-w-0 overflow-visible">
-                            <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0 self-center"></span>
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer w-full flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit">
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit">
                                 <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
@@ -1169,7 +1194,7 @@
             const downloadBtn = document.getElementById("download-img-btn");
             const shareBtn = document.getElementById("share-img-btn");
             
-            // Temporarily hide the Wesma header banner from screenshot capture so image zooms in on scores
+            // Temporarily hide the big Wesma header banner from screenshot capture so image zooms in on scores
             if (shareHeader) shareHeader.style.display = "none";
 
             html2canvas(captureElement, {
