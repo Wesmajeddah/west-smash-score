@@ -122,17 +122,10 @@
             animation: leafPulse 2s infinite ease-in-out;
         }
 
-        /* Animated Small Watermark Style */
-        .animated-watermark {
-            background: linear-gradient(90deg, #f59e0b, #fef08a, #38bdf8, #f59e0b);
-            background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: watermarkShine 4s linear infinite;
-        }
-        @keyframes watermarkShine {
-            to { background-position: 200% center; }
+        /* Clean Static Watermark Style (Animations removed for crystal clear screenshots) */
+        .static-watermark {
+            color: #f59e0b;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -161,9 +154,9 @@
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
-        <!-- Small Animated Watermark Badge Header for Screenshot Identification -->
+        <!-- Clear Static Watermark Header for Screenshot Identification (No animation) -->
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase animated-watermark flex items-center gap-1.5">
+            <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
                 <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
             </span>
             <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider">
