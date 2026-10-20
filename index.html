@@ -121,6 +121,9 @@
         .leaf-anim {
             animation: leafPulse 2s infinite ease-in-out;
         }
+
+        /* Class to hide elements specifically during html2canvas screenshot capture */
+        .no-capture { display: flex; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
@@ -148,8 +151,8 @@
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
-        <!-- Header -->
-        <div class="text-center py-2.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
+        <!-- Header (Hidden in screenshot capture via .no-capture class) -->
+        <div id="share-header-banner" class="text-center py-2.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-1">
             <div class="flex justify-between items-center px-1">
                 <span class="text-[10px] text-slate-400 font-light tracking-wider flex items-center gap-1">
                     <i class="fa-solid fa-circle text-[5px] text-emerald-400 animate-pulse"></i> LIVE
@@ -891,16 +894,16 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
-                // Badges styled to stay 100% visible and un-truncated in screenshots
+                // Perfectly aligned badges using flex items-center without vertical displacement
                 if (isWinner) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-semibold px-1.5 py-0.5 rounded flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-amber-400 text-slate-950 font-semibold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm self-center"><i class="fa-solid fa-crown text-[7px]"></i> 1st</span>`;
                 } else if (isFastest) {
                     extraCardClass = "fastest-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-semibold px-1.5 py-0.5 rounded flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-cyan-500 text-slate-950 font-semibold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm self-center"><i class="fa-solid fa-bolt text-[7px]"></i> Fast</span>`;
                 } else if (isLoser) {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-semibold px-1.5 py-0.5 rounded flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
+                    specialBadgeHtml = `<span class="text-[9px] bg-rose-900 text-rose-200 font-semibold px-1.5 py-0.5 rounded inline-flex items-center justify-center gap-1 shrink-0 min-w-[36px] text-center shadow-sm self-center"><i class="fa-solid fa-circle-exclamation text-[7px]"></i> Last</span>`;
                 }
 
                 const card = document.createElement("div");
@@ -908,7 +911,7 @@
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2 flex-1 min-w-0 overflow-visible">
-                            <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
+                            <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0 self-center"></span>
                             ${specialBadgeHtml}
                             <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer w-full flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit">
                                 <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
@@ -1160,11 +1163,15 @@
         function generateAndShareImage(type) {
             showToast("📸 ഫുൾ സ്കോർ കാർഡ് ഫോട്ടോ തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
+            const shareHeader = document.getElementById("share-header-banner");
             const previewModal = document.getElementById("preview-modal");
             const previewContainer = document.getElementById("preview-container");
             const downloadBtn = document.getElementById("download-img-btn");
             const shareBtn = document.getElementById("share-img-btn");
             
+            // Temporarily hide the Wesma header banner from screenshot capture so image zooms in on scores
+            if (shareHeader) shareHeader.style.display = "none";
+
             html2canvas(captureElement, {
                 scale: 3,
                 useCORS: true,
@@ -1178,6 +1185,9 @@
                 windowWidth: captureElement.scrollWidth,
                 windowHeight: captureElement.scrollHeight
             }).then(canvas => {
+                // Restore header banner visibility on live app UI
+                if (shareHeader) shareHeader.style.display = "block";
+
                 previewContainer.innerHTML = "";
                 const previewImg = document.createElement('img');
                 previewImg.src = canvas.toDataURL("image/png");
@@ -1214,6 +1224,7 @@
 
                 });
             }).catch(err => {
+                if (shareHeader) shareHeader.style.display = "block";
                 console.error("Image generation error:", err);
                 showToast("⚠️ ഫോട്ടോ തയ്യാറാക്കുന്നതിൽ ചെറിയ തടസ്സമുണ്ടായി.");
             });
