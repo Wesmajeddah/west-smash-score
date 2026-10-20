@@ -143,28 +143,6 @@
             animation: leafPulse 2s infinite ease-in-out;
         }
 
-        /* Fun Dancing Animation Effects */
-        @keyframes danceBounce {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-12px) rotate(-10deg) scale(1.1); }
-            50% { transform: translateY(0) rotate(10deg) scale(0.95); }
-            75% { transform: translateY(-8px) rotate(-5deg) scale(1.05); }
-        }
-        .dance-animation {
-            display: inline-block;
-            animation: danceBounce 0.8s infinite ease-in-out;
-        }
-
-        @keyframes discoGlow {
-            0% { filter: drop-shadow(0 0 8px #f59e0b); }
-            33% { filter: drop-shadow(0 0 12px #10b981); }
-            66% { filter: drop-shadow(0 0 12px #3b82f6); }
-            100% { filter: drop-shadow(0 0 8px #f59e0b); }
-        }
-        .disco-effect {
-            animation: discoGlow 1.5s infinite linear;
-        }
-
         .static-watermark {
             color: #f59e0b;
             font-weight: 700;
@@ -327,7 +305,7 @@
         </div>
     </div>
 
-    <!-- Defeated Team Selection Modal (Winner Stays Rotation Loss Tracker) -->
+    <!-- Defeated Team Selection Modal -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
             <div class="w-10 h-10 mx-auto bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/30 text-sm">
@@ -352,23 +330,25 @@
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             
-            <!-- Custom Modal Header with WESMA Details -->
+            <!-- Custom Modal Header with WESMA Details & Right Aligned Date -->
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col items-center justify-center relative">
                 <button onclick="closeFinishMatchModal()" class="absolute right-3 top-3 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <div class="text-base font-black text-amber-400 tracking-widest uppercase">WESMA</div>
-                <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB SINCE 2026</div>
-                <div id="modal-header-date" class="text-[8px] text-slate-400 font-light mt-0.5"></div>
+                <div class="text-[9px] text-amber-200/80 font-light tracking-wider flex items-center justify-between w-full px-2 mt-0.5">
+                    <span>BADMINTON CLUB SINCE 2026</span>
+                    <span id="modal-header-date" class="text-[9px] text-amber-300/90 font-semibold"></span>
+                </div>
             </div>
             
             <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs">
-                <!-- Content injected dynamically via JavaScript -->
+                <!-- Content injected dynamically -->
             </div>
 
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="generateAndShareImage('normal')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-image"></i> പ്രിവ്യൂ കാർഡ്
+                <button onclick="openWhatsAppChoiceModal('image')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> വാട്സാപ്പിലേക്ക് ഷെയർ ചെയ്യൂ
                 </button>
                 <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow">
                     CLOSE
@@ -456,31 +436,6 @@
                 </button>
                 <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs">
                     റദ്ദാക്കുക
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Screenshot Preview Modal -->
-    <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
-            <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-crop text-emerald-400"></i> സ്കോർ കാർഡ് പ്രിവ്യൂ (Full View)
-            </div>
-            <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[48vh] flex items-center justify-center p-2">
-                <!-- Captured Image Preview -->
-            </div>
-            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഗ്രൂപ്പിലേക്ക് ഷെയർ ചെയ്യാം.</div>
-            
-            <div class="grid grid-cols-3 gap-1.5 pt-1">
-                <button onclick="closePreviewModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-[11px]">
-                    അടയ്ക്കുക
-                </button>
-                <button id="download-img-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
-                </button>
-                <button id="share-img-btn" class="bg-cyan-700 hover:bg-cyan-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-share-nodes"></i> ഷെയർ
                 </button>
             </div>
         </div>
@@ -1168,12 +1123,6 @@
 
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2 text-center relative overflow-hidden">
-                    <div class="flex items-center justify-center gap-2">
-                        <span class="text-3xl dance-animation disco-effect">🕺</span>
-                        <span class="text-3xl dance-animation disco-effect" style="animation-delay: 0.2s;">🏆</span>
-                        <span class="text-3xl dance-animation disco-effect" style="animation-delay: 0.4s;">💃</span>
-                    </div>
-
                     <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         ✨ TOURNAMENT CHAMPIONS ✨
                     </div>
@@ -1602,13 +1551,9 @@
         }
 
         function generateAndShareImage(type) {
-            showToast("📸 പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
+            showToast("📸 വാട്സാപ്പ് കാർഡ് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const shareHeader = document.getElementById("share-header-banner");
-            const previewModal = document.getElementById("preview-modal");
-            const previewContainer = document.getElementById("preview-container");
-            const downloadBtn = document.getElementById("download-img-btn");
-            const shareBtn = document.getElementById("share-img-btn");
             
             if (shareHeader) shareHeader.style.display = "none";
 
@@ -1627,51 +1572,33 @@
             }).then(canvas => {
                 if (shareHeader) shareHeader.style.display = "block";
 
-                previewContainer.innerHTML = "";
-                const previewImg = document.createElement('img');
-                previewImg.src = canvas.toDataURL("image/png");
-                previewImg.className = "rounded-lg w-full object-contain shadow-lg border border-slate-800";
-                previewContainer.appendChild(previewImg);
-                previewModal.classList.remove("hidden");
-
                 canvas.toBlob(blob => {
                     currentCapturedBlob = blob;
-                    const fileUrl = URL.createObjectURL(blob);
-                    
-                    downloadBtn.onclick = function() {
+                    if (navigator.share && currentCapturedBlob) {
+                        const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
+                        navigator.share({
+                            title: 'WESMA BADMINTON SCORECARD',
+                            text: '🏸 WESMA Badminton Club - Match Scorecard',
+                            files: [file]
+                        }).catch(err => console.log('Share error', err));
+                    } else {
+                        const fileUrl = URL.createObjectURL(blob);
+                        let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്ത് ഷെയർ ചെയ്യാം!";
+                        let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                        window.open(url, '_blank');
+                        
+                        // Fallback download link
                         const link = document.createElement('a');
                         link.href = fileUrl;
                         link.download = 'WESMA_Match_Card.png';
                         link.click();
-                        showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
-                    };
-
-                    shareBtn.onclick = function() {
-                        if (navigator.share && currentCapturedBlob) {
-                            const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
-                            navigator.share({
-                                title: 'WESMA BADMINTON SCORECARD',
-                                text: '🏸 WESMA Badminton Club - Match Scorecard',
-                                files: [file]
-                            }).catch(err => console.log('Share error', err));
-                        } else {
-                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
-                            let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                            window.open(url, '_blank');
-                        }
-                    };
-
+                    }
                 });
             }).catch(err => {
                 if (shareHeader) shareHeader.style.display = "block";
                 console.error("Image generation error:", err);
-                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
+                showToast("⚠️ ഫോട്ടോ തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
             });
-        }
-
-        function closePreviewModal() {
-            const modal = document.getElementById("preview-modal");
-            if(modal) modal.classList.add("hidden");
         }
 
         function resetScores() {
