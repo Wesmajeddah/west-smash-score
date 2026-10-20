@@ -283,10 +283,15 @@
     <!-- Outside Capture Area: Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         
-        <!-- Action Options: END MATCH -->
-        <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-800 via-rose-900 to-amber-900 hover:from-rose-700 hover:to-amber-800 text-white font-bold py-3 px-3 rounded-xl border border-rose-500/50 flex items-center justify-center gap-2 text-xs shadow-xl transition-all active:scale-95 tracking-widest uppercase">
-            <i class="fa-solid fa-flag-checkered text-amber-300 text-sm"></i> END MATCH
-        </button>
+        <!-- Action Options: END MATCH (Locked with PIN) -->
+        <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
+            <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
+                <i class="fa-solid fa-lock text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ് ചെയ്യാൻ:
+            </span>
+            <button onclick="requestAdminForEndMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider">
+                <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
+            </button>
+        </div>
 
         <!-- Match History & Sound Options Section -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
@@ -308,13 +313,38 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <!-- Recovery & Reset Grid -->
+        <div class="grid grid-cols-3 gap-2">
             <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-2.5 px-1 rounded-xl border border-slate-700 flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ്
             </button>
-            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30">
-                <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
+            <button onclick="requestAdminForRecovery()" class="w-full bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-semibold py-2.5 px-1 rounded-xl border border-amber-500/40 flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md">
+                <i class="fa-solid fa-clock-rotate-left"></i> റിക്കവർ
             </button>
+            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30">
+                <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ്
+            </button>
+        </div>
+    </div>
+
+    <!-- Defeated Team Selection Modal (Winner Stays Rotation Loss Tracker) -->
+    <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
+            <div class="w-10 h-10 mx-auto bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/30 text-sm">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-sm font-semibold text-amber-300">തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക</h3>
+            <p class="text-xs text-slate-400 font-light">കോർട്ടിൽ പരാജയപ്പെട്ട (പുറത്തുപോകുന്ന) ടീം ഏതാണ്?</p>
+            
+            <div id="defeated-team-options" class="space-y-1.5 pt-1 max-h-48 overflow-y-auto">
+                <!-- Injected dynamically -->
+            </div>
+
+            <div class="pt-2">
+                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
+            </div>
         </div>
     </div>
 
@@ -490,11 +520,11 @@
         const ADMIN_PIN = "1234";
         
         const defaultTeams = [
-            { id: 1, name: "SHAFEER & FAISAL", wins: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 3, name: "ASHRAF & ANWAR", wins: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 4, name: "ANEESH & ANAS", wins: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
-            { id: 5, name: "FAHAD & MUJEEB", wins: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 }
+            { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, matchInterval: 0 },
+            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 },
+            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0 }
         ];
 
         const winMotivationalComments = [
@@ -528,7 +558,8 @@
         let audioContext = null;
         let currentCapturedBlob = null;
         let globalClickSequence = 0;
-        let selectedSoundSetting = 'chime'; // chime, band, whistle, bell, beep, muted
+        let selectedSoundSetting = 'chime';
+        let pendingWinningTeamId = null;
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
@@ -610,7 +641,7 @@
             if(gate) gate.classList.add("hidden");
             
             if (!tournamentStartTimestamp || (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000)) {
-                teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
+                teams.forEach(t => { t.wins = 0; t.losses = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.matchInterval = 0; });
                 tournamentStartTimestamp = Date.now();
                 lastActionTimestamp = Date.now();
                 globalClickSequence = 0;
@@ -620,7 +651,7 @@
         }
 
         function resetTournamentStateForNewSession() {
-            teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
+            teams.forEach(t => { t.wins = 0; t.losses = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.matchInterval = 0; });
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
@@ -629,7 +660,6 @@
             if(gate) gate.classList.remove("hidden");
         }
 
-        // Custom Sound Generator Supporting Multiple Sounds
         function playUniqueChimeSound() {
             if (selectedSoundSetting === 'muted') return;
             initAudioContext();
@@ -639,7 +669,6 @@
                 const now = audioContext.currentTime;
 
                 if (selectedSoundSetting === 'band') {
-                    // Band / Drum Beat Sound
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
                     osc.type = 'sine';
@@ -652,7 +681,6 @@
                     osc.start(now);
                     osc.stop(now + 0.3);
                 } else if (selectedSoundSetting === 'whistle') {
-                    // Referee Whistle Sound
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
                     osc.type = 'triangle';
@@ -665,7 +693,6 @@
                     osc.start(now);
                     osc.stop(now + 0.35);
                 } else if (selectedSoundSetting === 'bell') {
-                    // Arena Bell Sound
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
                     osc.type = 'sine';
@@ -677,7 +704,6 @@
                     osc.start(now);
                     osc.stop(now + 0.8);
                 } else if (selectedSoundSetting === 'beep') {
-                    // Digital Beep Sound
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
                     osc.type = 'square';
@@ -689,7 +715,6 @@
                     osc.start(now);
                     osc.stop(now + 0.15);
                 } else {
-                    // Classic Chime (Default)
                     const osc1 = audioContext.createOscillator();
                     const osc2 = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
@@ -718,10 +743,35 @@
             }
         }
 
-        // Variety Dance Champion Celebration Effect
         function triggerWinCelebration() {
             playUniqueChimeSound();
             triggerHapticFeedback([60, 40, 80]);
+        }
+
+        // Admin PIN Protected END MATCH Function
+        function requestAdminForEndMatch() {
+            triggerHapticFeedback([40]);
+            const pin = prompt("END MATCH ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ Admin PIN!");
+                return;
+            }
+            manualFinishMatch();
+        }
+
+        // Admin PIN Protected Recovery Function
+        function requestAdminForRecovery() {
+            triggerHapticFeedback([40]);
+            const pin = prompt("മിസ്സ് ആയ ഡാറ്റ റിക്കവർ ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ Admin PIN!");
+                return;
+            }
+            
+            // Try loading from local storage backup or history
+            loadLocalBackup();
+            render();
+            showToast("🔄 ഡാറ്റ വിജയകരമായി റിക്കവർ ചെയ്തു!");
         }
 
         function openSoundSettingsModal() {
@@ -977,14 +1027,14 @@
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
-                        let playedCount = Math.max(t.played || 0, t.wins);
-                        let losses = Math.max(0, playedCount - t.wins);
+                        let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
+                        let lossesCount = t.losses || 0;
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-xs font-light text-slate-300 py-1 border-b border-slate-900">
                                 <span>${i + 1}. ${escapeHtml(t.name)}</span>
                                 <div class="flex gap-3">
                                     <span class="text-amber-400 font-semibold">${t.wins} Win</span>
-                                    <span class="text-rose-400 font-semibold">${losses} Loss</span>
+                                    <span class="text-rose-400 font-semibold">${lossesCount} Loss</span>
                                 </div>
                             </div>
                         `;
@@ -1074,7 +1124,6 @@
             }, 1000);
         }
 
-        // END MATCH Function with Dancing Champion Animation
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             const totalPlays = calculateTotalPlays();
@@ -1108,8 +1157,8 @@
 
             let teamsTableHtml = "";
             sorted.forEach((t, i) => {
-                let played = Math.max(t.played || 0, t.wins);
-                let losses = Math.max(0, played - t.wins);
+                let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
+                let losses = t.losses || 0;
                 let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
@@ -1122,10 +1171,8 @@
             });
 
             container.innerHTML = `
-                <!-- Dancing Champion Animated Winner Box -->
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2 text-center relative overflow-hidden">
                     <div class="flex items-center justify-center gap-2">
-                        <!-- Fun Dancing Trophy Cartoon Emoji -->
                         <span class="text-3xl dance-animation disco-effect">🕺</span>
                         <span class="text-3xl dance-animation disco-effect" style="animation-delay: 0.2s;">🏆</span>
                         <span class="text-3xl dance-animation disco-effect" style="animation-delay: 0.4s;">💃</span>
@@ -1209,7 +1256,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -1234,8 +1281,8 @@
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
                 const isLoser = (team.wins === minWins && minWins < maxWins && !isWinner && !isSecond && !isThird);
                 
-                const playedCount = Math.max(team.played || 0, team.wins);
-                const losses = Math.max(0, playedCount - team.wins);
+                const playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
+                const lossesCount = team.losses || 0;
                 
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
@@ -1281,7 +1328,7 @@
                             
                             <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30 min-w-[42px]">
                                 <span class="text-xs text-amber-400 font-semibold">${team.wins} <span class="text-[8px] text-amber-200 font-light">Win</span></span>
-                                <span class="text-[10px] text-rose-400 font-semibold">${losses} <span class="text-[7px] text-rose-200 font-light">Loss</span></span>
+                                <span class="text-[10px] text-rose-400 font-semibold">${lossesCount} <span class="text-[7px] text-rose-200 font-light">Loss</span></span>
                             </div>
                             
                             <div class="relative">
@@ -1297,11 +1344,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 font-light pt-1.5 border-t border-slate-800/60 px-1">
-                        <span class="italic">Match Rotation Status</span>
-                        <span class="text-amber-300 font-semibold">Order: #${team.clickOrder || 0} | Interval: ${team.matchInterval || 0}m</span>
-                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -1311,6 +1353,7 @@
             updateLeaderboard();
         }
 
+        // Winner Stays Rotation Logic with Defeated Team Picker & Time Gap Calculation
         function handleScoreChange(id, delta) {
             const team = teams.find(t => t.id === id);
             if (!team) return;
@@ -1322,32 +1365,9 @@
                     return;
                 }
                 
-                if (lastActionTimestamp) {
-                    const durationMinutes = Math.round((now - lastActionTimestamp) / 60000);
-                    team.matchInterval = durationMinutes > 0 ? durationMinutes : 1;
-                    team.lastMatchTime = team.matchInterval;
-                } else {
-                    team.matchInterval = 0;
-                }
-
-                globalClickSequence += 1;
-                team.clickOrder = globalClickSequence;
-                team.lastClickTime = now;
+                pendingWinningTeamId = id;
+                openDefeatedTeamModal(id);
                 
-                if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
-                lastActionTimestamp = now;
-                
-                team.wins += delta;
-                team.played = (team.played || 0) + 1;
-                
-                autoSaveToHistory();
-                saveData();
-                render();
-
-                triggerWinCelebration();
-
-                const randMotiv = winMotivationalComments[Math.floor(Math.random() * winMotivationalComments.length)];
-                showToast(`🏆 ${team.name}\nWin #${team.wins} (Match Order: #${team.clickOrder})\n${randMotiv}`);
             } else if (delta < 0) {
                 triggerHapticFeedback([40]);
                 const pin = prompt("സ്കോർ കുറയ്ക്കുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -1357,7 +1377,7 @@
                 }
                 if (team.wins > 0) {
                     team.wins += delta;
-                    if (team.played > team.wins) team.played = Math.max(team.wins, team.played - 1);
+                    if (team.played > team.wins) team.played = Math.max(0, team.played - 1);
                     saveData();
                     render();
 
@@ -1367,6 +1387,70 @@
                     showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
                 }
             }
+        }
+
+        function openDefeatedTeamModal(winningTeamId) {
+            const modal = document.getElementById("defeated-team-modal");
+            const container = document.getElementById("defeated-team-options");
+            if (!modal || !container) return;
+
+            container.innerHTML = "";
+            teams.forEach(t => {
+                if (t.id !== winningTeamId) {
+                    const btn = document.createElement("button");
+                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-200 font-medium py-2.5 px-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between transition-all active:scale-95";
+                    btn.innerHTML = `<span>${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[10px]">തോറ്റ ടീമായി രേഖപ്പെടുത്തുക</span>`;
+                    btn.onclick = function() {
+                        confirmWinAndDefeatedTeam(winningTeamId, t.id);
+                    };
+                    container.appendChild(btn);
+                }
+            });
+
+            modal.classList.remove("hidden");
+        }
+
+        function closeDefeatedTeamModal() {
+            const modal = document.getElementById("defeated-team-modal");
+            if (modal) modal.classList.add("hidden");
+            pendingWinningTeamId = null;
+        }
+
+        function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
+            closeDefeatedTeamModal();
+            const team = teams.find(t => t.id === winningTeamId);
+            const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
+            if (!team || !defeatedTeam) return;
+
+            const now = Date.now();
+            
+            const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
+            const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
+            
+            team.matchInterval = intervalMinutes;
+            team.lastMatchTime = intervalMinutes;
+
+            globalClickSequence += 1;
+            team.clickOrder = globalClickSequence;
+            team.lastClickTime = now;
+            
+            if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
+            lastActionTimestamp = now;
+            
+            team.wins += 1;
+            team.played = (team.played || 0) + 1;
+
+            defeatedTeam.losses = (defeatedTeam.losses || 0) + 1;
+            defeatedTeam.played = (defeatedTeam.played || 0) + 1;
+            
+            autoSaveToHistory();
+            saveData();
+            render();
+
+            triggerWinCelebration();
+
+            const randMotiv = winMotivationalComments[Math.floor(Math.random() * winMotivationalComments.length)];
+            showToast(`🏆 ${team.name} Won (${intervalMinutes}m gap)!\n❌ ${defeatedTeam.name} Lost\n${randMotiv}`);
         }
 
         function openCustomNameModal(id, currentName) {
@@ -1504,8 +1588,8 @@
             let text = "🏸 *WESMA BADMINTON CLUB - LIVE SCORES* 🏸\n\n";
             
             sorted.forEach((t, i) => {
-                let played = Math.max(t.played || 0, t.wins);
-                let losses = Math.max(0, played - t.wins);
+                let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
+                let losses = t.losses || 0;
                 text += `${i + 1}. *${t.name}* \n   🏆 Wins: ${t.wins} | ❌ Losses: ${losses} | 🎮 Plays: ${played}\n\n`;
             });
 
