@@ -163,7 +163,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
 
-    <!-- Startup Gate Modal (Requires Start Click to open window) -->
+    <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
             <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
@@ -186,7 +186,7 @@
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
-        <!-- Clear Static Watermark Header for Screenshot Identification (No Date, Compact & Clear) -->
+        <!-- Clear Static Watermark Header for Screenshot Identification -->
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
             <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
                 <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
@@ -213,7 +213,7 @@
                 <!-- Rendered by JS -->
             </div>
 
-            <!-- Total Play Section & Timers (Includes Hours, Minutes & Seconds) -->
+            <!-- Total Play Section & Timers (Includes Summary Mode when match ends) -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
@@ -229,6 +229,16 @@
                         <i class="fa-solid fa-stopwatch text-emerald-400 text-xs"></i> Current Match Duration:
                     </span>
                     <span id="current-match-timer" class="text-emerald-400 text-xs font-semibold">0h 0m 0s</span>
+                </div>
+
+                <!-- Match Summary Box (Appears when match ends / inactive for > 15 mins) -->
+                <div id="match-summary-box" class="hidden text-xs text-cyan-300 bg-cyan-950/40 p-2.5 rounded-lg border border-cyan-500/30 space-y-1">
+                    <div class="font-semibold flex items-center gap-1 text-cyan-200">
+                        <i class="fa-solid fa-flag-checkered text-cyan-400"></i> കളി അവസാനിച്ചു - മാച്ച് സമ്മറി:
+                    </div>
+                    <div id="match-summary-text" class="text-[11px] text-slate-300 font-light leading-relaxed">
+                        <!-- Summary generated dynamically -->
+                    </div>
                 </div>
 
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
@@ -461,11 +471,9 @@
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                         tournamentHistory = parsed.tournamentHistory || [];
                         
-                        // Check if 1.5 hours (90 minutes) have passed since tournament start
                         if (tournamentStartTimestamp) {
                             const elapsed = Date.now() - tournamentStartTimestamp;
                             if (elapsed >= 90 * 60 * 1000) {
-                                // Auto reset after 1.5 hours and require Start Tournament gate
                                 resetTournamentStateForNewSession();
                             } else {
                                 const gate = document.getElementById("startup-gate");
@@ -520,7 +528,6 @@
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.add("hidden");
             
-            // If starting a fresh session after reset or first time
             if (!tournamentStartTimestamp || (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000)) {
                 teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
                 tournamentStartTimestamp = Date.now();
@@ -539,15 +546,12 @@
             if(gate) gate.classList.remove("hidden");
         }
 
-        // Unique Scoring Chime Sound (Replacing firecrackers sound with a pleasant success chime)
         function playUniqueChimeSound() {
             initAudioContext();
             if (!audioContext) return;
 
             try {
                 const now = audioContext.currentTime;
-                
-                // Play a harmonious double-tone chord (Chime effect)
                 const osc1 = audioContext.createOscillator();
                 const osc2 = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -555,7 +559,6 @@
                 osc1.type = 'sine';
                 osc2.type = 'triangle';
 
-                // Notes: C5 (523.25 Hz) & G5 (783.99 Hz)
                 osc1.frequency.setValueAtTime(523.25, now);
                 osc2.frequency.setValueAtTime(783.99, now);
 
@@ -603,7 +606,6 @@
             }
         }
 
-        // Initialize and restrict continuous firecrackers ONLY within the Champions box canvas
         function initChampionsBoxFirecrackers() {
             const canvas = document.getElementById("firecracker-canvas");
             if (!canvas || typeof confetti !== 'function') return;
@@ -655,7 +657,6 @@
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
                         
-                        // Check 1.5 hours auto-reset condition
                         if (tournamentStartTimestamp) {
                             const elapsed = Date.now() - tournamentStartTimestamp;
                             if (elapsed >= 90 * 60 * 1000) {
@@ -682,7 +683,6 @@
             startCooldownTickers();
         }
 
-        // Header Title Render with 'WESMA' Only
         function renderHeaderTitle() {
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
@@ -903,44 +903,54 @@
             }
         }
 
-        // Live Timer updated with Hours and 1.5 Hour (90 mins) Auto-Reset Check
+        // Live Timer updated with Hours, 1.5 Hour Auto-Reset, and Match Finished Summary Box
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
+                const summaryBox = document.getElementById("match-summary-box");
+                const summaryText = document.getElementById("match-summary-text");
                 
                 if (!tournamentStartTimestamp) {
                     if(totalDurationEl) totalDurationEl.textContent = "0h 0m 0s";
                     if(currentTimerEl) currentTimerEl.textContent = "0h 0m 0s";
+                    if(summaryBox) summaryBox.classList.add("hidden");
                     return;
                 }
 
                 const elapsedTotal = Date.now() - tournamentStartTimestamp;
                 
-                // 1.5 Hours (90 minutes) Auto-Reset Check
                 if (elapsedTotal >= 90 * 60 * 1000) {
                     resetTournamentStateForNewSession();
                     showToast("⏳ 1.5 മണിക്കൂർ കഴിഞ്ഞു! പുതിയ കളിക്കായി റീസെറ്റ് ചെയ്തു.");
                     return;
                 }
 
-                // Total Session Duration Calculation
                 const totalHours = Math.floor(elapsedTotal / 3600000);
                 const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
                 if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s`;
 
-                // Current Match Duration Calculation
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
                     const matchHours = Math.floor(matchDiffMs / 3600000);
                     const matchMins = Math.floor((matchDiffMs % 3600000) / 60000);
                     const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
                     
-                    if (matchDiffMs > 15 * 60 * 1000) {
-                        if(currentTimerEl) currentTimerEl.textContent = "നിഷ്ക്രിയമാണ് (Stopped)";
+                    if (matchDiffMs > 15 * 60 * 1000 && calculateTotalPlays() > 0) {
+                        if(currentTimerEl) currentTimerEl.textContent = "കളി അവസാനിച്ചു (Match Finished)";
+                        
+                        // Generate dynamic match summary when match finishes due to 15 mins inactivity
+                        if(summaryBox && summaryText) {
+                            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
+                            let champion = sorted[0].wins > 0 ? sorted[0].name : "ആരുമില്ല";
+                            let totalPlays = calculateTotalPlays();
+                            summaryText.innerHTML = `കളി അവസാനിച്ച് 15 മിനിറ്റിലധികം കഴിഞ്ഞിരിക്കുന്നു. ആകെ കളികൾ: <b>${totalPlays}</b>. നിലവിലെ ചാമ്പ്യൻ: <b>${champion}</b> (${sorted[0].wins} ജയം).`;
+                            summaryBox.classList.remove("hidden");
+                        }
                     } else {
+                        if(summaryBox) summaryBox.classList.add("hidden");
                         if (matchHours > 0) {
                             if(currentTimerEl) currentTimerEl.textContent = `${matchHours}h ${matchMins}m ${matchSecs}s`;
                         } else {
@@ -948,6 +958,7 @@
                         }
                     }
                 } else {
+                    if(summaryBox) summaryBox.classList.add("hidden");
                     if(currentTimerEl) currentTimerEl.textContent = "0h 0m 0s";
                 }
             }, 1000);
@@ -1014,7 +1025,6 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
-                // Clear, precision aligned rank badges for html2canvas rendering accuracy
                 if (isWinner) {
                     extraCardClass = "winner-card";
                     specialBadgeHtml = `<span class="rank-badge bg-amber-400 text-slate-950 shadow-sm"><i class="fa-solid fa-crown text-[8px] mr-1"></i>1st</span>`;
