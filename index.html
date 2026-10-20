@@ -218,7 +218,7 @@
                     <div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
                 </div>
 
-                <div id="fastest-win-text" class="text-xs font-light text-cyan-300 pt-2 border-t border-cyan-500/20 truncate px-1 text-center uppercase">
+                <div id="fastest-win-text" class="text-xs font-light text-cyan-300 pt-2 border-t border-cyan-500/20 px-1 text-center uppercase break-words whitespace-normal leading-normal">
                     ⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും
                 </div>
 
@@ -355,8 +355,8 @@
         </div>
     </div>
 
-    <!-- Prominent Center Pop-up Toast Notification with Extended 8-Second Display Duration -->
-    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
+    <!-- Prominent Center Pop-up Toast Notification (Click/Touch to Dismiss added) -->
+    <div id="toast" onclick="dismissToast()" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90 cursor-pointer">
         സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
     </div>
 
@@ -1056,7 +1056,8 @@
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
                 const fastestTeam = teamsWithTime[0];
-                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-light text-xs uppercase">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
+                // Fastest Win visibility updated for Screenshots
+                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-semibold text-xs uppercase inline-block break-words">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
             } else {
                 fastestEl.innerHTML = `⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
             }
@@ -1202,12 +1203,22 @@
             toast.innerText = text;
             toast.style.opacity = "1";
             toast.style.transform = "translate(-50%, -50%) scale(1)";
+            toast.style.pointerEvents = "auto"; // Enable clicking/touching on the toast
             
             if (toastTimeout) clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
-                toast.style.opacity = "0";
-                toast.style.transform = "translate(-50%, -50%) scale(0.9)";
+                dismissToast();
             }, 8000);
+        }
+
+        // Function to instantly dismiss the toast message on user touch/click
+        function dismissToast() {
+            const toast = document.getElementById("toast");
+            if(!toast) return;
+            toast.style.opacity = "0";
+            toast.style.transform = "translate(-50%, -50%) scale(0.9)";
+            toast.style.pointerEvents = "none";
+            if (toastTimeout) clearTimeout(toastTimeout);
         }
 
         function escapeHtml(str) {
