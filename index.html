@@ -17,7 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <!-- html2canvas for Image Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Canvas Confetti for Fireworks/Celebration Effect -->
+    <!-- Canvas Confetti for Celebration Effect -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
@@ -88,31 +88,25 @@
 
         .gold-border { border: 1.5px solid rgba(212, 175, 55, 0.4); }
         
-        /* Special Border Glow for First Place Champions Name */
+        /* Unique Glowing Gold Pulse Animation for Champions Box */
         .champions-special-border {
-            border: 2px dashed #F59E0B;
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.35), inset 0 0 8px rgba(245, 158, 11, 0.15);
-            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid #F59E0B;
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(245, 158, 11, 0.25);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
             border-radius: 0.75rem;
-            padding: 0.5rem;
+            padding: 0.6rem;
             margin-top: 0.5rem;
             overflow: hidden !important;
             word-break: break-word;
             position: relative;
+            animation: goldPulseGlow 3s infinite ease-in-out;
+        }
+        @keyframes goldPulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4), inset 0 0 10px rgba(245, 158, 11, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.8), inset 0 0 18px rgba(245, 158, 11, 0.4); }
         }
 
-        /* Sparkle Firecracker Canvas Overlay Inside Champions Box Only */
-        .champion-firecracker-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        /* Badges High Precision Clarity Styling (Fixes blurry/misaligned text in html2canvas photo export) */
+        /* Badges High Precision Clarity Styling */
         .rank-badge {
             display: inline-flex !important;
             align-items: center !important;
@@ -213,7 +207,7 @@
                 <!-- Rendered by JS -->
             </div>
 
-            <!-- Total Play Section & Timers (Includes Summary Mode when match ends) -->
+            <!-- Total Play Section & Timers -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
@@ -231,7 +225,7 @@
                     <span id="current-match-timer" class="text-emerald-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
 
-                <!-- Match Summary Box (Appears when match ends / inactive for > 15 mins) -->
+                <!-- Match Summary Box (Appears when match ends / inactive for > 10 mins) -->
                 <div id="match-summary-box" class="hidden text-xs text-cyan-300 bg-cyan-950/40 p-2.5 rounded-lg border border-cyan-500/30 space-y-1">
                     <div class="font-semibold flex items-center gap-1 text-cyan-200">
                         <i class="fa-solid fa-flag-checkered text-cyan-400"></i> കളി അവസാനിച്ചു - മാച്ച് സമ്മറി:
@@ -255,12 +249,11 @@
                     <div class="text-xs font-semibold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
                     </div>
-                    <!-- Champions Box with Inner Firecrackers Canvas Only -->
+                    <!-- Champions Box with Special Golden Pulse Animation -->
                     <div id="leader-text" class="champions-special-border text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider flex items-center justify-center gap-2">
-                        <canvas id="firecracker-canvas" class="champion-firecracker-canvas"></canvas>
-                        <span class="text-amber-400 relative z-20">🎆</span>
+                        <span class="text-amber-400 animate-pulse">👑</span>
                         <span id="champion-name-span" class="relative z-20">ലോഡ് ചെയ്യുന്നു...</span>
-                        <span class="text-amber-400 relative z-20">🎆</span>
+                        <span class="text-amber-400 animate-pulse">👑</span>
                     </div>
                 </div>
 
@@ -284,6 +277,11 @@
 
     <!-- Outside Capture Area: Match History Section & Action Buttons -->
     <div class="w-full max-w-xl pt-2 space-y-2">
+        <!-- Special Finish Match Button -->
+        <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-700 via-rose-800 to-rose-900 hover:from-rose-600 hover:to-rose-800 text-white font-bold py-3 px-3 rounded-xl border border-rose-500/50 flex items-center justify-center gap-2 text-xs shadow-xl transition-all active:scale-95 tracking-wider uppercase">
+            <i class="fa-solid fa-flag-checkered text-amber-300 text-sm"></i> കളി അവസാനിച്ചു (FINISH MATCH)
+        </button>
+
         <!-- Match History Section -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2">
@@ -309,6 +307,28 @@
             <button onclick="openWhatsAppChoiceModal('image')" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-semibold py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-emerald-500/30">
                 <i class="fa-brands fa-whatsapp text-emerald-100"></i> ഫോട്ടോ
             </button>
+        </div>
+    </div>
+
+    <!-- Manual Finish Match Detailed Summary Modal -->
+    <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="text-xs font-bold text-amber-300 flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> ടൂർണമെന്റ് ഫൈനൽ റിസൾട്ട്
+                </h3>
+                <button onclick="closeFinishMatchModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs">
+                <!-- Content injected dynamically via JavaScript -->
+            </div>
+            <div class="p-3 bg-slate-950 border-t border-slate-800 flex justify-end">
+                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs">
+                    അടയ്ക്കുക
+                </button>
+            </div>
         </div>
     </div>
 
@@ -356,7 +376,7 @@
         </div>
     </div>
 
-    <!-- Screenshot Preview, Download & Direct Share Modal -->
+    <!-- Screenshot Preview Modal -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
             <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
@@ -422,7 +442,6 @@
             { id: 5, name: "FAHAD & MUJEEB", wins: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0 }
         ];
 
-        // Motivational Comments for Winning (+1)
         const winMotivationalComments = [
             "ഗംഭീര പ്രകടനം! വിജയം തുടരട്ടെ! 🏆",
             "തകർപ്പൻ ജയം! ടീം വർക്കിന്റെ വിജയം! 🔥",
@@ -432,7 +451,6 @@
             "മാച്ച് വിന്നേഴ്സ്! ആവേശം കൊടുമുടിയിൽ! 🏸"
         ];
 
-        // Constructive Criticism Comments for Loss / Minus (-1)
         const lossCriticismComments = [
             "ശ്രദ്ധിക്കൂ! ഈ പോക്ക് അപകടമാണ്! ⚠️",
             "പോരായ്മകൾ തിരുത്തി അടുത്ത മാച്ചിൽ തിരിച്ചുവരൂ! 💪",
@@ -454,12 +472,10 @@
         let currentShareMode = 'text';
         let audioContext = null;
         let currentCapturedBlob = null;
-        let championConfettiInstance = null;
-        let firecrackerTimerId = null;
+        let isMatchManuallyFinished = false;
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
-        // Check LocalStorage on Load to restore state if browser accidentally closed
         function loadLocalBackup() {
             try {
                 const localData = localStorage.getItem('wesma_local_backup_v1');
@@ -470,6 +486,7 @@
                         tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                         tournamentHistory = parsed.tournamentHistory || [];
+                        isMatchManuallyFinished = parsed.isMatchManuallyFinished || false;
                         
                         if (tournamentStartTimestamp) {
                             const elapsed = Date.now() - tournamentStartTimestamp;
@@ -532,6 +549,7 @@
                 teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
                 tournamentStartTimestamp = Date.now();
                 lastActionTimestamp = Date.now();
+                isMatchManuallyFinished = false;
                 saveData();
             }
             render();
@@ -541,6 +559,7 @@
             teams.forEach(t => { t.wins = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; });
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
+            isMatchManuallyFinished = false;
             localStorage.removeItem('wesma_local_backup_v1');
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.remove("hidden");
@@ -606,34 +625,6 @@
             }
         }
 
-        function initChampionsBoxFirecrackers() {
-            const canvas = document.getElementById("firecracker-canvas");
-            if (!canvas || typeof confetti !== 'function') return;
-
-            if (!championConfettiInstance) {
-                championConfettiInstance = confetti.create(canvas, {
-                    resize: true,
-                    useWorker: true
-                });
-            }
-
-            if (firecrackerTimerId) clearInterval(firecrackerTimerId);
-
-            firecrackerTimerId = setInterval(() => {
-                const sorted = [...teams].sort((a, b) => b.wins - a.wins);
-                if (sorted[0] && sorted[0].wins > 0 && championConfettiInstance) {
-                    championConfettiInstance({
-                        particleCount: 8,
-                        spread: 60,
-                        startVelocity: 15,
-                        origin: { x: Math.random(), y: Math.random() },
-                        colors: ['#F59E0B', '#38BDF8', '#EC4899', '#4ADE80', '#FACC15'],
-                        disableForReducedMotion: true
-                    });
-                }
-            }, 1800);
-        }
-
         function initData() {
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -643,7 +634,6 @@
 
             renderHeaderTitle();
             render();
-            initChampionsBoxFirecrackers();
 
             if (dbRef) {
                 dbRef.on('value', (snapshot) => {
@@ -656,6 +646,7 @@
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
+                        isMatchManuallyFinished = data.isMatchManuallyFinished || false;
                         
                         if (tournamentStartTimestamp) {
                             const elapsed = Date.now() - tournamentStartTimestamp;
@@ -771,7 +762,8 @@
                     teams,
                     tournamentStartTimestamp,
                     lastActionTimestamp,
-                    tournamentHistory
+                    tournamentHistory,
+                    isMatchManuallyFinished
                 };
                 localStorage.setItem('wesma_local_backup_v1', JSON.stringify(payload));
             } catch(e) {
@@ -782,7 +774,7 @@
         function saveData() {
             saveLocalBackup();
             if (dbRef) {
-                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory }).catch((error) => {
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, isMatchManuallyFinished }).catch((error) => {
                     console.error("Firebase write error:", error);
                 });
             }
@@ -903,7 +895,7 @@
             }
         }
 
-        // Live Timer updated with Hours, 1.5 Hour Auto-Reset, and Match Finished Summary Box
+        // Live Timer updated with 10 Minutes Inactivity or Manual Finish Condition
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -919,7 +911,19 @@
                     return;
                 }
 
-                const elapsedTotal = Date.now() - tournamentStartTimestamp;
+                let isMatchFinished = isMatchManuallyFinished;
+
+                // Check 10 Minutes (10 * 60 * 1000 ms = 600,000 ms) Inactivity Condition
+                if (!isMatchFinished && lastActionTimestamp) {
+                    const matchDiffMs = Date.now() - lastActionTimestamp;
+                    if (matchDiffMs > 10 * 60 * 1000 && calculateTotalPlays() > 0) {
+                        isMatchFinished = true;
+                    }
+                }
+
+                // Session Duration Logic
+                const sessionEffectiveTime = isMatchFinished ? lastActionTimestamp : Date.now();
+                const elapsedTotal = sessionEffectiveTime - tournamentStartTimestamp;
                 
                 if (elapsedTotal >= 90 * 60 * 1000) {
                     resetTournamentStateForNewSession();
@@ -932,21 +936,21 @@
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
                 if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s`;
 
+                // Current Match Duration & Summary Logic
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
                     const matchHours = Math.floor(matchDiffMs / 3600000);
                     const matchMins = Math.floor((matchDiffMs % 3600000) / 60000);
                     const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
                     
-                    if (matchDiffMs > 15 * 60 * 1000 && calculateTotalPlays() > 0) {
+                    if (isMatchFinished) {
                         if(currentTimerEl) currentTimerEl.textContent = "കളി അവസാനിച്ചു (Match Finished)";
                         
-                        // Generate dynamic match summary when match finishes due to 15 mins inactivity
                         if(summaryBox && summaryText) {
                             let sorted = [...teams].sort((a, b) => b.wins - a.wins);
                             let champion = sorted[0].wins > 0 ? sorted[0].name : "ആരുമില്ല";
                             let totalPlays = calculateTotalPlays();
-                            summaryText.innerHTML = `കളി അവസാനിച്ച് 15 മിനിറ്റിലധികം കഴിഞ്ഞിരിക്കുന്നു. ആകെ കളികൾ: <b>${totalPlays}</b>. നിലവിലെ ചാമ്പ്യൻ: <b>${champion}</b> (${sorted[0].wins} ജയം).`;
+                            summaryText.innerHTML = `കളി അവസാനിച്ചു.<br>• ആകെ കളികൾ: <b>${totalPlays}</b><br>• നിലവിലെ ചാമ്പ്യൻ: <b>${champion}</b> (${sorted[0].wins} ജയം)<br>• അവസാനിച്ചപ്പോഴുള്ള സെഷൻ സമയം: <b>${totalHours}h ${totalMins}m ${totalSecs}s</b>`;
                             summaryBox.classList.remove("hidden");
                         }
                     } else {
@@ -962,6 +966,84 @@
                     if(currentTimerEl) currentTimerEl.textContent = "0h 0m 0s";
                 }
             }, 1000);
+        }
+
+        // Special Option Function: Finish Match Manually & Show Full Summary
+        function manualFinishMatch() {
+            const totalPlays = calculateTotalPlays();
+            if (totalPlays === 0) {
+                showToast("⚠️ നിലവിൽ മത്സരങ്ങളൊന്നും നടന്നിട്ടില്ല!");
+                return;
+            }
+
+            isMatchManuallyFinished = true;
+            saveData();
+
+            const modal = document.getElementById("finish-match-modal");
+            const container = document.getElementById("finish-match-modal-content");
+            if (!modal || !container) return;
+
+            let sorted = [...teams].sort((a, b) => {
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
+            });
+
+            let elapsedTotal = (lastActionTimestamp && tournamentStartTimestamp) ? (lastActionTimestamp - tournamentStartTimestamp) : 0;
+            let totalHours = Math.floor(elapsedTotal / 3600000);
+            let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
+            let totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
+
+            let champion = sorted[0].wins > 0 ? sorted[0].name : "ആരുമില്ല";
+
+            let teamsTableHtml = "";
+            sorted.forEach((t, i) => {
+                let played = Math.max(t.played || 0, t.wins);
+                let losses = Math.max(0, played - t.wins);
+                teamsTableHtml += `
+                    <tr class="border-b border-slate-800/80 text-center text-slate-200">
+                        <td class="py-2 px-1 text-left font-semibold text-amber-300">${i + 1}. ${escapeHtml(t.name)}</td>
+                        <td class="py-2 px-1 font-semibold text-slate-100">${played}</td>
+                        <td class="py-2 px-1 font-bold text-emerald-400">${t.wins}</td>
+                        <td class="py-2 px-1 font-bold text-rose-400">${losses}</td>
+                    </tr>
+                `;
+            });
+
+            container.innerHTML = `
+                <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 space-y-1 text-center">
+                    <div class="text-amber-400 font-bold text-sm">👑 ചാമ്പ്യന്മാർ: ${escapeHtml(champion)}</div>
+                    <div class="text-slate-400 text-[11px] font-light">ആകെ കളിച്ച മത്സരങ്ങൾ: <b class="text-white">${totalPlays}</b> | ആകെ സമയം: <b class="text-amber-300">${totalHours}h ${totalMins}m ${totalSecs}s</b></div>
+                </div>
+
+                <div class="space-y-1 pt-1">
+                    <div class="text-xs font-semibold text-amber-300 flex items-center gap-1">
+                        <i class="fa-solid fa-list-check text-amber-400"></i> വിശദമായ ടീം സ്കോറുകൾ:
+                    </div>
+                    <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-[10px] text-slate-400 uppercase text-center">
+                                    <th class="py-1.5 px-1 text-left">ടീം</th>
+                                    <th class="py-1.5 px-1">കളിച്ചത്</th>
+                                    <th class="py-1.5 px-1">ജയിച്ചത്</th>
+                                    <th class="py-1.5 px-1">തോറ്റത്</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${teamsTableHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove("hidden");
+            triggerWinCelebration();
+        }
+
+        function closeFinishMatchModal() {
+            const modal = document.getElementById("finish-match-modal");
+            if (modal) modal.classList.add("hidden");
         }
 
         function startCooldownTickers() {
@@ -1113,6 +1195,7 @@
                     team.lastMatchTime = durationMinutes > 0 ? durationMinutes : 1;
                 }
                 lastActionTimestamp = now;
+                isMatchManuallyFinished = false; // Resume match if point added
                 team.wins += delta;
                 team.played = (team.played || 0) + 1;
                 autoSaveToHistory();
