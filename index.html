@@ -33,7 +33,7 @@
             font-family: 'Inter', sans-serif;
             font-weight: 800;
             letter-spacing: 2px;
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             text-transform: uppercase;
             display: flex;
             align-items: baseline;
@@ -44,7 +44,7 @@
         /* Swash 'W' Base Mixed Gold Color + Extremely Slow & Random Vertical Flip */
         .special-w {
             font-family: 'Great Vibes', cursive;
-            font-size: 1.4em;
+            font-size: 1.35em;
             display: inline-block;
             transform: translateY(3px);
             color: #F59E0B;
@@ -98,6 +98,7 @@
             margin-top: 0.5rem;
             overflow: visible !important;
             word-break: break-word;
+            position: relative;
         }
 
         .winner-card {
@@ -164,13 +165,12 @@
             </span>
         </div>
 
-        <!-- Header Banner (Compact, Date Removed) -->
-        <div id="share-header-banner" class="text-center py-2 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0.5">
-            <div class="pt-0.5 pb-0.5">
+        <!-- Header Banner (WESMA Only - Badminton Club removed from interface body) -->
+        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
+            <div class="py-0.5">
                 <div id="header-title-container" class="wesma-title leading-tight">
                     <!-- Rendered by JS -->
                 </div>
-                <h2 class="text-[10px] font-medium text-slate-300 tracking-[0.2em] uppercase mt-0.5">BADMINTON CLUB</h2>
             </div>
         </div>
 
@@ -214,9 +214,11 @@
                     <div class="text-xs font-semibold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
                     </div>
-                    <!-- Champions Box with Special Border -->
-                    <div id="leader-text" class="champions-special-border text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider">
-                        ലോഡ് ചെയ്യുന്നു...
+                    <!-- Champions Box with Special Border & Continuous Firecracker Sparkles -->
+                    <div id="leader-text" class="champions-special-border text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider flex items-center justify-center gap-2">
+                        <span class="text-amber-400 animate-pulse">🎆</span>
+                        <span id="champion-name-span">ലോഡ് ചെയ്യുന്നു...</span>
+                        <span class="text-amber-400 animate-pulse">🎆</span>
                     </div>
                 </div>
 
@@ -404,6 +406,7 @@
         let lastActionTimestamp = null;
         let timerInterval = null;
         let cooldownInterval = null;
+        let firecrackerInterval = null;
         let isFirebaseConnected = false;
         let dbRef = null;
         let editingTeamId = null;
@@ -553,6 +556,28 @@
             }
         }
 
+        // Continuous Firecracker Effect for Champions section
+        function startContinuousFirecrackers() {
+            if (firecrackerInterval) return;
+            firecrackerInterval = setInterval(() => {
+                if (typeof confetti === 'function') {
+                    const leaderBox = document.getElementById("leader-text");
+                    if (!leaderBox) return;
+                    const rect = leaderBox.getBoundingClientRect();
+                    const x = (rect.left + rect.width / 2) / window.innerWidth;
+                    const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+                    confetti({
+                        particleCount: 12,
+                        spread: 50,
+                        origin: { x: x, y: y },
+                        colors: ['#F59E0B', '#38BDF8', '#EC4899', '#4ADE80', '#FACC15'],
+                        disableForReducedMotion: true
+                    });
+                }
+            }, 3000);
+        }
+
         function initData() {
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -562,6 +587,7 @@
 
             renderHeaderTitle();
             render();
+            startContinuousFirecrackers();
 
             if (dbRef) {
                 dbRef.on('value', (snapshot) => {
@@ -574,9 +600,8 @@
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
-                        saveLocalBackup(); // Sync with local storage backup
+                        saveLocalBackup();
                     } else {
-                        // If firebase is empty, fallback to local backup if available
                         const localData = localStorage.getItem('wesma_local_backup_v1');
                         if (!localData) {
                             teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -595,7 +620,7 @@
             startCooldownTickers();
         }
 
-        // Header Title Render with Very Slow & Completely Random Letter Flip
+        // Header Title Render with 'WESMA' Only (Badminton Club removed from body interface)
         function renderHeaderTitle() {
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
@@ -838,7 +863,6 @@
                     const matchMins = Math.floor(matchDiffMs / 60000);
                     const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
                     
-                    // Auto-stop match timer if inactive for more than 15 minutes (configurable threshold)
                     if (matchDiffMs > 15 * 60 * 1000) {
                         if(currentTimerEl) currentTimerEl.textContent = "നിഷ്ക്രിയമാണ് (Stopped)";
                     } else {
@@ -889,7 +913,6 @@
                 fastestTeamId = teamsWithTime[0].id;
             }
 
-            // Determine 2nd and 3rd rank dynamically using score and timing
             let rankedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
@@ -912,7 +935,6 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
-                // Compact, high clarity badges with smaller dimensions and clean styling
                 if (isWinner) {
                     extraCardClass = "winner-card";
                     specialBadgeHtml = `<span class="text-[8px] bg-amber-400 text-slate-950 font-bold px-1 py-0.5 rounded inline-flex items-center justify-center gap-0.5 shrink-0 h-4 shadow-sm"><i class="fa-solid fa-crown text-[6px]"></i> 1st</span>`;
@@ -943,24 +965,20 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <!-- Play Display -->
                             <div class="w-7 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700" title="Total Played">
                                 <span class="text-[7px] text-slate-400 font-light leading-none">Play</span>
                                 <span class="text-xs text-amber-300 font-semibold">${playedCount}</span>
                             </div>
                             
-                            <!-- Minus Button (-) -->
                             <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-12 bg-rose-950 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 active:scale-95 transition-all" title="Minus (-1 with PIN)">
                                 <i class="fa-solid fa-minus text-[10px]"></i>
                             </button>
                             
-                            <!-- Win/Loss Box -->
                             <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30 min-w-[42px]">
                                 <span class="text-xs text-amber-400 font-semibold">${team.wins} <span class="text-[8px] text-amber-200 font-light">Win</span></span>
                                 <span class="text-[10px] text-rose-400 font-semibold">${losses} <span class="text-[7px] text-rose-200 font-light">Loss</span></span>
                             </div>
                             
-                            <!-- Plus Button (+) -->
                             <div class="relative">
                                 <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-11 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-lg active:scale-95 transition-all" title="Win +1">
                                     <i class="fa-solid fa-plus text-base font-bold"></i>
@@ -1078,11 +1096,12 @@
 
         function updateLeaderboard() {
             const leaderEl = document.getElementById("leader-text");
+            const championSpan = document.getElementById("champion-name-span");
             const podiumEl = document.getElementById("podium-text");
             const fastestEl = document.getElementById("fastest-win-text");
             const loserEl = document.getElementById("loser-text");
 
-            if(!leaderEl) return;
+            if(!leaderEl || !championSpan) return;
 
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
@@ -1093,7 +1112,7 @@
             const minWins = sorted[sorted.length - 1].wins;
 
             if (maxWins === 0) {
-                leaderEl.innerHTML = `<span class="text-slate-400 font-light text-xs uppercase">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
+                championSpan.innerHTML = `<span class="text-slate-400 font-light text-xs uppercase">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
                 podiumEl.innerHTML = `<div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div><div>🥉 3-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>`;
                 fastestEl.innerHTML = `⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
                 loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
@@ -1103,13 +1122,12 @@
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
             
             if (firstPlaces.length === 1) {
-                leaderEl.innerHTML = `<div class="w-full break-words py-0.5">⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം) ⭐</div>`;
+                championSpan.innerHTML = `⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം) ⭐`;
             } else {
                 let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0 break-words">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം)</div>`).join('');
-                leaderEl.innerHTML = `<div class="flex flex-col space-y-0.5">${multiHtml}</div>`;
+                championSpan.innerHTML = `<div class="flex flex-col space-y-0.5">${multiHtml}</div>`;
             }
 
-            // Dynamic 2nd and 3rd rank display based on score & timing
             let podiumHtml = "";
             if (sorted.length > 1 && sorted[1].wins > 0) {
                 const secondTeam = sorted[1];
