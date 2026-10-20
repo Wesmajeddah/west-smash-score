@@ -261,7 +261,7 @@
     <!-- Outside Capture Area: Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         
-        <!-- Action Options: END MATCH with Locking System -->
+        <!-- Action Options: END MATCH with Locking System & WhatsApp Share -->
         <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
             <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
                 <i id="end-match-lock-icon" class="fa-solid fa-lock text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
@@ -273,10 +273,13 @@
                 <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider">
                     <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
                 </button>
+                <button onclick="openWhatsAppChoiceModal('finish_card')" class="bg-emerald-800 hover:bg-emerald-700 text-white font-semibold py-1.5 px-2.5 rounded-lg text-[11px] flex items-center gap-1 shadow" title="Share Final Card to WhatsApp">
+                    <i class="fa-brands fa-whatsapp"></i> ഷെയർ
+                </button>
             </div>
         </div>
 
-        <!-- Match History & Undo/Recovery Option Section (Replaced WhatsApp Share slot) -->
+        <!-- Match History & Options Section -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2">
                 <span class="text-xs text-amber-300 flex items-center gap-1 font-semibold">
@@ -287,10 +290,7 @@
                 </span>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="undoLastAction()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1" title="റിയാക്ഷൻ/അറിയാതെ സംഭവിച്ചവ മാറ്റാൻ">
-                    <i class="fa-solid fa-rotate-left"></i> മാറ്റുക (Undo)
-                </button>
-                <button onclick="openHistoryModal()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-2 py-1 rounded-lg border border-amber-500/30 flex items-center gap-1">
+                <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1">
                     <i class="fa-solid fa-folder-open"></i> കാണുക
                 </button>
             </div>
@@ -331,14 +331,15 @@
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             
-            <!-- Custom Modal Header with WESMA Badminton Club, SINCE 2026 below, and Date on right -->
+            <!-- Custom Modal Header with WESMA Details & SINCE 2026 Aligned -->
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
-                    <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA BADMINTON CLUB</div>
-                    <div class="text-[9px] text-amber-200/80 font-light tracking-wider">SINCE 2026</div>
+                    <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
+                    <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
                 </div>
                 <div class="flex flex-col text-right">
-                    <div id="modal-header-date" class="text-[9px] text-slate-400 font-light"></div>
+                    <div class="text-[10px] text-amber-300 font-bold tracking-widest">SINCE 2026</div>
+                    <div id="modal-header-date" class="text-[8px] text-slate-400 font-light"></div>
                 </div>
                 <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
@@ -350,8 +351,8 @@
             </div>
 
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="downloadFinalCardImage()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
+                <button onclick="generateAndShareImage('normal')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-image"></i> പ്രിവ്യൂ കാർഡ്
                 </button>
                 <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow">
                     CLOSE
@@ -404,6 +405,31 @@
         </div>
     </div>
 
+    <!-- Screenshot Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
+            <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-crop text-emerald-400"></i> സ്കോർ കാർഡ് പ്രിവ്യൂ (Full View)
+            </div>
+            <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[48vh] flex items-center justify-center p-2">
+                <!-- Captured Image Preview -->
+            </div>
+            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഗ്രൂപ്പിലേക്ക് ഷെയർ ചെയ്യാം.</div>
+            
+            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                <button onclick="closePreviewModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-[11px]">
+                    അടയ്ക്കുക
+                </button>
+                <button id="download-img-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
+                </button>
+                <button id="share-img-btn" class="bg-cyan-700 hover:bg-cyan-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-share-nodes"></i> ഷെയർ
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- History Popup Modal -->
     <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
@@ -429,9 +455,14 @@
         </div>
     </div>
 
-    <!-- Prominent Center Pop-up Toast Notification -->
-    <div id="toast" onclick="dismissToast()" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90 cursor-pointer">
-        സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!
+    <!-- Prominent Center Pop-up Toast Notification with Accidental Click Undo Option ("മാറ്റുക") -->
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
+        <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!</div>
+        <div id="toast-undo-container" class="mt-3 pt-2 border-t border-amber-500/30 hidden">
+            <button onclick="undoLastAction()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-4 py-1.5 rounded-xl shadow pointer-events-auto transition-all active:scale-95 uppercase tracking-wider">
+                🔄 മാറ്റുക (Undo)
+            </button>
+        </div>
     </div>
 
     <script>
@@ -456,6 +487,7 @@
         let editingTeamId = null;
         let currentShareMode = 'text';
         let audioContext = null;
+        let currentCapturedBlob = null;
         let globalClickSequence = 0;
         let pendingWinningTeamId = null;
         let isEndMatchLocked = true; // Default locked
@@ -465,7 +497,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v88');
+                const localData = localStorage.getItem('wesma_local_backup_v87');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -502,7 +534,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v88');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v87');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -554,7 +586,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v88');
+            localStorage.removeItem('wesma_local_backup_v87');
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.remove("hidden");
         }
@@ -567,6 +599,7 @@
             try {
                 const now = audioContext.currentTime;
 
+                // Whistle tone
                 const osc1 = audioContext.createOscillator();
                 const gain1 = audioContext.createGain();
                 osc1.type = 'triangle';
@@ -579,6 +612,7 @@
                 osc1.start(now);
                 osc1.stop(now + 0.3);
 
+                // Chime tone
                 const osc2 = audioContext.createOscillator();
                 const gain2 = audioContext.createGain();
                 osc2.type = 'sine';
@@ -651,7 +685,7 @@
                         }
                         saveLocalBackup();
                     } else {
-                        const localData = localStorage.getItem('wesma_local_backup_v88');
+                        const localData = localStorage.getItem('wesma_local_backup_v87');
                         if (!localData) {
                             teams = JSON.parse(JSON.stringify(defaultTeams));
                             saveData();
@@ -760,7 +794,7 @@
                     tournamentHistory,
                     globalClickSequence
                 };
-                localStorage.setItem('wesma_local_backup_v88', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v87', JSON.stringify(payload));
             } catch(e) {
                 console.log("LocalStorage save error", e);
             }
@@ -1039,28 +1073,6 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        function downloadFinalCardImage() {
-            showToast("📥 ഫൈനൽ കാർഡ് ഡൗൺലോഡ് ചെയ്യപ്പെടുന്നു...");
-            const modalContent = document.querySelector("#finish-match-modal .bg-slate-900");
-            if (!modalContent) return;
-
-            html2canvas(modalContent, {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: "#030712",
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL("image/png");
-                link.download = 'WESMA_Tournament_Final_Card.png';
-                link.click();
-                showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
-            }).catch(err => {
-                console.error("Download error:", err);
-                showToast("⚠️ ഡൗൺലോഡ് ചെയ്യുന്നതിൽ തടസ്സമുണ്ടായി.");
-            });
-        }
-
         function startCooldownTickers() {
             if (cooldownInterval) clearInterval(cooldownInterval);
             cooldownInterval = setInterval(() => {
@@ -1091,7 +1103,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -1224,7 +1236,7 @@
                     saveData();
                     render();
 
-                    showToast("⚠️ സ്കോർ കുറച്ചു! എന്തെങ്കിലും തെറ്റായി സംഭവിച്ചിട്ടുണ്ടെങ്കിൽ 'മാറ്റുക (Undo)' ബട്ടൺ ഉപയോഗിക്കുക.");
+                    showToastWithUndo(`⚠️ ${team.name} സ്കോർ കുറച്ചു!`);
                 } else {
                     showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
                 }
@@ -1297,12 +1309,12 @@
 
             triggerWinCelebration();
 
-            showToast(`🏆 ${team.name} Won (${intervalMinutes}m gap)!\n❌ ${defeatedTeam.name} Lost. (അറിയാതെ സംഭവിച്ചവ മാറ്റാൻ 'മാറ്റുക' ഉപയോഗിക്കുക)`);
+            showToastWithUndo(`🏆 ${team.name} Won (${intervalMinutes}m gap)!\n❌ ${defeatedTeam.name} Lost`);
         }
 
         function undoLastAction() {
             if (!lastActionSnapshot) {
-                showToast("⚠️ മാറ്റാൻ കഴിഞ്ഞ ഡാറ്റ ലഭ്യമല്ല (നേരത്തെ മാറ്റങ്ങൾ ഒന്നും ചെയ്തിട്ടില്ല)!");
+                showToast("⚠️ മാറ്റാൻ കഴിഞ്ഞ ഡാറ്റ ലഭ്യമല്ല!");
                 return;
             }
             triggerHapticFeedback([50]);
@@ -1310,7 +1322,7 @@
             lastActionSnapshot = null;
             saveData();
             render();
-            showToast("🔄 അവസാന പ്രവർത്തനം വിജയകരമായി മാറ്റിവെച്ചു (Undo Successful)!");
+            showToast("🔄 അവസാന പ്രവർത്തനം മാറ്റിവെച്ചു (Undo Successful)!");
         }
 
         function openCustomNameModal(id, currentName) {
@@ -1436,7 +1448,11 @@
 
         function proceedWhatsAppShare(type) {
             closeWhatsAppChoiceModal();
-            shareWhatsAppText(type);
+            if (currentShareMode === 'text') {
+                shareWhatsAppText(type);
+            } else {
+                generateAndShareImage(type);
+            }
         }
 
         function shareWhatsAppText(type) {
@@ -1462,6 +1478,79 @@
             window.open(url, '_blank');
         }
 
+        function generateAndShareImage(type) {
+            showToast("📸 പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
+            const captureElement = document.getElementById("capture-area");
+            const shareHeader = document.getElementById("share-header-banner");
+            const previewModal = document.getElementById("preview-modal");
+            const previewContainer = document.getElementById("preview-container");
+            const downloadBtn = document.getElementById("download-img-btn");
+            const shareBtn = document.getElementById("share-img-btn");
+            
+            if (shareHeader) shareHeader.style.display = "none";
+
+            html2canvas(captureElement, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: "#030712",
+                logging: false,
+                letterRendering: true,
+                scrollX: 0,
+                scrollY: 0,
+                width: captureElement.scrollWidth,
+                height: captureElement.scrollHeight,
+                windowWidth: captureElement.scrollWidth,
+                windowHeight: captureElement.scrollHeight
+            }).then(canvas => {
+                if (shareHeader) shareHeader.style.display = "block";
+
+                previewContainer.innerHTML = "";
+                const previewImg = document.createElement('img');
+                previewImg.src = canvas.toDataURL("image/png");
+                previewImg.className = "rounded-lg w-full object-contain shadow-lg border border-slate-800";
+                previewContainer.appendChild(previewImg);
+                previewModal.classList.remove("hidden");
+
+                canvas.toBlob(blob => {
+                    currentCapturedBlob = blob;
+                    const fileUrl = URL.createObjectURL(blob);
+                    
+                    downloadBtn.onclick = function() {
+                        const link = document.createElement('a');
+                        link.href = fileUrl;
+                        link.download = 'WESMA_Match_Card.png';
+                        link.click();
+                        showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
+                    };
+
+                    shareBtn.onclick = function() {
+                        if (navigator.share && currentCapturedBlob) {
+                            const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
+                            navigator.share({
+                                title: 'WESMA BADMINTON SCORECARD',
+                                text: '🏸 WESMA Badminton Club - Match Scorecard',
+                                files: [file]
+                            }).catch(err => console.log('Share error', err));
+                        } else {
+                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
+                            let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                        }
+                    };
+
+                });
+            }).catch(err => {
+                if (shareHeader) shareHeader.style.display = "block";
+                console.error("Image generation error:", err);
+                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
+            });
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById("preview-modal");
+            if(modal) modal.classList.add("hidden");
+        }
+
         function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -1478,8 +1567,11 @@
         let toastTimeout = null;
         function showToast(text) {
             const toast = document.getElementById("toast");
-            if(!toast) return;
-            toast.innerText = text;
+            const toastText = document.getElementById("toast-text");
+            const undoContainer = document.getElementById("toast-undo-container");
+            if(!toast || !toastText) return;
+            toastText.innerText = text;
+            if(undoContainer) undoContainer.classList.add("hidden");
             toast.style.opacity = "1";
             toast.style.transform = "translate(-50%, -50%) scale(1)";
             toast.style.pointerEvents = "auto";
@@ -1487,7 +1579,24 @@
             if (toastTimeout) clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 dismissToast();
-            }, 6000);
+            }, 5000);
+        }
+
+        function showToastWithUndo(text) {
+            const toast = document.getElementById("toast");
+            const toastText = document.getElementById("toast-text");
+            const undoContainer = document.getElementById("toast-undo-container");
+            if(!toast || !toastText) return;
+            toastText.innerText = text;
+            if(undoContainer) undoContainer.classList.remove("hidden");
+            toast.style.opacity = "1";
+            toast.style.transform = "translate(-50%, -50%) scale(1)";
+            toast.style.pointerEvents = "auto";
+            
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                dismissToast();
+            }, 8000);
         }
 
         function dismissToast() {
