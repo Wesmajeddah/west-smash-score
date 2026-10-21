@@ -153,6 +153,97 @@
         .reset-anim {
             animation: resetFlash 0.6s ease-in-out;
         }
+
+        /* REALISTIC DANCING PLAYERS ANIMATION STYLES */
+        .dance-stage {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            background: radial-gradient(circle at bottom, #1e293b 0%, #020617 80%);
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .spotlight {
+            position: absolute;
+            top: -20%;
+            width: 80px;
+            height: 200px;
+            background: linear-gradient(180deg, rgba(245,158,11,0.4) 0%, rgba(255,255,255,0) 100%);
+            transform: rotate(-15deg);
+            animation: spotlightMove 4s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+        .spotlight-right {
+            right: 10%;
+            transform: rotate(15deg);
+            animation: spotlightMoveRight 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes spotlightMove {
+            0% { transform: rotate(-25deg); opacity: 0.3; }
+            100% { transform: rotate(10deg); opacity: 0.8; }
+        }
+        @keyframes spotlightMoveRight {
+            0% { transform: rotate(25deg); opacity: 0.3; }
+            100% { transform: rotate(-10deg); opacity: 0.8; }
+        }
+
+        /* Realistic Human Player SVG Rig */
+        .human-player {
+            position: absolute;
+            bottom: 12px;
+            width: 65px;
+            height: 110px;
+            transform-origin: bottom center;
+        }
+
+        .player-1 {
+            left: 20%;
+            animation: runAndDanceLeft 5s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        .player-2 {
+            right: 20%;
+            animation: runAndDanceRight 5.5s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        @keyframes runAndDanceLeft {
+            0% { left: 10%; transform: scaleX(1) translateY(0); }
+            20% { left: 40%; transform: scaleX(1) translateY(-12px) rotate(5deg); }
+            35% { left: 60%; transform: scaleX(-1) translateY(0) rotate(-8deg); }
+            50% { left: 35%; transform: scaleX(-1) translateY(-18px) rotate(10deg); }
+            70% { left: 15%; transform: scaleX(1) translateY(-5px) rotate(-5deg); }
+            85% { left: 45%; transform: scaleX(1) translateY(-15px) rotate(8deg); }
+            100% { left: 10%; transform: scaleX(1) translateY(0); }
+        }
+
+        @keyframes runAndDanceRight {
+            0% { right: 10%; transform: scaleX(1) translateY(0); }
+            25% { right: 45%; transform: scaleX(1) translateY(-15px) rotate(-8deg); }
+            40% { right: 65%; transform: scaleX(-1) translateY(0) rotate(6deg); }
+            60% { right: 30%; transform: scaleX(-1) translateY(-20px) rotate(-12deg); }
+            80% { right: 15%; transform: scaleX(1) translateY(-8px) rotate(5deg); }
+            100% { right: 10%; transform: scaleX(1) translateY(0); }
+        }
+
+        /* Body parts limb dancing keyframes */
+        .torso { transform-origin: bottom center; animation: torsoSway 0.6s infinite alternate ease-in-out; }
+        .head { transform-origin: bottom center; animation: headBop 0.4s infinite alternate ease-in-out; }
+        .arm-left { transform-origin: top left; animation: armDanceL 0.5s infinite alternate ease-in-out; }
+        .arm-right { transform-origin: top right; animation: armDanceR 0.5s infinite alternate ease-in-out; }
+        .leg-left { transform-origin: top center; animation: legDanceL 0.4s infinite alternate ease-in-out; }
+        .leg-right { transform-origin: top center; animation: legDanceR 0.4s infinite alternate ease-in-out; }
+
+        @keyframes torsoSway { 0% { transform: rotate(-4deg); } 100% { transform: rotate(6deg); } }
+        @keyframes headBop { 0% { transform: translateY(0) rotate(-3deg); } 100% { transform: translateY(-3px) rotate(3deg); } }
+        @keyframes armDanceL { 0% { transform: rotate(-40deg); } 100% { transform: rotate(70deg); } }
+        @keyframes armDanceR { 0% { transform: rotate(60deg); } 100% { transform: rotate(-50deg); } }
+        @keyframes legDanceL { 0% { transform: rotate(-25deg); } 100% { transform: rotate(30deg); } }
+        @keyframes legDanceR { 0% { transform: rotate(25deg); } 100% { transform: rotate(-30deg); } }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
@@ -199,15 +290,13 @@
             <div id="teams-list" class="space-y-2.5"></div>
 
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="flex items-center justify-between px-2.5 py-1.5 bg-slate-950 rounded-lg border border-amber-500/20">
-                        <span class="text-[11px] font-light text-slate-300">Team Matches:</span>
-                        <span id="total-play-val" class="text-amber-400 font-bold text-xs">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-2.5 py-1.5 bg-slate-950 rounded-lg border border-cyan-500/20">
-                        <span class="text-[11px] font-light text-slate-300">Player Matches:</span>
-                        <span id="total-player-play-val" class="text-cyan-400 font-bold text-xs">0</span>
-                    </div>
+                <div class="flex items-center justify-between px-2 py-1 bg-slate-950 rounded-lg border border-amber-500/20">
+                    <span class="text-xs font-light text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
+                    </span>
+                    <span id="total-play-val" class="text-amber-400 font-semibold text-xs bg-slate-950 px-3 py-0.5 rounded-lg min-w-[45px] text-center shadow-inner">
+                        0
+                    </span>
                 </div>
                 
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
@@ -293,7 +382,7 @@
         </div>
     </div>
 
-    <!-- Defeated Team Selection Modal (Redesigned with larger cards & padding) -->
+    <!-- Defeated Team Selection Modal (Redesigned Interface) -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
             <div class="w-12 h-12 mx-auto bg-rose-500/15 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/40 text-base shadow-md">
@@ -310,7 +399,7 @@
         </div>
     </div>
 
-    <!-- Special End Match Modal Window -->
+    <!-- Special End Match Modal Window with Realistic Dancing Champion Animation -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
@@ -446,7 +535,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v95');
+                const localData = localStorage.getItem('wesma_local_backup_v96');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -478,7 +567,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v95');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v96');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -531,7 +620,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v95');
+            localStorage.removeItem('wesma_local_backup_v96');
             const gate = document.getElementById("startup-gate");
             if(gate) {
                 gate.style.display = "flex";
@@ -544,29 +633,20 @@
             if (!audioContext) return;
             try {
                 const now = audioContext.currentTime;
-                const osc1 = audioContext.createOscillator();
-                const gain1 = audioContext.createGain();
-                osc1.type = 'triangle';
-                osc1.frequency.setValueAtTime(2600, now);
-                osc1.frequency.setValueAtTime(3000, now + 0.1);
-                gain1.gain.setValueAtTime(0.3, now);
-                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc1.connect(gain1);
-                gain1.connect(audioContext.destination);
-                osc1.start(now);
-                osc1.stop(now + 0.3);
-
-                const osc2 = audioContext.createOscillator();
-                const gain2 = audioContext.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(523.25, now);
-                osc2.frequency.setValueAtTime(783.99, now + 0.15);
-                gain2.gain.setValueAtTime(0.4, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-                osc2.connect(gain2);
-                gain2.connect(audioContext.destination);
-                osc2.start(now);
-                osc2.stop(now + 0.7);
+                // Upbeat Celebration Music Melody Synthesizer
+                const notes = [523.25, 659.25, 783.99, 1046.50, 880.00, 1046.50];
+                notes.forEach((freq, index) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + index * 0.12);
+                    gain.gain.setValueAtTime(0.2, now + index * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.12 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now + index * 0.12);
+                    osc.stop(now + index * 0.12 + 0.25);
+                });
             } catch(e) {
                 console.log("Audio error", e);
             }
@@ -670,15 +750,10 @@
             return teams.reduce((sum, team) => sum + (team.played || 0), 0);
         }
 
-        function calculateTotalPlayerPlays() {
-            // Since 4 players participate in each match (2 vs 2), total player match appearances = team matches * 2
-            return calculateTotalPlays() * 2;
-        }
-
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v95', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v96', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -880,16 +955,95 @@
                 `;
             });
 
+            // Realistic Animated Human Players Stage SVG
+            const dancingPlayersStageHtml = `
+                <div class="dance-stage my-2">
+                    <div class="spotlight"></div>
+                    <div class="spotlight spotlight-right"></div>
+                    
+                    <!-- Player 1 (Real Human Badminton Player Vector) -->
+                    <div class="human-player player-1">
+                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow-lg">
+                            <g class="torso">
+                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
+                                <text x="50" y="85" font-size="10" font-weight="bold" fill="#000" text-anchor="middle">1</text>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
+                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
+                                    <circle cx="46" cy="42" r="1.5" fill="#000" />
+                                    <circle cx="54" cy="42" r="1.5" fill="#000" />
+                                    <path d="M 45 48 Q 50 53 55 48" stroke="#000" stroke-width="1.5" fill="none" />
+                                </g>
+                                <g class="arm-left">
+                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <!-- Badminton Racket -->
+                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="arm-right">
+                                    <path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
+                                </g>
+                                <g class="leg-left">
+                                    <path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" />
+                                    <ellipse cx="24" cy="157" rx="8" ry="4" fill="#fff" />
+                                </g>
+                                <g class="leg-right">
+                                    <path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" />
+                                    <ellipse cx="76" cy="157" rx="8" ry="4" fill="#fff" />
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- Player 2 (Real Human Badminton Player Vector) -->
+                    <div class="human-player player-2">
+                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow-lg">
+                            <g class="torso">
+                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
+                                <text x="50" y="85" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
+                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
+                                    <circle cx="46" cy="42" r="1.5" fill="#000" />
+                                    <circle cx="54" cy="42" r="1.5" fill="#000" />
+                                    <path d="M 45 48 Q 50 53 55 48" stroke="#000" stroke-width="1.5" fill="none" />
+                                </g>
+                                <g class="arm-left">
+                                    <path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
+                                </g>
+                                <g class="arm-right">
+                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <!-- Badminton Racket -->
+                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="leg-left">
+                                    <path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" />
+                                    <ellipse cx="21" cy="154" rx="8" ry="4" fill="#fff" />
+                                </g>
+                                <g class="leg-right">
+                                    <path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" />
+                                    <ellipse cx="79" cy="154" rx="8" ry="4" fill="#fff" />
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2 text-center relative overflow-hidden">
                     <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        ✨ TOURNAMENT CHAMPIONS ✨
+                        ✨ TOURNAMENT CHAMPIONS DANCE CELEBRATION ✨
                     </div>
+                    
+                    ${dancingPlayersStageHtml}
+
                     <div class="text-base font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
                     <div class="text-xs text-slate-300 font-light pt-1 border-t border-amber-500/30">
-                        Team Matches: <b class="text-white">${calculateTotalPlays()}</b> | Player Matches: <b class="text-cyan-300">${calculateTotalPlayerPlays()}</b> | Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
+                        Total Plays: <b class="text-white">${calculateTotalPlays()}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
                     </div>
                 </div>
                 <div class="space-y-1 text-left pt-1">
@@ -1047,9 +1201,7 @@
             });
             
             const totalPlayEl = document.getElementById("total-play-val");
-            const totalPlayerPlayEl = document.getElementById("total-player-play-val");
             if(totalPlayEl) totalPlayEl.textContent = calculateTotalPlays();
-            if(totalPlayerPlayEl) totalPlayerPlayEl.textContent = calculateTotalPlayerPlays();
             updateLeaderboard();
         }
 
@@ -1319,7 +1471,7 @@
             });
 
             text += `🏆 *Champions:* ${sorted[0].wins > 0 ? sorted[0].name : 'Pending'}\n`;
-            text += `👥 *Total Matches:* ${calculateTotalPlays()} (Player Matches: ${calculateTotalPlayerPlays()})\n`;
+            text += `⚡ *Total Matches:* ${calculateTotalPlays()}\n`;
             text += `📅 *Date:* ${new Date().toLocaleDateString('en-GB')}`;
 
             let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
