@@ -154,30 +154,26 @@
             animation: spinReset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* SPECIAL BORDER & GLOW ANIMATION FOR RESET BUTTON */
-        .special-reset-border {
-            border: 1.5px solid rgba(244, 63, 94, 0.8);
-            box-shadow: 0 0 10px rgba(244, 63, 94, 0.3);
-            animation: resetButtonPulse 2.5s infinite ease-in-out;
+        @keyframes resetBtnGlow {
+            0%, 100% { box-shadow: 0 0 8px rgba(225, 29, 72, 0.3), inset 0 0 5px rgba(225, 29, 72, 0.2); }
+            50% { box-shadow: 0 0 16px rgba(225, 29, 72, 0.7), inset 0 0 10px rgba(225, 29, 72, 0.4); border-color: rgba(244, 63, 94, 0.8); }
         }
-        @keyframes resetButtonPulse {
-            0%, 100% { 
-                border-color: rgba(244, 63, 94, 0.6); 
-                box-shadow: 0 0 8px rgba(244, 63, 94, 0.25);
-            }
-            50% { 
-                border-color: rgba(251, 113, 133, 1); 
-                box-shadow: 0 0 16px rgba(244, 63, 94, 0.65);
-            }
+        .reset-btn-animated {
+            border: 1.5px solid rgba(225, 29, 72, 0.5);
+            animation: resetBtnGlow 2.5s infinite ease-in-out;
         }
 
-        /* LIVE MATCH PULSING BADGE */
-        .live-pulse-badge {
-            animation: liveBadgePulse 1.5s infinite ease-in-out;
+        @keyframes liveDotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(239, 68, 68, 0.9); }
+            50% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 12px rgba(239, 68, 68, 1); }
         }
-        @keyframes liveBadgePulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.08); opacity: 0.85; }
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: liveDotPulse 1.2s infinite ease-in-out;
         }
 
         .dance-stage-compact {
@@ -294,16 +290,15 @@
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
-            <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
-                <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
-            </span>
             <div class="flex items-center gap-2">
-                <!-- LIVE MATCH INDICATOR -->
-                <span class="live-pulse-badge text-[8px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-extrabold tracking-wider flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span> LIVE
+                <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
+                    <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
                 </span>
-                <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
+                <span class="bg-rose-950/80 border border-rose-500/50 text-rose-300 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider">
+                    <span class="live-dot"></span> LIVE
+                </span>
             </div>
+            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
         </div>
 
         <!-- Header Banner -->
@@ -373,13 +368,12 @@
 
     <!-- Match Controls & Compact Summary Above End Match -->
     <div class="w-full max-w-xl pt-2 space-y-2">
-        <!-- Compact Match Stats & Summary Option Relocated Here -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 shadow-md flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie text-amber-400 text-sm"></i>
                 <div>
                     <div class="text-xs font-bold text-amber-300">MATCH STATS & SUMMARY</div>
-                    <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ സമയം, തോൽപ്പിച്ച ഡീറ്റെയിൽസ്</div>
+                    <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ</div>
                 </div>
             </div>
             <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
@@ -415,8 +409,7 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-            <!-- SPECIAL BORDER & ANIMATED RESET BUTTON -->
-            <button id="reset-btn-el" onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-rose-300 font-bold py-2.5 px-1 rounded-xl special-reset-border flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md cursor-pointer">
+            <button id="reset-btn-el" onclick="resetScores()" class="w-full bg-slate-900 hover:bg-rose-950/80 text-rose-200 font-bold py-2.5 px-1 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all active:scale-95 shadow-md cursor-pointer reset-btn-animated">
                 <i id="reset-icon-el" class="fa-solid fa-rotate-right text-rose-400"></i> റീസെറ്റ്
             </button>
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
@@ -425,7 +418,7 @@
         </div>
     </div>
 
-    <!-- Match Stats & Summary Modal Window -->
+    <!-- Match Stats & Summary Modal Window with Head-to-Head Stats -->
     <div id="time-summary-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
@@ -434,7 +427,7 @@
                 </h3>
                 <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="modal-time-summary-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
+            <div id="modal-time-summary-content" class="p-3 space-y-2 overflow-y-auto flex-1"></div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeTimeSummaryModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-4 py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
@@ -564,11 +557,11 @@
         const ADMIN_PIN = "1234";
         
         const defaultTeams = [
-            { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], lostDetails: [] },
-            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], lostDetails: [] },
-            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], lostDetails: [] },
-            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], lostDetails: [] },
-            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], lostDetails: [] }
+            { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [] },
+            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-blue-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [] },
+            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-emerald-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [] },
+            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-rose-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [] },
+            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-purple-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [] }
         ];
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -591,7 +584,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v101');
+                const localData = localStorage.getItem('wesma_local_backup_v102');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -623,7 +616,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v101');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v102');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -676,14 +669,12 @@
                 t.wins = 0; t.losses = 0; t.played = 0; 
                 t.lastMatchTime = 0; t.lastClickTime = 0; 
                 t.clickOrder = 0; t.matchInterval = 0; 
-                t.totalTimeSpentMinutes = 0; 
-                t.defeatedDetails = [];
-                t.lostDetails = [];
+                t.totalTimeSpentMinutes = 0; t.defeatedDetails = [];
             });
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v101');
+            localStorage.removeItem('wesma_local_backup_v102');
             const gate = document.getElementById("startup-gate");
             if(gate) {
                 gate.style.display = "flex";
@@ -815,7 +806,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v101', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v102', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -869,52 +860,75 @@
             }
         }
 
-        /* Format Defeated Team Records with Time Duration */
-        function formatDefeatedDetailsWithTime(detailsList) {
-            if (!detailsList || detailsList.length === 0) return "ആരെയും തോൽപ്പിച്ചിട്ടില്ല";
+        function formatDefeatedTeamsWithDetailedTime(defeatedList) {
+            if (!defeatedList || defeatedList.length === 0) return "ആരെയും തോൽപ്പിച്ചിട്ടില്ല";
             
-            const groupMap = {};
-            detailsList.forEach(item => {
-                let name = typeof item === 'string' ? item : item.name;
-                let mins = typeof item === 'object' ? item.duration : 0;
-                
-                if (!groupMap[name]) {
-                    groupMap[name] = { count: 0, totalMins: 0 };
+            const grouped = {};
+            defeatedList.forEach(item => {
+                const name = item.name;
+                const duration = item.durationMinutes || 1;
+                if (!grouped[name]) {
+                    grouped[name] = { count: 0, times: [] };
                 }
-                groupMap[name].count += 1;
-                groupMap[name].totalMins += mins;
+                grouped[name].count += 1;
+                grouped[name].times.push(`${duration}m`);
             });
 
-            return Object.entries(groupMap).map(([name, data]) => {
+            return Object.entries(grouped).map(([name, data]) => {
+                const timesStr = data.times.join(", ");
                 if (data.count > 1) {
-                    return `${name} (${data.count} പ്രാവശ്യം - ${data.totalMins}m)`;
+                    return `${name} (${data.count} പ്രാവശ്യം - സമയം: ${timesStr})`;
                 }
-                return `${name} (${data.totalMins}m)`;
-            }).join(", ");
+                return `${name} (${timesStr})`;
+            }).join(" • ");
         }
 
-        /* Format Lost Match Records with Time Duration */
-        function formatLostDetailsWithTime(detailsList) {
-            if (!detailsList || detailsList.length === 0) return "തോൽവികൾ ഇല്ല";
-            
-            const groupMap = {};
-            detailsList.forEach(item => {
-                let name = typeof item === 'string' ? item : item.name;
-                let mins = typeof item === 'object' ? item.duration : 0;
-                
-                if (!groupMap[name]) {
-                    groupMap[name] = { count: 0, totalMins: 0 };
+        /* Calculate Head-to-Head Max Defeated & Max Loss Opponent */
+        function getHeadToHeadSummary(team) {
+            if (!team.defeatedDetails || team.defeatedDetails.length === 0) {
+                return { maxDefeated: null, maxLossAgainst: null };
+            }
+
+            // Count how many times this team defeated each opponent
+            const defCounts = {};
+            team.defeatedDetails.forEach(item => {
+                defCounts[item.name] = (defCounts[item.name] || 0) + 1;
+            });
+            let maxDefName = null;
+            let maxDefCount = 0;
+            for (let [name, count] of Object.entries(defCounts)) {
+                if (count > maxDefCount) {
+                    maxDefCount = count;
+                    maxDefName = name;
                 }
-                groupMap[name].count += 1;
-                groupMap[name].totalMins += mins;
+            }
+
+            // Count how many times this team was defeated BY each opponent across all teams
+            // (Or check matches where opponents defeated this team)
+            const lossCounts = {};
+            teams.forEach(otherTeam => {
+                if (otherTeam.id !== team.id && otherTeam.defeatedDetails) {
+                    otherTeam.defeatedDetails.forEach(item => {
+                        if (item.name === team.name) {
+                            lossCounts[otherTeam.name] = (lossCounts[otherTeam.name] || 0) + 1;
+                        }
+                    });
+                }
             });
 
-            return Object.entries(groupMap).map(([name, data]) => {
-                if (data.count > 1) {
-                    return `${name} (${data.count} പ്രാവശ്യം - ${data.totalMins}m)`;
+            let maxLossName = null;
+            let maxLossCount = 0;
+            for (let [name, count] of Object.entries(lossCounts)) {
+                if (count > maxLossCount) {
+                    maxLossCount = count;
+                    maxLossName = name;
                 }
-                return `${name} (${data.totalMins}m)`;
-            }).join(", ");
+            }
+
+            return {
+                maxDefeated: maxDefName ? `${maxDefName} (${maxDefCount} പ്രാവശ്യം)` : null,
+                maxLossAgainst: maxLossName ? `${maxLossName} (${maxLossCount} പ്രാവശ്യം)` : null
+            };
         }
 
         /* Match Stats & Summary Modal Open Function */
@@ -926,20 +940,23 @@
 
             let html = "";
             teams.forEach(t => {
-                let defeatedFormatted = formatDefeatedDetailsWithTime(t.defeatedDetails);
-                let lostFormatted = formatLostDetailsWithTime(t.lostDetails);
+                let defeatedFormatted = formatDefeatedTeamsWithDetailedTime(t.defeatedDetails);
                 let mins = t.totalTimeSpentMinutes || 0;
+                let h2h = getHeadToHeadSummary(t);
                 
                 html += `
                     <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 space-y-1.5 shadow">
                         <div class="flex items-center justify-between text-xs font-bold text-slate-100">
                             <span>${escapeHtml(t.name)}</span>
-                            <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"><i class="fa-solid fa-clock text-[9px] mr-1"></i>${mins} Mins</span>
+                            <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"><i class="fa-solid fa-clock text-[9px] mr-1"></i>ആകെ സമയം: ${mins} Mins</span>
                         </div>
                         <div class="text-[11px] text-slate-400 font-light space-y-1 pt-1 border-t border-slate-900">
-                            <div>തോൽപ്പിച്ച ടീമുകൾ (സമയം): <b class="text-emerald-400 font-medium">${escapeHtml(defeatedFormatted)}</b></div>
-                            <div>പരാജയപ്പെടുത്തിയവർ (സമയം): <b class="text-rose-400 font-medium">${escapeHtml(lostFormatted)}</b></div>
-                            <div class="flex justify-between text-[10px] text-slate-500 pt-0.5">
+                            <div>തോൽപ്പിച്ച ടീമുകളും സമയവും: <br/><b class="text-emerald-400 font-medium leading-relaxed">${escapeHtml(defeatedFormatted)}</b></div>
+                            <div class="pt-1 border-t border-slate-900/60 space-y-0.5">
+                                <div>🔥 ഏറ്റവും കൂടുതൽ തോൽപ്പിച്ചത്: <b class="text-amber-300">${h2h.maxDefeated ? escapeHtml(h2h.maxDefeated) : 'ലഭ്യമല്ല'}</b></div>
+                                <div>⚠️ ഏറ്റവും കൂടുതൽ തോറ്റത് ആർക്കെതിരെ: <b class="text-rose-400">${h2h.maxLossAgainst ? escapeHtml(h2h.maxLossAgainst) : 'ലഭ്യമല്ല'}</b></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-900/60">
                                 <span>വിൻ സ്കോർ: ${t.wins}</span>
                                 <span>തോൽവി: ${t.losses || 0}</span>
                                 <span>ആകെ കളികൾ: ${t.played || 0}</span>
@@ -1364,7 +1381,6 @@
             }
         }
 
-        /* Larger Team Buttons with Spacing to Prevent Accidental Touches */
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
@@ -1410,10 +1426,10 @@
             defeatedTeam.totalTimeSpentMinutes = (defeatedTeam.totalTimeSpentMinutes || 0) + intervalMinutes;
 
             if (!team.defeatedDetails) team.defeatedDetails = [];
-            team.defeatedDetails.push({ name: defeatedTeam.name, duration: intervalMinutes });
-
-            if (!defeatedTeam.lostDetails) defeatedTeam.lostDetails = [];
-            defeatedTeam.lostDetails.push({ name: team.name, duration: intervalMinutes });
+            team.defeatedDetails.push({
+                name: defeatedTeam.name,
+                durationMinutes: intervalMinutes
+            });
 
             globalClickSequence += 1;
             team.clickOrder = globalClickSequence;
