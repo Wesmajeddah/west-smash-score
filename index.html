@@ -99,7 +99,6 @@
             50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.8), inset 0 0 18px rgba(245, 158, 11, 0.4); }
         }
 
-        /* Smaller Badge Sizes */
         .rank-badge {
             display: inline-flex !important;
             align-items: center !important;
@@ -146,7 +145,6 @@
             font-weight: 700;
         }
 
-        /* Spinning Reset Animation */
         @keyframes spinReset {
             0% { transform: rotate(0deg) scale(1); filter: brightness(1); }
             50% { transform: rotate(180deg) scale(0.92); filter: brightness(1.8) hue-rotate(120deg); }
@@ -156,7 +154,6 @@
             animation: spinReset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Compact Dancing Animation */
         .dance-stage-compact {
             position: relative;
             width: 100%;
@@ -313,12 +310,18 @@
                 </div>
             </div>
 
-            <!-- Daily Team Match Duration & Defeated Teams Summary Chart -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-md space-y-2">
-                <div class="text-xs font-bold text-amber-300 uppercase tracking-wide flex items-center gap-1.5 border-b border-slate-800 pb-1.5">
-                    <i class="fa-solid fa-chart-pie text-amber-400"></i> DAILY SUMMARY & TIME TRACKER
+            <!-- Compact Time Summary Button Box -->
+            <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 shadow-md flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-400 text-sm"></i>
+                    <div>
+                        <div class="text-xs font-bold text-amber-300">TIME SUMMARY</div>
+                        <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ പ്ലേ ടൈമും ഫലങ്ങളും</div>
+                    </div>
                 </div>
-                <div id="daily-summary-chart" class="space-y-1.5 text-xs"></div>
+                <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-eye"></i> കാണുക
+                </button>
             </div>
 
             <!-- Leaderboard Summary Section -->
@@ -386,6 +389,22 @@
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
                 <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
             </button>
+        </div>
+    </div>
+
+    <!-- Time Summary Modal Window -->
+    <div id="time-summary-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="text-xs font-bold text-amber-300 flex items-center gap-2 uppercase">
+                    <i class="fa-solid fa-chart-pie text-amber-400"></i> Daily Time Summary & Results
+                </h3>
+                <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="modal-time-summary-content" class="p-3 space-y-2 overflow-y-auto flex-1"></div>
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
+                <button onclick="closeTimeSummaryModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-4 py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
+            </div>
         </div>
     </div>
 
@@ -536,7 +555,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v98');
+                const localData = localStorage.getItem('wesma_local_backup_v99');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -568,7 +587,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v98');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v99');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -626,7 +645,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v98');
+            localStorage.removeItem('wesma_local_backup_v99');
             const gate = document.getElementById("startup-gate");
             if(gate) {
                 gate.style.display = "flex";
@@ -758,7 +777,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v98', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v99', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -770,7 +789,6 @@
                 });
             }
             updateLeaderboard();
-            renderDailySummaryChart();
         }
 
         function autoSaveToHistory() {
@@ -811,6 +829,45 @@
             } else {
                 summaryEl.textContent = `സെഷൻ റെക്കോർഡുകൾ.`;
             }
+        }
+
+        /* Time Summary Modal Functions */
+        function openTimeSummaryModal() {
+            triggerHapticFeedback([30]);
+            const modal = document.getElementById("time-summary-modal");
+            const container = document.getElementById("modal-time-summary-content");
+            if (!modal || !container) return;
+
+            let html = "";
+            teams.forEach(t => {
+                let defeatedStr = (t.defeatedTeams && t.defeatedTeams.length > 0) ? t.defeatedTeams.join(", ") : "ആരെയും തോൽപ്പിച്ചിട്ടില്ല";
+                let mins = t.totalTimeSpentMinutes || 0;
+                
+                html += `
+                    <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5 shadow">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-100">
+                            <span>${escapeHtml(t.name)}</span>
+                            <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"><i class="fa-solid fa-clock text-[9px] mr-1"></i>${mins} Mins</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400 font-light space-y-1 pt-1 border-t border-slate-900">
+                            <div>തോൽപ്പിച്ച ടീമുകൾ: <b class="text-emerald-400 font-medium">${escapeHtml(defeatedStr)}</b></div>
+                            <div class="flex justify-between text-[10px] text-slate-500">
+                                <span>വിൻ സ്കോർ: ${t.wins}</span>
+                                <span>തോൽവി: ${t.losses || 0}</span>
+                                <span>ആകെ കളികൾ: ${t.played || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            modal.classList.remove("hidden");
+        }
+
+        function closeTimeSummaryModal() {
+            const modal = document.getElementById("time-summary-modal");
+            if (modal) modal.classList.add("hidden");
         }
 
         function openHistoryModal() {
@@ -1076,32 +1133,6 @@
             }, 500);
         }
 
-        function renderDailySummaryChart() {
-            const chartEl = document.getElementById("daily-summary-chart");
-            if (!chartEl) return;
-
-            let html = "";
-            teams.forEach(t => {
-                let defeatedStr = (t.defeatedTeams && t.defeatedTeams.length > 0) ? t.defeatedTeams.join(", ") : "ആരെയും തോൽപ്പിച്ചിട്ടില്ല";
-                let mins = t.totalTimeSpentMinutes || 0;
-                
-                html += `
-                    <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-2 space-y-1">
-                        <div class="flex items-center justify-between text-[11px] font-semibold text-slate-200">
-                            <span>${escapeHtml(t.name)}</span>
-                            <span class="text-amber-400 font-bold"><i class="fa-solid fa-clock text-[9px] mr-1"></i>${mins} Mins</span>
-                        </div>
-                        <div class="text-[10px] text-slate-400 font-light flex items-center justify-between">
-                            <span class="truncate max-w-[220px]">തോൽപ്പിച്ചവ: <b class="text-emerald-400 font-normal">${escapeHtml(defeatedStr)}</b></span>
-                            <span class="text-slate-500">${t.wins}W - ${t.losses || 0}L</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            chartEl.innerHTML = html;
-        }
-
         function render() {
             const container = document.getElementById("teams-list");
             if(!container) return;
@@ -1140,7 +1171,6 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
-                /* Reduced Badge Sizes */
                 if (isWinner) {
                     extraCardClass = "winner-card";
                     specialBadgeHtml = `<span class="rank-badge bg-amber-400 text-slate-950 shadow-sm"><i class="fa-solid fa-crown text-[6px] mr-0.5"></i>1st</span>`;
@@ -1209,7 +1239,6 @@
             const totalPlayEl = document.getElementById("total-play-val");
             if(totalPlayEl) totalPlayEl.textContent = calculateTotalPlays();
             updateLeaderboard();
-            renderDailySummaryChart();
         }
 
         function handleScoreChange(id, delta) {
@@ -1247,7 +1276,6 @@
             }
         }
 
-        /* Simplified Defeated Team Selection Modal - Display Names Only */
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
@@ -1289,11 +1317,9 @@
             team.matchInterval = intervalMinutes;
             team.lastMatchTime = intervalMinutes;
             
-            /* Accumulate total playing time spent */
             team.totalTimeSpentMinutes = (team.totalTimeSpentMinutes || 0) + intervalMinutes;
             defeatedTeam.totalTimeSpentMinutes = (defeatedTeam.totalTimeSpentMinutes || 0) + intervalMinutes;
 
-            /* Track defeated team names list */
             if (!team.defeatedTeams) team.defeatedTeams = [];
             team.defeatedTeams.push(defeatedTeam.name);
 
@@ -1495,7 +1521,6 @@
             window.open(url, '_blank');
         }
 
-        /* Reset Button with Spinning Animation */
         function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
