@@ -27,7 +27,6 @@
             font-size: 15px;
         }
         
-        /* Wesma Header Unique Style */
         .wesma-title {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
@@ -151,6 +150,26 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
 
+    <!-- Startup Gate Modal -->
+    <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
+            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
+                <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="96" fill="#D4AF37" />
+                    <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#D4AF37" stroke-width="1.5" />
+                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-sm font-semibold text-amber-300 tracking-wider">WESMA BADMINTON</h2>
+                <p class="text-xs text-slate-400 font-light mt-1 tracking-widest text-amber-200 uppercase">WELCOME TO TOURNAMENT</p>
+            </div>
+            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-semibold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> START TOURNAMENT
+            </button>
+        </div>
+    </div>
+    
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
@@ -159,13 +178,17 @@
             <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
                 <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
             </span>
-            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
+            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider">
+                <!-- Loaded via JS -->
+            </span>
         </div>
 
-        <!-- Header Banner (WESMA Only) -->
+        <!-- Header Banner -->
         <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
             <div class="py-0.5">
-                <div id="header-title-container" class="wesma-title leading-tight"></div>
+                <div id="header-title-container" class="wesma-title leading-tight">
+                    <!-- Rendered by JS -->
+                </div>
             </div>
         </div>
 
@@ -173,7 +196,9 @@
         <div id="main-content-area" class="space-y-2.5">
             
             <!-- Teams List -->
-            <div id="teams-list" class="space-y-2.5"></div>
+            <div id="teams-list" class="space-y-2.5">
+                <!-- Rendered by JS -->
+            </div>
 
             <!-- Total Play Section & Timers -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
@@ -181,7 +206,9 @@
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
                         <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
                     </span>
-                    <span id="total-play-val" class="text-amber-400 font-semibold text-xs bg-slate-950 px-3 py-0.5 rounded-lg border border-amber-500/20 min-w-[45px] text-center shadow-inner">0</span>
+                    <span id="total-play-val" class="text-amber-400 font-semibold text-xs bg-slate-950 px-3 py-0.5 rounded-lg border border-amber-500/20 min-w-[45px] text-center shadow-inner">
+                        0
+                    </span>
                 </div>
                 
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
@@ -233,12 +260,15 @@
     <!-- Outside Capture Area: Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         
-        <!-- Action Options: END MATCH & WhatsApp Share -->
+        <!-- Action Options: END MATCH with Locking System & WhatsApp Share -->
         <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
             <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
-                <i class="fa-solid fa-flag-checkered text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
+                <i id="end-match-lock-icon" class="fa-solid fa-lock text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
             </span>
             <div class="flex items-center gap-1.5">
+                <button onclick="toggleEndMatchLock()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-300 px-2 py-1.5 rounded-lg border border-amber-500/30 flex items-center gap-1 font-semibold" title="Lock/Unlock End Match">
+                    <span id="lock-btn-text">അൺലോക്ക്</span>
+                </button>
                 <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider">
                     <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
                 </button>
@@ -254,7 +284,9 @@
                 <span class="text-xs text-amber-300 flex items-center gap-1 font-semibold">
                     <i class="fa-solid fa-clock-history text-amber-400"></i> HISTORY
                 </span>
-                <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[120px] sm:max-w-[180px]">സെഷൻ റെക്കോർഡുകൾ.</span>
+                <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[120px] sm:max-w-[180px]">
+                    സെഷൻ റെക്കോർഡുകൾ.
+                </span>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1">
@@ -280,10 +312,16 @@
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
             <h3 class="text-sm font-semibold text-amber-300">തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക</h3>
-            <p class="text-xs text-slate-400 font-light">കോർട്ടിൽ പരാജയപ്പെട്ട (പുറത്തുപോകുന്ന) ടീം ഏതാണ്?</p>
-            <div id="defeated-team-options" class="space-y-1.5 pt-1 max-h-48 overflow-y-auto"></div>
+            <p class="text-xs text-slate-400 font-light">കോർട്ടിൽ പരാജയപ്പെട്ട ടീം ഏതാണ്?</p>
+            
+            <div id="defeated-team-options" class="space-y-1.5 pt-1 max-h-48 overflow-y-auto">
+                <!-- Injected dynamically -->
+            </div>
+
             <div class="pt-2">
-                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">റദ്ദാക്കുക</button>
+                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
             </div>
         </div>
     </div>
@@ -291,27 +329,32 @@
     <!-- Special End Match Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
+            
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
-                    <div class="text-[8px] text-amber-300 font-bold tracking-widest mt-0.5">SINCE 2026</div>
                 </div>
-                <div class="flex flex-col text-right justify-center">
-                    <div id="modal-header-date" class="text-[9px] text-slate-300 font-light"></div>
+                <div class="flex flex-col text-right">
+                    <div class="text-[10px] text-amber-300 font-bold tracking-widest">SINCE 2026</div>
+                    <div id="modal-header-date" class="text-[8px] text-slate-400 font-light"></div>
                 </div>
                 <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
-            <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs"></div>
+            <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs">
+                <!-- Content injected dynamically -->
+            </div>
 
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="downloadFinishCardImage()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
+                <button onclick="generateAndShareImage('normal')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-image"></i> പ്രിവ്യൂ കാർഡ്
                 </button>
-                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow">CLOSE</button>
+                <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow">
+                    CLOSE
+                </button>
             </div>
         </div>
     </div>
@@ -324,13 +367,19 @@
             </div>
             <h3 class="text-sm font-semibold text-amber-300">ടീം പേര് മാറ്റുക</h3>
             <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ പേര് നൽകുക</p>
+            
             <div class="space-y-2 pt-1">
                 <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
                 <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര്" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-amber-500 uppercase">
             </div>
+
             <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">റദ്ദാക്കുക</button>
-                <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow">സേവ് ചെയ്യുക</button>
+                <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
+                <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow">
+                    സേവ് ചെയ്യുക
+                </button>
             </div>
         </div>
     </div>
@@ -347,7 +396,34 @@
                 <button onclick="proceedWhatsAppShare('business')" class="w-full bg-teal-800 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
                     <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Business
                 </button>
-                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs">റദ്ദാക്കുക</button>
+                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs">
+                    റദ്ദാക്കുക
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
+            <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-crop text-emerald-400"></i> സ്കോർ കാർഡ് പ്രിവ്യൂ (Full View)
+            </div>
+            <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[48vh] flex items-center justify-center p-2">
+                <!-- Captured Image Preview -->
+            </div>
+            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഗ്രൂപ്പിലേക്ക് ഷെയർ ചെയ്യാം.</div>
+            
+            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                <button onclick="closePreviewModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-[11px]">
+                    അടയ്ക്കുക
+                </button>
+                <button id="download-img-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
+                </button>
+                <button id="share-img-btn" class="bg-cyan-700 hover:bg-cyan-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-share-nodes"></i> ഷെയർ
+                </button>
             </div>
         </div>
     </div>
@@ -363,17 +439,21 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
+            <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
+                <!-- History logs -->
+            </div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
                 <button onclick="clearHistory()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-light py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1">
                     <i class="fa-solid fa-trash-can"></i> ക്ലിയർ ചെയ്യുക
                 </button>
-                <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 rounded-xl text-xs">അടയ്ക്കുക</button>
+                <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 rounded-xl text-xs">
+                    അടയ്ക്കുക
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Prominent Center Pop-up Toast Notification with Undo Option -->
     <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-6 py-5 rounded-2xl text-sm shadow-[0_0_35px_rgba(245,158,11,0.6)] opacity-0 transition-all duration-300 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!</div>
         <div id="toast-undo-container" class="mt-3 pt-2 border-t border-amber-500/30 hidden">
@@ -396,8 +476,8 @@
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
-        let tournamentStartTimestamp = Date.now();
-        let lastActionTimestamp = Date.now();
+        let tournamentStartTimestamp = null;
+        let lastActionTimestamp = null;
         let timerInterval = null;
         let cooldownInterval = null;
         let isFirebaseConnected = false;
@@ -408,21 +488,32 @@
         let currentCapturedBlob = null;
         let globalClickSequence = 0;
         let pendingWinningTeamId = null;
+        let isEndMatchLocked = true;
         let lastActionSnapshot = null;
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v89');
+                const localData = localStorage.getItem('wesma_local_backup_v87');
                 if (localData) {
                     const parsed = JSON.parse(localData);
-                    if (parsed && parsed.teams && parsed.teams.length > 0) {
+                    if (parsed && parsed.teams) {
                         teams = parsed.teams;
-                        tournamentStartTimestamp = parsed.tournamentStartTimestamp || Date.now();
-                        lastActionTimestamp = parsed.lastActionTimestamp || Date.now();
+                        tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
+                        lastActionTimestamp = parsed.lastActionTimestamp || null;
                         tournamentHistory = parsed.tournamentHistory || [];
                         globalClickSequence = parsed.globalClickSequence || 0;
+                        
+                        if (tournamentStartTimestamp) {
+                            const elapsed = Date.now() - tournamentStartTimestamp;
+                            if (elapsed >= 90 * 60 * 1000) {
+                                resetTournamentStateForNewSession();
+                            } else {
+                                const gate = document.getElementById("startup-gate");
+                                if(gate) gate.classList.add("hidden");
+                            }
+                        }
                     }
                 }
             } catch(e) {
@@ -432,6 +523,7 @@
 
         loadLocalBackup();
         renderHeaderTitle();
+        render();
 
         try {
             if (typeof firebase !== 'undefined') {
@@ -440,7 +532,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v89');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v87');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -456,9 +548,7 @@
         function initAudioContext() {
             if (!audioContext) {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtx) {
-                    audioContext = new AudioCtx();
-                }
+                if (AudioCtx) audioContext = new AudioCtx();
             }
             if (audioContext && audioContext.state === 'suspended') {
                 audioContext.resume();
@@ -469,6 +559,32 @@
             if (window.navigator && window.navigator.vibrate) {
                 window.navigator.vibrate(pattern);
             }
+        }
+
+        function launchApp() {
+            initAudioContext();
+            triggerHapticFeedback([40, 60, 40]);
+            const gate = document.getElementById("startup-gate");
+            if(gate) gate.classList.add("hidden");
+            
+            if (!tournamentStartTimestamp || (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000)) {
+                teams.forEach(t => { t.wins = 0; t.losses = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
+                tournamentStartTimestamp = Date.now();
+                lastActionTimestamp = Date.now();
+                globalClickSequence = 0;
+                saveData();
+            }
+            render();
+        }
+
+        function resetTournamentStateForNewSession() {
+            teams.forEach(t => { t.wins = 0; t.losses = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
+            tournamentStartTimestamp = null;
+            lastActionTimestamp = null;
+            globalClickSequence = 0;
+            localStorage.removeItem('wesma_local_backup_v87');
+            const gate = document.getElementById("startup-gate");
+            if(gate) gate.classList.remove("hidden");
         }
 
         function playBestSound() {
@@ -500,7 +616,7 @@
                 osc2.start(now);
                 osc2.stop(now + 0.7);
             } catch(e) {
-                console.log("Audio play error", e);
+                console.log("Audio error", e);
             }
         }
 
@@ -509,12 +625,30 @@
             triggerHapticFeedback([60, 40, 80]);
         }
 
+        function toggleEndMatchLock() {
+            triggerHapticFeedback([30]);
+            if (isEndMatchLocked) {
+                const pin = prompt("അൺലോക്ക് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+                if (pin !== ADMIN_PIN) {
+                    if (pin !== null) alert("തെറ്റായ PIN!");
+                    return;
+                }
+                isEndMatchLocked = false;
+                document.getElementById("end-match-lock-icon").className = "fa-solid fa-lock-open text-emerald-400 text-[10px]";
+                document.getElementById("lock-btn-text").textContent = "ലോക്ക്";
+                showToast("🔓 End Match അൺലോക്ക് ചെയ്തു!");
+            } else {
+                isEndMatchLocked = true;
+                document.getElementById("end-match-lock-icon").className = "fa-solid fa-lock text-amber-400 text-[10px]";
+                document.getElementById("lock-btn-text").textContent = "അൺലോക്ക്";
+                showToast("🔒 End Match ലോക്ക് ചെയ്തു!");
+            }
+        }
+
         function initData() {
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            if(dateBadgeSmall) {
-                dateBadgeSmall.innerHTML = `${todayStr}`;
-            }
+            if(dateBadgeSmall) dateBadgeSmall.innerHTML = `${todayStr}`;
 
             renderHeaderTitle();
             render();
@@ -527,17 +661,17 @@
                             const found = data.teams.find(st => st && st.id === defTeam.id);
                             return found && found.name ? { ...defTeam, ...found } : defTeam;
                         });
-                        tournamentStartTimestamp = data.tournamentStartTimestamp || Date.now();
-                        lastActionTimestamp = data.lastActionTimestamp || Date.now();
+                        tournamentStartTimestamp = data.tournamentStartTimestamp || null;
+                        lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
                         globalClickSequence = data.globalClickSequence || 0;
-                        saveLocalBackup();
-                    } else {
-                        const localData = localStorage.getItem('wesma_local_backup_v89');
-                        if (!localData) {
-                            teams = JSON.parse(JSON.stringify(defaultTeams));
-                            saveData();
+                        
+                        if (tournamentStartTimestamp) {
+                            if (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000) {
+                                resetTournamentStateForNewSession();
+                            }
                         }
+                        saveLocalBackup();
                     }
                     render();
                     updateHistorySummaryText();
@@ -555,14 +689,7 @@
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            let letters = [
-                { char: 'W', isW: true },
-                { char: 'E', isW: false },
-                { char: 'S', isW: false },
-                { char: 'M', isW: false },
-                { char: 'A', isW: false }
-            ];
-
+            let letters = [{ char: 'W', isW: true }, { char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
             let delays = [2.0, 5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
 
             let titleHtml = "";
@@ -574,21 +701,16 @@
                     titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
                 }
             });
-
             headerContainer.innerHTML = titleHtml;
         }
 
         function formatSingleLetterAnimatedName(nameStr) {
             let upperName = (nameStr || "").toUpperCase();
             let parts = upperName.split('&');
-            
-            if (parts.length < 2) {
-                return formatPartSingleAnim(upperName, 0);
-            }
+            if (parts.length < 2) return upperName;
 
             let part1 = parts[0].trim();
             let part2 = parts[1].trim();
-
             let randIdx1 = Math.floor(Math.random() * part1.length);
             let randIdx2 = Math.floor(Math.random() * part2.length);
 
@@ -596,7 +718,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx1) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (1 + Math.random() * 6).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${(1 + Math.random() * 6).toFixed(1)}s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -605,7 +727,7 @@
                 if (char === ' ') return ' ';
                 if (idx === randIdx2) {
                     let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (7 + Math.random() * 6).toFixed(1) }s;">${escapeHtml(char)}</span>`;
+                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${(7 + Math.random() * 6).toFixed(1)}s;">${escapeHtml(char)}</span>`;
                 }
                 return escapeHtml(char);
             }).join('');
@@ -617,35 +739,15 @@
             return (nameStr || "").toUpperCase();
         }
 
-        function formatPartSingleAnim(str, delayOffset) {
-            let randIdx = Math.floor(Math.random() * str.length);
-            return str.split('').map((char, idx) => {
-                if (char === ' ') return ' ';
-                if (idx === randIdx) {
-                    let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${ (delayOffset + Math.random() * 6).toFixed(1) }s;">${escapeHtml(char)}</span>`;
-                }
-                return escapeHtml(char);
-            }).join('');
-        }
-
         function calculateTotalPlays() {
             return teams.reduce((sum, team) => sum + (team.played || 0), 0);
         }
 
         function saveLocalBackup() {
             try {
-                const payload = {
-                    teams,
-                    tournamentStartTimestamp,
-                    lastActionTimestamp,
-                    tournamentHistory,
-                    globalClickSequence
-                };
-                localStorage.setItem('wesma_local_backup_v89', JSON.stringify(payload));
-            } catch(e) {
-                console.log("LocalStorage save error", e);
-            }
+                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
+                localStorage.setItem('wesma_local_backup_v87', JSON.stringify(payload));
+            } catch(e) {}
         }
 
         function saveData() {
@@ -665,7 +767,6 @@
             const dateStr = new Date(tournamentStartTimestamp).toLocaleDateString('en-GB', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
             });
-
             const currentDurationMinutes = Math.round((Date.now() - tournamentStartTimestamp) / 60000);
 
             const record = {
@@ -678,10 +779,7 @@
 
             if (tournamentHistory.length > 0) {
                 const latestHistory = tournamentHistory[0];
-                const timeDifferenceMs = Math.abs(Date.now() - latestHistory.id);
-                const oneHourMs = 60 * 60 * 1000;
-
-                if (timeDifferenceMs < oneHourMs) {
+                if (Math.abs(Date.now() - latestHistory.id) < 60 * 60 * 1000) {
                     tournamentHistory[0] = record;
                 } else {
                     tournamentHistory.unshift(record);
@@ -689,7 +787,6 @@
             } else {
                 tournamentHistory.unshift(record);
             }
-
             updateHistorySummaryText();
         }
 
@@ -699,7 +796,7 @@
             if (tournamentHistory.length > 0) {
                 summaryEl.textContent = `ആകെ ${tournamentHistory.length} സെഷനുകൾ സേവ് ചെയ്തു.`;
             } else {
-                summaryEl.textContent = `സെഷൻ റെക്കോർഡുകൾ ലഭ്യമാണ്.`;
+                summaryEl.textContent = `സെഷൻ റെക്കോർഡുകൾ.`;
             }
         }
 
@@ -723,14 +820,12 @@
                     card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
-                        let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
-                        let lossesCount = t.losses || 0;
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-xs font-light text-slate-300 py-1 border-b border-slate-900">
                                 <span>${i + 1}. ${escapeHtml(t.name)}</span>
                                 <div class="flex gap-3">
                                     <span class="text-amber-400 font-semibold">${t.wins} Win</span>
-                                    <span class="text-rose-400 font-semibold">${lossesCount} Loss</span>
+                                    <span class="text-rose-400 font-semibold">${t.losses || 0} Loss</span>
                                 </div>
                             </div>
                         `;
@@ -786,7 +881,21 @@
                     return;
                 }
 
+                if (lastActionTimestamp && Date.now() - lastActionTimestamp > 10 * 60 * 1000 && calculateTotalPlays() > 0) {
+                    autoSaveToHistory();
+                    resetTournamentStateForNewSession();
+                    showToast("⏳ 10 മിനിറ്റിൽ പുതിയ പോയിന്റുകളൊന്നും വരാത്തതിനാൽ കളി ഓട്ടോ റീസെറ്റായി ഹിസ്റ്ററിയിൽ സേവായി!");
+                    return;
+                }
+
                 const elapsedTotal = Date.now() - tournamentStartTimestamp;
+                if (elapsedTotal >= 90 * 60 * 1000) {
+                    autoSaveToHistory();
+                    resetTournamentStateForNewSession();
+                    showToast("⏳ 1.5 മണിക്കൂർ കഴിഞ്ഞു! കളി സേവ് ആയി റീസെറ്റ് ചെയ്തു.");
+                    return;
+                }
+
                 const totalHours = Math.floor(elapsedTotal / 3600000);
                 const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
@@ -804,9 +913,13 @@
         }
 
         function manualFinishMatch() {
+            if (isEndMatchLocked) {
+                showToast("🔒 End Match ലോക്ക് ചെയ്തിരിക്കുന്നു! ദയവായി അൺലോക്ക് ചെയ്യുക.");
+                return;
+            }
+
             triggerHapticFeedback([100, 50, 100]);
-            const totalPlays = calculateTotalPlays();
-            if (totalPlays === 0) {
+            if (calculateTotalPlays() === 0) {
                 showToast("⚠️ നിലവിൽ മത്സരങ്ങളൊന്നും നടന്നിട്ടില്ല!");
                 return;
             }
@@ -831,20 +944,18 @@
             let elapsedTotal = (lastActionTimestamp && tournamentStartTimestamp) ? (lastActionTimestamp - tournamentStartTimestamp) : 0;
             let totalHours = Math.floor(elapsedTotal / 3600000);
             let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
-
             let championName = sorted[0].wins > 0 ? sorted[0].name : "NO WINNER";
 
             let teamsTableHtml = "";
             sorted.forEach((t, i) => {
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
-                let losses = t.losses || 0;
                 let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
                         <td class="py-1.5 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '👑' : ''}</td>
                         <td class="py-1.5 px-1">${played}</td>
                         <td class="py-1.5 px-1 font-bold text-emerald-400">${t.wins}</td>
-                        <td class="py-1.5 px-1 font-bold text-rose-400">${losses}</td>
+                        <td class="py-1.5 px-1 font-bold text-rose-400">${t.losses || 0}</td>
                     </tr>
                 `;
             });
@@ -854,20 +965,16 @@
                     <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         ✨ TOURNAMENT CHAMPIONS ✨
                     </div>
-
                     <div class="text-base font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
-
                     <div class="text-xs text-emerald-300 font-semibold italic">
                         "തകർപ്പൻ ജയം! ടീം വേറെ ലെവൽ പ്രകടനം! 🎉"
                     </div>
-
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30">
-                        Total Plays: <b class="text-white">${totalPlays}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
+                        Total Plays: <b class="text-white">${calculateTotalPlays()}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
                     </div>
                 </div>
-
                 <div class="space-y-1 text-left pt-1">
                     <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
                         <i class="fa-solid fa-list-check text-amber-400"></i> FINAL SCORES:
@@ -882,14 +989,11 @@
                                     <th class="py-1 px-1">LOST</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${teamsTableHtml}
-                            </tbody>
+                            <tbody>${teamsTableHtml}</tbody>
                         </table>
                     </div>
                 </div>
             `;
-
             modal.classList.remove("hidden");
             triggerWinCelebration();
         }
@@ -897,43 +1001,6 @@
         function closeFinishMatchModal() {
             const modal = document.getElementById("finish-match-modal");
             if (modal) modal.classList.add("hidden");
-        }
-
-        function downloadFinishCardImage() {
-            showToast("📸 കാർഡ് ഡൗൺലോഡ് ചെയ്യപ്പെടുന്നു...");
-            const captureElement = document.getElementById("capture-area");
-            const shareHeader = document.getElementById("share-header-banner");
-            
-            if (shareHeader) shareHeader.style.display = "none";
-
-            html2canvas(captureElement, {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: "#030712",
-                logging: false,
-                letterRendering: true,
-                scrollX: 0,
-                scrollY: 0,
-                width: captureElement.scrollWidth,
-                height: captureElement.scrollHeight,
-                windowWidth: captureElement.scrollWidth,
-                windowHeight: captureElement.scrollHeight
-            }).then(canvas => {
-                if (shareHeader) shareHeader.style.display = "block";
-
-                canvas.toBlob(blob => {
-                    const fileUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = fileUrl;
-                    link.download = 'WESMA_Match_Card.png';
-                    link.click();
-                    showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
-                });
-            }).catch(err => {
-                if (shareHeader) shareHeader.style.display = "block";
-                console.error("Image generation error:", err);
-                showToast("⚠️ ഡൗൺലോഡ് ചെയ്യുന്നതിൽ തടസ്സമുണ്ടായി.");
-            });
         }
 
         function startCooldownTickers() {
@@ -966,7 +1033,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -1054,7 +1121,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="flex items-center justify-between text-[10px] text-slate-400 font-light pt-1.5 border-t border-slate-800/60 px-1">
                         <span class="italic">Match Rotation Status</span>
                         <span class="text-amber-300 font-semibold">Order: #${team.clickOrder || 0} | Interval: ${team.matchInterval || 0}m</span>
@@ -1068,8 +1134,6 @@
             updateLeaderboard();
         }
 
-        let defeatedModalTimeout = null;
-
         function handleScoreChange(id, delta) {
             const team = teams.find(t => t.id === id);
             if (!team) return;
@@ -1080,7 +1144,6 @@
                     showToast("⚠️ ദയവായി കുറച്ചുസമയം കാത്തിരിക്കൂ!");
                     return;
                 }
-                
                 pendingWinningTeamId = id;
                 openDefeatedTeamModal(id);
                 
@@ -1093,12 +1156,10 @@
                 }
                 if (team.wins > 0) {
                     lastActionSnapshot = JSON.parse(JSON.stringify(teams));
-                    
                     team.wins += delta;
                     if (team.played > team.wins) team.played = Math.max(0, team.played - 1);
                     saveData();
                     render();
-
                     showToastWithUndo(`⚠️ ${team.name} സ്കോർ കുറച്ചു!`);
                 } else {
                     showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
@@ -1117,26 +1178,17 @@
                     const btn = document.createElement("button");
                     btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-200 font-medium py-2.5 px-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between transition-all active:scale-95";
                     btn.innerHTML = `<span>${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[10px]">തോറ്റ ടീമായി രേഖപ്പെടുത്തുക</span>`;
-                    btn.onclick = function() {
-                        confirmWinAndDefeatedTeam(winningTeamId, t.id);
-                    };
+                    btn.onclick = function() { confirmWinAndDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
                 }
             });
-
             modal.classList.remove("hidden");
-
-            if (defeatedModalTimeout) clearTimeout(defeatedModalTimeout);
-            defeatedModalTimeout = setTimeout(() => {
-                closeDefeatedTeamModal();
-            }, 6000);
         }
 
         function closeDefeatedTeamModal() {
             const modal = document.getElementById("defeated-team-modal");
             if (modal) modal.classList.add("hidden");
             pendingWinningTeamId = null;
-            if (defeatedModalTimeout) clearTimeout(defeatedModalTimeout);
         }
 
         function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
@@ -1146,14 +1198,12 @@
             if (!team || !defeatedTeam) return;
 
             lastActionSnapshot = JSON.parse(JSON.stringify(teams));
-
             const now = Date.now();
             const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
             const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
             
             team.matchInterval = intervalMinutes;
             team.lastMatchTime = intervalMinutes;
-
             globalClickSequence += 1;
             team.clickOrder = globalClickSequence;
             team.lastClickTime = now;
@@ -1163,14 +1213,12 @@
             
             team.wins += 1;
             team.played = (team.played || 0) + 1;
-
             defeatedTeam.losses = (defeatedTeam.losses || 0) + 1;
             defeatedTeam.played = (defeatedTeam.played || 0) + 1;
             
             autoSaveToHistory();
             saveData();
             render();
-
             triggerWinCelebration();
 
             showToastWithUndo(`🏆 ${team.name} Won (${intervalMinutes}m gap)!\n❌ ${defeatedTeam.name} Lost`);
@@ -1214,7 +1262,6 @@
                 alert("തെറ്റായ Admin PIN!");
                 return;
             }
-
             if (!nameInput) {
                 alert("ദയവായി ഒരു ടീം പേര് നൽകുക!");
                 return;
@@ -1257,7 +1304,6 @@
             }
 
             const firstPlaces = sorted.filter(t => t.wins === maxWins);
-            
             if (firstPlaces.length === 1) {
                 championSpan.innerHTML = `⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം) ⭐`;
             } else {
@@ -1267,15 +1313,13 @@
 
             let podiumHtml = "";
             if (sorted.length > 1 && sorted[1].wins > 0) {
-                const secondTeam = sorted[1];
-                podiumHtml += `<div class="text-amber-200/90 font-light">🥈 2-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(secondTeam.name)}</span> (${secondTeam.wins} ജയം)</div>`;
+                podiumHtml += `<div class="text-amber-200/90 font-light">🥈 2-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} ജയം)</div>`;
             } else {
                 podiumHtml += `<div class="text-amber-200/80 font-light">🥈 2-ാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
             }
 
             if (sorted.length > 2 && sorted[2].wins > 0) {
-                const thirdTeam = sorted[2];
-                podiumHtml += `<div class="text-amber-200/90 font-light">🥉 3-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(thirdTeam.name)}</span> (${thirdTeam.wins} ജയം)</div>`;
+                podiumHtml += `<div class="text-amber-200/90 font-light">🥉 3-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} ജയം)</div>`;
             } else {
                 podiumHtml += `<div class="text-amber-200/80 font-light">🥉 3-ാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
             }
@@ -1284,8 +1328,7 @@
             const teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
-                const fastestTeam = teamsWithTime[0];
-                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-semibold text-xs uppercase inline-block break-words">${escapeHtml(fastestTeam.name)}</span> (${fastestTeam.lastMatchTime} mins)`;
+                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-semibold text-xs uppercase inline-block break-words">${escapeHtml(teamsWithTime[0].name)}</span> (${teamsWithTime[0].lastMatchTime} mins)`;
             } else {
                 fastestEl.innerHTML = `⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
             }
@@ -1315,7 +1358,7 @@
             if (currentShareMode === 'text') {
                 shareWhatsAppText(type);
             } else {
-                shareWhatsAppCardImage(type);
+                generateAndShareImage(type);
             }
         }
 
@@ -1325,27 +1368,25 @@
             
             sorted.forEach((t, i) => {
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
-                let losses = t.losses || 0;
-                text += `${i + 1}. *${t.name}* \n   🏆 Wins: ${t.wins} | ❌ Losses: ${losses} | 🎮 Plays: ${played}\n\n`;
+                text += `${i + 1}. *${t.name}* \n   🏆 Wins: ${t.wins} | ❌ Losses: ${t.losses || 0} | 🎮 Plays: ${played}\n\n`;
             });
 
             text += `🏆 *Champions:* ${sorted[0].wins > 0 ? sorted[0].name : 'Pending'}\n`;
             text += `⚡ *Total Plays:* ${calculateTotalPlays()}\n`;
             text += `📅 *Date:* ${new Date().toLocaleDateString('en-GB')}`;
 
-            let url = "";
-            if (type === 'business') {
-                url = `whatsapp://send?text=${encodeURIComponent(text)}`;
-            } else {
-                url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            }
+            let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
             window.open(url, '_blank');
         }
 
-        function shareWhatsAppCardImage(type) {
-            showToast("📸 വാട്സാപ്പ് കാർഡ് തയ്യാറാക്കുന്നു...");
+        function generateAndShareImage(type) {
+            showToast("📸 പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const shareHeader = document.getElementById("share-header-banner");
+            const previewModal = document.getElementById("preview-modal");
+            const previewContainer = document.getElementById("preview-container");
+            const downloadBtn = document.getElementById("download-img-btn");
+            const shareBtn = document.getElementById("share-img-btn");
             
             if (shareHeader) shareHeader.style.display = "none";
 
@@ -1358,32 +1399,54 @@
                 scrollX: 0,
                 scrollY: 0,
                 width: captureElement.scrollWidth,
-                height: captureElement.scrollHeight,
-                windowWidth: captureElement.scrollWidth,
-                windowHeight: captureElement.scrollHeight
+                height: captureElement.scrollHeight
             }).then(canvas => {
                 if (shareHeader) shareHeader.style.display = "block";
 
+                previewContainer.innerHTML = "";
+                const previewImg = document.createElement('img');
+                previewImg.src = canvas.toDataURL("image/png");
+                previewImg.className = "rounded-lg w-full object-contain shadow-lg border border-slate-800";
+                previewContainer.appendChild(previewImg);
+                previewModal.classList.remove("hidden");
+
                 canvas.toBlob(blob => {
                     currentCapturedBlob = blob;
-                    if (navigator.share && currentCapturedBlob) {
-                        const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
-                        navigator.share({
-                            title: 'WESMA BADMINTON SCORECARD',
-                            text: '🏸 WESMA Badminton Club - Match Scorecard',
-                            files: [file]
-                        }).catch(err => console.log('Share error', err));
-                    } else {
-                        let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
-                        let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                        window.open(url, '_blank');
-                    }
+                    const fileUrl = URL.createObjectURL(blob);
+                    
+                    downloadBtn.onclick = function() {
+                        const link = document.createElement('a');
+                        link.href = fileUrl;
+                        link.download = 'WESMA_Match_Card.png';
+                        link.click();
+                        showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
+                    };
+
+                    shareBtn.onclick = function() {
+                        if (navigator.share && currentCapturedBlob) {
+                            const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
+                            navigator.share({
+                                title: 'WESMA BADMINTON SCORECARD',
+                                text: '🏸 WESMA Badminton Club - Match Scorecard',
+                                files: [file]
+                            }).catch(err => console.log('Share error', err));
+                        } else {
+                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
+                            let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                        }
+                    };
                 });
             }).catch(err => {
                 if (shareHeader) shareHeader.style.display = "block";
                 console.error("Image generation error:", err);
-                showToast("⚠️ കാർഡ് തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
+                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
             });
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById("preview-modal");
+            if(modal) modal.classList.add("hidden");
         }
 
         function resetScores() {
@@ -1412,9 +1475,7 @@
             toast.style.pointerEvents = "auto";
             
             if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                dismissToast();
-            }, 5000);
+            toastTimeout = setTimeout(() => { dismissToast(); }, 5000);
         }
 
         function showToastWithUndo(text) {
@@ -1429,9 +1490,7 @@
             toast.style.pointerEvents = "auto";
             
             if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                dismissToast();
-            }, 8000);
+            toastTimeout = setTimeout(() => { dismissToast(); }, 8000);
         }
 
         function dismissToast() {
