@@ -718,7 +718,6 @@
             updateMatchStatusBadge();
         }
 
-        /* RESET Function: Scores Reset state, BUT History remains safely saved! */
         function resetTournamentStateForNewSession() {
             teams.forEach(t => { 
                 t.wins = 0; t.losses = 0; t.played = 0; 
@@ -942,30 +941,6 @@
             }
         }
 
-        function formatDefeatedTeamsWithDetailedTime(defeatedList) {
-            if (!defeatedList || defeatedList.length === 0) return "ആരെയും തോൽപ്പിച്ചിട്ടില്ല";
-            
-            const grouped = {};
-            defeatedList.forEach(item => {
-                const name = item.name;
-                const duration = item.durationMinutes || 1;
-                if (!grouped[name]) {
-                    grouped[name] = { count: 0, times: [] };
-                }
-                grouped[name].count += 1;
-                grouped[name].times.push(`${duration}m`);
-            });
-
-            return Object.entries(grouped).map(([name, data]) => {
-                const timesStr = data.times.join(", ");
-                if (data.count > 1) {
-                    return `${name} (${data.count} പ്രാവശ്യം - സമയം: ${timesStr})`;
-                }
-                return `${name} (${timesStr})`;
-            }).join(" • ");
-        }
-
-        /* Open Match Stats & Summary Modal with i-Buttons for Wins, Losses, and Total Plays */
         function openTimeSummaryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("time-summary-modal");
@@ -1034,7 +1009,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Show detailed i-button Info (Wins Details, Losses Details, Matches Played) */
+        /* Show detailed i-button Info (Grouped Losses by Opponent e.g., '2 പ്രാവശ്യം തോറ്റു') */
         function showTeamInfoDetail(teamId, type) {
             triggerHapticFeedback([30]);
             const team = teams.find(t => t.id === teamId);
@@ -1063,26 +1038,35 @@
             } else if (type === 'losses') {
                 html += `<div class="text-rose-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ മത്സരങ്ങളുടെ വിവരങ്ങൾ (Total Losses: ${team.losses || 0})</div>`;
                 
-                // Calculate loss opponents from other teams' defeatedDetails
-                let lostAgainstList = [];
+                // Group losses by opponent team name
+                let lossGrouped = {};
                 teams.forEach(otherTeam => {
                     if (otherTeam.defeatedDetails) {
                         otherTeam.defeatedDetails.forEach(item => {
                             if (item.name === team.name) {
-                                lostAgainstList.push({ winnerName: otherTeam.name, duration: item.durationMinutes || 1 });
+                                if (!lossGrouped[otherTeam.name]) {
+                                    lossGrouped[otherTeam.name] = { count: 0, times: [] };
+                                }
+                                lossGrouped[otherTeam.name].count += 1;
+                                lossGrouped[otherTeam.name].times.push(item.durationMinutes || 1);
                             }
                         });
                     }
                 });
 
-                if (lostAgainstList.length === 0) {
+                const lossEntries = Object.entries(lossGrouped);
+                if (lossEntries.length === 0) {
                     html += `<div class="text-slate-400 italic">ആരോടും തോറ്റിട്ടില്ല.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
-                    lostAgainstList.forEach((item, i) => {
-                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center">
-                            <span>${i + 1}. തോറ്റത് ആരോടാണ്: <b class="text-white">${escapeHtml(item.winnerName)}</b></span>
-                            <span class="text-amber-400 text-[10px] font-medium">${item.duration} Mins</span>
+                    lossEntries.forEach(([winnerName, data], i) => {
+                        let timesStr = data.times.map(t => `${t}m`).join(", ");
+                        html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b></span>
+                                <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
+                            </div>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1212,6 +1196,7 @@
             }, 1000);
         }
 
+        /* END MATCH Popup Modal - Includes Winner Plays & Time, plus Total Match Count & Duration at the bottom */
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
@@ -1249,7 +1234,14 @@
             let elapsedTotal = (lastActionTimestamp && tournamentStartTimestamp) ? (lastActionTimestamp - tournamentStartTimestamp) : 0;
             let totalHours = Math.floor(elapsedTotal / 3600000);
             let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
-            let championName = sorted[0].wins > 0 ? sorted[0].name : "NO WINNER";
+            
+            let winnerTeam = sorted[0];
+            let championName = winnerTeam.wins > 0 ? winnerTeam.name : "NO WINNER";
+            let winnerPlays = winnerTeam.played || 0;
+            let winnerTimeMins = winnerTeam.totalTimeSpentMinutes || 0;
+
+            let totalPlaysCount = calculateTotalPlays();
+            let totalMatchesCount = totalPlaysCount / 2;
 
             let teamsTableHtml = "";
             sorted.forEach((t, i) => {
@@ -1325,10 +1317,14 @@
                     <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
-                    <div class="text-[11px] text-slate-300 font-light pt-1 border-t border-amber-500/30">
-                        Total Plays: <b class="text-white">${calculateTotalPlays()}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
+                    <!-- Winner Details: Winner Plays & Winner Duration Time -->
+                    <div class="text-[11px] text-slate-300 font-light pt-1 border-t border-amber-500/30 flex justify-center gap-3">
+                        <span>വിജയികളുടെ ആകെ കളികൾ: <b class="text-white">${winnerPlays}</b></span>
+                        <span>|</span>
+                        <span>ആകെ സമയം: <b class="text-amber-300">${winnerTimeMins} Mins</b></span>
                     </div>
                 </div>
+
                 <div class="space-y-1 text-left pt-1">
                     <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
                         <i class="fa-solid fa-list-check text-amber-400"></i> FINAL SCORES:
@@ -1345,6 +1341,18 @@
                             </thead>
                             <tbody>${teamsTableHtml}</tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Total Match Count & Total Session Duration at Bottom Interface -->
+                <div class="bg-slate-950 border border-amber-500/30 rounded-xl p-2.5 text-slate-300 font-medium text-xs space-y-1 shadow-md">
+                    <div class="flex justify-between items-center">
+                        <span class="flex items-center gap-1.5 text-slate-400 font-light"><i class="fa-solid fa-trophy text-amber-400"></i> ടോട്ടൽ മാച്ചുകൾ (Total Matches):</span>
+                        <span class="text-amber-300 font-bold">${totalMatchesCount}</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-slate-800/80 pt-1">
+                        <span class="flex items-center gap-1.5 text-slate-400 font-light"><i class="fa-solid fa-clock text-amber-400"></i> ടോട്ടൽ സെഷൻ സമയം (Total Duration):</span>
+                        <span class="text-emerald-400 font-bold">${totalHours}h ${totalMins}m</span>
                     </div>
                 </div>
             `;
