@@ -160,20 +160,15 @@
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
-            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)] flex items-center justify-center text-amber-400">
-                <!-- Custom Logo SVG matching the provided image style -->
-                <svg viewBox="0 0 200 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 85 L35 45 L50 70 L65 45 L85 85" fill="none" stroke="#F59E0B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M45 55 C45 30, 65 20, 75 35 C65 45, 55 45, 45 55 Z" fill="#F59E0B"/>
-                    <ellipse cx="60" cy="45" rx="8" ry="6" fill="#030712"/>
+            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
+                <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="96" fill="#D4AF37" />
+                    <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#D4AF37" stroke-width="1.5" />
+                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div>
-                <h2 class="text-sm font-semibold text-amber-300 tracking-wider flex items-center justify-center gap-1.5">
-                    <span class="inline-flex items-center text-amber-400 font-bold" style="font-family:'Inter',sans-serif;">
-                        <span style="font-family:'Great Vibes',cursive; font-size:1.3em; margin-right:1px;">W</span><span style="position:relative; display:inline-block;"><i class="fa-solid fa-shuttlecock text-[9px]" style="position:absolute; top:-7px; left:-2px; transform:rotate(-25deg);"></i>ESMA</span>
-                    </span> BADMINTON
-                </h2>
+                <h2 class="text-sm font-semibold text-amber-300 tracking-wider">WESMA BADMINTON</h2>
                 <p class="text-xs text-slate-400 font-light mt-1 tracking-widest text-amber-200 uppercase">WELCOME TO TOURNAMENT</p>
             </div>
             <button type="button" onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-semibold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
@@ -187,25 +182,14 @@
         
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
             <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
-                <!-- Custom Logo Graphic in Header Watermark -->
-                <span class="inline-flex items-center text-amber-400 font-bold" style="font-family:'Inter',sans-serif;">
-                    <span style="font-family:'Great Vibes',cursive; font-size:1.2em;">W</span><span style="position:relative; display:inline-block;"><i class="fa-solid fa-shuttlecock text-[8px]" style="position:absolute; top:-6px; left:-2px; transform:rotate(-25deg);"></i>ESMA</span>
-                </span> BADMINTON CLUB
+                <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
             </span>
             <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
         </div>
 
-        <!-- Header Banner with Logo Design -->
-        <div id="share-header-banner" class="text-center py-2 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
-            <div class="py-0.5 flex items-center justify-center gap-2">
-                <!-- Custom Logo Icon matching the photo -->
-                <div class="relative w-8 h-8 flex items-center justify-center text-amber-400 shrink-0">
-                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 75 L30 35 L50 65 L70 35 L90 75" fill="none" stroke="#F59E0B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M42 45 C42 22, 62 12, 72 27 C62 37, 52 37, 42 45 Z" fill="#F59E0B"/>
-                        <ellipse cx="57" cy="35" rx="8" ry="6" fill="#030712"/>
-                    </svg>
-                </div>
+        <!-- Header Banner -->
+        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
+            <div class="py-0.5">
                 <div id="header-title-container" class="wesma-title leading-tight"></div>
             </div>
         </div>
@@ -326,11 +310,7 @@
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
-                    <div class="text-sm font-black text-amber-400 tracking-widest uppercase flex items-center gap-1">
-                        <span class="inline-flex items-center text-amber-400 font-bold" style="font-family:'Inter',sans-serif;">
-                            <span style="font-family:'Great Vibes',cursive; font-size:1.2em;">W</span><span style="position:relative; display:inline-block;"><i class="fa-solid fa-shuttlecock text-[8px]" style="position:absolute; top:-6px; left:-2px; transform:rotate(-25deg);"></i>ESMA</span>
-                        </span>
-                    </div>
+                    <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
                     <div class="text-[9px] text-amber-400 font-bold tracking-widest mt-0.5">SINCE 2026</div>
                 </div>
@@ -461,7 +441,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v95');
+                const localData = localStorage.getItem('wesma_local_backup_v94');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -493,7 +473,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v95');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v94');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -546,7 +526,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v95');
+            localStorage.removeItem('wesma_local_backup_v94');
             const gate = document.getElementById("startup-gate");
             if(gate) {
                 gate.style.display = "flex";
@@ -631,21 +611,17 @@
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            // Updated Logo W with Shuttlecock design embedded
-            let logoHtml = `
-                <span class="special-w" style="position:relative; display:inline-block; margin-right:2px;">
-                    W
-                    <i class="fa-solid fa-shuttlecock" style="position:absolute; top:-10px; left:2px; font-size:0.45em; transform:rotate(-25deg); color:#F59E0B;"></i>
-                </span>
-            `;
+            let letters = [{ char: 'W', isW: true }, { char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
+            let delays = [2.0, 5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
 
-            let letters = [{ char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
-            let delays = [5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
-
-            let titleHtml = logoHtml;
+            let titleHtml = "";
             letters.forEach((item, idx) => {
                 let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
+                if (item.isW) {
+                    titleHtml += `<span class="special-w" style="--w-rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">W</span>`;
+                } else {
+                    titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
+                }
             });
             headerContainer.innerHTML = titleHtml;
         }
@@ -692,7 +668,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v95', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v94', JSON.stringify(payload));
             } catch(e) {}
         }
 
