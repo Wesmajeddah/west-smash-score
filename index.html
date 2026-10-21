@@ -146,6 +146,16 @@
             color: #f59e0b;
             font-weight: 700;
         }
+
+        /* Special Reset Animation */
+        @keyframes resetFlash {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(0.98); filter: brightness(1.5) hue-rotate(90deg); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .reset-anim {
+            animation: resetFlash 0.6s ease-in-out;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
@@ -260,7 +270,7 @@
     <!-- Outside Capture Area: Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         
-        <!-- Action Options: END MATCH & WhatsApp Share -->
+        <!-- Action Options: END MATCH only -->
         <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
             <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
                 <i class="fa-solid fa-flag-checkered text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
@@ -268,9 +278,6 @@
             <div class="flex items-center gap-1.5">
                 <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider">
                     <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
-                </button>
-                <button onclick="openWhatsAppChoiceModal('finish_card')" class="bg-emerald-800 hover:bg-emerald-700 text-white font-semibold py-1.5 px-2.5 rounded-lg text-[11px] flex items-center gap-1 shadow" title="Share Final Card to WhatsApp">
-                    <i class="fa-brands fa-whatsapp"></i> ഷെയർ
                 </button>
             </div>
         </div>
@@ -302,20 +309,29 @@
         </div>
     </div>
 
-    <!-- Defeated Team Selection Modal -->
+    <!-- Defeated Team Selection Modal (Updated to show Winning Team & Defeated Teams) -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
-            <div class="w-10 h-10 mx-auto bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/30 text-sm">
-                <i class="fa-solid fa-shield-halved"></i>
+            <div class="w-10 h-10 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-sm">
+                <i class="fa-solid fa-trophy"></i>
             </div>
-            <h3 class="text-sm font-semibold text-amber-300">തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക</h3>
-            <p class="text-xs text-slate-400 font-light">കോർട്ടിൽ പരാജയപ്പെട്ട ടീം ഏതാണ്?</p>
+            <h3 class="text-sm font-semibold text-amber-300">മത്സര ഫലം രേഖപ്പെടുത്തുക</h3>
             
-            <div id="defeated-team-options" class="space-y-1.5 pt-1 max-h-48 overflow-y-auto">
-                <!-- Injected dynamically -->
+            <!-- Winner Team Display Box -->
+            <div class="bg-slate-950 border border-amber-500/30 rounded-xl p-2.5 text-left space-y-0.5">
+                <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wide block">🏆 വിജയിച്ച ടീം (Winner):</span>
+                <span id="modal-winner-name-span" class="text-xs font-extrabold text-white uppercase">---</span>
             </div>
 
-            <div class="pt-2">
+            <!-- Defeated Team Selection List -->
+            <div class="space-y-1 text-left">
+                <span class="text-[10px] text-rose-400 font-bold uppercase tracking-wide block">❌ തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക:</span>
+                <div id="defeated-team-options" class="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+            <div class="pt-1">
                 <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
                     റദ്ദാക്കുക
                 </button>
@@ -345,12 +361,9 @@
                 <!-- Content injected dynamically -->
             </div>
 
-            <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="downloadMatchCardImage()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
-                </button>
-                <button onclick="shareMatchCardImageWhatsApp()" class="bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
-                    <i class="fa-brands fa-whatsapp"></i> ഷെയർ
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 flex justify-center">
+                <button onclick="downloadMatchCardImage()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-camera"></i> സ്ക്രീൻഷോട്ട് (Screenshot)
                 </button>
             </div>
         </div>
@@ -482,7 +495,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v88');
+                const localData = localStorage.getItem('wesma_local_backup_v90');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -493,13 +506,8 @@
                         globalClickSequence = parsed.globalClickSequence || 0;
                         
                         if (tournamentStartTimestamp) {
-                            const elapsed = Date.now() - tournamentStartTimestamp;
-                            if (elapsed >= 90 * 60 * 1000) {
-                                resetTournamentStateForNewSession();
-                            } else {
-                                const gate = document.getElementById("startup-gate");
-                                if(gate) gate.classList.add("hidden");
-                            }
+                            const gate = document.getElementById("startup-gate");
+                            if(gate) gate.classList.add("hidden");
                         }
                     }
                 }
@@ -519,7 +527,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v88');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v90');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -554,8 +562,7 @@
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.add("hidden");
             
-            if (!tournamentStartTimestamp || (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000)) {
-                teams.forEach(t => { t.wins = 0; t.losses = 0; t.played = 0; t.lastMatchTime = 0; t.lastClickTime = 0; t.clickOrder = 0; t.matchInterval = 0; });
+            if (!tournamentStartTimestamp) {
                 tournamentStartTimestamp = Date.now();
                 lastActionTimestamp = Date.now();
                 globalClickSequence = 0;
@@ -569,7 +576,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v88');
+            localStorage.removeItem('wesma_local_backup_v90');
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.remove("hidden");
         }
@@ -633,11 +640,6 @@
                         tournamentHistory = data.tournamentHistory || [];
                         globalClickSequence = data.globalClickSequence || 0;
                         
-                        if (tournamentStartTimestamp) {
-                            if (Date.now() - tournamentStartTimestamp >= 90 * 60 * 1000) {
-                                resetTournamentStateForNewSession();
-                            }
-                        }
                         saveLocalBackup();
                     }
                     render();
@@ -713,7 +715,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v88', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v90', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -848,19 +850,7 @@
                     return;
                 }
 
-                if (lastActionTimestamp && Date.now() - lastActionTimestamp > 10 * 60 * 1000 && calculateTotalPlays() > 0) {
-                    autoSaveToHistory();
-                    resetTournamentStateForNewSession();
-                    return;
-                }
-
                 const elapsedTotal = Date.now() - tournamentStartTimestamp;
-                if (elapsedTotal >= 90 * 60 * 1000) {
-                    autoSaveToHistory();
-                    resetTournamentStateForNewSession();
-                    return;
-                }
-
                 const totalHours = Math.floor(elapsedTotal / 3600000);
                 const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
@@ -928,10 +918,7 @@
                     <div class="text-base font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
-                    <div class="text-xs text-emerald-300 font-semibold italic">
-                        "തകർപ്പൻ ജയം! ടീം വേറെ ലെവൽ പ്രകടനം! 🎉"
-                    </div>
-                    <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30">
+                    <div class="text-xs text-slate-300 font-light pt-1 border-t border-amber-500/30">
                         Total Plays: <b class="text-white">${calculateTotalPlays()}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
                     </div>
                 </div>
@@ -1119,6 +1106,7 @@
                     lastActionDescription = `${team.name} ടീമിന്റെ സ്കോർ -1 കുറച്ചു.`;
                     team.wins += delta;
                     if (team.played > team.wins) team.played = Math.max(0, team.played - 1);
+                    autoSaveToHistory();
                     saveData();
                     render();
                     showToast(`⚠️ ${team.name} സ്കോർ കുറച്ചു!`);
@@ -1130,15 +1118,21 @@
 
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
+            const winnerSpan = document.getElementById("modal-winner-name-span");
             const container = document.getElementById("defeated-team-options");
-            if (!modal || !container) return;
+            if (!modal || !container || !winnerSpan) return;
+
+            const winningTeam = teams.find(t => t.id === winningTeamId);
+            if (winningTeam) {
+                winnerSpan.textContent = winningTeam.name;
+            }
 
             container.innerHTML = "";
             teams.forEach(t => {
                 if (t.id !== winningTeamId) {
                     const btn = document.createElement("button");
                     btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-200 font-medium py-2.5 px-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between transition-all active:scale-95";
-                    btn.innerHTML = `<span>${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[10px]">തോറ്റ ടീമായി രേഖപ്പെടുത്തുക</span>`;
+                    btn.innerHTML = `<span>${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[10px]">തോറ്റ ടീം</span>`;
                     btn.onclick = function() { confirmWinAndDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
                 }
@@ -1218,6 +1212,7 @@
             teams = JSON.parse(JSON.stringify(lastActionSnapshot));
             lastActionSnapshot = null;
             lastActionDescription = "";
+            autoSaveToHistory();
             saveData();
             render();
             closeUndoModal();
@@ -1344,8 +1339,6 @@
             closeWhatsAppChoiceModal();
             if (currentShareMode === 'text') {
                 shareWhatsAppText(type);
-            } else {
-                shareMatchCardImageWhatsAppDirect(type);
             }
         }
 
@@ -1367,7 +1360,7 @@
         }
 
         function downloadMatchCardImage() {
-            showToast("📸 ഡൗൺലോഡ് ചെയ്യപ്പെടുന്നു...");
+            showToast("📸 സ്ക്രീൻഷോട്ട് ഡൗൺലോഡ് ചെയ്യപ്പെടുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const shareHeader = document.getElementById("share-header-banner");
             
@@ -1398,49 +1391,6 @@
             });
         }
 
-        function shareMatchCardImageWhatsApp() {
-            openWhatsAppChoiceModal('finish_card');
-        }
-
-        function shareMatchCardImageWhatsAppDirect(type) {
-            showToast("📸 വാട്സാപ്പിലേക്ക് തയ്യാറാക്കുന്നു...");
-            const captureElement = document.getElementById("capture-area");
-            const shareHeader = document.getElementById("share-header-banner");
-            
-            if (shareHeader) shareHeader.style.display = "none";
-
-            html2canvas(captureElement, {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: "#030712",
-                logging: false,
-                letterRendering: true,
-                scrollX: 0,
-                scrollY: 0,
-                width: captureElement.scrollWidth,
-                height: captureElement.scrollHeight
-            }).then(canvas => {
-                if (shareHeader) shareHeader.style.display = "block";
-                canvas.toBlob(blob => {
-                    if (navigator.share && blob) {
-                        const file = new File([blob], 'WESMA_Match_Card.png', { type: 'image/png' });
-                        navigator.share({
-                            title: 'WESMA BADMINTON SCORECARD',
-                            text: '🏸 WESMA Badminton Club - Match Scorecard',
-                            files: [file]
-                        }).catch(err => console.log('Share error', err));
-                    } else {
-                        let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ്!";
-                        let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                        window.open(url, '_blank');
-                    }
-                });
-            }).catch(err => {
-                if (shareHeader) shareHeader.style.display = "block";
-                console.error("Image generation error:", err);
-            });
-        }
-
         function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -1449,6 +1399,11 @@
                 return;
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്യണോ?")) {
+                const captureArea = document.getElementById("capture-area");
+                if (captureArea) {
+                    captureArea.classList.add("reset-anim");
+                    setTimeout(() => { captureArea.classList.remove("reset-anim"); }, 600);
+                }
                 resetTournamentStateForNewSession();
                 showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
             }
