@@ -15,8 +15,6 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <!-- html2canvas for Image Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         body {
@@ -147,7 +145,6 @@
             font-weight: 700;
         }
 
-        /* Special Reset Animation */
         @keyframes resetFlash {
             0% { transform: scale(1); filter: brightness(1); }
             50% { transform: scale(0.98); filter: brightness(1.5) hue-rotate(90deg); }
@@ -163,18 +160,23 @@
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
-            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
-                <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="96" fill="#D4AF37" />
-                    <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#D4AF37" stroke-width="1.5" />
-                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)] flex items-center justify-center text-amber-400">
+                <!-- Custom Logo SVG matching the provided image style -->
+                <svg viewBox="0 0 200 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 85 L35 45 L50 70 L65 45 L85 85" fill="none" stroke="#F59E0B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M45 55 C45 30, 65 20, 75 35 C65 45, 55 45, 45 55 Z" fill="#F59E0B"/>
+                    <ellipse cx="60" cy="45" rx="8" ry="6" fill="#030712"/>
                 </svg>
             </div>
             <div>
-                <h2 class="text-sm font-semibold text-amber-300 tracking-wider">WESMA BADMINTON</h2>
+                <h2 class="text-sm font-semibold text-amber-300 tracking-wider flex items-center justify-center gap-1.5">
+                    <span class="inline-flex items-center text-amber-400 font-bold" style="font-family:'Inter',sans-serif;">
+                        <span style="font-family:'Great Vibes',cursive; font-size:1.3em; margin-right:1px;">W</span><span style="position:relative; display:inline-block;"><i class="fa-solid fa-shuttlecock text-[9px]" style="position:absolute; top:-7px; left:-2px; transform:rotate(-25deg);"></i>ESMA</span>
+                    </span> BADMINTON
+                </h2>
                 <p class="text-xs text-slate-400 font-light mt-1 tracking-widest text-amber-200 uppercase">WELCOME TO TOURNAMENT</p>
             </div>
-            <button onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-semibold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2">
+            <button type="button" onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-semibold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-play"></i> START TOURNAMENT
             </button>
         </div>
@@ -183,34 +185,35 @@
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
-        <!-- Clear Static Watermark Header for Screenshot Identification -->
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
             <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5">
-                <i class="fa-solid fa-shuttlecock text-amber-400 text-[9px]"></i> WESMA BADMINTON CLUB
+                <!-- Custom Logo Graphic in Header Watermark -->
+                <span class="inline-flex items-center text-amber-400 font-bold" style="font-family:'Inter',sans-serif;">
+                    <span style="font-family:'Great Vibes',cursive; font-size:1.2em;">W</span><span style="position:relative; display:inline-block;"><i class="fa-solid fa-shuttlecock text-[8px]" style="position:absolute; top:-6px; left:-2px; transform:rotate(-25deg);"></i>ESMA</span>
+                </span> BADMINTON CLUB
             </span>
-            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider">
-                <!-- Loaded via JS -->
-            </span>
+            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
         </div>
 
-        <!-- Header Banner -->
-        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
-            <div class="py-0.5">
-                <div id="header-title-container" class="wesma-title leading-tight">
-                    <!-- Rendered by JS -->
+        <!-- Header Banner with Logo Design -->
+        <div id="share-header-banner" class="text-center py-2 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
+            <div class="py-0.5 flex items-center justify-center gap-2">
+                <!-- Custom Logo Icon matching the photo -->
+                <div class="relative w-8 h-8 flex items-center justify-center text-amber-400 shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 75 L30 35 L50 65 L70 35 L90 75" fill="none" stroke="#F59E0B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M42 45 C42 22, 62 12, 72 27 C62 37, 52 37, 42 45 Z" fill="#F59E0B"/>
+                        <ellipse cx="57" cy="35" rx="8" ry="6" fill="#030712"/>
+                    </svg>
                 </div>
+                <div id="header-title-container" class="wesma-title leading-tight"></div>
             </div>
         </div>
 
         <!-- Main Content Area -->
         <div id="main-content-area" class="space-y-2.5">
-            
-            <!-- Teams List -->
-            <div id="teams-list" class="space-y-2.5">
-                <!-- Rendered by JS -->
-            </div>
+            <div id="teams-list" class="space-y-2.5"></div>
 
-            <!-- Total Play Section & Timers -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
                 <div class="flex items-center justify-between px-2">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
@@ -230,7 +233,7 @@
 
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
-                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration (Max 1h 30m):
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration:
                     </span>
                     <span id="total-duration-timer" class="text-amber-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
@@ -262,30 +265,25 @@
                     തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
                 </div>
             </div>
-
         </div>
-
     </div>
 
-    <!-- Outside Capture Area: Match Controls -->
+    <!-- Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
-        
-        <!-- Action Options: END MATCH only -->
         <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
             <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
                 <i class="fa-solid fa-flag-checkered text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
             </span>
             <div class="flex items-center gap-1.5">
-                <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider">
+                <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer">
                     <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
                 </button>
             </div>
         </div>
 
-        <!-- Match History & Options Section with Undo Integration -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2">
-                <button onclick="openUndoModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider">
+                <button onclick="openUndoModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                     🔄 UNDO
                 </button>
                 <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[120px] sm:max-w-[180px]">
@@ -293,17 +291,17 @@
                 </span>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1">
+                <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-folder-open"></i> കാണുക
                 </button>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-2.5 px-1 rounded-xl border border-slate-700 flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md">
+            <button onclick="resetScores()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-light py-2.5 px-1 rounded-xl border border-slate-700 flex items-center justify-center gap-1 text-xs transition-all active:scale-95 shadow-md cursor-pointer">
                 <i class="fa-solid fa-rotate-right text-slate-400"></i> റീസെറ്റ്
             </button>
-            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30">
+            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
                 <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
             </button>
         </div>
@@ -316,15 +314,9 @@
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
             <h3 class="text-sm font-semibold text-amber-300">തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക</h3>
-            
-            <div id="defeated-team-options" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                <!-- Injected dynamically -->
-            </div>
-
+            <div id="defeated-team-options" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
             <div class="pt-1">
-                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
-                    റദ്ദാക്കുക
-                </button>
+                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
             </div>
         </div>
     </div>
@@ -332,24 +324,24 @@
     <!-- Special End Match Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
-            
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
-                    <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
+                    <div class="text-sm font-black text-amber-400 tracking-widest uppercase flex items-center gap-1">
+                        <span class="inline-flex items-center text-amber-400 font-bold" style="font-family:'Inter',sans-serif;">
+                            <span style="font-family:'Great Vibes',cursive; font-size:1.2em;">W</span><span style="position:relative; display:inline-block;"><i class="fa-solid fa-shuttlecock text-[8px]" style="position:absolute; top:-6px; left:-2px; transform:rotate(-25deg);"></i>ESMA</span>
+                        </span>
+                    </div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
                     <div class="text-[9px] text-amber-400 font-bold tracking-widest mt-0.5">SINCE 2026</div>
                 </div>
                 <div class="flex flex-col text-right">
                     <div id="modal-header-date" class="text-[10px] text-amber-300 font-bold tracking-wider"></div>
                 </div>
-                <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
+                <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            
-            <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs">
-                <!-- Content injected dynamically -->
-            </div>
+            <div id="finish-match-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs"></div>
         </div>
     </div>
 
@@ -361,19 +353,13 @@
             </div>
             <h3 class="text-sm font-semibold text-amber-300">ടീം പേര് മാറ്റുക</h3>
             <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ പേര് നൽകുക</p>
-            
             <div class="space-y-2 pt-1">
                 <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
                 <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര്" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-amber-500 uppercase">
             </div>
-
             <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs">
-                    റദ്ദാക്കുക
-                </button>
-                <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow">
-                    സേവ് ചെയ്യുക
-                </button>
+                <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
+                <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">സേവ് ചെയ്യുക</button>
             </div>
         </div>
     </div>
@@ -384,15 +370,13 @@
             <h3 class="text-sm font-semibold text-amber-300">വാട്സാപ്പ് തിരഞ്ഞെടുക്കുക</h3>
             <p class="text-xs text-slate-400 font-light">ഏത് ആപ്പിലേക്കാണ് അയക്കേണ്ടത്?</p>
             <div class="space-y-2 pt-2">
-                <button onclick="proceedWhatsAppShare('normal')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
+                <button onclick="proceedWhatsAppShare('normal')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow cursor-pointer">
                     <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp (റഗുലർ)
                 </button>
-                <button onclick="proceedWhatsAppShare('business')" class="w-full bg-teal-800 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
+                <button onclick="proceedWhatsAppShare('business')" class="w-full bg-teal-800 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow cursor-pointer">
                     <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Business
                 </button>
-                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs">
-                    റദ്ദാക്കുക
-                </button>
+                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
             </div>
         </div>
     </div>
@@ -403,12 +387,10 @@
             <div class="w-14 h-14 mx-auto bg-gradient-to-tr from-amber-500/20 to-amber-400/10 text-amber-400 rounded-2xl flex items-center justify-center border border-amber-500/40 text-xl shadow-lg">
                 <i class="fa-solid fa-rotate-left"></i>
             </div>
-            
             <div>
                 <h3 class="text-base font-extrabold text-amber-300 tracking-wider uppercase">ACTION REVERSAL CENTER</h3>
                 <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">Undo & Amendment Control</p>
             </div>
-
             <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 text-left space-y-2 shadow-inner">
                 <div class="text-[10px] font-bold text-amber-400/90 uppercase tracking-wider flex items-center gap-1.5">
                     <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> LAST RECORDED ACTION
@@ -417,14 +399,9 @@
                     അവസാന മാറ്റങ്ങൾ ഒന്നും ലഭ്യമല്ല.
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-3 pt-1">
-                <button onclick="closeUndoModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition-all active:scale-95">
-                    CANCEL
-                </button>
-                <button id="confirm-undo-btn" onclick="executeUndoAction()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
-                    REVERT ACTION
-                </button>
+                <button onclick="closeUndoModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition-all active:scale-95 cursor-pointer">CANCEL</button>
+                <button id="confirm-undo-btn" onclick="executeUndoAction()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer">REVERT ACTION</button>
             </div>
         </div>
     </div>
@@ -436,25 +413,19 @@
                 <h3 class="text-xs font-semibold text-amber-300 flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-amber-400"></i> TOURNAMENT LOGS
                 </h3>
-                <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1">
-                <!-- History logs -->
-            </div>
+            <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="clearHistory()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-light py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1">
+                <button onclick="clearHistory()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-light py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-trash-can"></i> ക്ലിയർ ചെയ്യുക
                 </button>
-                <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 rounded-xl text-xs">
-                    അടയ്ക്കുക
-                </button>
+                <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
         </div>
     </div>
 
-    <!-- Prominent Center Pop-up Toast Notification (Short duration) -->
+    <!-- Prominent Center Pop-up Toast Notification -->
     <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-5 py-3 rounded-2xl text-xs shadow-[0_0_25px_rgba(245,158,11,0.5)] opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!</div>
     </div>
@@ -490,7 +461,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v92');
+                const localData = localStorage.getItem('wesma_local_backup_v95');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -522,7 +493,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v92');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v95');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -554,8 +525,12 @@
         function launchApp() {
             initAudioContext();
             triggerHapticFeedback([40, 60, 40]);
+            
             const gate = document.getElementById("startup-gate");
-            if(gate) gate.classList.add("hidden");
+            if (gate) {
+                gate.style.display = "none";
+                gate.classList.add("hidden");
+            }
             
             if (!tournamentStartTimestamp) {
                 tournamentStartTimestamp = Date.now();
@@ -571,9 +546,12 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v92');
+            localStorage.removeItem('wesma_local_backup_v95');
             const gate = document.getElementById("startup-gate");
-            if(gate) gate.classList.remove("hidden");
+            if(gate) {
+                gate.style.display = "flex";
+                gate.classList.remove("hidden");
+            }
         }
 
         function playBestSound() {
@@ -653,17 +631,21 @@
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            let letters = [{ char: 'W', isW: true }, { char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
-            let delays = [2.0, 5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
+            // Updated Logo W with Shuttlecock design embedded
+            let logoHtml = `
+                <span class="special-w" style="position:relative; display:inline-block; margin-right:2px;">
+                    W
+                    <i class="fa-solid fa-shuttlecock" style="position:absolute; top:-10px; left:2px; font-size:0.45em; transform:rotate(-25deg); color:#F59E0B;"></i>
+                </span>
+            `;
 
-            let titleHtml = "";
+            let letters = [{ char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
+            let delays = [5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
+
+            let titleHtml = logoHtml;
             letters.forEach((item, idx) => {
                 let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                if (item.isW) {
-                    titleHtml += `<span class="special-w" style="--w-rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">W</span>`;
-                } else {
-                    titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
-                }
+                titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
             });
             headerContainer.innerHTML = titleHtml;
         }
@@ -710,7 +692,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v92', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v95', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -726,7 +708,7 @@
 
         function autoSaveToHistory() {
             const totalPlays = calculateTotalPlays();
-            if (totalPlays === 0 || !tournamentStartTimestamp) return;
+            if (!tournamentStartTimestamp) return;
 
             const dateStr = new Date(tournamentStartTimestamp).toLocaleDateString('en-GB', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
@@ -1048,7 +1030,7 @@
                                 <span class="text-xs text-amber-300 font-semibold">${playedCount}</span>
                             </div>
                             
-                            <button onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-12 bg-rose-950 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 active:scale-95 transition-all" title="Minus (-1 with PIN)">
+                            <button type="button" onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-12 bg-rose-950 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 active:scale-95 transition-all cursor-pointer" title="Minus (-1 with PIN)">
                                 <i class="fa-solid fa-minus text-[10px]"></i>
                             </button>
                             
@@ -1058,7 +1040,7 @@
                             </div>
                             
                             <div class="relative">
-                                <button id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-11 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-lg active:scale-95 transition-all" title="Win +1">
+                                <button type="button" id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-11 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-lg active:scale-95 transition-all cursor-pointer" title="Win +1">
                                     <i class="fa-solid fa-plus text-base font-bold"></i>
                                 </button>
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-lg flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
@@ -1127,7 +1109,8 @@
             teams.forEach(t => {
                 if (t.id !== winningTeamId) {
                     const btn = document.createElement("button");
-                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-200 font-medium py-2.5 px-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between transition-all active:scale-95";
+                    btn.type = "button";
+                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-200 font-medium py-2.5 px-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between transition-all active:scale-95 cursor-pointer";
                     btn.innerHTML = `<span>${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[10px]">തോറ്റ ടീം</span>`;
                     btn.onclick = function() { confirmWinAndDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
