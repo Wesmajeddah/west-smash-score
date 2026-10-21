@@ -152,7 +152,7 @@
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
 
     <!-- Startup Gate Modal -->
-    <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
+    <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
             <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
                 <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -482,9 +482,6 @@
                             const elapsed = Date.now() - tournamentStartTimestamp;
                             if (elapsed >= 90 * 60 * 1000) {
                                 resetTournamentStateForNewSession();
-                            } else {
-                                const gate = document.getElementById("startup-gate");
-                                if(gate) gate.classList.add("hidden");
                             }
                         }
                     }
@@ -1547,7 +1544,7 @@
             toastText.innerText = text;
             if(undoContainer) undoContainer.classList.remove("hidden");
             toast.style.opacity = "1";
-            toast.style.transform = "translate(-50%, -50%) scale(1)";
+            toast.style.transform = "translate(-50%, -50++) scale(1)";
             toast.style.pointerEvents = "auto";
             
             if (toastTimeout) clearTimeout(toastTimeout);
