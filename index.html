@@ -261,15 +261,12 @@
     <!-- Outside Capture Area: Match Controls -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         
-        <!-- Action Options: END MATCH with Locking System & WhatsApp Share -->
+        <!-- Action Options: END MATCH & WhatsApp Share -->
         <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
             <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
-                <i id="end-match-lock-icon" class="fa-solid fa-lock text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
+                <i class="fa-solid fa-flag-checkered text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
             </span>
             <div class="flex items-center gap-1.5">
-                <button onclick="toggleEndMatchLock()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-300 px-2 py-1.5 rounded-lg border border-amber-500/30 flex items-center gap-1 font-semibold" title="Lock/Unlock End Match">
-                    <span id="lock-btn-text">അൺലോക്ക്</span>
-                </button>
                 <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider">
                     <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
                 </button>
@@ -336,10 +333,10 @@
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
+                    <div class="text-[8px] text-amber-300 font-bold tracking-widest mt-0.5">SINCE 2026</div>
                 </div>
-                <div class="flex flex-col text-right">
-                    <div class="text-[10px] text-amber-300 font-bold tracking-widest">SINCE 2026</div>
-                    <div id="modal-header-date" class="text-[8px] text-slate-400 font-light"></div>
+                <div class="flex flex-col text-right justify-center">
+                    <div id="modal-header-date" class="text-[9px] text-slate-300 font-light"></div>
                 </div>
                 <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs">
                     <i class="fa-solid fa-xmark"></i>
@@ -351,8 +348,8 @@
             </div>
 
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="generateAndShareImage('normal')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-image"></i> പ്രിവ്യൂ കാർഡ്
+                <button onclick="downloadFinishCardImage()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
                 </button>
                 <button onclick="closeFinishMatchModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-xl text-xs uppercase tracking-wider shadow">
                     CLOSE
@@ -400,31 +397,6 @@
                 </button>
                 <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-800 text-slate-300 font-light py-2 rounded-xl text-xs">
                     റദ്ദാക്കുക
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Screenshot Preview Modal -->
-    <div id="preview-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 text-center space-y-3">
-            <div class="text-xs font-light text-amber-300 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-crop text-emerald-400"></i> സ്കോർ കാർഡ് പ്രിവ്യൂ (Full View)
-            </div>
-            <div id="preview-container" class="w-full overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 max-h-[48vh] flex items-center justify-center p-2">
-                <!-- Captured Image Preview -->
-            </div>
-            <div class="text-[10px] text-slate-400 font-light">ഫുൾ സൈസ് ഇമേജ് ഗാലറിയിലേക്ക് സീവ് ചെയ്യാം അല്ലെങ്കിൽ ഗ്രൂപ്പിലേക്ക് ഷെയർ ചെയ്യാം.</div>
-            
-            <div class="grid grid-cols-3 gap-1.5 pt-1">
-                <button onclick="closePreviewModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-[11px]">
-                    അടയ്ക്കുക
-                </button>
-                <button id="download-img-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-download"></i> ഡൗൺലോഡ്
-                </button>
-                <button id="share-img-btn" class="bg-cyan-700 hover:bg-cyan-600 text-white font-semibold py-2 rounded-xl text-[11px] shadow flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-share-nodes"></i> ഷെയർ
                 </button>
             </div>
         </div>
@@ -490,14 +462,13 @@
         let currentCapturedBlob = null;
         let globalClickSequence = 0;
         let pendingWinningTeamId = null;
-        let isEndMatchLocked = true; // Default locked
         let lastActionSnapshot = null; // For accidental click undo ("മാറ്റുക")
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v87');
+                const localData = localStorage.getItem('wesma_local_backup_v88');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -534,7 +505,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v87');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v88');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -586,7 +557,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v87');
+            localStorage.removeItem('wesma_local_backup_v88');
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.remove("hidden");
         }
@@ -634,26 +605,6 @@
             triggerHapticFeedback([60, 40, 80]);
         }
 
-        function toggleEndMatchLock() {
-            triggerHapticFeedback([30]);
-            if (isEndMatchLocked) {
-                const pin = prompt("അൺലോക്ക് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
-                if (pin !== ADMIN_PIN) {
-                    if (pin !== null) alert("തെറ്റായ PIN!");
-                    return;
-                }
-                isEndMatchLocked = false;
-                document.getElementById("end-match-lock-icon").className = "fa-solid fa-lock-open text-emerald-400 text-[10px]";
-                document.getElementById("lock-btn-text").textContent = "ലോക്ക്";
-                showToast("🔓 End Match അൺലോക്ക് ചെയ്തു!");
-            } else {
-                isEndMatchLocked = true;
-                document.getElementById("end-match-lock-icon").className = "fa-solid fa-lock text-amber-400 text-[10px]";
-                document.getElementById("lock-btn-text").textContent = "അൺലോക്ക്";
-                showToast("🔒 End Match ലോക്ക് ചെയ്തു!");
-            }
-        }
-
         function initData() {
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -685,7 +636,7 @@
                         }
                         saveLocalBackup();
                     } else {
-                        const localData = localStorage.getItem('wesma_local_backup_v87');
+                        const localData = localStorage.getItem('wesma_local_backup_v88');
                         if (!localData) {
                             teams = JSON.parse(JSON.stringify(defaultTeams));
                             saveData();
@@ -794,7 +745,7 @@
                     tournamentHistory,
                     globalClickSequence
                 };
-                localStorage.setItem('wesma_local_backup_v87', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v88', JSON.stringify(payload));
             } catch(e) {
                 console.log("LocalStorage save error", e);
             }
@@ -973,11 +924,6 @@
         }
 
         function manualFinishMatch() {
-            if (isEndMatchLocked) {
-                showToast("🔒 End Match ലോക്ക് ചെയ്തിരിക്കുന്നു! ദയവായി അൺലോക്ക് ചെയ്യുക.");
-                return;
-            }
-
             triggerHapticFeedback([100, 50, 100]);
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0) {
@@ -1073,6 +1019,43 @@
             if (modal) modal.classList.add("hidden");
         }
 
+        function downloadFinishCardImage() {
+            showToast("📸 കാർഡ് ഡൗൺലോഡ് ചെയ്യപ്പെടുന്നു...");
+            const captureElement = document.getElementById("capture-area");
+            const shareHeader = document.getElementById("share-header-banner");
+            
+            if (shareHeader) shareHeader.style.display = "none";
+
+            html2canvas(captureElement, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: "#030712",
+                logging: false,
+                letterRendering: true,
+                scrollX: 0,
+                scrollY: 0,
+                width: captureElement.scrollWidth,
+                height: captureElement.scrollHeight,
+                windowWidth: captureElement.scrollWidth,
+                windowHeight: captureElement.scrollHeight
+            }).then(canvas => {
+                if (shareHeader) shareHeader.style.display = "block";
+
+                canvas.toBlob(blob => {
+                    const fileUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = 'WESMA_Match_Card.png';
+                    link.click();
+                    showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
+                });
+            }).catch(err => {
+                if (shareHeader) shareHeader.style.display = "block";
+                console.error("Image generation error:", err);
+                showToast("⚠️ ഡൗൺലോഡ് ചെയ്യുന്നതിൽ തടസ്സമുണ്ടായി.");
+            });
+        }
+
         function startCooldownTickers() {
             if (cooldownInterval) clearInterval(cooldownInterval);
             cooldownInterval = setInterval(() => {
@@ -1103,7 +1086,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -1206,6 +1189,8 @@
         }
 
         // Winner Stays Rotation Logic with Defeated Team Picker & Exact Time Gap Calculation
+        let defeatedModalTimeout = null;
+
         function handleScoreChange(id, delta) {
             const team = teams.find(t => t.id === id);
             if (!team) return;
@@ -1228,7 +1213,6 @@
                     return;
                 }
                 if (team.wins > 0) {
-                    // Save snapshot for undo ("മാറ്റുക")
                     lastActionSnapshot = JSON.parse(JSON.stringify(teams));
                     
                     team.wins += delta;
@@ -1262,12 +1246,19 @@
             });
 
             modal.classList.remove("hidden");
+
+            // Auto-dismiss popup after 6 seconds if no interaction
+            if (defeatedModalTimeout) clearTimeout(defeatedModalTimeout);
+            defeatedModalTimeout = setTimeout(() => {
+                closeDefeatedTeamModal();
+            }, 6000);
         }
 
         function closeDefeatedTeamModal() {
             const modal = document.getElementById("defeated-team-modal");
             if (modal) modal.classList.add("hidden");
             pendingWinningTeamId = null;
+            if (defeatedModalTimeout) clearTimeout(defeatedModalTimeout);
         }
 
         function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
@@ -1276,12 +1267,9 @@
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
             if (!team || !defeatedTeam) return;
 
-            // Save snapshot before changes for accidental click undo ("മാറ്റുക")
             lastActionSnapshot = JSON.parse(JSON.stringify(teams));
 
             const now = Date.now();
-            
-            // Exact time gap calculation from tournament start or last match action
             const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
             const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
             
@@ -1295,11 +1283,9 @@
             if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
             lastActionTimestamp = now;
             
-            // Winner gets +1 win & +1 played
             team.wins += 1;
             team.played = (team.played || 0) + 1;
 
-            // Selected defeated team gets +1 loss & +1 played
             defeatedTeam.losses = (defeatedTeam.losses || 0) + 1;
             defeatedTeam.played = (defeatedTeam.played || 0) + 1;
             
@@ -1451,7 +1437,7 @@
             if (currentShareMode === 'text') {
                 shareWhatsAppText(type);
             } else {
-                generateAndShareImage(type);
+                shareWhatsAppCardImage(type);
             }
         }
 
@@ -1478,14 +1464,10 @@
             window.open(url, '_blank');
         }
 
-        function generateAndShareImage(type) {
-            showToast("📸 പ്രിവ്യൂ കാർഡ് തയ്യാറാക്കുന്നു...");
+        function shareWhatsAppCardImage(type) {
+            showToast("📸 വാട്സാപ്പ് കാർഡ് തയ്യാറാക്കുന്നു...");
             const captureElement = document.getElementById("capture-area");
             const shareHeader = document.getElementById("share-header-banner");
-            const previewModal = document.getElementById("preview-modal");
-            const previewContainer = document.getElementById("preview-container");
-            const downloadBtn = document.getElementById("download-img-btn");
-            const shareBtn = document.getElementById("share-img-btn");
             
             if (shareHeader) shareHeader.style.display = "none";
 
@@ -1504,51 +1486,26 @@
             }).then(canvas => {
                 if (shareHeader) shareHeader.style.display = "block";
 
-                previewContainer.innerHTML = "";
-                const previewImg = document.createElement('img');
-                previewImg.src = canvas.toDataURL("image/png");
-                previewImg.className = "rounded-lg w-full object-contain shadow-lg border border-slate-800";
-                previewContainer.appendChild(previewImg);
-                previewModal.classList.remove("hidden");
-
                 canvas.toBlob(blob => {
                     currentCapturedBlob = blob;
-                    const fileUrl = URL.createObjectURL(blob);
-                    
-                    downloadBtn.onclick = function() {
-                        const link = document.createElement('a');
-                        link.href = fileUrl;
-                        link.download = 'WESMA_Match_Card.png';
-                        link.click();
-                        showToast("ഫോട്ടോ ഗാലറിയിലേക്ക് ഡൗൺലോഡ് ചെയ്തു!");
-                    };
-
-                    shareBtn.onclick = function() {
-                        if (navigator.share && currentCapturedBlob) {
-                            const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
-                            navigator.share({
-                                title: 'WESMA BADMINTON SCORECARD',
-                                text: '🏸 WESMA Badminton Club - Match Scorecard',
-                                files: [file]
-                            }).catch(err => console.log('Share error', err));
-                        } else {
-                            let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
-                            let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                            window.open(url, '_blank');
-                        }
-                    };
-
+                    if (navigator.share && currentCapturedBlob) {
+                        const file = new File([currentCapturedBlob], 'WESMA_Match_Card.png', { type: 'image/png' });
+                        navigator.share({
+                            title: 'WESMA BADMINTON SCORECARD',
+                            text: '🏸 WESMA Badminton Club - Match Scorecard',
+                            files: [file]
+                        }).catch(err => console.log('Share error', err));
+                    } else {
+                        let text = "🏸 *WESMA BADMINTON CLUB* 🏸\n🏆 സ്കോർ കാർഡ് ഡൗൺലോഡ് ചെയ്തിട്ടുണ്ട്!";
+                        let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                        window.open(url, '_blank');
+                    }
                 });
             }).catch(err => {
                 if (shareHeader) shareHeader.style.display = "block";
                 console.error("Image generation error:", err);
-                showToast("⚠️ പ്രിവ്യൂ തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
+                showToast("⚠️ കാർഡ് തയ്യാറാക്കുന്നതിൽ തടസ്സമുണ്ടായി.");
             });
-        }
-
-        function closePreviewModal() {
-            const modal = document.getElementById("preview-modal");
-            if(modal) modal.classList.add("hidden");
         }
 
         function resetScores() {
