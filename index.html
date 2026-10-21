@@ -199,13 +199,15 @@
             <div id="teams-list" class="space-y-2.5"></div>
 
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
-                <div class="flex items-center justify-between px-2">
-                    <span class="text-xs font-light text-slate-300 flex items-center gap-2">
-                        <i class="fa-solid fa-gamepad text-amber-400"></i> Total Plays :
-                    </span>
-                    <span id="total-play-val" class="text-amber-400 font-semibold text-xs bg-slate-950 px-3 py-0.5 rounded-lg border border-amber-500/20 min-w-[45px] text-center shadow-inner">
-                        0
-                    </span>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex items-center justify-between px-2.5 py-1.5 bg-slate-950 rounded-lg border border-amber-500/20">
+                        <span class="text-[11px] font-light text-slate-300">Team Matches:</span>
+                        <span id="total-play-val" class="text-amber-400 font-bold text-xs">0</span>
+                    </div>
+                    <div class="flex items-center justify-between px-2.5 py-1.5 bg-slate-950 rounded-lg border border-cyan-500/20">
+                        <span class="text-[11px] font-light text-slate-300">Player Matches:</span>
+                        <span id="total-player-play-val" class="text-cyan-400 font-bold text-xs">0</span>
+                    </div>
                 </div>
                 
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
@@ -291,16 +293,19 @@
         </div>
     </div>
 
-    <!-- Defeated Team Selection Modal -->
+    <!-- Defeated Team Selection Modal (Redesigned with larger cards & padding) -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
-            <div class="w-10 h-10 mx-auto bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/30 text-sm">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
+            <div class="w-12 h-12 mx-auto bg-rose-500/15 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/40 text-base shadow-md">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <h3 class="text-sm font-semibold text-amber-300">തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക</h3>
-            <div id="defeated-team-options" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
-            <div class="pt-1">
-                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
+            <div>
+                <h3 class="text-sm font-bold text-amber-300 uppercase tracking-wide">തോറ്റ ടീമിനെ തിരഞ്ഞെടുക്കുക</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">തെറ്റ് വരാതിരിക്കാൻ കൃത്യമായി ക്ലിക്ക് ചെയ്യുക</p>
+            </div>
+            <div id="defeated-team-options" class="space-y-2.5 max-h-60 overflow-y-auto pr-1"></div>
+            <div class="pt-2">
+                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-2xl text-xs uppercase tracking-wider cursor-pointer border border-slate-700">റദ്ദാക്കുക</button>
             </div>
         </div>
     </div>
@@ -441,7 +446,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v94');
+                const localData = localStorage.getItem('wesma_local_backup_v95');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -473,7 +478,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v94');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v95');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -526,7 +531,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v94');
+            localStorage.removeItem('wesma_local_backup_v95');
             const gate = document.getElementById("startup-gate");
             if(gate) {
                 gate.style.display = "flex";
@@ -665,10 +670,15 @@
             return teams.reduce((sum, team) => sum + (team.played || 0), 0);
         }
 
+        function calculateTotalPlayerPlays() {
+            // Since 4 players participate in each match (2 vs 2), total player match appearances = team matches * 2
+            return calculateTotalPlays() * 2;
+        }
+
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v94', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v95', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -879,7 +889,7 @@
                         ${escapeHtml(championName)}
                     </div>
                     <div class="text-xs text-slate-300 font-light pt-1 border-t border-amber-500/30">
-                        Total Plays: <b class="text-white">${calculateTotalPlays()}</b> | Session Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
+                        Team Matches: <b class="text-white">${calculateTotalPlays()}</b> | Player Matches: <b class="text-cyan-300">${calculateTotalPlayerPlays()}</b> | Time: <b class="text-amber-300">${totalHours}h ${totalMins}m</b>
                     </div>
                 </div>
                 <div class="space-y-1 text-left pt-1">
@@ -1037,7 +1047,9 @@
             });
             
             const totalPlayEl = document.getElementById("total-play-val");
+            const totalPlayerPlayEl = document.getElementById("total-player-play-val");
             if(totalPlayEl) totalPlayEl.textContent = calculateTotalPlays();
+            if(totalPlayerPlayEl) totalPlayerPlayEl.textContent = calculateTotalPlayerPlays();
             updateLeaderboard();
         }
 
@@ -1086,8 +1098,8 @@
                 if (t.id !== winningTeamId) {
                     const btn = document.createElement("button");
                     btn.type = "button";
-                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-200 font-medium py-2.5 px-3 rounded-xl border border-slate-800 text-xs flex items-center justify-between transition-all active:scale-95 cursor-pointer";
-                    btn.innerHTML = `<span>${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[10px]">തോറ്റ ടീം</span>`;
+                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-semibold py-3 px-4 rounded-2xl border border-slate-700/80 text-xs flex items-center justify-between transition-all active:scale-95 shadow-md cursor-pointer";
+                    btn.innerHTML = `<span class="tracking-wide">${escapeHtml(t.name)}</span> <span class="text-rose-400 text-[11px] font-bold bg-rose-950/60 px-2 py-1 rounded-xl border border-rose-800/40">തോറ്റ ടീം</span>`;
                     btn.onclick = function() { confirmWinAndDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
                 }
@@ -1307,7 +1319,7 @@
             });
 
             text += `🏆 *Champions:* ${sorted[0].wins > 0 ? sorted[0].name : 'Pending'}\n`;
-            text += `⚡ *Total Plays:* ${calculateTotalPlays()}\n`;
+            text += `👥 *Total Matches:* ${calculateTotalPlays()} (Player Matches: ${calculateTotalPlayerPlays()})\n`;
             text += `📅 *Date:* ${new Date().toLocaleDateString('en-GB')}`;
 
             let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
