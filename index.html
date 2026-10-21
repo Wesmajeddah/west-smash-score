@@ -366,7 +366,7 @@
                     തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
                 </div>
 
-                <!-- പുതിയ ഫീച്ചർ: ഏറ്റവും കൂടുതൽ ആരെയാണ് തോൽപ്പിച്ചത് / ആരോടാണ് തോറ്റത് -->
+                <!-- H2H Stats Section -->
                 <div class="pt-2 border-t border-amber-500/20 text-left space-y-1.5">
                     <button onclick="toggleH2HInterface()" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-semibold text-[11px] py-2 px-2 rounded-lg border border-amber-500/30 flex items-center justify-between transition-all cursor-pointer">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-amber-400"></i> ഏറ്റവും കൂടുതൽ ജയങ്ങൾ/തോൽവികൾ (H2H Stats)</span>
@@ -1210,7 +1210,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -1334,8 +1334,20 @@
                 if (team.wins > 0) {
                     lastActionSnapshot = JSON.parse(JSON.stringify(teams));
                     lastActionDescription = `${team.name} team score reduced by -1.`;
+                    
+                    // സ്കോർ കുറയ്ക്കുമ്പോൾ wins, played എന്നിവയ്‌ക്കൊപ്പം തോറ്റ ടീമുകളുടെ വിവരങ്ങളും (defeatedDetails & losses) കൃത്യമായി റിവേഴ്സ് ചെയ്യുക
                     team.wins += delta;
                     if (team.played > team.wins) team.played = Math.max(0, team.played - 1);
+                    
+                    if (team.defeatedDetails && team.defeatedDetails.length > 0) {
+                        let lastDefeatedObj = team.defeatedDetails.pop();
+                        let defeatedTeamObj = teams.find(t => t.name === lastDefeatedObj.name);
+                        if (defeatedTeamObj) {
+                            defeatedTeamObj.losses = Math.max(0, (defeatedTeamObj.losses || 0) - 1);
+                            if (defeatedTeamObj.played > 0) defeatedTeamObj.played = Math.max(0, defeatedTeamObj.played - 1);
+                        }
+                    }
+
                     autoSaveToHistory();
                     saveData();
                     render();
@@ -1577,7 +1589,7 @@
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
 
-            // H2H Calculations (ഏറ്റവും കൂടുതൽ ആരെയാണ് തോൽപ്പിച്ചത് / ആരോടാണ് തോറ്റത്)
+            // H2H Calculations (ഉണ്ടായ മാറ്റങ്ങൾക്ക് അനുസൃതമായി തത്സമയം അപ്ഡേറ്റ് ആവുന്നു)
             let overallDefeatedCounts = {};
             let teamLossAgainstCounts = {};
 
@@ -1585,18 +1597,15 @@
                 if (!teamLossAgainstCounts[t.name]) teamLossAgainstCounts[t.name] = {};
                 if (t.defeatedDetails) {
                     t.defeatedDetails.forEach(item => {
-                        // Winner t defeated item.name
                         if (!overallDefeatedCounts[t.name]) overallDefeatedCounts[t.name] = {};
                         overallDefeatedCounts[t.name][item.name] = (overallDefeatedCounts[t.name][item.name] || 0) + 1;
 
-                        // item.name lost against t
                         if (!teamLossAgainstCounts[item.name]) teamLossAgainstCounts[item.name] = {};
                         teamLossAgainstCounts[item.name][t.name] = (teamLossAgainstCounts[item.name][t.name] || 0) + 1;
                     });
                 }
             });
 
-            // Find max defeated pair
             let maxDefeatCount = 0;
             let topDefeatText = "വിവരങ്ങൾ ലഭ്യമല്ല";
             Object.entries(overallDefeatedCounts).forEach(([winner, targets]) => {
@@ -1608,7 +1617,6 @@
                 });
             });
 
-            // Find max lost against pair
             let maxLossCount = 0;
             let topLossText = "വിവരങ്ങൾ ലഭ്യമല്ല";
             Object.entries(teamLossAgainstCounts).forEach(([loser, winners]) => {
