@@ -490,7 +490,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v91');
+                const localData = localStorage.getItem('wesma_local_backup_v92');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -522,7 +522,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v91');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v92');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -571,7 +571,7 @@
             tournamentStartTimestamp = null;
             lastActionTimestamp = null;
             globalClickSequence = 0;
-            localStorage.removeItem('wesma_local_backup_v91');
+            localStorage.removeItem('wesma_local_backup_v92');
             const gate = document.getElementById("startup-gate");
             if(gate) gate.classList.remove("hidden");
         }
@@ -710,7 +710,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence };
-                localStorage.setItem('wesma_local_backup_v91', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v92', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -1149,7 +1149,7 @@
             if (!team || !defeatedTeam) return;
 
             lastActionSnapshot = JSON.parse(JSON.stringify(teams));
-            lastActionDescription = `جയം: ${team.name} vs പരാജയം: ${defeatedTeam.name}`;
+            lastActionDescription = `ജയം: ${team.name} vs പരാജയം: ${defeatedTeam.name}`;
 
             const now = Date.now();
             const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
@@ -1188,7 +1188,7 @@
                 detailsEl.innerHTML = `<span class="text-slate-300 font-semibold">${lastActionDescription}</span>`;
                 confirmBtn.disabled = false;
             } else {
-                detailsEl.innerHTML = "<span class="text-slate-500 font-light">അവസാന മാറ്റങ്ങൾ ഒന്നും ലഭ്യമല്ല.</span>";
+                detailsEl.innerHTML = `<span class="text-slate-500 font-light">അവസാന മാറ്റങ്ങൾ ഒന്നും ലഭ്യമല്ല.</span>`;
                 confirmBtn.disabled = true;
             }
             modal.classList.remove("hidden");
