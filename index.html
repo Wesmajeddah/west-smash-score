@@ -154,7 +154,6 @@
             animation: spinReset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Pulsing Glow Animation for Reset Button */
         @keyframes resetBtnGlow {
             0%, 100% { box-shadow: 0 0 8px rgba(225, 29, 72, 0.3), inset 0 0 5px rgba(225, 29, 72, 0.2); }
             50% { box-shadow: 0 0 16px rgba(225, 29, 72, 0.7), inset 0 0 10px rgba(225, 29, 72, 0.4); border-color: rgba(244, 63, 94, 0.8); }
@@ -164,7 +163,6 @@
             animation: resetBtnGlow 2.5s infinite ease-in-out;
         }
 
-        /* Special Animated i-Button */
         @keyframes iBtnPulse {
             0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(245, 158, 11, 0.6); }
             50% { transform: scale(1.25); box-shadow: 0 0 12px rgba(245, 158, 11, 1); color: #fbbf24; }
@@ -176,7 +174,6 @@
             justify-content: center;
         }
 
-        /* Unique Styled Summary Card with Separate Glowing Animations per Team */
         @keyframes teamCardGlow1 {
             0%, 100% { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
             50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
@@ -222,7 +219,6 @@
             background: linear-gradient(180deg, #f59e0b 0%, #10b981 50%, #e11d48 100%);
         }
 
-        /* Pulsing Live Dot Animation */
         @keyframes liveDotPulseGreen {
             0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(34, 197, 94, 0.9); }
             50% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 12px rgba(34, 197, 94, 1); }
@@ -465,7 +461,7 @@
         </div>
     </div>
 
-    <!-- Match Controls & Compact Summary Above End Match -->
+    <!-- Match Controls & Compact Summary Above Current Status -->
     <div class="w-full max-w-xl pt-2 space-y-2">
         <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 shadow-md flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -475,19 +471,19 @@
                     <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ</div>
                 </div>
             </div>
-            <!-- Updated Side Button Text to RECORDS -->
             <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
                 <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
             </button>
         </div>
 
-        <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 shadow-md">
-            <span class="text-[11px] text-slate-400 font-light flex items-center gap-1">
-                <i class="fa-solid fa-flag-checkered text-amber-400 text-[10px]"></i> ടൂർണമെന്റ് ഫിനിഷ്:
+        <!-- NEW: CURRENT STATUS INTERFACE (Replaces End Match) -->
+        <div class="flex items-center justify-between bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-2 shadow-md">
+            <span class="text-[11px] text-amber-300 font-bold flex items-center gap-1.5">
+                <span class="live-dot-green"></span> CURRENT STATUS:
             </span>
             <div class="flex items-center gap-1.5">
-                <button onclick="manualFinishMatch()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-1.5 px-3 rounded-lg border border-rose-800/60 flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer">
-                    <i class="fa-solid fa-flag-checkered text-amber-300"></i> END MATCH
+                <button onclick="manualFinishMatch()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold py-1.5 px-3 rounded-lg shadow flex items-center gap-1 text-[11px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer">
+                    <i class="fa-solid fa-share-nodes text-slate-950"></i> SHARE STATUS
                 </button>
             </div>
         </div>
@@ -502,6 +498,10 @@
                 </span>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Add Team Button (New) -->
+                <button onclick="openAddTeamModal()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-2 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 cursor-pointer" title="പുതിയ ടീമിനെ ചേർക്കുക">
+                    <i class="fa-solid fa-user-plus"></i> ടീം ചേർക്കുക
+                </button>
                 <button onclick="openHistoryModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-folder-open"></i> ഹിസ്റ്ററി
                 </button>
@@ -549,16 +549,16 @@
         </div>
     </div>
 
-    <!-- Unique Styled Match Stats & Detailed Summary Modal -->
+    <!-- Records / Summary Modal with Compact Columns for Screenshot Optimization -->
     <div id="time-summary-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-3 bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/60 border-b border-amber-500/30 flex items-center justify-between">
                 <h3 class="text-xs font-extrabold text-amber-300 flex items-center gap-2 uppercase tracking-wider">
-                    <i class="fa-solid fa-chart-pie text-amber-400 animate-pulse"></i> MATCH STATS & DETAILED SUMMARY
+                    <i class="fa-solid fa-chart-pie text-amber-400 animate-pulse"></i> RECORDS & MATCH STATS
                 </h3>
                 <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="modal-time-summary-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
+            <div id="modal-time-summary-content" class="p-2 space-y-2 overflow-y-auto flex-1"></div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeTimeSummaryModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-4 py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
@@ -589,14 +589,14 @@
         </div>
     </div>
 
-    <!-- Special End Match Modal Window -->
+    <!-- Current Status / Share Status Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
-                    <div class="text-[9px] text-amber-400 font-bold tracking-widest mt-0.5">SINCE 2026</div>
+                    <div class="text-[9px] text-amber-400 font-bold tracking-widest mt-0.5">CURRENT STATUS</div>
                 </div>
                 <div class="flex flex-col text-right">
                     <div id="modal-header-date" class="text-[10px] text-amber-300 font-bold tracking-wider"></div>
@@ -624,6 +624,25 @@
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
                 <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">സേവ് ചെയ്യുക</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Team Modal (Hidden by default unless triggered) -->
+    <div id="add-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
+            <div class="w-10 h-10 mx-auto bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center border border-emerald-500/30 text-sm">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h3 class="text-sm font-semibold text-amber-300">പുതിയ ടീമിനെ ചേർക്കുക</h3>
+            <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ ടീമിന്റെ പേര് നൽകുക</p>
+            <div class="space-y-2 pt-1">
+                <input type="password" id="add-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
+                <input type="text" id="new-team-name-input" placeholder="ടീം പേര് (ഉദാ: PLAYER 1 & PLAYER 2)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-emerald-500 uppercase">
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="closeAddTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
+                <button onclick="submitNewTeam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow cursor-pointer text-white">ചേർക്കുക</button>
             </div>
         </div>
     </div>
@@ -724,6 +743,7 @@
         let lastActionDescription = "";
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
+        const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
         function getDeviceInformation() {
             const ua = navigator.userAgent;
@@ -892,10 +912,7 @@
                 dbRef.on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data && data.teams && Array.isArray(data.teams) && data.teams.length > 0) {
-                        teams = defaultTeams.map((defTeam) => {
-                            const found = data.teams.find(st => st && st.id === defTeam.id);
-                            return found && found.name ? { ...defTeam, ...found } : defTeam;
-                        });
+                        teams = data.teams;
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
@@ -1011,7 +1028,6 @@
             updateLeaderboard();
         }
 
-        /* 1 hour 15 minutes rule for session history addition */
         function autoSaveToHistory() {
             const totalPlays = calculateTotalPlays();
             if (!tournamentStartTimestamp) return;
@@ -1119,7 +1135,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Unique Summary Modal Interface with Special Border & Separate Team Animations */
+        /* RECORDS Modal: Compact columns to fit all teams in one screenshot without other changes */
         function openTimeSummaryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("time-summary-modal");
@@ -1137,45 +1153,45 @@
                 let animClass = `unique-summary-card-${((t.id - 1) % 5) + 1}`;
                 
                 html += `
-                    <div class="unique-summary-card ${animClass} rounded-xl p-3 space-y-2">
-                        <div class="flex items-center justify-between text-xs font-bold text-slate-100">
-                            <span class="flex items-center gap-1.5 pl-1">
-                                <span class="text-amber-400 font-black text-[11px]">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider">${escapeHtml(t.name)}</span>
+                    <div class="unique-summary-card ${animClass} rounded-lg p-2 space-y-1">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-100">
+                            <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
+                                <span class="text-amber-400 font-black">#${idx + 1}</span>
+                                <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-amber-300 font-extrabold bg-slate-950/80 px-2.5 py-1 rounded-lg border border-amber-500/30 text-[10px] tracking-wide">
-                                <i class="fa-solid fa-clock text-amber-400 mr-1"></i>TOTAL TIME: ${mins} Mins
+                            <span class="text-amber-300 font-extrabold bg-slate-950/80 px-2 py-0.5 rounded border border-amber-500/30 text-[9px] shrink-0">
+                                TIME: ${mins}m
                             </span>
                         </div>
-                        <div class="grid grid-cols-3 gap-1.5 pt-1 text-[10px]">
-                            <div class="bg-slate-950/90 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-emerald-400 font-black uppercase tracking-wider">WINS</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="text-amber-400 hover:text-amber-300 text-xs font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
+                        <div class="grid grid-cols-3 gap-1 text-[10px]">
+                            <div class="bg-slate-950/90 border border-emerald-500/40 rounded px-1.5 py-1 text-center flex items-center justify-between">
+                                <span class="text-emerald-400 font-bold uppercase text-[9px]">W</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-emerald-300 font-black">${t.wins}</span>
+                                    <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="text-amber-400 hover:text-amber-300 text-[9px] cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                 </div>
-                                <span class="text-emerald-300 text-sm font-black mt-1">${t.wins}</span>
                             </div>
 
-                            <div class="bg-slate-950/90 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-rose-400 font-black uppercase tracking-wider">LOSSES</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="text-amber-400 hover:text-amber-300 text-xs font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
+                            <div class="bg-slate-950/90 border border-rose-500/40 rounded px-1.5 py-1 text-center flex items-center justify-between">
+                                <span class="text-rose-400 font-bold uppercase text-[9px]">L</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-rose-300 font-black">${t.losses || 0}</span>
+                                    <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="text-amber-400 hover:text-amber-300 text-[9px] cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                 </div>
-                                <span class="text-rose-300 text-sm font-black mt-1">${t.losses || 0}</span>
                             </div>
 
-                            <div class="bg-slate-950/90 border border-amber-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-amber-300 font-black uppercase tracking-wider">TOTAL MATCH</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="text-amber-400 hover:text-amber-300 text-xs font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
+                            <div class="bg-slate-950/90 border border-amber-500/40 rounded px-1.5 py-1 text-center flex items-center justify-between">
+                                <span class="text-amber-300 font-bold uppercase text-[9px]">M</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-amber-200 font-black">${t.played || 0}</span>
+                                    <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="text-amber-400 hover:text-amber-300 text-[9px] cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                 </div>
-                                <span class="text-amber-200 text-sm font-black mt-1">${t.played || 0}</span>
                             </div>
                         </div>
                     </div>
@@ -1389,20 +1405,10 @@
             }, 1000);
         }
 
+        /* CURRENT STATUS / SHARE STATUS MODAL */
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
-            const pin = prompt("END MATCH ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
-            if (pin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
-                return;
-            }
-
-            if (calculateTotalPlays() === 0) {
-                showToast("⚠️ നിലവിൽ മത്സരങ്ങളൊന്നും നടന്നിട്ടില്ല!");
-                return;
-            }
-
             isMatchEnded = true;
             updateMatchStatusBadge();
 
@@ -1503,7 +1509,7 @@
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        ✨ TOURNAMENT CHAMPIONS CELEBRATION ✨
+                        ✨ CURRENT MATCH STATUS ✨
                     </div>
                     
                     ${dancingPlayersStageCompactHtml}
@@ -1531,7 +1537,7 @@
 
                 <div class="space-y-1 text-left pt-1">
                     <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-list-check text-amber-400"></i> FINAL SCORES:
+                        <i class="fa-solid fa-list-check text-amber-400"></i> LIVE SCORES:
                     </div>
                     <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
                         <table class="w-full text-left border-collapse">
@@ -1898,6 +1904,60 @@
             closeCustomNameModal();
         }
 
+        /* ADD NEW TEAM FUNCTIONS */
+        function openAddTeamModal() {
+            triggerHapticFeedback([30]);
+            const modal = document.getElementById("add-team-modal");
+            const nameInput = document.getElementById("new-team-name-input");
+            const pinInput = document.getElementById("add-admin-pin");
+            if(nameInput) nameInput.value = "";
+            if(pinInput) pinInput.value = "";
+            if(modal) modal.classList.remove("hidden");
+        }
+
+        function closeAddTeamModal() {
+            const modal = document.getElementById("add-team-modal");
+            if(modal) modal.classList.add("hidden");
+        }
+
+        function submitNewTeam() {
+            const pinInput = document.getElementById("add-admin-pin").value;
+            const nameInput = document.getElementById("new-team-name-input").value.trim().toUpperCase();
+
+            if (pinInput !== ADMIN_PIN) {
+                alert("തെറ്റായ Admin PIN!");
+                return;
+            }
+            if (!nameInput) {
+                alert("ദയവായി പുതിയ ടീമിന്റെ പേര് നൽകുക!");
+                return;
+            }
+
+            const newId = teams.length > 0 ? Math.max(...teams.map(t => t.id)) + 1 : 1;
+            const randomBadgeBg = badgeColorsList[Math.floor(Math.random() * badgeColorsList.length)];
+
+            teams.push({
+                id: newId,
+                name: nameInput,
+                wins: 0,
+                losses: 0,
+                played: 0,
+                badgeBg: randomBadgeBg,
+                lastMatchTime: 0,
+                lastClickTime: 0,
+                clickOrder: 0,
+                matchInterval: 0,
+                totalTimeSpentMinutes: 0,
+                defeatedDetails: []
+            });
+
+            autoSaveToHistory();
+            saveData();
+            render();
+            closeAddTeamModal();
+            showToast("🎉 പുതിയ ടീമിനെ വിജയകരമായി ചേർത്തു!");
+        }
+
         function toggleH2HInterface() {
             const container = document.getElementById("h2h-stats-container");
             const icon = document.getElementById("h2h-toggle-icon");
@@ -1913,6 +1973,7 @@
             }
         }
 
+        /* REFINED H2H & LEADERBOARD LOGIC */
         function updateLeaderboard() {
             const leaderEl = document.getElementById("leader-text");
             const championSpan = document.getElementById("champion-name-span");
@@ -1979,11 +2040,11 @@
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
 
+            // Enhanced H2H Precise Processing (Refined to correctly handle identical counts & mutual records)
             let overallDefeatedCounts = {};
             let teamLossAgainstCounts = {};
 
             teams.forEach(t => {
-                if (!teamLossAgainstCounts[t.name]) teamLossAgainstCounts[t.name] = {};
                 if (t.defeatedDetails) {
                     t.defeatedDetails.forEach(item => {
                         if (!overallDefeatedCounts[t.name]) overallDefeatedCounts[t.name] = {};
@@ -1996,29 +2057,37 @@
             });
 
             let maxDefeatCount = 0;
-            let topDefeatText = "വിവരങ്ങൾ ലഭ്യമല്ല";
+            let topDefeatPairs = [];
             Object.entries(overallDefeatedCounts).forEach(([winner, targets]) => {
                 Object.entries(targets).forEach(([target, count]) => {
                     if (count > maxDefeatCount) {
                         maxDefeatCount = count;
-                        topDefeatText = `🎯 ${winner} 👉 ഏറ്റവും കൂടുതൽ തോൽപ്പിച്ചത്: <b class="text-white">${target}</b> (${count} പ്രാവശ്യം)`;
+                        topDefeatPairs = [`<b class="text-white">${winner}</b> 👉 ഏറ്റവും കൂടുതൽ തോൽപ്പിച്ചത്: <b class="text-white">${target}</b> (${count} പ്രാവശ്യം)`];
+                    } else if (count === maxDefeatCount && maxDefeatCount > 0) {
+                        topDefeatPairs.push(`<b class="text-white">${winner}</b> 👉 ഏറ്റവും കൂടുതൽ തോൽപ്പിച്ചത്: <b class="text-white">${target}</b> (${count} പ്രാവശ്യം)`);
                     }
                 });
             });
 
             let maxLossCount = 0;
-            let topLossText = "വിവരങ്ങൾ ലഭ്യമല്ല";
+            let topLossPairs = [];
             Object.entries(teamLossAgainstCounts).forEach(([loser, winners]) => {
                 Object.entries(winners).forEach(([winner, count]) => {
                     if (count > maxLossCount) {
                         maxLossCount = count;
-                        topLossText = `⚠️ ${loser} 👉 ഏറ്റവും കൂടുതൽ തോറ്റത് ആരോടാണ്: <b class="text-white">${winner}</b> (${count} പ്രാവശ്യം)`;
+                        topLossPairs = [`<b class="text-white">${loser}</b> 👉 ഏറ്റവും കൂടുതൽ തോറ്റത് ആരോടാണ്: <b class="text-white">${winner}</b> (${count} പ്രാവശ്യം)`];
+                    } else if (count === maxLossCount && maxLossCount > 0) {
+                        topLossPairs.push(`<b class="text-white">${loser}</b> 👉 ഏറ്റവും കൂടുതൽ തോറ്റത് ആരോടാണ്: <b class="text-white">${winner}</b> (${count} പ്രാവശ്യം)`);
                     }
                 });
             });
 
-            if(mostDefeatedEl) mostDefeatedEl.innerHTML = topDefeatText;
-            if(mostLostToEl) mostLostToEl.innerHTML = topLossText;
+            if (mostDefeatedEl) {
+                mostDefeatedEl.innerHTML = topDefeatPairs.length > 0 ? `🎯 ${topDefeatPairs.join(' | ')}` : `🎯 ഏറ്റവും കൂടുതൽ ആരെയാണ് തോൽപ്പിച്ചത്: വിവരങ്ങൾ ലഭ്യമല്ല`;
+            }
+            if (mostLostToEl) {
+                mostLostToEl.innerHTML = topLossPairs.length > 0 ? `⚠️ ${topLossPairs.join(' | ')}` : `⚠️ ഏറ്റവും കൂടുതൽ ആര് ആരോടാണ് തോറ്റത്: വിവരങ്ങൾ ലഭ്യമല്ല`;
+            }
         }
 
         function openWhatsAppChoiceModal(mode) {
