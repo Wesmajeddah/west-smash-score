@@ -1163,7 +1163,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Detailed i-Button Modal Info: Updated to group wins/losses by opponent and count */
+        /* Detailed i-Button Modal Info: Updated to group wins/losses by opponent and count with correct player names */
         function showTeamInfoDetail(teamId, type) {
             triggerHapticFeedback([30]);
             const team = teams.find(t => t.id === teamId);
@@ -1194,7 +1194,7 @@
                         let timesStr = data.times.map(t => `${t}m`).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
                             <div>
-                                <span class="text-slate-300 font-medium">${i + 1}. തോൽപ്പിച്ചത്: <b class="text-white">${escapeHtml(opponentName)}</b></span>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(opponentName)}</b> ടീമിനെതിരെ</span>
                                 <div class="text-[10px] text-emerald-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം ജയിച്ചു` : '1 പ്രാവശ്യം ജയിച്ചു'}</div>
                             </div>
                             <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
@@ -1229,7 +1229,7 @@
                         let timesStr = data.times.map(t => `${t}m`).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
                             <div>
-                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> തോൽപ്പിച്ചു</span>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> ടീമിനെതിരെ</span>
                                 <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
                             </div>
                             <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
