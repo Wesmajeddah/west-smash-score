@@ -163,17 +163,6 @@
             animation: resetBtnGlow 2.5s infinite ease-in-out;
         }
 
-        @keyframes iBtnPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(245, 158, 11, 0.6); }
-            50% { transform: scale(1.25); box-shadow: 0 0 12px rgba(245, 158, 11, 1); color: #fbbf24; }
-        }
-        .animated-i-btn {
-            animation: iBtnPulse 1.8s infinite ease-in-out;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         @keyframes teamCardGlow1 {
             0%, 100% { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
             50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
@@ -367,7 +356,12 @@
                     <span id="match-status-dot" class="live-dot-green"></span> <span id="match-status-text">LIVE</span>
                 </span>
             </div>
-            <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
+            <div class="flex items-center gap-1.5">
+                <button onclick="openResetAuditModal()" class="text-[9px] bg-slate-900 border border-slate-800 text-slate-400 hover:text-amber-300 px-1.5 py-0.5 rounded flex items-center gap-1 cursor-pointer" title="റീസെറ്റ് ലോഗുകൾ">
+                    <i class="fa-solid fa-shield-halved text-[8px]"></i> Logs
+                </button>
+                <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
+            </div>
         </div>
 
         <!-- Header Banner -->
@@ -392,7 +386,7 @@
                                 0
                             </span>
                             <span class="text-[9px] text-slate-400 font-bold uppercase">(PER TEAM)</span>
-                            <button onclick="openPerTeamPlaysModal()" class="ml-1 text-amber-400 hover:text-amber-300 text-[11px] cursor-pointer animated-i-btn" title="Per Team Details">
+                            <button onclick="openPerTeamPlaysModal()" class="ml-1 text-amber-400 hover:text-amber-300 text-[11px] cursor-pointer" title="Per Team Details">
                                 <i class="fa-solid fa-circle-info"></i>
                             </button>
                         </div>
@@ -414,7 +408,7 @@
 
                 <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
-                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration:
+                        <i class="fa-solid fa-clock-rotate-left text-amber-400 text-xs"></i> Session Duration (Max 1h 15m):
                     </span>
                     <span id="total-duration-timer" class="text-amber-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
@@ -500,8 +494,8 @@
                 <button onclick="openUndoModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                     🔄 UNDO
                 </button>
-                <!-- Add Team i-Button placed right next to Undo -->
-                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-emerald-950 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 rounded-lg flex items-center justify-center animated-i-btn cursor-pointer shadow" title="പുതിയ ടീമിനെ ചേർക്കുക">
+                <!-- Add Team button placed right next to Undo (animation removed as requested) -->
+                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-emerald-950 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 rounded-lg flex items-center justify-center cursor-pointer shadow" title="പുതിയ ടീമിനെ ചേർക്കുക">
                     <i class="fa-solid fa-user-plus text-[10px]"></i>
                 </button>
                 <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[100px] sm:max-w-[150px]">
@@ -516,7 +510,7 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-            <!-- Reset Button without Info Popup -->
+            <!-- Reset Button with device tracking -->
             <div class="flex items-center gap-1">
                 <button id="reset-btn-el" onclick="resetScores()" class="w-full bg-slate-900 hover:bg-rose-950/80 text-rose-200 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all active:scale-95 shadow-md cursor-pointer reset-btn-animated">
                     <i id="reset-icon-el" class="fa-solid fa-rotate-right text-rose-400"></i> റീസെറ്റ്
@@ -541,7 +535,7 @@
         </div>
     </div>
 
-    <!-- RECORDS Modal: Even smaller & compact for clear visibility of WIN, LOSS, TOTAL MATCH -->
+    <!-- RECORDS Modal: Unique larger info buttons for seamless clicking -->
     <div id="time-summary-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-2.5 bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/60 border-b border-amber-500/30 flex items-center justify-between">
@@ -621,14 +615,14 @@
         </div>
     </div>
 
-    <!-- Custom Name Editing Popup Modal -->
+    <!-- Custom Name Editing Popup Modal (With extremely small, safe Delete option) -->
     <div id="custom-name-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 relative">
             <div class="w-10 h-10 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-sm">
                 <i class="fa-solid fa-pen-to-square"></i>
             </div>
-            <h3 class="text-sm font-semibold text-amber-300">ടീം പേര് മാറ്റുക / ഡിലീറ്റ് ചെയ്യുക</h3>
-            <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് മാറ്റുകയോ ഡിലീറ്റ് ചെയ്യുകയോ ചെയ്യാം</p>
+            <h3 class="text-sm font-semibold text-amber-300">ടീം പേര് മാറ്റുക</h3>
+            <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് സേവ് ചെയ്യുക</p>
             <div class="space-y-2 pt-1">
                 <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
                 <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര്" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-amber-500 uppercase">
@@ -637,9 +631,10 @@
                 <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
                 <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">സേവ് ചെയ്യുക</button>
             </div>
-            <div class="pt-1 border-t border-slate-800/80">
-                <button onclick="deleteTeamFromModal()" class="w-full bg-rose-950/90 hover:bg-rose-900 text-rose-300 font-bold py-2 rounded-xl text-xs border border-rose-800/60 shadow transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-trash-can text-[11px]"></i> ടീമിനെ ഡിലീറ്റ് ചെയ്യുക
+            <!-- Ultra-small, unobtrusive safety delete button at bottom left -->
+            <div class="pt-2 border-t border-slate-800/60 flex justify-start">
+                <button onclick="deleteTeamFromModal()" class="text-[9px] text-rose-400/70 hover:text-rose-300 bg-rose-950/30 hover:bg-rose-900/50 px-2 py-1 rounded border border-rose-900/40 transition-all cursor-pointer flex items-center gap-1 opacity-75 hover:opacity-100">
+                    <i class="fa-solid fa-trash-can text-[8px]"></i> ഡിലീറ്റ്
                 </button>
             </div>
         </div>
@@ -660,6 +655,22 @@
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeAddTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
                 <button onclick="submitNewTeam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow cursor-pointer text-white">ചേർക്കുക</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Device Audit Modal -->
+    <div id="reset-audit-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-shield-halved text-rose-400"></i> RESET AUDIT LOGS
+                </h3>
+                <button onclick="closeResetAuditModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="reset-audit-content" class="p-3 space-y-2 overflow-y-auto flex-1 text-xs"></div>
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
+                <button onclick="closeResetAuditModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
         </div>
     </div>
@@ -732,6 +743,7 @@
 
     <script>
         const ADMIN_PIN = "1234";
+        const SESSION_LIMIT_MS = 75 * 60 * 1000; // 1 hr 15 mins (75 Mins)
         
         const defaultTeams = [
             { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-500", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [] },
@@ -764,9 +776,12 @@
 
         function getDeviceInformation() {
             const ua = navigator.userAgent;
-            let deviceType = "Desktop";
+            let deviceType = "Desktop PC";
             if (/Mobi|Android|iPhone|iPad/i.test(ua)) {
-                deviceType = "Mobile / Tablet";
+                deviceType = "Mobile/Tablet";
+                if (/iPhone/i.test(ua)) deviceType = "Apple iPhone";
+                else if (/iPad/i.test(ua)) deviceType = "Apple iPad";
+                else if (/Android/i.test(ua)) deviceType = "Android Mobile";
             }
             let browser = "Web Browser";
             if (ua.includes("Chrome")) browser = "Chrome";
@@ -790,7 +805,7 @@
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
                         
-                        if (tournamentStartTimestamp) {
+                        if (tournamentStartTimestamp && !isMatchEnded) {
                             const gate = document.getElementById("startup-gate");
                             if(gate) gate.classList.add("hidden");
                         }
@@ -864,6 +879,7 @@
             updateMatchStatusBadge();
         }
 
+        /* Fully resets scores and state for a brand new session, preserving History */
         function resetTournamentStateForNewSession() {
             teams.forEach(t => { 
                 t.wins = 0; t.losses = 0; t.played = 0; 
@@ -875,6 +891,8 @@
             lastActionTimestamp = null;
             globalClickSequence = 0;
             isMatchEnded = false;
+            lastActionSnapshot = null;
+            lastActionDescription = "";
             
             saveLocalBackup();
             if (dbRef) {
@@ -887,6 +905,7 @@
                 gate.classList.remove("hidden");
             }
             updateMatchStatusBadge();
+            render();
         }
 
         function playBestSound() {
@@ -959,7 +978,7 @@
             const text = document.getElementById("match-status-text");
             if (!badge || !dot || !text) return;
 
-            if (isMatchEnded) {
+            if (isMatchEnded || !tournamentStartTimestamp) {
                 badge.className = "bg-rose-950/80 border border-rose-500/50 text-rose-300 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider";
                 dot.className = "live-dot-red";
                 text.textContent = "MATCH STOPPED";
@@ -1045,6 +1064,7 @@
             updateLeaderboard();
         }
 
+        /* Saves current tournament session snapshot into history logs */
         function autoSaveToHistory() {
             const totalPlays = calculateTotalPlays();
             if (!tournamentStartTimestamp) return;
@@ -1064,8 +1084,7 @@
 
             if (tournamentHistory.length > 0) {
                 const latestHistory = tournamentHistory[0];
-                const oneHourFifteenMs = 75 * 60 * 1000;
-                if (Math.abs(Date.now() - latestHistory.id) < oneHourFifteenMs) {
+                if (Math.abs(Date.now() - latestHistory.id) < SESSION_LIMIT_MS) {
                     tournamentHistory[0] = record;
                 } else {
                     tournamentHistory.unshift(record);
@@ -1116,7 +1135,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* RECORDS Modal: Extremely compact layout to ensure WIN, LOSS, TOTAL MATCH are clearly visible together */
+        /* RECORDS Modal: Unique larger info buttons for easy tapping */
         function openTimeSummaryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("time-summary-modal");
@@ -1146,33 +1165,27 @@
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 text-[10px]">
                             <div class="bg-slate-950/95 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="text-amber-400 hover:text-amber-300 text-[9px] font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                    </button>
-                                </div>
-                                <span class="text-emerald-300 text-sm font-black mt-0.5">${t.wins}</span>
+                                <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
+                                <span class="text-emerald-300 text-sm font-black my-0.5">${t.wins}</span>
+                                <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="w-full bg-emerald-950 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold py-1 rounded text-[9px] cursor-pointer flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-circle-info text-[10px]"></i> വിവരങ്ങൾ
+                                </button>
                             </div>
 
                             <div class="bg-slate-950/95 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="text-amber-400 hover:text-amber-300 text-[9px] font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                    </button>
-                                </div>
-                                <span class="text-rose-300 text-sm font-black mt-0.5">${t.losses || 0}</span>
+                                <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
+                                <span class="text-rose-300 text-sm font-black my-0.5">${t.losses || 0}</span>
+                                <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="w-full bg-rose-950 hover:bg-rose-900 border border-rose-500/40 text-rose-300 font-bold py-1 rounded text-[9px] cursor-pointer flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-circle-info text-[10px]"></i> വിവരങ്ങൾ
+                                </button>
                             </div>
 
                             <div class="bg-slate-950/95 border border-amber-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="text-amber-400 hover:text-amber-300 text-[9px] font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                    </button>
-                                </div>
-                                <span class="text-amber-200 text-sm font-black mt-0.5">${t.played || 0}</span>
+                                <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
+                                <span class="text-amber-200 text-sm font-black my-0.5">${t.played || 0}</span>
+                                <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="w-full bg-amber-950 hover:bg-amber-900 border border-amber-500/40 text-amber-300 font-bold py-1 rounded text-[9px] cursor-pointer flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-circle-info text-[10px]"></i> വിവരങ്ങൾ
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1348,6 +1361,7 @@
             }
         }
 
+        /* 1 hr 15 mins Auto-Cutoff and Live Timer Logic */
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -1360,7 +1374,7 @@
                         const totalHours = Math.floor(elapsedTotal / 3600000);
                         const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                         const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
-                        if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s (STOPPED)`;
+                        if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s (ENDED)`;
                         if(currentTimerEl) currentTimerEl.textContent = "STOPPED";
                     } else if (!tournamentStartTimestamp) {
                         if(totalDurationEl) totalDurationEl.textContent = "0h 0m 0s";
@@ -1370,6 +1384,15 @@
                 }
 
                 const elapsedTotal = Date.now() - tournamentStartTimestamp;
+
+                /* 1 hr 15 mins (75 Mins) Auto Cut-off Enforcement */
+                if (elapsedTotal >= SESSION_LIMIT_MS) {
+                    autoSaveToHistory();
+                    showToast("⏳ 1 hour & 15 mins session completed! Session saved.");
+                    resetTournamentStateForNewSession();
+                    return;
+                }
+
                 const totalHours = Math.floor(elapsedTotal / 3600000);
                 const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
@@ -1536,7 +1559,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* END MATCH MODAL */
+        /* END MATCH: Saves session into history, resets everything, and routes to startup start window */
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
@@ -1551,153 +1574,9 @@
                 return;
             }
 
-            isMatchEnded = true;
-            updateMatchStatusBadge();
-
             autoSaveToHistory();
-            saveData();
-
-            const modal = document.getElementById("finish-match-modal");
-            const container = document.getElementById("finish-match-modal-content");
-            const dateHeader = document.getElementById("modal-header-date");
-            if (!modal || !container) return;
-
-            if (dateHeader) {
-                dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            }
-
-            let sorted = [...teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
-            });
-
-            let elapsedTotal = (lastActionTimestamp && tournamentStartTimestamp) ? (lastActionTimestamp - tournamentStartTimestamp) : 0;
-            let totalHours = Math.floor(elapsedTotal / 3600000);
-            let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
-            
-            let winnerTeam = sorted[0];
-            let championName = winnerTeam.wins > 0 ? winnerTeam.name : "NO WINNER";
-            let winnerPlays = winnerTeam.played || 0;
-            let winnerTimeMins = winnerTeam.totalTimeSpentMinutes || 0;
-
-            let totalPlaysCount = calculateTotalPlays();
-            let totalMatchesCount = totalPlaysCount / 2;
-
-            let teamsTableHtml = "";
-            sorted.forEach((t, i) => {
-                let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
-                let isWinnerRow = (i === 0 && t.wins > 0);
-                teamsTableHtml += `
-                    <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '👑' : ''}</td>
-                        <td class="py-1 px-1">${played}</td>
-                        <td class="py-1 px-1 font-bold text-emerald-400">${t.wins}</td>
-                        <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0}</td>
-                    </tr>
-                `;
-            });
-
-            const dancingPlayersStageCompactHtml = `
-                <div class="dance-stage-compact my-1.5">
-                    <div class="spotlight-small"></div>
-                    <div class="spotlight-small spotlight-right-small"></div>
-                    
-                    <div class="human-player-small player-1-small">
-                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                            <g class="torso">
-                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
-                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
-                                <g class="head">
-                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
-                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
-                                </g>
-                                <g class="arm-left">
-                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
-                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
-                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
-                                </g>
-                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                            </g>
-                        </svg>
-                    </div>
-
-                    <div class="human-player-small player-2-small">
-                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                            <g class="torso">
-                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
-                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-                                <g class="head">
-                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
-                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
-                                </g>
-                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
-                                <g class="arm-right">
-                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
-                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
-                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
-                                </g>
-                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                            </g>
-                        </svg>
-                    </div>
-                </div>
-            `;
-
-            const leaderboardHtml = document.getElementById("main-leaderboard-section").outerHTML;
-
-            container.innerHTML = `
-                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center relative overflow-hidden">
-                    <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        ✨ TOURNAMENT CHAMPIONS CELEBRATION ✨
-                    </div>
-                    
-                    ${dancingPlayersStageCompactHtml}
-
-                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
-                        ${escapeHtml(championName)}
-                    </div>
-                    <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
-                        <div class="flex justify-center gap-3">
-                            <span>വിജയികളുടെ ആകെ കളികൾ: <b class="text-white">${winnerPlays}</b></span>
-                            <span>|</span>
-                            <span>ആകെ സമയം: <b class="text-amber-300">${winnerTimeMins} Mins</b></span>
-                        </div>
-                        <div class="flex justify-center gap-3 border-t border-amber-500/20 pt-1 text-[9px]">
-                            <span>ടോട്ടൽ മാച്ചുകൾ: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)}</b></span>
-                            <span>|</span>
-                            <span>ടോട്ടൽ സെഷൻ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="my-2">
-                    ${leaderboardHtml}
-                </div>
-
-                <div class="space-y-1 text-left pt-1">
-                    <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-list-check text-amber-400"></i> FINAL SCORES:
-                    </div>
-                    <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-slate-800 text-[9px] text-slate-400 uppercase text-center">
-                                    <th class="py-1 px-1 text-left">TEAM</th>
-                                    <th class="py-1 px-1">PLAYED</th>
-                                    <th class="py-1 px-1">WON</th>
-                                    <th class="py-1 px-1">LOST</th>
-                                </tr>
-                            </thead>
-                            <tbody>${teamsTableHtml}</tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-            modal.classList.remove("hidden");
-            triggerWinCelebration();
+            showToast("🏁 മാച്ച് അവസാനിച്ചു! സെഷൻ സേവ് ചെയ്ത് റീസെറ്റ് ചെയ്തു.");
+            resetTournamentStateForNewSession();
         }
 
         function closeFinishMatchModal() {
@@ -2046,10 +1925,11 @@
             closeCustomNameModal();
         }
 
+        /* Extremely small safety delete team feature */
         function deleteTeamFromModal() {
             const pinInput = document.getElementById("edit-admin-pin").value;
             if (pinInput !== ADMIN_PIN) {
-                alert("തെറ്റായ Admin PIN!");
+                alert("ടീം ഡിലീറ്റ് ചെയ്യുന്നതിന് ആദ്യം Admin PIN (1234) ടൈപ്പ് ചെയ്യുക!");
                 return;
             }
 
@@ -2061,7 +1941,7 @@
                 return;
             }
 
-            if (window.confirm(`"${team.name}" എന്ന ടീമിനെ പൂർണ്ണമായി നീക്കം ചെയ്യണോ?`)) {
+            if (window.confirm(`സേഫ്റ്റി ചെക്ക്: "${team.name}" എന്ന ടീമിനെ ഡിലീറ്റ് ചെയ്യണോ?`)) {
                 triggerHapticFeedback([60]);
                 lastActionSnapshot = JSON.parse(JSON.stringify(teams));
                 lastActionDescription = `DELETED TEAM: ${team.name}`;
@@ -2072,7 +1952,7 @@
                 saveData();
                 render();
                 closeCustomNameModal();
-                showToast(`🗑️ ${team.name} ടീമിനെ നീക്കം ചെയ്തു!`);
+                showToast(`🗑️ ${team.name} ഡിലീറ്റ് ചെയ്തു!`);
             }
         }
 
@@ -2285,6 +2165,7 @@
             window.open(url, '_blank');
         }
 
+        /* Reset Scores with Device & Password Verification */
         function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -2293,7 +2174,7 @@
                 return;
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്യണോ? (സേവ് ചെയ്ത ഹിസ്റ്ററി മാഞ്ഞുപോകില്ല)")) {
-                const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 const deviceInfo = getDeviceInformation();
                 
                 resetAuditLog.unshift({
@@ -2305,9 +2186,7 @@
                 const resetIcon = document.getElementById("reset-icon-el");
                 const captureArea = document.getElementById("capture-area");
                 
-                if (resetIcon) {
-                    resetIcon.classList.add("animate-spin");
-                }
+                if (resetIcon) resetIcon.classList.add("animate-spin");
                 if (captureArea) {
                     captureArea.classList.add("reset-anim-spin");
                     setTimeout(() => { 
@@ -2319,6 +2198,40 @@
                 resetTournamentStateForNewSession();
                 showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
             }
+        }
+
+        /* Reset Audit Modal Controls */
+        function openResetAuditModal() {
+            triggerHapticFeedback([30]);
+            const modal = document.getElementById("reset-audit-modal");
+            const container = document.getElementById("reset-audit-content");
+            if (!modal || !container) return;
+
+            if (!resetAuditLog || resetAuditLog.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 italic text-center py-4">റീസെറ്റ് വിവരങ്ങൾ ലഭ്യമല്ല.</div>`;
+            } else {
+                let html = "";
+                resetAuditLog.forEach((log, i) => {
+                    html += `
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1">
+                            <div class="flex justify-between items-center font-bold text-amber-300">
+                                <span>Reset #${resetAuditLog.length - i}</span>
+                                <span class="text-[10px] text-slate-400 font-normal">${log.date}</span>
+                            </div>
+                            <div class="text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-mobile-screen text-emerald-400"></i> ${escapeHtml(log.device)}
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            modal.classList.remove("hidden");
+        }
+
+        function closeResetAuditModal() {
+            const modal = document.getElementById("reset-audit-modal");
+            if (modal) modal.classList.add("hidden");
         }
 
         let toastTimeout = null;
