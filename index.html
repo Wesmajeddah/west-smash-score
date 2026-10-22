@@ -176,6 +176,25 @@
             justify-content: center;
         }
 
+        /* Unique Styled Summary Card Interface */
+        .unique-summary-card {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
+            border: 1.5px solid rgba(245, 158, 11, 0.35);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(245, 158, 11, 0.1);
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+        .unique-summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #f59e0b 0%, #10b981 50%, #e11d48 100%);
+        }
+
         /* Pulsing Live Dot Animation */
         @keyframes liveDotPulseGreen {
             0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(34, 197, 94, 0.9); }
@@ -429,8 +448,9 @@
                     <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ</div>
                 </div>
             </div>
+            <!-- Updated Side Button Text to HISTORY -->
             <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
-                <i class="fa-solid fa-eye"></i> കാണുക
+                <i class="fa-solid fa-clock-rotate-left"></i> HISTORY
             </button>
         </div>
 
@@ -466,7 +486,7 @@
                 <button id="reset-btn-el" onclick="resetScores()" class="flex-1 bg-slate-900 hover:bg-rose-950/80 text-rose-200 font-bold py-2.5 px-1 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all active:scale-95 shadow-md cursor-pointer reset-btn-animated">
                     <i id="reset-icon-el" class="fa-solid fa-rotate-right text-rose-400"></i> റീസെറ്റ്
                 </button>
-                <button onclick="openResetAuditModal()" class="w-8 h-10 bg-slate-900 hover:bg-slate-800 border border-rose-500/40 text-amber-400 rounded-xl flex items-center justify-center animated-i-btn cursor-pointer" title="Reset History Log">
+                <button onclick="openResetAuditModal()" class="w-8 h-10 bg-slate-900 hover:bg-slate-800 border border-rose-500/40 text-amber-400 rounded-xl flex items-center justify-center animated-i-btn cursor-pointer" title="Reset Tracker info">
                     <i class="fa-solid fa-circle-info text-xs"></i>
                 </button>
             </div>
@@ -489,29 +509,29 @@
         </div>
     </div>
 
-    <!-- Reset Audit Trail Modal -->
+    <!-- Reset Audit Trail Modal (Device/Phone Tracker) -->
     <div id="reset-audit-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 space-y-3 relative">
             <button onclick="closeResetAuditModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-xs font-bold text-rose-400 uppercase tracking-wider text-center border-b border-slate-800 pb-2">
-                🚨 RESET AUDIT LOG
+                🚨 RESET TRACKER LOG (DEVICE DETAILS)
             </h3>
             <div id="reset-audit-content" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
         </div>
     </div>
 
-    <!-- Match Stats & Detailed Summary Modal -->
+    <!-- Unique Styled Match Stats & Detailed Summary Modal -->
     <div id="time-summary-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-                <h3 class="text-xs font-bold text-amber-300 flex items-center gap-2 uppercase">
-                    <i class="fa-solid fa-chart-pie text-amber-400"></i> Match Stats & Detailed Summary
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-3 bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/60 border-b border-amber-500/30 flex items-center justify-between">
+                <h3 class="text-xs font-extrabold text-amber-300 flex items-center gap-2 uppercase tracking-wider">
+                    <i class="fa-solid fa-chart-pie text-amber-400 animate-pulse"></i> MATCH STATS & DETAILED SUMMARY
                 </h3>
-                <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="modal-time-summary-content" class="p-3 space-y-2 overflow-y-auto flex-1"></div>
+            <div id="modal-time-summary-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeTimeSummaryModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-4 py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
@@ -660,7 +680,7 @@
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
-        let resetAuditLog = []; // Stores details of who/when performed resets
+        let resetAuditLog = []; // Stores details of device/who/when performed resets
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let isMatchEnded = false;
@@ -677,6 +697,21 @@
         let lastActionDescription = "";
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
+
+        // Helper to detect device info
+        function getDeviceInformation() {
+            const ua = navigator.userAgent;
+            let deviceType = "Desktop";
+            if (/Mobi|Android|iPhone|iPad/i.test(ua)) {
+                deviceType = "Mobile / Tablet";
+            }
+            let browser = "Web Browser";
+            if (ua.includes("Chrome")) browser = "Chrome";
+            else if (ua.includes("Safari")) browser = "Safari";
+            else if (ua.includes("Firefox")) browser = "Firefox";
+            
+            return `${deviceType} (${browser})`;
+        }
 
         function loadLocalBackup() {
             try {
@@ -990,7 +1025,6 @@
             }
         }
 
-        /* Open Per Team Plays Breakdown Modal */
         function openPerTeamPlaysModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("per-team-plays-modal");
@@ -1021,7 +1055,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Open Reset Audit Trail Modal */
+        /* Open Reset Audit Trail Modal (Device/Phone Tracker Info) */
         function openResetAuditModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("reset-audit-modal");
@@ -1040,7 +1074,10 @@
                                 <span class="text-[10px] text-slate-400">${log.date}</span>
                             </div>
                             <div class="text-[11px] text-slate-300">
-                                നിർവ്വഹിച്ചത്: <b class="text-rose-400">${log.by}</b>
+                                നിർവ്വഹിച്ച ആപ്പ്/ഫോൺ: <b class="text-rose-400">${log.device}</b>
+                            </div>
+                            <div class="text-[10px] text-slate-400">
+                                അഡ്മിൻ PIN: <b class="text-emerald-400">${log.pin}</b>
                             </div>
                         </div>
                     `;
@@ -1055,7 +1092,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Match Stats & Summary Modal (English Labels: WINS, LOSSES, TOTAL MATCH) */
+        /* Unique Match Summary Modal Interface (English: TOTAL TIME, WINS, LOSSES, TOTAL MATCH) */
         function openTimeSummaryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("time-summary-modal");
@@ -1072,18 +1109,20 @@
                 let mins = t.totalTimeSpentMinutes || 0;
                 
                 html += `
-                    <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 space-y-2 shadow">
+                    <div class="unique-summary-card rounded-xl p-3 space-y-2">
                         <div class="flex items-center justify-between text-xs font-bold text-slate-100">
-                            <span class="flex items-center gap-1.5">
-                                <span class="text-amber-400 font-extrabold text-[10px]">#${idx + 1}</span>
-                                <span>${escapeHtml(t.name)}</span>
+                            <span class="flex items-center gap-1.5 pl-1">
+                                <span class="text-amber-400 font-black text-[11px]">#${idx + 1}</span>
+                                <span class="uppercase tracking-wider">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"><i class="fa-solid fa-clock text-[9px] mr-1"></i>آകെ സമയം: ${mins} Mins</span>
+                            <span class="text-amber-300 font-extrabold bg-slate-950/80 px-2.5 py-1 rounded-lg border border-amber-500/30 text-[10px] tracking-wide">
+                                <i class="fa-solid fa-clock text-amber-400 mr-1"></i>TOTAL TIME: ${mins} Mins
+                            </span>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 pt-1 text-[10px]">
-                            <div class="bg-slate-900 border border-emerald-500/30 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950/90 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-emerald-400 font-extrabold uppercase">WINS</span>
+                                    <span class="text-emerald-400 font-black uppercase tracking-wider">WINS</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="text-amber-400 hover:text-amber-300 text-xs font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
@@ -1091,9 +1130,9 @@
                                 <span class="text-emerald-300 text-sm font-black mt-1">${t.wins}</span>
                             </div>
 
-                            <div class="bg-slate-900 border border-rose-500/30 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950/90 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-rose-400 font-extrabold uppercase">LOSSES</span>
+                                    <span class="text-rose-400 font-black uppercase tracking-wider">LOSSES</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="text-amber-400 hover:text-amber-300 text-xs font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
@@ -1101,9 +1140,9 @@
                                 <span class="text-rose-300 text-sm font-black mt-1">${t.losses || 0}</span>
                             </div>
 
-                            <div class="bg-slate-900 border border-amber-500/30 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950/90 border border-amber-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-amber-300 font-extrabold uppercase">TOTAL MATCH</span>
+                                    <span class="text-amber-300 font-black uppercase tracking-wider">TOTAL MATCH</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="text-amber-400 hover:text-amber-300 text-xs font-bold cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
@@ -1124,7 +1163,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Show detailed i-button Info (Malayalam details preserved) */
+        /* Detailed i-Button Modal Info: Losses specifies opponent name e.g. 'മുസ്തഫയോട് 2 പ്രാവശ്യം തോറ്റു' */
         function showTeamInfoDetail(teamId, type) {
             triggerHapticFeedback([30]);
             const team = teams.find(t => t.id === teamId);
@@ -1177,7 +1216,7 @@
                         let timesStr = data.times.map(t => `${t}m`).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
                             <div>
-                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b></span>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> യോട്</span>
                                 <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
                             </div>
                             <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
@@ -1310,7 +1349,7 @@
             }, 1000);
         }
 
-        /* END MATCH Popup Modal - Includes Champions Board Interface & Total Match/Time info */
+        /* END MATCH Popup Modal */
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
@@ -1420,7 +1459,6 @@
                 </div>
             `;
 
-            // Clone main leaderboard HTML into end match popup
             const leaderboardHtml = document.getElementById("main-leaderboard-section").outerHTML;
 
             container.innerHTML = `
@@ -1441,7 +1479,6 @@
                     </div>
                 </div>
 
-                <!-- Embedded Champions Leaderboard Summary Window -->
                 <div class="my-2">
                     ${leaderboardHtml}
                 </div>
@@ -1989,7 +2026,7 @@
             window.open(url, '_blank');
         }
 
-        /* RESET Function: Records Admin Audit Log */
+        /* RESET Function: Records Device/Phone Details in Audit Log */
         function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
@@ -1999,9 +2036,12 @@
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്യണോ? (സേവ് ചെയ്ത ഹിസ്റ്ററി മാഞ്ഞുപോകില്ല)")) {
                 const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const deviceInfo = getDeviceInformation();
+                
                 resetAuditLog.unshift({
                     date: nowStr,
-                    by: `Admin (PIN: ${ADMIN_PIN})`
+                    device: deviceInfo,
+                    pin: ADMIN_PIN
                 });
 
                 const resetIcon = document.getElementById("reset-icon-el");
