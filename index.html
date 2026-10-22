@@ -444,7 +444,7 @@
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie text-amber-400 text-sm"></i>
                 <div>
-                    <div class="text-xs font-bold text-amber-300">MATCH STATS & SUMMARY</div>
+                    <div class="text-xs font-bold text-amber-300">SUMMARY</div>
                     <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ</div>
                 </div>
             </div>
@@ -1163,7 +1163,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Detailed i-Button Modal Info: Losses specifies opponent name e.g. 'മുസ്തഫയോട് 2 പ്രാവശ്യം തോറ്റു' */
+        /* Detailed i-Button Modal Info: Updated to group wins/losses by opponent and count */
         function showTeamInfoDetail(teamId, type) {
             triggerHapticFeedback([30]);
             const team = teams.find(t => t.id === teamId);
@@ -1180,11 +1180,24 @@
                 if (!team.defeatedDetails || team.defeatedDetails.length === 0) {
                     html += `<div class="text-slate-400 italic">ആരെയും തോൽപ്പിച്ചിട്ടില്ല.</div>`;
                 } else {
+                    let winGrouped = {};
+                    team.defeatedDetails.forEach(item => {
+                        if (!winGrouped[item.name]) {
+                            winGrouped[item.name] = { count: 0, times: [] };
+                        }
+                        winGrouped[item.name].count += 1;
+                        winGrouped[item.name].times.push(item.durationMinutes || 1);
+                    });
+
                     html += `<div class="space-y-1.5 pt-1">`;
-                    team.defeatedDetails.forEach((item, i) => {
-                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center">
-                            <span>${i + 1}. തോൽപ്പിച്ചത്: <b class="text-white">${escapeHtml(item.name)}</b></span>
-                            <span class="text-amber-400 text-[10px] font-medium">${item.durationMinutes || 1} Mins</span>
+                    Object.entries(winGrouped).forEach(([opponentName, data], i) => {
+                        let timesStr = data.times.map(t => `${t}m`).join(", ");
+                        html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-slate-300 font-medium">${i + 1}. തോൽപ്പിച്ചത്: <b class="text-white">${escapeHtml(opponentName)}</b></span>
+                                <div class="text-[10px] text-emerald-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം ജയിച്ചു` : '1 പ്രാവശ്യം ജയിച്ചു'}</div>
+                            </div>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1216,7 +1229,7 @@
                         let timesStr = data.times.map(t => `${t}m`).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
                             <div>
-                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> യോട്</span>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> തോൽപ്പിച്ചു</span>
                                 <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
                             </div>
                             <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
@@ -1349,7 +1362,7 @@
             }, 1000);
         }
 
-        /* END MATCH Popup Modal */
+        /* END MATCH Popup Modal - Updated layout to place total match and total duration below winner's games & time */
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
@@ -1402,10 +1415,10 @@
                 let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1.5 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '👑' : ''}</td>
-                        <td class="py-1.5 px-1">${played}</td>
-                        <td class="py-1.5 px-1 font-bold text-emerald-400">${t.wins}</td>
-                        <td class="py-1.5 px-1 font-bold text-rose-400">${t.losses || 0}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '👑' : ''}</td>
+                        <td class="py-1 px-1">${played}</td>
+                        <td class="py-1 px-1 font-bold text-emerald-400">${t.wins}</td>
+                        <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0}</td>
                     </tr>
                 `;
             });
@@ -1472,10 +1485,17 @@
                     <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
-                    <div class="text-[11px] text-slate-300 font-light pt-1 border-t border-amber-500/30 flex justify-center gap-3">
-                        <span>വിജയികളുടെ ആകെ കളികൾ: <b class="text-white">${winnerPlays}</b></span>
-                        <span>|</span>
-                        <span>ആകെ സമയം: <b class="text-amber-300">${winnerTimeMins} Mins</b></span>
+                    <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
+                        <div class="flex justify-center gap-3">
+                            <span>വിജയികളുടെ ആകെ കളികൾ: <b class="text-white">${winnerPlays}</b></span>
+                            <span>|</span>
+                            <span>ആകെ സമയം: <b class="text-amber-300">${winnerTimeMins} Mins</b></span>
+                        </div>
+                        <div class="flex justify-center gap-3 border-t border-amber-500/20 pt-1 text-[9px]">
+                            <span>ടോട്ടൽ മാച്ചുകൾ: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)}</b></span>
+                            <span>|</span>
+                            <span>ടോട്ടൽ സെഷൻ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></span>
+                        </div>
                     </div>
                 </div>
 
@@ -1499,17 +1519,6 @@
                             </thead>
                             <tbody>${teamsTableHtml}</tbody>
                         </table>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 border border-amber-500/30 rounded-xl p-2.5 text-slate-300 font-medium text-xs space-y-1 shadow-md">
-                    <div class="flex justify-between items-center">
-                        <span class="flex items-center gap-1.5 text-slate-400 font-light"><i class="fa-solid fa-trophy text-amber-400"></i> ടോട്ടൽ മാച്ചുകൾ (Total Matches):</span>
-                        <span class="text-amber-300 font-bold">${totalMatchesCount}</span>
-                    </div>
-                    <div class="flex justify-between items-center border-t border-slate-800/80 pt-1">
-                        <span class="flex items-center gap-1.5 text-slate-400 font-light"><i class="fa-solid fa-clock text-amber-400"></i> ടോട്ടൽ സെഷൻ സമയം (Total Duration):</span>
-                        <span class="text-emerald-400 font-bold">${totalHours}h ${totalMins}m</span>
                     </div>
                 </div>
             `;
