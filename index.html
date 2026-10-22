@@ -627,8 +627,8 @@
             <div class="w-10 h-10 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-sm">
                 <i class="fa-solid fa-pen-to-square"></i>
             </div>
-            <h3 class="text-sm font-semibold text-amber-300">ടീം പേര് മാറ്റുക</h3>
-            <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ പേര് നൽകുക</p>
+            <h3 class="text-sm font-semibold text-amber-300">ടീം പേര് മാറ്റുക / ഡിലീറ്റ് ചെയ്യുക</h3>
+            <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് മാറ്റുകയോ ഡിലീറ്റ് ചെയ്യുകയോ ചെയ്യാം</p>
             <div class="space-y-2 pt-1">
                 <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
                 <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര്" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-amber-500 uppercase">
@@ -636,6 +636,11 @@
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക</button>
                 <button onclick="submitCustomTeamName()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">സേവ് ചെയ്യുക</button>
+            </div>
+            <div class="pt-1 border-t border-slate-800/80">
+                <button onclick="deleteTeamFromModal()" class="w-full bg-rose-950/90 hover:bg-rose-900 text-rose-300 font-bold py-2 rounded-xl text-xs border border-rose-800/60 shadow transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-trash-can text-[11px]"></i> ടീമിനെ ഡിലീറ്റ് ചെയ്യുക
+                </button>
             </div>
         </div>
     </div>
@@ -1785,7 +1790,7 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit">
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit or delete">
                                 <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
@@ -2041,6 +2046,36 @@
             closeCustomNameModal();
         }
 
+        function deleteTeamFromModal() {
+            const pinInput = document.getElementById("edit-admin-pin").value;
+            if (pinInput !== ADMIN_PIN) {
+                alert("തെറ്റായ Admin PIN!");
+                return;
+            }
+
+            const team = teams.find(t => t.id === editingTeamId);
+            if (!team) return;
+
+            if (teams.length <= 2) {
+                alert("ടൂർണമെന്റിൽ കുറഞ്ഞത് 2 ടീമുകളെങ്കിലും ഉണ്ടായിരിക്കണം!");
+                return;
+            }
+
+            if (window.confirm(`"${team.name}" എന്ന ടീമിനെ പൂർണ്ണമായി നീക്കം ചെയ്യണോ?`)) {
+                triggerHapticFeedback([60]);
+                lastActionSnapshot = JSON.parse(JSON.stringify(teams));
+                lastActionDescription = `DELETED TEAM: ${team.name}`;
+
+                teams = teams.filter(t => t.id !== editingTeamId);
+                
+                autoSaveToHistory();
+                saveData();
+                render();
+                closeCustomNameModal();
+                showToast(`🗑️ ${team.name} ടീമിനെ നീക്കം ചെയ്തു!`);
+            }
+        }
+
         /* ADD NEW TEAM FUNCTIONS */
         function openAddTeamModal() {
             triggerHapticFeedback([30]);
@@ -2110,7 +2145,7 @@
             }
         }
 
-        /* H2H LOGIC: Displays ONLY who lost against whom in structured point items */
+        /* H2H LOGIC: Displays ONLY the top/biggest loser against an opponent */
         function updateLeaderboard() {
             const leaderEl = document.getElementById("leader-text");
             const championSpan = document.getElementById("champion-name-span");
@@ -2175,36 +2210,41 @@
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
 
-            let teamLossAgainstCounts = {};
+            let lossPairs = [];
             teams.forEach(t => {
                 if (t.defeatedDetails) {
                     t.defeatedDetails.forEach(item => {
-                        if (!teamLossAgainstCounts[item.name]) teamLossAgainstCounts[item.name] = {};
-                        teamLossAgainstCounts[item.name][t.name] = (teamLossAgainstCounts[item.name][t.name] || 0) + 1;
+                        let existing = lossPairs.find(p => p.loser === item.name && p.winner === t.name);
+                        if (existing) {
+                            existing.count += 1;
+                        } else {
+                            lossPairs.push({ loser: item.name, winner: t.name, count: 1 });
+                        }
                     });
                 }
             });
 
             let lossPointsHtml = "";
-            let hasLossRecords = false;
+            if (lossPairs.length > 0) {
+                lossPairs.sort((a, b) => b.count - a.count);
+                let maxLossCount = lossPairs[0].count;
+                let topLossPairs = lossPairs.filter(p => p.count === maxLossCount);
 
-            Object.entries(teamLossAgainstCounts).forEach(([loser, winners]) => {
-                Object.entries(winners).forEach(([winner, count]) => {
-                    hasLossRecords = true;
+                topLossPairs.forEach(pair => {
                     lossPointsHtml += `
                         <div class="flex items-start gap-1.5 bg-slate-900 p-1.5 rounded-lg border border-slate-800">
                             <span class="text-rose-400 font-bold">•</span>
                             <div>
-                                <b class="text-white uppercase">${loser}</b> ടീം, <b class="text-amber-300 uppercase">${winner}</b> ടീമിനെതിരെ 
-                                <span class="text-rose-300 font-extrabold">${count} പ്രാവശ്യം</span> തോറ്റു.
+                                <b class="text-white uppercase">${escapeHtml(pair.loser)}</b> ടീം, <b class="text-amber-300 uppercase">${escapeHtml(pair.winner)}</b> ടീമിനെതിരെ 
+                                <span class="text-rose-300 font-extrabold">${pair.count} പ്രാവശ്യം</span> തോറ്റു.
                             </div>
                         </div>
                     `;
                 });
-            });
+            }
 
             if (mostLostToEl) {
-                mostLostToEl.innerHTML = hasLossRecords ? lossPointsHtml : `<div class="text-slate-500 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല.</div>`;
+                mostLostToEl.innerHTML = lossPairs.length > 0 ? lossPointsHtml : `<div class="text-slate-500 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല.</div>`;
             }
         }
 
