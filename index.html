@@ -176,7 +176,34 @@
             justify-content: center;
         }
 
-        /* Unique Styled Summary Card Interface */
+        /* Unique Styled Summary Card with Separate Glowing Animations per Team */
+        @keyframes teamCardGlow1 {
+            0%, 100% { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+            50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+        }
+        @keyframes teamCardGlow2 {
+            0%, 100% { border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
+            50% { border-color: rgba(56, 189, 248, 1); box-shadow: 0 0 20px rgba(56, 189, 248, 0.6); }
+        }
+        @keyframes teamCardGlow3 {
+            0%, 100% { border-color: rgba(74, 222, 128, 0.5); box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+            50% { border-color: rgba(74, 222, 128, 1); box-shadow: 0 0 20px rgba(74, 222, 128, 0.6); }
+        }
+        @keyframes teamCardGlow4 {
+            0%, 100% { border-color: rgba(244, 63, 94, 0.5); box-shadow: 0 0 10px rgba(244, 63, 94, 0.2); }
+            50% { border-color: rgba(244, 63, 94, 1); box-shadow: 0 0 20px rgba(244, 63, 94, 0.6); }
+        }
+        @keyframes teamCardGlow5 {
+            0%, 100% { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+            50% { border-color: rgba(168, 85, 247, 1); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
+        }
+
+        .unique-summary-card-1 { animation: teamCardGlow1 3s infinite ease-in-out; }
+        .unique-summary-card-2 { animation: teamCardGlow2 3s infinite ease-in-out; }
+        .unique-summary-card-3 { animation: teamCardGlow3 3s infinite ease-in-out; }
+        .unique-summary-card-4 { animation: teamCardGlow4 3s infinite ease-in-out; }
+        .unique-summary-card-5 { animation: teamCardGlow5 3s infinite ease-in-out; }
+
         .unique-summary-card {
             background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
             border: 1.5px solid rgba(245, 158, 11, 0.35);
@@ -448,9 +475,9 @@
                     <div class="text-[9px] text-slate-400 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ</div>
                 </div>
             </div>
-            <!-- Updated Side Button Text to HISTORY -->
+            <!-- Updated Side Button Text to RECORDS -->
             <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
-                <i class="fa-solid fa-clock-rotate-left"></i> HISTORY
+                <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
             </button>
         </div>
 
@@ -680,7 +707,7 @@
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
-        let resetAuditLog = []; // Stores details of device/who/when performed resets
+        let resetAuditLog = []; 
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let isMatchEnded = false;
@@ -698,7 +725,6 @@
 
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
 
-        // Helper to detect device info
         function getDeviceInformation() {
             const ua = navigator.userAgent;
             let deviceType = "Desktop";
@@ -985,6 +1011,7 @@
             updateLeaderboard();
         }
 
+        /* 1 hour 15 minutes rule for session history addition */
         function autoSaveToHistory() {
             const totalPlays = calculateTotalPlays();
             if (!tournamentStartTimestamp) return;
@@ -1004,7 +1031,8 @@
 
             if (tournamentHistory.length > 0) {
                 const latestHistory = tournamentHistory[0];
-                if (Math.abs(Date.now() - latestHistory.id) < 60 * 60 * 1000) {
+                const oneHourFifteenMs = 75 * 60 * 1000;
+                if (Math.abs(Date.now() - latestHistory.id) < oneHourFifteenMs) {
                     tournamentHistory[0] = record;
                 } else {
                     tournamentHistory.unshift(record);
@@ -1055,7 +1083,6 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Open Reset Audit Trail Modal (Device/Phone Tracker Info) */
         function openResetAuditModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("reset-audit-modal");
@@ -1092,7 +1119,7 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Unique Match Summary Modal Interface (English: TOTAL TIME, WINS, LOSSES, TOTAL MATCH) */
+        /* Unique Summary Modal Interface with Special Border & Separate Team Animations */
         function openTimeSummaryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("time-summary-modal");
@@ -1107,9 +1134,10 @@
             let html = "";
             sortedTeamsForSummary.forEach((t, idx) => {
                 let mins = t.totalTimeSpentMinutes || 0;
+                let animClass = `unique-summary-card-${((t.id - 1) % 5) + 1}`;
                 
                 html += `
-                    <div class="unique-summary-card rounded-xl p-3 space-y-2">
+                    <div class="unique-summary-card ${animClass} rounded-xl p-3 space-y-2">
                         <div class="flex items-center justify-between text-xs font-bold text-slate-100">
                             <span class="flex items-center gap-1.5 pl-1">
                                 <span class="text-amber-400 font-black text-[11px]">#${idx + 1}</span>
@@ -1163,7 +1191,6 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        /* Detailed i-Button Modal Info: Updated to group wins/losses by opponent and count with correct player names */
         function showTeamInfoDetail(teamId, type) {
             triggerHapticFeedback([30]);
             const team = teams.find(t => t.id === teamId);
@@ -1362,7 +1389,6 @@
             }, 1000);
         }
 
-        /* END MATCH Popup Modal - Updated layout to place total match and total duration below winner's games & time */
         function manualFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
@@ -1953,7 +1979,6 @@
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
 
-            // H2H Calculations
             let overallDefeatedCounts = {};
             let teamLossAgainstCounts = {};
 
@@ -1970,7 +1995,6 @@
                 }
             });
 
-            // Find max defeated pair
             let maxDefeatCount = 0;
             let topDefeatText = "വിവരങ്ങൾ ലഭ്യമല്ല";
             Object.entries(overallDefeatedCounts).forEach(([winner, targets]) => {
@@ -1982,7 +2006,6 @@
                 });
             });
 
-            // Find max lost against pair
             let maxLossCount = 0;
             let topLossText = "വിവരങ്ങൾ ലഭ്യമല്ല";
             Object.entries(teamLossAgainstCounts).forEach(([loser, winners]) => {
@@ -2035,7 +2058,6 @@
             window.open(url, '_blank');
         }
 
-        /* RESET Function: Records Device/Phone Details in Audit Log */
         function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
