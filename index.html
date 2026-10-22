@@ -500,12 +500,14 @@
                 <button onclick="openUndoModal()" class="text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                     🔄 UNDO
                 </button>
-                
-                <!-- Single Exterior i-Button for Add/Remove Team Menu -->
-                <button onclick="openTeamManagementMenu()" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 border border-amber-500/50 text-amber-300 rounded-lg flex items-center justify-center animated-i-btn cursor-pointer shadow" title="ടീം മാനേജ്മെന്റ് മെനു">
-                    <i class="fa-solid fa-circle-info text-xs"></i>
+                <!-- Add Team i-Button -->
+                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-emerald-950 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 rounded-lg flex items-center justify-center animated-i-btn cursor-pointer shadow" title="പുതിയ ടീമിനെ ചേർക്കുക">
+                    <i class="fa-solid fa-user-plus text-[10px]"></i>
                 </button>
-
+                <!-- Remove Team i-Button -->
+                <button onclick="openRemoveTeamModal()" class="w-7 h-7 bg-rose-950 hover:bg-rose-900 border border-rose-500/50 text-rose-300 rounded-lg flex items-center justify-center animated-i-btn cursor-pointer shadow" title="ടീമിനെ നീക്കം ചെയ്യുക">
+                    <i class="fa-solid fa-user-minus text-[10px]"></i>
+                </button>
                 <span id="history-summary-text" class="text-[10px] text-slate-400 font-light italic truncate max-w-[80px] sm:max-w-[120px]">
                     സെഷൻ റെക്കോർഡുകൾ.
                 </span>
@@ -527,33 +529,6 @@
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
                 <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
             </button>
-        </div>
-    </div>
-
-    <!-- Team Management Menu Popup (Add/Remove options inside special interface) -->
-    <div id="team-management-menu-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-4 relative">
-            <button onclick="closeTeamManagementMenu()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="w-12 h-12 mx-auto bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center border border-amber-500/30 text-lg shadow">
-                <i class="fa-solid fa-users-gear"></i>
-            </div>
-            <div>
-                <h3 class="text-sm font-extrabold text-amber-300 uppercase tracking-wider">ടീം മാനേജ്മെന്റ്</h3>
-                <p class="text-[10px] text-slate-400 font-light mt-0.5">പുതിയ ടീമിനെ ചേർക്കുകയോ നീക്കം ചെയ്യുകയോ ചെയ്യാം</p>
-            </div>
-            <div class="space-y-2.5 pt-1">
-                <button onclick="openAddTeamFromMenu()" class="w-full bg-emerald-950 hover:bg-emerald-900 text-emerald-300 font-semibold py-3 px-3 rounded-xl border border-emerald-500/40 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow cursor-pointer">
-                    <i class="fa-solid fa-user-plus"></i> പുതിയ ടീമിനെ ചേർക്കുക (Add)
-                </button>
-                <button onclick="openRemoveTeamFromMenu()" class="w-full bg-rose-950 hover:bg-rose-900 text-rose-300 font-semibold py-3 px-3 rounded-xl border border-rose-500/40 flex items-center justify-center gap-2 text-xs transition-all active:scale-95 shadow cursor-pointer">
-                    <i class="fa-solid fa-user-minus"></i> ടീമിനെ നീക്കം ചെയ്യുക (Remove)
-                </button>
-            </div>
-            <div class="pt-2 border-t border-slate-800">
-                <button onclick="closeTeamManagementMenu()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2.5 rounded-xl text-xs uppercase cursor-pointer">അടയ്ക്കുക</button>
-            </div>
         </div>
     </div>
 
@@ -607,43 +582,6 @@
             <div class="pt-2 border-t border-slate-800">
                 <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs uppercase cursor-pointer border border-slate-700 transition-all active:scale-95">റദ്ദാക്കുക</button>
             </div>
-        </div>
-    </div>
-
-    <!-- WIN CELEBRATION POPUP MODAL (Restored with Sound & Animation) -->
-    <div id="win-celebration-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-[70] hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4 relative overflow-hidden">
-            <div class="w-16 h-16 mx-auto bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center border-2 border-amber-400 text-2xl shadow-[0_0_20px_rgba(245,158,11,0.6)] animate-bounce">
-                <i class="fa-solid fa-trophy"></i>
-            </div>
-            <div>
-                <h3 class="text-base font-black text-amber-300 tracking-wider uppercase">VICTORY CELEBRATION!</h3>
-                <p id="winning-team-announcement" class="text-xs font-bold text-slate-200 mt-1 uppercase">ടീം വിജയിച്ചു</p>
-            </div>
-            <div class="dance-stage-compact my-2">
-                <div class="spotlight-small"></div>
-                <div class="spotlight-small spotlight-right-small"></div>
-                
-                <div class="human-player-small player-1-small">
-                    <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                        <g class="torso">
-                            <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
-                            <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
-                            <g class="head"><circle cx="50" cy="42" r="12" fill="#fdba74" /></g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="human-player-small player-2-small">
-                    <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                        <g class="torso">
-                            <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
-                            <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-                            <g class="head"><circle cx="50" cy="42" r="12" fill="#fed7aa" /></g>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-            <button onclick="closeWinCelebrationModal()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-3 rounded-2xl text-xs uppercase tracking-wider shadow-lg cursor-pointer transition-all active:scale-95">ശരി (OK)</button>
         </div>
     </div>
 
@@ -1519,7 +1457,18 @@
                             <g class="torso">
                                 <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
                                 <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
-                                <g class="head"><circle cx="50" cy="42" r="12" fill="#fdba74" /></g>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
+                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
+                                </g>
+                                <g class="arm-left">
+                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
                             </g>
                         </svg>
                     </div>
@@ -1529,7 +1478,18 @@
                             <g class="torso">
                                 <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
                                 <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-                                <g class="head"><circle cx="50" cy="42" r="12" fill="#fed7aa" /></g>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
+                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
+                                </g>
+                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="arm-right">
+                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
                             </g>
                         </svg>
                     </div>
@@ -1664,7 +1624,18 @@
                             <g class="torso">
                                 <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
                                 <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
-                                <g class="head"><circle cx="50" cy="42" r="12" fill="#fdba74" /></g>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
+                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
+                                </g>
+                                <g class="arm-left">
+                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
                             </g>
                         </svg>
                     </div>
@@ -1674,7 +1645,18 @@
                             <g class="torso">
                                 <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
                                 <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-                                <g class="head"><circle cx="50" cy="42" r="12" fill="#fed7aa" /></g>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
+                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
+                                </g>
+                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="arm-right">
+                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
                             </g>
                         </svg>
                     </div>
@@ -2002,22 +1984,9 @@
             autoSaveToHistory();
             saveData();
             render();
-
-            // Trigger Win Celebration Popup & Sound as requested
-            triggerWinCelebrationModal(team.name);
-        }
-
-        function triggerWinCelebrationModal(teamName) {
             triggerWinCelebration();
-            const modal = document.getElementById("win-celebration-modal");
-            const announcement = document.getElementById("winning-team-announcement");
-            if (announcement) announcement.textContent = `⭐ ${teamName} WON! ⭐`;
-            if (modal) modal.classList.remove("hidden");
-        }
 
-        function closeWinCelebrationModal() {
-            const modal = document.getElementById("win-celebration-modal");
-            if (modal) modal.classList.add("hidden");
+            showToast(`🏆 ${team.name} Won!`);
         }
 
         function openUndoModal() {
@@ -2097,28 +2066,6 @@
                 showToast("ടീമിന്റെ പേര് മാറ്റിയിട്ടുണ്ട്!");
             }
             closeCustomNameModal();
-        }
-
-        /* TEAM MANAGEMENT MENU FUNCTIONS (Add/Remove Interior Interface) */
-        function openTeamManagementMenu() {
-            triggerHapticFeedback([30]);
-            const modal = document.getElementById("team-management-menu-modal");
-            if (modal) modal.classList.remove("hidden");
-        }
-
-        function closeTeamManagementMenu() {
-            const modal = document.getElementById("team-management-menu-modal");
-            if (modal) modal.classList.add("hidden");
-        }
-
-        function openAddTeamFromMenu() {
-            closeTeamManagementMenu();
-            openAddTeamModal();
-        }
-
-        function openRemoveTeamFromMenu() {
-            closeTeamManagementMenu();
-            openRemoveTeamModal();
         }
 
         /* ADD NEW TEAM FUNCTIONS */
@@ -2316,7 +2263,7 @@
                         <div class="flex items-center gap-1.5 bg-slate-900 p-2 rounded-lg border border-slate-800 text-rose-300">
                             <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
                             <div>
-                                ആകെ ഏറ്റവും കൂടുതൽ തോറ്റത്: <b class="text-white uppercase">${worstLoser.name}</b> (<span class="text-rose-400 font-extrabold">${worstLoser.losses || 0} പ്രാവശ്യം</span>)
+                                ആകെ ഏറ്റവും കൂടുതൽ തോറ്റത്: <b class="text-white uppercase">${worstLoser.name}</b> (<span class="text-rose-400 font-extrabold">${worstLosser.losses || 0} പ്രാവശ്യം</span>)
                             </div>
                         </div>
                     `;
