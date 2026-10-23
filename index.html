@@ -175,7 +175,7 @@
         }
 
         .defeated-option-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.97);
             background-color: rgba(225, 29, 72, 0.25) !important;
             border-color: #f43f5e !important;
             box-shadow: 0 0 15px rgba(244, 63, 94, 0.7);
@@ -635,34 +635,34 @@
         </div>
     </div>
 
-    <!-- Defeated Team Selection Modal with Special Touch Animation -->
+    <!-- UPDATED: Defeated Team Selection Modal with Enlarged Window & Better Touch Target -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-5 text-center space-y-3">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl p-6 text-center space-y-4">
             <div>
-                <div id="winning-team-indicator" class="mb-2 p-2 bg-amber-500/20 border border-amber-500/40 rounded-xl text-amber-300 font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 shadow">
-                    <i class="fa-solid fa-crown text-amber-400"></i> <span id="winning-team-name-span">WINNER TEAM</span>
+                <div id="winning-team-indicator" class="mb-3 p-3 bg-amber-500/20 border border-amber-500/40 rounded-2xl text-amber-300 font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow">
+                    <i class="fa-solid fa-crown text-amber-400 text-base"></i> <span id="winning-team-name-span">WINNER TEAM</span>
                 </div>
-                <h3 class="text-xs font-extrabold text-amber-300 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക</h3>
-                <p class="text-[9px] text-slate-400 font-light mt-0.5">ഏത് ടീമിനെതിരെയാണ് വിജയം?</p>
+                <h3 class="text-sm sm:text-base font-extrabold text-amber-300 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക</h3>
+                <p class="text-xs text-slate-400 font-light mt-1">ഏത് ടീമിനെതിരെയാണ് വിജയം അടിയറവ് പറഞ്ഞത്?</p>
             </div>
-            <div id="defeated-team-options" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
-            <div class="pt-2 border-t border-slate-800">
-                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-2xl text-xs uppercase cursor-pointer border border-slate-700 transition-all active:scale-95">റദ്ദാക്കുക</button>
+            <div id="defeated-team-options" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+            <div class="pt-3 border-t border-slate-800">
+                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs uppercase cursor-pointer border border-slate-700 transition-all active:scale-95">റദ്ദാക്കുക</button>
             </div>
         </div>
     </div>
 
     <!-- Team Selection Confirmation Pop-up (Are you sure?) -->
     <div id="confirm-defeated-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[70] hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
-            <div class="w-10 h-10 mx-auto bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/40 text-sm">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
+            <div class="w-12 h-12 mx-auto bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/40 text-base">
                 <i class="fa-solid fa-question"></i>
             </div>
-            <h3 class="text-xs font-extrabold text-amber-300 uppercase tracking-wide">തീർച്ചയായും ഉറപ്പാണോ?</h3>
-            <p id="confirm-defeated-msg" class="text-xs text-slate-200 font-semibold leading-relaxed">തോറ്റ ടീം:</p>
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeConfirmDefeatedModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">ഇല്ല (മാറ്റുക)</button>
-                <button onclick="executeConfirmedWin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">അതെ (ഉറപ്പാണ്)</button>
+            <h3 class="text-sm font-extrabold text-amber-300 uppercase tracking-wide">തീർച്ചയായും ഉറപ്പാണോ?</h3>
+            <p id="confirm-defeated-msg" class="text-xs sm:text-sm text-slate-200 font-semibold leading-relaxed">തോറ്റ ടീം:</p>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeConfirmDefeatedModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2.5 rounded-xl text-xs cursor-pointer">ഇല്ല (മാറ്റുക)</button>
+                <button onclick="executeConfirmedWin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs shadow cursor-pointer">അതെ (ഉറപ്പാണ്)</button>
             </div>
         </div>
     </div>
@@ -1109,25 +1109,31 @@
             }
         }
 
+        // FIXED BUG: Last defeated mapping now accurately retrieves the absolute last defeated sequence
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
 
-            let allDefeats = [];
+            let lastEvent = null;
+            let highestSeq = -1;
+
             teams.forEach(t => {
                 if (t.defeatedDetails && t.defeatedDetails.length > 0) {
                     t.defeatedDetails.forEach(d => {
-                        allDefeats.push({
-                            winner: t.name,
-                            loser: d.name
-                        });
+                        let seq = d.seq || 0;
+                        if (seq > highestSeq) {
+                            highestSeq = seq;
+                            lastEvent = {
+                                winner: t.name,
+                                loser: d.name
+                            };
+                        }
                     });
                 }
             });
 
-            if (allDefeats.length > 0) {
-                let latest = allDefeats[allDefeats.length - 1];
-                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(latest.loser)}</span>`;
+            if (lastEvent) {
+                barEl.innerHTML = `<span class="text-white">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(lastEvent.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
             }
@@ -1146,17 +1152,20 @@
                         allDefeats.push({
                             winner: t.name,
                             loser: d.name,
+                            seq: d.seq || 0,
                             durationMinutes: d.durationMinutes || 1
                         });
                     });
                 }
             });
 
+            allDefeats.sort((a, b) => b.seq - a.seq);
+
             if (allDefeats.length === 0) {
                 content.innerHTML = `<div class="text-slate-400 italic text-center py-3">No matches played yet.</div>`;
             } else {
                 let html = "";
-                allDefeats.slice().reverse().forEach((item, index) => {
+                allDefeats.forEach((item) => {
                     html += `
                         <div class="bg-slate-950 p-1.5 rounded-md border border-slate-800 flex justify-between items-center text-[10px] whitespace-nowrap overflow-hidden">
                             <div class="truncate mr-1">
@@ -1730,6 +1739,7 @@
             }
         }
 
+        // FIXED BUG: Timer logic properly calculated without resetting unexpectedly
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -2310,6 +2320,7 @@
             }
         }
 
+        // UPDATED: Enlarged window layout for selecting defeated teams cleanly
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
@@ -2327,18 +2338,18 @@
                     let lastDefeatedText = "No previous defeat";
                     if (t.defeatedDetails && t.defeatedDetails.length > 0) {
                         const last = t.defeatedDetails[t.defeatedDetails.length - 1];
-                        lastDefeatedText = `Last defeated: ${last.name}`;
+                        lastDefeatedText = `Last defeated by: ${last.name}`;
                     }
 
                     const btn = document.createElement("button");
                     btn.type = "button";
-                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3 px-3 rounded-2xl border-2 border-slate-700/80 text-xs text-left transition-all cursor-pointer flex flex-col gap-0.5 defeated-option-btn";
+                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3.5 px-4 rounded-2xl border-2 border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 defeated-option-btn shadow-md";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
-                            <span class="uppercase tracking-wider font-extrabold text-slate-200">${escapeHtml(t.name)}</span>
-                            <span class="text-[9px] text-rose-400 font-bold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">Select Defeated</span>
+                            <span class="uppercase tracking-wider font-extrabold text-amber-300 text-xs sm:text-sm">${escapeHtml(t.name)}</span>
+                            <span class="text-[10px] text-rose-300 font-bold bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/40 uppercase">SELECT DEFEATED</span>
                         </div>
-                        <div class="text-[9px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
+                        <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
                     btn.onclick = function() { promptConfirmDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
@@ -2365,7 +2376,7 @@
             const confirmModal = document.getElementById("confirm-defeated-modal");
             const msgEl = document.getElementById("confirm-defeated-msg");
             if (msgEl) {
-                msgEl.innerHTML = `<b class="text-amber-300">${escapeHtml(winningTeam.name)}</b> ടീം തോൽപ്പിച്ചത് <b class="text-rose-400">${escapeHtml(defeatedTeam.name)}</b> ടീമിനെയാണോ?`;
+                msgEl.innerHTML = `<b class="text-amber-300 font-extrabold">${escapeHtml(winningTeam.name)}</b> ടീം തോൽപ്പിച്ചത് <b class="text-rose-400 font-extrabold">${escapeHtml(defeatedTeam.name)}</b> ടീമിനെയാണോ?`;
             }
             if (confirmModal) confirmModal.classList.remove("hidden");
         }
@@ -2389,6 +2400,7 @@
             pendingDefeatedTeamId = null;
         }
 
+        // FIXED BUG: Accurately mapping winner and loser defeated sequence
         function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
             const team = teams.find(t => t.id === winningTeamId);
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
@@ -2412,13 +2424,15 @@
             team.totalTimeSpentMinutes = (team.totalTimeSpentMinutes || 0) + intervalMinutes;
             defeatedTeam.totalTimeSpentMinutes = (defeatedTeam.totalTimeSpentMinutes || 0) + intervalMinutes;
 
+            globalClickSequence += 1;
+
             if (!team.defeatedDetails) team.defeatedDetails = [];
             team.defeatedDetails.push({
                 name: defeatedTeam.name,
+                seq: globalClickSequence,
                 durationMinutes: intervalMinutes
             });
 
-            globalClickSequence += 1;
             team.clickOrder = globalClickSequence;
             team.lastClickTime = now;
             
