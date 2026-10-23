@@ -423,6 +423,8 @@
                                 0
                             </span>
                             <span class="text-[9px] text-slate-400 font-bold uppercase">(PER TEAM)</span>
+                            <!-- Hidden Reset Option for Admin Only -->
+                            <button onclick="hiddenSecretReset()" class="ml-1 text-slate-700 hover:text-slate-600 text-[8px] cursor-pointer" title="Secret Reset">•</button>
                             <button onclick="openPerTeamPlaysModal()" class="ml-1 text-amber-400 hover:text-amber-300 text-[11px] cursor-pointer animated-i-btn" title="Per Team Details">
                                 <i class="fa-solid fa-circle-info"></i>
                             </button>
@@ -451,13 +453,10 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Summary Section (Modified as requested: Only Most Lost To section remains) -->
+            <!-- Leaderboard Summary Section (Only Most Lost Team shown) -->
             <div id="main-leaderboard-section" class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
-                <div class="text-left space-y-1.5">
-                    <div class="text-xs font-bold text-amber-300 uppercase tracking-wide flex items-center gap-1.5 mb-2">
-                        <i class="fa-solid fa-people-arrows text-amber-400"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് (H2H Stats)
-                    </div>
-                    <div id="h2h-stats-container" class="bg-slate-950 rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-[11px]">
+                <div class="pt-1 text-left space-y-1.5">
+                    <div id="h2h-stats-container" class="bg-slate-950 rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-[11px] block">
                         <div id="most-lost-to-target" class="text-rose-400 font-medium space-y-1">⚠️ ഏറ്റവും കൂടുതൽ തോറ്റതിന്റെ വിവരങ്ങൾ കണക്കാക്കുന്നു...</div>
                     </div>
                 </div>
@@ -518,13 +517,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-            <!-- Hidden Reset button area placed discreetly in the corner / watermark area as requested -->
-            <div class="flex items-center gap-1">
-                <button onclick="hiddenResetAction()" class="w-full bg-slate-950 text-slate-800 hover:text-slate-700 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all active:scale-95 shadow-none cursor-pointer border border-transparent">
-                    <span class="text-[8px] opacity-20">.</span>
-                </button>
-            </div>
+        <div class="grid grid-cols-1 gap-2">
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
                 <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
             </button>
@@ -533,15 +526,14 @@
 
     <!-- Very Compact Last Defeated Detailed History Modal (Opened via 'i' button on top bar) -->
     <div id="last-defeated-history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-xl shadow-2xl p-4 space-y-2.5 relative">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-xl shadow-2xl p-3 space-y-2 relative">
             <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-md flex items-center justify-center text-[10px] cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-xs font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-2">
-                🛡️ LAST DEFEATED FULL HISTORY
+            <h3 class="text-[10px] font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-1.5">
+                🛡️ LAST DEFEATED HISTORY
             </h3>
-            <!-- Enlarged and extended downwards length with full list view -->
-            <div id="last-defeated-history-content" class="space-y-1.5 max-h-[70vh] overflow-y-auto pr-1 text-xs"></div>
+            <div id="last-defeated-history-content" class="space-y-1 max-h-52 overflow-y-auto pr-0.5 text-[10px]"></div>
         </div>
     </div>
 
@@ -584,9 +576,9 @@
         </div>
     </div>
 
-    <!-- UPDATED: Defeated Team Selection Modal with Enlarged Window & Lowered Height/Length -->
-    <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl p-6 text-center space-y-4 my-auto mt-12">
+    <!-- UPDATED: Enlarged & Downward Moved Defeated Team Selection Window with Full List -->
+    <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-end sm:items-center justify-end sm:justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 text-center space-y-4 max-h-[85vh] flex flex-col mb-0 sm:mb-auto">
             <div>
                 <div id="winning-team-indicator" class="mb-3 p-3 bg-amber-500/20 border border-amber-500/40 rounded-2xl text-amber-300 font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow">
                     <i class="fa-solid fa-crown text-amber-400 text-base"></i> <span id="winning-team-name-span">WINNER TEAM</span>
@@ -594,7 +586,7 @@
                 <h3 class="text-sm sm:text-base font-extrabold text-amber-300 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക</h3>
                 <p class="text-xs text-slate-400 font-light mt-1">ഏത് ടീമിനെതിരെയാണ് വിജയം അടിയറവ് പറഞ്ഞത്?</p>
             </div>
-            <div id="defeated-team-options" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
+            <div id="defeated-team-options" class="space-y-2.5 overflow-y-auto pr-1 flex-1"></div>
             <div class="pt-3 border-t border-slate-800">
                 <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs uppercase cursor-pointer border border-slate-700 transition-all active:scale-95">റദ്ദാക്കുക</button>
             </div>
@@ -636,12 +628,14 @@
         </div>
     </div>
 
-    <!-- End Match Modal Window (Contains custom reset option as requested) -->
+    <!-- End Match Modal Window with Manual Reset Option -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
-            <div class="bg-amber-500/10 border-b border-amber-500/20 py-1.5 px-3 flex items-center justify-between text-[10px] text-amber-300 font-bold">
-                <span>🔄 RESET TOURNAMENT:</span>
-                <button onclick="resetScoresFromEndMatch()" class="bg-rose-900 hover:bg-rose-800 text-white px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase shadow cursor-pointer">റീസെറ്റ് ചെയ്യുക</button>
+            <div class="bg-amber-500/10 border-b border-amber-500/20 py-2 px-3 flex items-center justify-between text-xs text-amber-300 font-bold">
+                <span>⚡ SESSION MANAGEMENT:</span>
+                <button onclick="resetScores()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-bold py-1 px-3 rounded-lg border border-rose-800/60 text-[10px] uppercase tracking-wider cursor-pointer">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> റീസെറ്റ് ചെയ്യുക
+                </button>
             </div>
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
@@ -755,11 +749,8 @@
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
-            <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
-                <button onclick="clearHistory()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-light py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1 cursor-pointer">
-                    <i class="fa-solid fa-trash-can"></i> എല്ലാം ക്ലിയർ ചെയ്യുക
-                </button>
-                <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 flex justify-end">
+                <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 px-4 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
         </div>
     </div>
@@ -787,16 +778,6 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="history-team-info-detail-content" class="space-y-3 text-xs"></div>
-        </div>
-    </div>
-
-    <!-- NEW: Head-to-Head History Details Modal for each team (Opened via 'i' button next to pen) -->
-    <div id="team-h2h-history-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[75] hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-5 space-y-3 relative max-h-[85vh] flex flex-col">
-            <button onclick="closeTeamH2HHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div id="team-h2h-history-content" class="space-y-2 text-xs overflow-y-auto flex-1 pr-1"></div>
         </div>
     </div>
 
@@ -847,24 +828,9 @@
             return `${m}m`;
         }
 
-        function getDeviceInformation() {
-            const ua = navigator.userAgent;
-            let deviceType = "Mobile Device";
-            if (/iPad|Tablet/i.test(ua)) deviceType = "Tablet";
-            else if (!/Mobi|Android|iPhone/i.test(ua)) deviceType = "Desktop Computer";
-
-            let browser = "Browser";
-            if (ua.includes("Chrome")) browser = "Chrome";
-            else if (ua.includes("Safari")) browser = "Safari";
-            else if (ua.includes("Firefox")) browser = "Firefox";
-            
-            const screenRes = `${window.screen ? window.screen.width : 0}x${window.screen ? window.screen.height : 0}`;
-            return `${deviceType} (${browser}) • Screen: ${screenRes}`;
-        }
-
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v102');
+                const localData = localStorage.getItem('wesma_local_backup_v101');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -897,7 +863,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v102');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v101');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -1060,29 +1026,30 @@
             }
         }
 
-        // FIXED BUG: Last defeated mapping now correctly checks sequence
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
 
-            let allDefeats = [];
+            let lastEvent = null;
+            let highestSeq = -1;
+
             teams.forEach(t => {
                 if (t.defeatedDetails && t.defeatedDetails.length > 0) {
                     t.defeatedDetails.forEach(d => {
-                        allDefeats.push({
-                            winner: t.name,
-                            loser: d.name,
-                            seq: d.seq || 0
-                        });
+                        let seq = d.seq || 0;
+                        if (seq > highestSeq) {
+                            highestSeq = seq;
+                            lastEvent = {
+                                winner: t.name,
+                                loser: d.name
+                            };
+                        }
                     });
                 }
             });
 
-            allDefeats.sort((a, b) => b.seq - a.seq);
-
-            if (allDefeats.length > 0) {
-                const latest = allDefeats[0];
-                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(latest.loser)}</span>`;
+            if (lastEvent) {
+                barEl.innerHTML = `<span class="text-white">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(lastEvent.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
             }
@@ -1116,13 +1083,13 @@
                 let html = "";
                 allDefeats.forEach((item) => {
                     html += `
-                        <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
+                        <div class="bg-slate-950 p-1.5 rounded-md border border-slate-800 flex justify-between items-center text-[10px] whitespace-nowrap overflow-hidden">
                             <div class="truncate mr-1">
                                 <span class="text-emerald-400 font-bold uppercase">${escapeHtml(item.winner)}</span>
                                 <span class="text-slate-300"> Defeated </span>
                                 <span class="text-rose-400 font-bold uppercase">${escapeHtml(item.loser)}</span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[9px] font-semibold bg-slate-900 px-1 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
                         </div>
                     `;
                 });
@@ -1186,10 +1153,6 @@
             return `${formattedPart1} & <br class="sm:hidden">${formattedPart2}`;
         }
 
-        function formatPlainName(nameStr) {
-            return (nameStr || "").toUpperCase();
-        }
-
         function calculateTotalPlays() {
             return teams.reduce((sum, team) => sum + (team.played || 0), 0);
         }
@@ -1197,7 +1160,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v102', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v101', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -1477,6 +1440,7 @@
                             </div>
                         `;
                     });
+                    
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                             <div>
@@ -1490,8 +1454,8 @@
                                 <button onclick="openHistoryRecordDetailModal(${idx})" class="w-7 h-7 bg-amber-500/25 hover:bg-amber-500/40 text-amber-300 rounded-lg flex items-center justify-center border border-amber-500/50 text-xs cursor-pointer animated-i-btn shadow" title="ഈ കളിയുടെ റെക്കോർഡ്സ് പരിശോധിക്കുക">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
-                                <button onclick="deleteSingleHistory(${idx})" class="w-7 h-7 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800 text-xs cursor-pointer shadow" title="ഈ കളിമാത്രം ഡിലീറ്റ് ചെയ്യുക">
-                                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                <button onclick="deleteSingleHistory(${idx})" class="w-7 h-7 bg-rose-950 hover:bg-rose-900 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 text-xs cursor-pointer shadow" title="ഈ ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്യുക">
+                                    <i class="fa-solid fa-trash-can text-[9px]"></i>
                                 </button>
                             </div>
                         </div>
@@ -1510,16 +1474,17 @@
 
         function deleteSingleHistory(idx) {
             triggerHapticFeedback([40]);
-            const pin = prompt("ഈ സെഷൻ ഡിലീറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            const pin = prompt("ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (pin !== ADMIN_PIN) {
                 if (pin !== null) alert("തെറ്റായ PIN!");
                 return;
             }
-            if (window.confirm("ഈ സെഷൻ റെക്കോർഡ് മാത്രം ഡിലീറ്റ് ചെയ്യണോ?")) {
+            if (window.confirm("ഈ സെഷൻ ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?")) {
                 tournamentHistory.splice(idx, 1);
                 saveData();
+                updateHistorySummaryText();
                 openHistoryModal();
-                showToast("സെഷൻ റെക്കോർഡ് ഡിലീറ്റ് ചെയ്തു!");
+                showToast("ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്തു!");
             }
         }
 
@@ -1691,23 +1656,6 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        function clearHistory() {
-            triggerHapticFeedback([50]);
-            const pin = prompt("ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
-            if (pin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
-                return;
-            }
-            if (window.confirm("ഹിസ്റ്ററി ഡാറ്റ പൂർണ്ണമായി നീക്കം ചെയ്യണോ?")) {
-                tournamentHistory = [];
-                saveData();
-                updateHistorySummaryText();
-                openHistoryModal();
-                showToast("ഹിസ്റ്ററി ക്ലിയർ ചെയ്തു!");
-            }
-        }
-
-        // FIXED: 6 hours (360 minutes) exact auto-reset timer as requested
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -1718,6 +1666,7 @@
                     const elapsedMs = Date.now() - tournamentStartTimestamp;
                     const elapsedMinutes = Math.floor(elapsedMs / 60000);
 
+                    // 6 മണിക്കൂർ (360 മിനിറ്റ്) ഓട്ടോ റീസെറ്റ്
                     if (elapsedMinutes >= 360) {
                         autoSaveToHistory();
                         resetTournamentStateForNewSession();
@@ -1800,13 +1749,68 @@
                 `;
             });
 
+            const dancingPlayersStageCompactHtml = `
+                <div class="dance-stage-compact my-1.5">
+                    <div class="spotlight-small"></div>
+                    <div class="spotlight-small spotlight-right-small"></div>
+                    
+                    <div class="human-player-small player-1-small">
+                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
+                            <g class="torso">
+                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
+                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
+                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
+                                </g>
+                                <g class="arm-left">
+                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="human-player-small player-2-small">
+                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
+                            <g class="torso">
+                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
+                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
+                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
+                                </g>
+                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="arm-right">
+                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
+            // Champions section placed inside Share Window as requested
+            let lossPairsText = document.getElementById("most-lost-to-target") ? document.getElementById("most-lost-to-target").innerHTML : "";
+
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        ✨ CURRENT MATCH STATUS ✨
+                        ✨ CHAMPIONS & CURRENT STATUS ✨
                     </div>
+                    
+                    ${dancingPlayersStageCompactHtml}
+
                     <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
-                        ${escapeHtml(championName)}
+                        👑 ${escapeHtml(championName)} 👑
                     </div>
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
                         <div class="flex justify-center gap-3">
@@ -1820,6 +1824,11 @@
                             <span>ടോട്ടൽ സെഷൻ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
+                </div>
+
+                <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 text-left space-y-1.5">
+                    <div class="text-[10px] font-bold text-amber-300 uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം:</div>
+                    <div class="text-[11px] text-rose-300">${lossPairsText}</div>
                 </div>
 
                 <div class="space-y-1 text-left pt-1">
@@ -1909,13 +1918,67 @@
                 `;
             });
 
+            const dancingPlayersStageCompactHtml = `
+                <div class="dance-stage-compact my-1.5">
+                    <div class="spotlight-small"></div>
+                    <div class="spotlight-small spotlight-right-small"></div>
+                    
+                    <div class="human-player-small player-1-small">
+                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
+                            <g class="torso">
+                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
+                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
+                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
+                                </g>
+                                <g class="arm-left">
+                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="human-player-small player-2-small">
+                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
+                            <g class="torso">
+                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
+                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
+                                <g class="head">
+                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
+                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
+                                </g>
+                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
+                                <g class="arm-right">
+                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
+                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
+                                </g>
+                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
+            let lossPairsText = document.getElementById("most-lost-to-target") ? document.getElementById("most-lost-to-target").innerHTML : "";
+
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         ✨ TOURNAMENT CHAMPIONS CELEBRATION ✨
                     </div>
+                    
+                    ${dancingPlayersStageCompactHtml}
+
                     <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
-                        ${escapeHtml(championName)}
+                        👑 ${escapeHtml(championName)} 👑
                     </div>
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
                         <div class="flex justify-center gap-3">
@@ -1929,6 +1992,11 @@
                             <span>ടോട്ടൽ സെഷൻ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
+                </div>
+
+                <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 text-left space-y-1.5">
+                    <div class="text-[10px] font-bold text-amber-300 uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം:</div>
+                    <div class="text-[11px] text-rose-300">${lossPairsText}</div>
                 </div>
 
                 <div class="space-y-1 text-left pt-1">
@@ -2045,17 +2113,17 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide flex-1 flex items-center justify-between py-1 min-w-0">
-                                <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="cursor-pointer flex items-center hover:text-amber-300 min-w-0 truncate" title="Click to edit or delete">
-                                    <span class="leading-snug break-words pr-1 truncate">${formatSingleLetterAnimatedName(team.name)}</span>
-                                    <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
-                                </div>
-                                <button onclick="openTeamH2HHistory(${team.id})" class="w-6 h-6 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-md flex items-center justify-center text-[10px] shrink-0 cursor-pointer ml-1 animated-i-btn" title="ആരോടൊക്കെ കളിച്ചു എന്ന് അറിയാൻ">
-                                    <i class="fa-solid fa-circle-info"></i>
-                                </button>
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit or delete">
+                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
+                                <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
+                            <!-- New 'i' Button inside the Play/Count card area to show match history details -->
+                            <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="w-6 h-12 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded-lg flex items-center justify-center border border-amber-500/30 text-[10px] cursor-pointer animated-i-btn" title="കളിച്ച വിവരങ്ങൾ പരിശോധിക്കുക">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+
                             <div class="w-7 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700" title="Total Played">
                                 <span class="text-[7px] text-slate-400 font-light leading-none">Play</span>
                                 <span class="text-xs text-amber-300 font-semibold">${playedCount}</span>
@@ -2101,65 +2169,6 @@
                 totalPlayDividedEl.textContent = Number.isInteger(dividedVal) ? dividedVal : dividedVal.toFixed(1);
             }
             updateLeaderboard();
-        }
-
-        function openTeamH2HHistory(teamId) {
-            triggerHapticFeedback([30]);
-            const team = teams.find(t => t.id === teamId);
-            const modal = document.getElementById("team-h2h-history-modal");
-            const content = document.getElementById("team-h2h-history-content");
-            if (!team || !modal || !content) return;
-
-            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2">${escapeHtml(team.name)} - കളിച്ച വിവരങ്ങൾ</div>`;
-
-            let opponentMap = {};
-            
-            // Defeats against others
-            if (team.defeatedDetails) {
-                team.defeatedDetails.forEach(d => {
-                    if (!opponentMap[d.name]) opponentMap[d.name] = { wonAgainst: 0, lostAgainst: 0 };
-                    opponentMap[d.name].wonAgainst += 1;
-                });
-            }
-
-            // Defeats by others
-            teams.forEach(other => {
-                if (other.id !== team.id && other.defeatedDetails) {
-                    other.defeatedDetails.forEach(d => {
-                        if (d.name === team.name) {
-                            if (!opponentMap[other.name]) opponentMap[other.name] = { wonAgainst: 0, lostAgainst: 0 };
-                            opponentMap[other.name].lostAgainst += 1;
-                        }
-                    });
-                }
-            });
-
-            const entries = Object.entries(opponentMap);
-            if (entries.length === 0) {
-                html += `<div class="text-slate-400 italic text-center py-4">ഇതുവരെ മറ്റ് ടീമുകളുമായി കളിച്ചിട്ടില്ല.</div>`;
-            } else {
-                html += `<div class="space-y-2 pt-1">`;
-                entries.forEach(([oppName, stats]) => {
-                    html += `
-                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-                            <span class="font-bold text-slate-200 uppercase">${escapeHtml(oppName)}</span>
-                            <div class="flex gap-2">
-                                <span class="text-emerald-400 font-semibold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">Wins: ${stats.wonAgainst}</span>
-                                <span class="text-rose-400 font-semibold bg-rose-950 px-2 py-0.5 rounded border border-rose-500/30">Loss: ${stats.lostAgainst}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-
-            content.innerHTML = html;
-            modal.classList.remove("hidden");
-        }
-
-        function closeTeamH2HHistoryModal() {
-            const modal = document.getElementById("team-h2h-history-modal");
-            if (modal) modal.classList.add("hidden");
         }
 
         function handleScoreChange(id, delta) {
@@ -2211,6 +2220,7 @@
             }
         }
 
+        // Expanded Defeated Team Modal showing the full list of selectable defeated teams cleanly
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
@@ -2233,13 +2243,13 @@
 
                     const btn = document.createElement("button");
                     btn.type = "button";
-                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3.5 px-4 rounded-2xl border-2 border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 defeated-option-btn shadow-md";
+                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3 px-4 rounded-xl border border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-0.5 defeated-option-btn shadow-md";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
                             <span class="uppercase tracking-wider font-extrabold text-amber-300 text-xs sm:text-sm">${escapeHtml(t.name)}</span>
-                            <span class="text-[10px] text-rose-300 font-bold bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/40 uppercase">SELECT DEFEATED</span>
+                            <span class="text-[9px] text-rose-300 font-bold bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40 uppercase">SELECT</span>
                         </div>
-                        <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
+                        <div class="text-[9px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
                     btn.onclick = function() { promptConfirmDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
@@ -2571,6 +2581,21 @@
                 text += `${i + 1}. *${t.name}* \n   🏆 Wins: ${t.wins} | ❌ Losses: ${t.losses || 0} | 🎮 Plays: ${played}\n\n`;
             });
 
+            let lossPairs = [];
+            teams.forEach(t => {
+                if (t.defeatedDetails) {
+                    t.defeatedDetails.forEach(item => {
+                        let existing = lossPairs.find(p => p.loser === item.name && p.winner === t.name);
+                        if (existing) existing.count += 1;
+                        else lossPairs.push({ loser: item.name, winner: t.name, count: 1 });
+                    });
+                }
+            });
+            if (lossPairs.length > 0) {
+                lossPairs.sort((a, b) => b.count - a.count);
+                text += `⚠️ *Most Defeated:* ${lossPairs[0].loser} lost to ${lossPairs[0].winner} (${lossPairs[0].count} times)\n`;
+            }
+
             const totalPlays = calculateTotalPlays();
             text += `🏆 *Champions:* ${sorted[0].wins > 0 ? sorted[0].name : 'Pending'}\n`;
             text += `⚡ *Total Matches:* ${totalPlays / 2} Matches (${totalPlays} Per Team Plays)\n`;
@@ -2580,7 +2605,7 @@
             window.open(url, '_blank');
         }
 
-        function hiddenResetAction() {
+        function resetScores() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (inputPin !== ADMIN_PIN) {
@@ -2593,15 +2618,14 @@
             }
         }
 
-        function resetScoresFromEndMatch() {
-            const pin = prompt("റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
-            if (pin !== ADMIN_PIN) {
-                if (pin !== null) alert("തെറ്റായ PIN!");
-                return;
-            }
-            if (window.confirm("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യണോ?")) {
-                resetTournamentStateForNewSession();
-                showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
+        // Hidden secret reset function placed inside Total Plays for admin access only
+        function hiddenSecretReset() {
+            const pin = prompt("Secret Admin Reset PIN:");
+            if (pin === ADMIN_PIN) {
+                if (window.confirm("എല്ലാ ഡാറ്റയും പൂർണ്ണമായി റീസെറ്റ് ചെയ്യണോ?")) {
+                    resetTournamentStateForNewSession();
+                    showToast("ഫുൾ റീസെറ്റ് വിജയകരമായി പൂർത്തിയായി!");
+                }
             }
         }
 
@@ -2629,7 +2653,7 @@
         }
 
         function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            return str.replace(/&/g, "&amp;").replace(/<</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
 </body>
