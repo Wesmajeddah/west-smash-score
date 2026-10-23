@@ -164,8 +164,8 @@
         }
 
         @keyframes iBtnPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 4px rgba(245, 158, 11, 0.6); }
-            50% { transform: scale(1.15); box-shadow: 0 0 8px rgba(245, 158, 11, 1); color: #fbbf24; }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(245, 158, 11, 0.6); }
+            50% { transform: scale(1.25); box-shadow: 0 0 12px rgba(245, 158, 11, 1); color: #fbbf24; }
         }
         .animated-i-btn {
             animation: iBtnPulse 1.8s infinite ease-in-out;
@@ -402,17 +402,17 @@
             </div>
         </div>
 
-        <!-- ULTRA COMPACT LAST DEFEATED TOP BAR WITH 'i' BUTTON -->
+        <!-- EXTRA COMPACT LAST DEFEATED TOP BAR WITH 'i' BUTTON -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-lg px-2 py-1 flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-1.5 min-w-0 flex-1 pr-1">
+            <div class="flex items-center gap-1.5 min-w-0">
                 <span class="w-4 h-4 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-[8px] shrink-0">
                     <i class="fa-solid fa-shield-halved"></i>
                 </span>
                 <div class="min-w-0 truncate">
-                    <div id="main-top-last-defeated-text" class="text-[10px] font-bold text-amber-300 truncate whitespace-nowrap">കളികൾ ആരംഭിച്ചിട്ടില്ല</div>
+                    <div id="main-top-last-defeated-text" class="text-[10px] font-bold text-amber-300 truncate">No matches played yet</div>
                 </div>
             </div>
-            <button onclick="openLastDefeatedHistoryModal()" class="w-5 h-5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded flex items-center justify-center text-[9px] shrink-0 cursor-pointer animated-i-btn" title="മുൻപ് തോറ്റ വിവരങ്ങൾ">
+            <button onclick="openLastDefeatedHistoryModal()" class="w-5 h-5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-md flex items-center justify-center text-[9px] shrink-0 cursor-pointer animated-i-btn" title="Previous Defeats History">
                 <i class="fa-solid fa-circle-info"></i>
             </button>
         </div>
@@ -567,16 +567,16 @@
         </div>
     </div>
 
-    <!-- Last Defeated Detailed History Modal (Opened via 'i' button on top bar) -->
+    <!-- Very Compact Last Defeated Detailed History Modal (Opened via 'i' button on top bar) -->
     <div id="last-defeated-history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 space-y-3 relative">
-            <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-xl shadow-2xl p-3 space-y-2 relative">
+            <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-md flex items-center justify-center text-[10px] cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-xs font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-2">
-                🛡️ PREVIOUS DEFEATS & MATCHES
+            <h3 class="text-[10px] font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-1.5">
+                🛡️ LAST DEFEATED HISTORY
             </h3>
-            <div id="last-defeated-history-content" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+            <div id="last-defeated-history-content" class="space-y-1 max-h-52 overflow-y-auto pr-0.5 text-[10px]"></div>
         </div>
     </div>
 
@@ -648,6 +648,21 @@
             <div id="defeated-team-options" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
             <div class="pt-2 border-t border-slate-800">
                 <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-2xl text-xs uppercase cursor-pointer border border-slate-700 transition-all active:scale-95">റദ്ദാക്കുക</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Selection Confirmation Pop-up (Are you sure?) -->
+    <div id="confirm-defeated-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[70] hidden">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
+            <div class="w-10 h-10 mx-auto bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/40 text-sm">
+                <i class="fa-solid fa-question"></i>
+            </div>
+            <h3 class="text-xs font-extrabold text-amber-300 uppercase tracking-wide">തീർച്ചയായും ഉറപ്പാണോ?</h3>
+            <p id="confirm-defeated-msg" class="text-xs text-slate-200 font-semibold leading-relaxed">തോറ്റ ടീം:</p>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="closeConfirmDefeatedModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">ഇല്ല (മാറ്റുക)</button>
+                <button onclick="executeConfirmedWin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">അതെ (ഉറപ്പാണ്)</button>
             </div>
         </div>
     </div>
@@ -858,6 +873,7 @@
         let audioContext = null;
         let globalClickSequence = 0;
         let pendingWinningTeamId = null;
+        let pendingDefeatedTeamId = null;
         let lastActionSnapshot = null;
         let lastActionDescription = "";
 
@@ -1093,7 +1109,7 @@
             }
         }
 
-        // Update Ultra Compact Main Top Bar Last Defeated Text with Single Line Truncate
+        // Update Main Top Bar Last Defeated Text in English with Truncate
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
@@ -1112,13 +1128,13 @@
 
             if (allDefeats.length > 0) {
                 let latest = allDefeats[allDefeats.length - 1];
-                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> തോൽപ്പിച്ചത് <span class="text-rose-400">${escapeHtml(latest.loser)}</span>`;
+                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(latest.loser)}</span>`;
             } else {
-                barEl.textContent = "കളികൾ ആരംഭിച്ചിട്ടില്ല";
+                barEl.textContent = "No matches played yet";
             }
         }
 
-        // Modal for Last Defeated 'i' Button showing history of who defeated whom
+        // Very Compact Last Defeated History Modal with Single-line names
         function openLastDefeatedHistoryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("last-defeated-history-modal");
@@ -1139,18 +1155,18 @@
             });
 
             if (allDefeats.length === 0) {
-                content.innerHTML = `<div class="text-slate-400 italic text-center py-4">ഇതുവരെ കളികളൊന്നും നടന്നിട്ടില്ല.</div>`;
+                content.innerHTML = `<div class="text-slate-400 italic text-center py-3">No matches played yet.</div>`;
             } else {
                 let html = "";
                 allDefeats.slice().reverse().forEach((item, index) => {
                     html += `
-                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="truncate pr-2">
+                        <div class="bg-slate-950 p-1.5 rounded-md border border-slate-800 flex justify-between items-center text-[10px] whitespace-nowrap overflow-hidden">
+                            <div class="truncate mr-1">
                                 <span class="text-emerald-400 font-bold uppercase">${escapeHtml(item.winner)}</span>
-                                <span class="text-slate-300"> തോൽപ്പിച്ചത് </span>
+                                <span class="text-slate-300"> Defeated </span>
                                 <span class="text-rose-400 font-bold uppercase">${escapeHtml(item.loser)}</span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[9px] font-semibold bg-slate-900 px-1 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
                         </div>
                     `;
                 });
@@ -1292,8 +1308,8 @@
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 html += `
                     <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-200 truncate pr-2">${escapeHtml(t.name)}</span>
-                        <div class="flex items-center gap-2 shrink-0">
+                        <span class="font-bold text-slate-200">${escapeHtml(t.name)}</span>
+                        <div class="flex items-center gap-2">
                             <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${played} Plays</span>
                             <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
                             <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
@@ -1412,11 +1428,11 @@
                     Object.entries(winGrouped).forEach(([opponentName, data], i) => {
                         let timesStr = data.times.map(t => `${t}m`).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
-                            <div class="truncate pr-2">
+                            <div>
                                 <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(opponentName)}</b> ടീമിനെതിരെ <i class="fa-solid fa-award text-amber-400"></i></span>
                                 <div class="text-[10px] text-emerald-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം ജയിച്ചു` : '1 പ്രാവശ്യം ജയിച്ചു'}</div>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800 shrink-0">${timesStr}</span>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1447,11 +1463,11 @@
                     lossEntries.forEach(([winnerName, data], i) => {
                         let timesStr = data.times.map(t => `${t}m`).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
-                            <div class="truncate pr-2">
+                            <div>
                                 <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> ടീമിനെതിരെ <i class="fa-solid fa-shield-halved text-rose-400"></i></span>
                                 <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800 shrink-0">${timesStr}</span>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1496,8 +1512,8 @@
                     sortedTeams.forEach((t, i) => {
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-xs font-light text-slate-300 py-1 border-b border-slate-900">
-                                <span class="truncate pr-2">${i + 1}. ${escapeHtml(t.name)}</span>
-                                <div class="flex gap-3 shrink-0">
+                                <span>${i + 1}. ${escapeHtml(t.name)}</span>
+                                <div class="flex gap-3">
                                     <span class="text-emerald-400 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                                     <span class="text-rose-400 font-semibold">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
                                 </div>
@@ -1506,11 +1522,11 @@
                     });
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <div class="truncate pr-2">
-                                <div class="text-xs font-semibold text-amber-300 truncate">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-400"></i> ${winnersNames}</div>
+                            <div>
+                                <div class="text-xs font-semibold text-amber-300">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-400"></i> ${winnersNames}</div>
                                 <div class="text-[10px] font-light text-slate-400">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="flex items-center gap-1.5">
                                 <span class="text-[10px] bg-amber-500/10 text-amber-400 font-semibold px-2 py-0.5 rounded border border-amber-500/20">
                                     Total: ${item.totalPlays}
                                 </span>
@@ -1638,11 +1654,11 @@
                     Object.entries(winGrouped).forEach(([opponentName, data], i) => {
                         let timesStr = data.times.map(t => formatHoursAndMins(t)).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
-                            <div class="truncate pr-2">
+                            <div>
                                 <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(opponentName)}</b> ടീമിനെതിരെ <i class="fa-solid fa-award text-amber-400"></i></span>
                                 <div class="text-[10px] text-emerald-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം ജയിച്ചു` : '1 പ്രാവശ്യം ജയിച്ചു'}</div>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800 shrink-0">${timesStr}</span>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1673,11 +1689,11 @@
                     lossEntries.forEach(([winnerName, data], i) => {
                         let timesStr = data.times.map(t => formatHoursAndMins(t)).join(", ");
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
-                            <div class="truncate pr-2">
+                            <div>
                                 <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> ടീമിനെതിരെ <i class="fa-solid fa-shield-halved text-rose-400"></i></span>
                                 <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800 shrink-0">${timesStr}</span>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1800,7 +1816,7 @@
                 let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'} truncate max-w-[120px]">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-400">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -1867,7 +1883,7 @@
                     
                     ${dancingPlayersStageCompactHtml}
 
-                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider truncate">
+                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
@@ -1968,7 +1984,7 @@
                 let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'} truncate max-w-[120px]">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-400">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -2035,7 +2051,7 @@
                     
                     ${dancingPlayersStageCompactHtml}
 
-                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider truncate">
+                    <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
@@ -2188,7 +2204,7 @@
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
                             <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit or delete">
-                                <span class="leading-snug truncate pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
+                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
@@ -2303,7 +2319,7 @@
             container.innerHTML = "";
             teams.forEach(t => {
                 if (t.id !== winningTeamId) {
-                    let lastDefeatedText = "ആരെയും തോൽപ്പിച്ചിട്ടില്ല";
+                    let lastDefeatedText = "No previous defeat";
                     if (t.defeatedDetails && t.defeatedDetails.length > 0) {
                         const last = t.defeatedDetails[t.defeatedDetails.length - 1];
                         lastDefeatedText = `Last defeated: ${last.name}`;
@@ -2314,12 +2330,12 @@
                     btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3 px-3 rounded-2xl border-2 border-slate-700/80 text-xs text-left transition-all cursor-pointer flex flex-col gap-0.5 defeated-option-btn";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
-                            <span class="uppercase tracking-wider font-extrabold text-slate-200 truncate pr-2">${escapeHtml(t.name)}</span>
-                            <span class="text-[9px] text-rose-400 font-bold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 shrink-0">Select Defeated</span>
+                            <span class="uppercase tracking-wider font-extrabold text-slate-200">${escapeHtml(t.name)}</span>
+                            <span class="text-[9px] text-rose-400 font-bold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">Select Defeated</span>
                         </div>
-                        <div class="text-[9px] text-slate-400 font-light italic pointer-events-none truncate">${lastDefeatedText}</div>
+                        <div class="text-[9px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
-                    btn.onclick = function() { confirmWinAndDefeatedTeam(winningTeamId, t.id); };
+                    btn.onclick = function() { promptConfirmDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
                 }
             });
@@ -2329,11 +2345,47 @@
         function closeDefeatedTeamModal() {
             const modal = document.getElementById("defeated-team-modal");
             if (modal) modal.classList.add("hidden");
+        }
+
+        // Confirmation Pop-up before finalizing win and defeated team
+        function promptConfirmDefeatedTeam(winningTeamId, defeatedTeamId) {
+            pendingWinningTeamId = winningTeamId;
+            pendingDefeatedTeamId = defeatedTeamId;
+            
+            const winningTeam = teams.find(t => t.id === winningTeamId);
+            const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
+            if (!winningTeam || !defeatedTeam) return;
+
+            closeDefeatedTeamModal();
+
+            const confirmModal = document.getElementById("confirm-defeated-modal");
+            const msgEl = document.getElementById("confirm-defeated-msg");
+            if (msgEl) {
+                msgEl.innerHTML = `<b class="text-amber-300">${escapeHtml(winningTeam.name)}</b> ടീം തോൽപ്പിച്ചത് <b class="text-rose-400">${escapeHtml(defeatedTeam.name)}</b> ടീമിനെയാണോ?`;
+            }
+            if (confirmModal) confirmModal.classList.remove("hidden");
+        }
+
+        function closeConfirmDefeatedModal() {
+            const confirmModal = document.getElementById("confirm-defeated-modal");
+            if (confirmModal) confirmModal.classList.add("hidden");
+            if (pendingWinningTeamId) {
+                openDefeatedTeamModal(pendingWinningTeamId);
+            }
+        }
+
+        function executeConfirmedWin() {
+            const confirmModal = document.getElementById("confirm-defeated-modal");
+            if (confirmModal) confirmModal.classList.add("hidden");
+
+            if (pendingWinningTeamId && pendingDefeatedTeamId) {
+                confirmWinAndDefeatedTeam(pendingWinningTeamId, pendingDefeatedTeamId);
+            }
             pendingWinningTeamId = null;
+            pendingDefeatedTeamId = null;
         }
 
         function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
-            closeDefeatedTeamModal();
             const team = teams.find(t => t.id === winningTeamId);
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
             if (!team || !defeatedTeam) return;
@@ -2590,19 +2642,19 @@
             if (firstPlaces.length === 1) {
                 championSpan.innerHTML = `⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം <i class="fa-solid fa-trophy text-amber-400"></i>) ⭐`;
             } else {
-                let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0 truncate">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം <i class="fa-solid fa-trophy text-amber-400"></i>)</div>`).join('');
-                championSpan.innerHTML = `<div class="flex flex-col space-y-0.5 truncate">${multiHtml}</div>`;
+                let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0 break-words">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം <i class="fa-solid fa-trophy text-amber-400"></i>)</div>`).join('');
+                championSpan.innerHTML = `<div class="flex flex-col space-y-0.5">${multiHtml}</div>`;
             }
 
             let podiumHtml = "";
             if (sorted.length > 1 && sorted[1].wins > 0) {
-                podiumHtml += `<div class="text-amber-200/90 font-light truncate">🥈 2-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} ജയം <i class="fa-solid fa-trophy text-amber-400 text-[10px]"></i>)</div>`;
+                podiumHtml += `<div class="text-amber-200/90 font-light">🥈 2-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} ജയം <i class="fa-solid fa-trophy text-amber-400 text-[10px]"></i>)</div>`;
             } else {
                 podiumHtml += `<div class="text-amber-200/80 font-light">🥈 2-ാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
             }
 
             if (sorted.length > 2 && sorted[2].wins > 0) {
-                podiumHtml += `<div class="text-amber-200/90 font-light truncate">🥉 3-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} ജയം <i class="fa-solid fa-trophy text-amber-400 text-[10px]"></i>)</div>`;
+                podiumHtml += `<div class="text-amber-200/90 font-light">🥉 3-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} ജയം <i class="fa-solid fa-trophy text-amber-400 text-[10px]"></i>)</div>`;
             } else {
                 podiumHtml += `<div class="text-amber-200/80 font-light">🥉 3-ാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
             }
@@ -2611,14 +2663,14 @@
             const teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
-                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-semibold text-xs uppercase inline-block truncate max-w-[200px] align-bottom">${escapeHtml(teamsWithTime[0].name)}</span> (${teamsWithTime[0].lastMatchTime} mins)`;
+                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-semibold text-xs uppercase inline-block break-words">${escapeHtml(teamsWithTime[0].name)}</span> (${teamsWithTime[0].lastMatchTime} mins)`;
             } else {
                 fastestEl.innerHTML = `⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
             }
 
             const lowestTeams = sorted.filter(t => t.wins === minWins);
             if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="text-rose-200 font-light text-xs uppercase truncate">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം <i class="fa-solid fa-shield text-[10px] text-rose-400"></i>)`;
+                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="text-rose-200 font-light text-xs uppercase">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം <i class="fa-solid fa-shield text-[10px] text-rose-400"></i>)`;
             } else {
                 loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
             }
@@ -2645,9 +2697,9 @@
 
                 topLossPairs.forEach(pair => {
                     lossPointsHtml += `
-                        <div class="flex items-start gap-1.5 bg-slate-900 p-1.5 rounded-lg border border-slate-800 truncate">
+                        <div class="flex items-start gap-1.5 bg-slate-900 p-1.5 rounded-lg border border-slate-800">
                             <span class="text-rose-400 font-bold">•</span>
-                            <div class="truncate">
+                            <div>
                                 <b class="text-white uppercase">${escapeHtml(pair.loser)}</b> ടീം, <b class="text-amber-300 uppercase">${escapeHtml(pair.winner)}</b> ടീമിനെതിരെ 
                                 <span class="text-rose-300 font-extrabold">${pair.count} പ്രാവശ്യം</span> തോറ്റു.
                             </div>
