@@ -81,23 +81,6 @@
         }
 
         .gold-border { border: 1.5px solid rgba(212, 175, 55, 0.4); }
-        
-        .champions-special-border {
-            border: 2px solid #F59E0B;
-            box-shadow: 0 0 18px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(245, 158, 11, 0.25);
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
-            border-radius: 0.75rem;
-            padding: 0.6rem;
-            margin-top: 0.5rem;
-            overflow: hidden !important;
-            word-break: break-word;
-            position: relative;
-            animation: goldPulseGlow 3s infinite ease-in-out;
-        }
-        @keyframes goldPulseGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4), inset 0 0 10px rgba(245, 158, 11, 0.2); }
-            50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.8), inset 0 0 18px rgba(245, 158, 11, 0.4); }
-        }
 
         .rank-badge {
             display: inline-flex !important;
@@ -222,84 +205,71 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* Smash Stage Animation for End Match with realistic shuttle smash action */
-        .smash-stage-compact {
+        /* --- UNIQUE BADMINTON DANCE ANIMATION STAGE --- */
+        .dance-stage-container {
             position: relative;
             width: 100%;
-            height: 90px;
-            background: radial-gradient(circle at bottom, #1e293b 0%, #020617 80%);
-            border-radius: 0.75rem;
+            height: 100px;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 90%);
+            border-radius: 1rem;
             overflow: hidden;
-            border: 1.5px solid rgba(245, 158, 11, 0.4);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+            border: 1.5px solid rgba(245, 158, 11, 0.5);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 15px rgba(245, 158, 11, 0.2);
         }
 
-        .smash-player-left {
+        /* Unique Dancing Player 1 (Left Side) */
+        .dancer-left {
             position: absolute;
-            bottom: 6px;
-            left: 18%;
-            width: 36px;
-            height: 60px;
-            animation: playerJumpLeft 1.2s infinite ease-in-out;
+            bottom: 10px;
+            left: 22%;
+            animation: playerDanceLeft 1.4s infinite ease-in-out;
         }
 
-        .smash-player-right {
+        /* Unique Dancing Player 2 (Right Side) */
+        .dancer-right {
             position: absolute;
-            bottom: 6px;
-            right: 18%;
-            width: 36px;
-            height: 60px;
-            animation: playerJumpRight 1.2s infinite ease-in-out;
+            bottom: 10px;
+            right: 22%;
+            animation: playerDanceRight 1.4s infinite ease-in-out;
         }
 
-        @keyframes playerJumpLeft {
-            0%, 100% { transform: translateY(0) scaleX(1); }
-            50% { transform: translateY(-12px) scaleX(1.05); }
+        @keyframes playerDanceLeft {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-10px) rotate(-8deg) scale(1.05); }
+            50% { transform: translateY(0) rotate(0deg) scale(1); }
+            75% { transform: translateY(-14px) rotate(8deg) scale(1.08); }
         }
 
-        @keyframes playerJumpRight {
-            0%, 100% { transform: translateY(0) scaleX(1); }
-            50% { transform: translateY(-12px) scaleX(1.05); }
+        @keyframes playerDanceRight {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-14px) rotate(8deg) scale(1.08); }
+            50% { transform: translateY(0) rotate(0deg) scale(1); }
+            75% { transform: translateY(-10px) rotate(-8deg) scale(1.05); }
         }
 
-        .smash-racket-arm {
+        /* Dancing Racket Swing */
+        .dancing-racket-arm {
             transform-origin: bottom center;
-            animation: racketSmashSwing 1.2s infinite ease-in-out;
+            animation: racketDanceSwing 0.7s infinite alternate ease-in-out;
         }
 
-        @keyframes racketSmashSwing {
-            0%, 100% { transform: rotate(-45deg); }
-            45% { transform: rotate(10deg); }
-            50% { transform: rotate(70deg); }
-            55% { transform: rotate(-20deg); }
+        @keyframes racketDanceSwing {
+            0% { transform: rotate(-35deg); }
+            100% { transform: rotate(55deg); }
         }
 
-        .shuttle-smash-anim {
+        /* Shuttle Dancing Bounce in Middle */
+        .shuttle-dance-bounce {
             position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #38BDF8, 0 0 20px #F59E0B;
-            animation: shuttleTrajectory 1.2s infinite linear;
+            top: 15px;
+            left: 48%;
+            font-size: 16px;
+            animation: shuttleDanceBounce 0.7s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes shuttleTrajectory {
-            0% { left: 28%; bottom: 45px; transform: scale(0.6); }
-            45% { left: 48%; bottom: 70px; transform: scale(1.4); }
-            50% { left: 52% { bottom: 65px; transform: scale(1.8); } }
-            70% { left: 72%; bottom: 30px; transform: scale(1); }
-            100% { left: 75%; bottom: 10px; transform: scale(0.6); }
-        }
-
-        .net-barrier {
-            position: absolute;
-            bottom: 0;
-            left: 49%;
-            width: 2px;
-            height: 35px;
-            background: #f59e0b;
-            box-shadow: 0 0 5px #f59e0b;
+        @keyframes shuttleDanceBounce {
+            0% { transform: translateY(0) scale(0.9) rotate(0deg); }
+            100% { transform: translateY(35px) scale(1.3) rotate(180deg); }
         }
 
         .record-detail-btn {
@@ -366,17 +336,17 @@
             </div>
         </div>
 
-        <!-- EXTRA COMPACT LAST DEFEATED TOP BAR WITH 'i' BUTTON -->
-        <div class="bg-slate-900 border border-amber-500/30 rounded-lg px-2.5 py-1.5 flex items-center justify-between shadow-sm gap-2">
-            <div class="flex items-center gap-2 min-w-0 flex-1">
-                <span class="w-4 h-4 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-[8px] shrink-0">
+        <!-- EXTRA COMPACT OUTER LAST DEFEATED BAR WITH 'i' BUTTON -->
+        <div class="bg-slate-900 border border-amber-500/30 rounded-lg px-2 py-1 flex items-center justify-between shadow-sm gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                <span class="w-3.5 h-3.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-[7px] shrink-0">
                     <i class="fa-solid fa-shield-halved"></i>
                 </span>
                 <div class="min-w-0 flex-1">
-                    <div id="main-top-last-defeated-text" class="text-[11px] font-bold text-amber-300 truncate w-full">No matches played yet</div>
+                    <div id="main-top-last-defeated-text" class="text-[9px] font-bold text-amber-300 truncate w-full">No matches played yet</div>
                 </div>
             </div>
-            <button onclick="openLastDefeatedHistoryModal()" class="w-6 h-6 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-md flex items-center justify-center text-[10px] shrink-0 cursor-pointer" title="Previous Defeats History">
+            <button onclick="openLastDefeatedHistoryModal()" class="w-5 h-5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded flex items-center justify-center text-[9px] shrink-0 cursor-pointer" title="Previous Defeats History">
                 <i class="fa-solid fa-circle-info"></i>
             </button>
         </div>
@@ -499,16 +469,16 @@
         </div>
     </div>
 
-    <!-- Last Defeated History Modal (Single Window & Full List with Proper Text Wrap) -->
+    <!-- Last Defeated History Modal (ENLARGED WINDOW WITH CLEAR SMALLER TEXT) -->
     <div id="last-defeated-history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-xl shadow-2xl p-4 space-y-3 relative max-h-[85vh] flex flex-col">
+        <div class="bg-slate-900 border gold-border w-full max-w-xl rounded-2xl shadow-2xl p-4 space-y-3 relative max-h-[85vh] flex flex-col">
             <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-xs font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-2">
                 🛡️ LAST DEFEATED HISTORY (FULL LIST)
             </h3>
-            <div id="last-defeated-history-content" class="space-y-2 overflow-y-auto pr-1 text-xs flex-1"></div>
+            <div id="last-defeated-history-content" class="space-y-2 overflow-y-auto pr-1 text-[10px] flex-1"></div>
         </div>
     </div>
 
@@ -583,7 +553,7 @@
         </div>
     </div>
 
-    <!-- Current Status Share Modal Window (Focused on Top Scorer & Most Defeated) -->
+    <!-- Current Status Share Modal Window (Top Scorer & Most Defeated Only) -->
     <div id="current-status-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
@@ -814,7 +784,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v107');
+                const localData = localStorage.getItem('wesma_local_backup_v108');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -847,7 +817,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v107');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v108');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -1069,14 +1039,14 @@
                 let html = "";
                 allDefeats.forEach((item, index) => {
                     html += `
-                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs gap-2">
-                            <div class="min-w-0 flex-1 break-words">
+                        <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px] gap-2">
+                            <div class="min-w-0 flex-1 break-words leading-tight">
                                 <span class="text-amber-400 font-bold">#${allDefeats.length - index}</span> 
                                 <span class="text-emerald-400 font-bold uppercase">${escapeHtml(item.winner)}</span>
                                 <span class="text-slate-300"> Defeated </span>
                                 <span class="text-rose-400 font-bold uppercase">${escapeHtml(item.loser)}</span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[9px] font-semibold bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
                         </div>
                     `;
                 });
@@ -1147,7 +1117,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v107', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v108', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -1679,7 +1649,7 @@
                 const totalHours = Math.floor(elapsedTotal / 3600000);
                 const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
-                if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s`;
+                if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}`;
 
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
@@ -1718,30 +1688,30 @@
             let mostDefeatedCount = mostDefeatedTeam ? (mostDefeatedTeam.losses || 0) : 0;
 
             container.innerHTML = `
-                <div class="bg-gradient-to-br from-amber-500/25 via-slate-900 to-amber-600/25 p-3 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-2.5 text-center relative overflow-hidden">
-                    <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold">
+                <div class="bg-gradient-to-br from-amber-500/25 via-slate-900 to-amber-600/25 p-3.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-3 text-center relative overflow-hidden">
+                    <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5">
                         ✨ LIVE MATCH HIGHLIGHTS ✨
                     </div>
 
-                    <div class="space-y-2 pt-1">
-                        <div class="bg-slate-950/90 border border-emerald-500/50 rounded-xl p-2.5 text-left shadow-inner flex items-center justify-between">
+                    <div class="space-y-2.5 pt-1">
+                        <div class="bg-slate-950/90 border border-emerald-500/50 rounded-xl p-3 text-left shadow-inner flex items-center justify-between">
                             <div>
                                 <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-trophy"></i> ഏറ്റവും കൂടുതൽ പോയിന്റ് / ജയം (Top Scorer)
                                 </div>
                                 <div class="text-sm font-black text-amber-300 uppercase mt-0.5">${escapeHtml(topScorerName)}</div>
                             </div>
-                            <span class="text-xs font-black text-emerald-300 bg-emerald-950 px-2 py-1 rounded-lg border border-emerald-800">${topScorerWins} Wins</span>
+                            <span class="text-xs font-black text-emerald-300 bg-emerald-950 px-2.5 py-1 rounded-lg border border-emerald-800">${topScorerWins} Wins</span>
                         </div>
 
-                        <div class="bg-slate-950/90 border border-rose-500/50 rounded-xl p-2.5 text-left shadow-inner flex items-center justify-between">
+                        <div class="bg-slate-950/90 border border-rose-500/50 rounded-xl p-3 text-left shadow-inner flex items-center justify-between">
                             <div>
                                 <div class="text-[9px] text-rose-400 font-bold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-shield-halved"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് (Most Defeated)
                                 </div>
                                 <div class="text-sm font-black text-rose-300 uppercase mt-0.5">${escapeHtml(mostDefeatedName)}</div>
                             </div>
-                            <span class="text-xs font-black text-rose-300 bg-rose-950 px-2 py-1 rounded-lg border border-rose-800">${mostDefeatedCount} Losses</span>
+                            <span class="text-xs font-black text-rose-300 bg-rose-950 px-2.5 py-1 rounded-lg border border-rose-800">${mostDefeatedCount} Losses</span>
                         </div>
                     </div>
                 </div>
@@ -1805,6 +1775,9 @@
             let winnerPlays = winnerTeam.played || 0;
             let winnerTimeMins = winnerTeam.totalTimeSpentMinutes || 0;
 
+            let totalPlaysCount = calculateTotalPlays();
+            let totalMatchesCount = totalPlaysCount / 2;
+
             const maxWins = sorted[0].wins;
             const minWins = sorted[sorted.length - 1].wins;
             let loserTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins && t.id !== winnerTeam.id);
@@ -1826,111 +1799,79 @@
 
             let podiumTextHtml = "";
             if (sorted.length > 1 && sorted[1].wins > 0) {
-                podiumTextHtml += `<div>🥈 2nd Place: <span class="text-white uppercase">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
+                podiumTextHtml += `<div>🥈 രണ്ടാം സ്ഥാനം: <span class="text-white uppercase font-bold">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
             } else {
-                podiumTextHtml += `<div>🥈 2nd Place: Calculating...</div>`;
+                podiumTextHtml += `<div>🥈 രണ്ടാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
             }
             if (sorted.length > 2 && sorted[2].wins > 0) {
-                podiumTextHtml += `<div>🥉 3rd Place: <span class="text-white uppercase">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
+                podiumTextHtml += `<div>🥉 മൂന്നാം സ്ഥാനം: <span class="text-white uppercase font-bold">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
             } else {
-                podiumTextHtml += `<div>🥉 3rd Place: Calculating...</div>`;
-            }
-
-            // H2H Most Lost Stats calculation for End Match modal
-            let lossPairs = [];
-            teams.forEach(t => {
-                if (t.defeatedDetails) {
-                    t.defeatedDetails.forEach(item => {
-                        let existing = lossPairs.find(p => p.loser === item.name && p.winner === t.name);
-                        if (existing) {
-                            existing.count += 1;
-                        } else {
-                            lossPairs.push({ loser: item.name, winner: t.name, count: 1 });
-                        }
-                    });
-                }
-            });
-
-            let h2hHtml = "";
-            if (lossPairs.length > 0) {
-                lossPairs.sort((a, b) => b.count - a.count);
-                let maxLossCount = lossPairs[0].count;
-                let topLossPairs = lossPairs.filter(p => p.count === maxLossCount);
-                topLossPairs.forEach(pair => {
-                    h2hHtml += `<div class="text-[11px] text-rose-300"><b>${escapeHtml(pair.loser)}</b> team lost against <b>${escapeHtml(pair.winner)}</b> <span class="text-rose-400 font-extrabold">${pair.count} times</span>.</div>`;
-                });
-            } else {
-                h2hHtml = `<div class="text-slate-400 italic text-[11px]">No stats available.</div>`;
+                podiumTextHtml += `<div>🥉 മൂന്നാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
             }
 
             container.innerHTML = `
-                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2 text-center relative overflow-hidden">
-                    <!-- Shuttle Smash Animation Stage (Smash Champions text removed) -->
-                    <div class="smash-stage-compact my-1">
-                        <div class="net-barrier"></div>
-                        <div class="shuttle-smash-anim"></div>
+                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2.5 text-center relative overflow-hidden">
+                    
+                    <!-- UNIQUE SHUTTLE DANCE ANIMATION STAGE -->
+                    <div class="dance-stage-container my-1">
+                        <div class="shuttle-dance-bounce">🏸</div>
                         
-                        <!-- Left Player Smashing -->
-                        <div class="smash-player-left">
-                            <div class="absolute top-0 left-3 w-3 h-3 bg-amber-200 rounded-full border border-amber-400"></div>
-                            <div class="absolute top-3 left-3 w-2.5 h-4 bg-amber-500 rounded-sm"></div>
-                            <div class="smash-racket-arm absolute top-2 left-4 w-4 h-1.5 bg-cyan-300 rounded-full"></div>
-                            <div class="absolute top-7 left-2 w-1 h-3.5 bg-slate-300 rounded-full"></div>
-                            <div class="absolute top-7 left-3 w-1 h-3.5 bg-slate-300 rounded-full"></div>
+                        <!-- Left Dancing Player with Racket -->
+                        <div class="dancer-left flex flex-col items-center">
+                            <div class="w-3.5 h-3.5 bg-amber-200 rounded-full border border-amber-400"></div>
+                            <div class="w-3 h-5 bg-amber-500 rounded-sm"></div>
+                            <div class="dancing-racket-arm w-4 h-1.5 bg-cyan-300 rounded-full -mt-4"></div>
+                            <div class="flex gap-1 mt-1">
+                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
+                            </div>
                         </div>
 
-                        <!-- Right Player Smashing -->
-                        <div class="smash-player-right">
-                            <div class="absolute top-0 left-3 w-3 h-3 bg-cyan-200 rounded-full border border-cyan-400"></div>
-                            <div class="absolute top-3 left-3 w-2.5 h-4 bg-cyan-500 rounded-sm"></div>
-                            <div class="smash-racket-arm absolute top-2 -left-1 w-4 h-1.5 bg-amber-300 rounded-full"></div>
-                            <div class="absolute top-7 left-2 w-1 h-3.5 bg-slate-300 rounded-full"></div>
-                            <div class="absolute top-7 left-3 w-1 h-3.5 bg-slate-300 rounded-full"></div>
+                        <!-- Right Dancing Player with Racket -->
+                        <div class="dancer-right flex flex-col items-center">
+                            <div class="w-3.5 h-3.5 bg-cyan-200 rounded-full border border-cyan-400"></div>
+                            <div class="w-3 h-5 bg-cyan-500 rounded-sm"></div>
+                            <div class="dancing-racket-arm w-4 h-1.5 bg-amber-300 rounded-full -mt-4"></div>
+                            <div class="flex gap-1 mt-1">
+                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
+                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Highlighted Ultimate Champions Name with English label -->
-                    <div class="bg-slate-950/90 border-2 border-amber-400 rounded-xl p-2 shadow-inner">
-                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">👑 Ultimate Champions 👑</div>
+                    <!-- Highlighted Ultimate Winner Name -->
+                    <div class="bg-slate-950/90 border-2 border-amber-400 rounded-xl p-2.5 shadow-inner">
+                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">👑 വിജയിച്ച ചാംപ്യൻമാർ 👑</div>
                         <div class="text-base font-black text-amber-300 uppercase tracking-wider mt-0.5 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]">
                             🌟 ${escapeHtml(championName)} 🌟
                         </div>
                     </div>
 
+                    <!-- Overall Total Match & Time Stats inside End Match Window -->
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
                         <div class="flex justify-center gap-3">
-                            <span>Winner Total Plays: <b class="text-white">${winnerPlays}</b></span>
+                            <span>ആകെ മാച്ചുകൾ: <b class="text-amber-300 font-bold">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b></span>
                             <span>|</span>
-                            <span>Total Time: <b class="text-amber-300">${formatHoursAndMins(winnerTimeMins)}</b></span>
+                            <span>ആകെ സമയം: <b class="text-emerald-400 font-bold">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Podium Standings (English replacement) & Loser Team Section -->
+                <!-- Malayalam Labels for Podium and Loser -->
                 <div class="grid grid-cols-1 gap-2 text-xs">
                     <div class="bg-slate-900 border gold-border rounded-xl p-2.5 text-center shadow-lg space-y-1.5">
-                        <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 Elite Podium Standings</div>
+                        <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 പ്രധാന വിജയികളുടെ നിര (പോഡിയം)</div>
                         <div class="text-left space-y-1 pt-1 border-t border-amber-500/20">
                             ${podiumTextHtml}
                         </div>
                     </div>
 
-                    <!-- Loser Team Section -->
+                    <!-- Malayalam Title for Most Defeated Team -->
                     <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2.5 text-center shadow-lg space-y-1">
                         <div class="font-bold text-rose-400 uppercase tracking-wide flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-rose-500"></i> Most Defeated Team (Loser Team)
+                            <i class="fa-solid fa-shield-halved text-rose-500"></i> ഏറ്റവും കൂടുതൽ തോൽവി വഴങ്ങിയ ടീം
                         </div>
                         <div class="text-white font-extrabold uppercase text-xs">${loserNames}</div>
-                    </div>
-
-                    <!-- H2H Most Lost Stats in End Match Modal -->
-                    <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-2.5 text-left shadow-lg space-y-1.5">
-                        <div class="font-bold text-amber-300 uppercase tracking-wide text-center flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-people-arrows text-amber-400"></i> Head-to-Head Defeat Breakdown (H2H Stats)
-                        </div>
-                        <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 space-y-1">
-                            ${h2hHtml}
-                        </div>
                     </div>
                 </div>
 
