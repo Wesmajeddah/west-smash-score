@@ -772,16 +772,26 @@
     <!-- History Record Details Popup Modal -->
     <div id="history-record-detail-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-[70] hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-3 bg-slate-950 border-b border-amber-500/30 flex items-center justify-between">
-                <h3 class="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-chart-pie text-amber-400"></i> SESSION RECORDS & STATS
+            <div class="p-2.5 bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/60 border-b border-amber-500/30 flex items-center justify-between">
+                <h3 class="text-xs font-extrabold text-amber-300 flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-chart-pie text-amber-400 animate-pulse"></i> RECORDS & MATCH STATS
                 </h3>
                 <button onclick="closeHistoryRecordDetailModal()" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="history-record-detail-content" class="p-3 space-y-2 overflow-y-auto flex-1"></div>
-            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
+            <div id="history-record-detail-content" class="p-2 space-y-1.5 overflow-y-auto flex-1"></div>
+            <div class="p-2 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeHistoryRecordDetailModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
+        </div>
+    </div>
+
+    <!-- History Team Detailed Info Popup -->
+    <div id="history-team-info-detail-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[80] hidden">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-5 space-y-3 relative">
+            <button onclick="closeHistoryTeamInfoDetailModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="history-team-info-detail-content" class="space-y-3 text-xs"></div>
         </div>
     </div>
 
@@ -1169,8 +1179,8 @@
                         <span class="font-bold text-slate-200">${escapeHtml(t.name)}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${played} Plays</span>
-                            <span class="text-[10px] text-emerald-400 font-semibold">${t.wins}W</span>
-                            <span class="text-[10px] text-rose-400 font-semibold">${t.losses || 0}L</span>
+                            <span class="text-[10px] text-emerald-400 font-semibold">${t.wins}W 🥳</span>
+                            <span class="text-[10px] text-rose-400 font-semibold">${t.losses || 0}L 😢</span>
                         </div>
                     </div>
                 `;
@@ -1388,8 +1398,8 @@
                                 <span class="text-[10px] bg-amber-500/10 text-amber-400 font-semibold px-2 py-0.5 rounded border border-amber-500/20">
                                     Total: ${item.totalPlays}
                                 </span>
-                                <button onclick="openHistoryRecordDetailModal(${idx})" class="w-7 h-7 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg flex items-center justify-center border border-amber-500/40 text-xs cursor-pointer animated-i-btn" title="ഈ കളിയുടെ റെക്കോർഡ്സ് തുറക്കുക">
-                                    <i class="fa-solid fa-chart-pie"></i>
+                                <button onclick="openHistoryRecordDetailModal(${idx})" class="w-7 h-7 bg-amber-500/25 hover:bg-amber-500/40 text-amber-300 rounded-lg flex items-center justify-center border border-amber-500/50 text-xs cursor-pointer animated-i-btn shadow" title="ഈ കളിയുടെ റെക്കോർഡ്സ് പരിശോധിക്കുക">
+                                    <i class="fa-solid fa-circle-info"></i>
                                 </button>
                             </div>
                         </div>
@@ -1441,6 +1451,9 @@
                             <div class="bg-slate-950/95 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
+                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
+                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                    </button>
                                 </div>
                                 <span class="text-emerald-300 text-sm font-black mt-0.5">${t.wins} 🥳</span>
                             </div>
@@ -1448,6 +1461,9 @@
                             <div class="bg-slate-950/95 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
+                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
+                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                    </button>
                                 </div>
                                 <span class="text-rose-300 text-sm font-black mt-0.5">${t.losses || 0} 😢</span>
                             </div>
@@ -1455,6 +1471,9 @@
                             <div class="bg-slate-950/95 border border-amber-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
+                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
+                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                    </button>
                                 </div>
                                 <span class="text-amber-200 text-sm font-black mt-0.5">${t.played || 0} 🤝</span>
                             </div>
@@ -1469,6 +1488,99 @@
 
         function closeHistoryRecordDetailModal() {
             const modal = document.getElementById("history-record-detail-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        function showHistoryTeamInfoDetail(historyIndex, teamId, type) {
+            triggerHapticFeedback([30]);
+            const item = tournamentHistory[historyIndex];
+            if (!item || !item.teams) return;
+            const team = item.teams.find(t => t.id === teamId);
+            if (!team) return;
+
+            const modal = document.getElementById("history-team-info-detail-modal");
+            const content = document.getElementById("history-team-info-detail-content");
+            if (!modal || !content) return;
+
+            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2">${escapeHtml(team.name)}</div>`;
+
+            if (type === 'wins') {
+                html += `<div class="text-emerald-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> ജയിച്ച മത്സരങ്ങളുടെ വിവരങ്ങൾ (Total Wins: ${team.wins} 🥳)</div>`;
+                if (!team.defeatedDetails || team.defeatedDetails.length === 0) {
+                    html += `<div class="text-slate-400 italic">ആരെയും തോൽപ്പിച്ചിട്ടില്ല 😢.</div>`;
+                } else {
+                    let winGrouped = {};
+                    team.defeatedDetails.forEach(itemInfo => {
+                        if (!winGrouped[itemInfo.name]) {
+                            winGrouped[itemInfo.name] = { count: 0, times: [] };
+                        }
+                        winGrouped[itemInfo.name].count += 1;
+                        winGrouped[itemInfo.name].times.push(itemInfo.durationMinutes || 1);
+                    });
+
+                    html += `<div class="space-y-1.5 pt-1">`;
+                    Object.entries(winGrouped).forEach(([opponentName, data], i) => {
+                        let timesStr = data.times.map(t => `${t}m`).join(", ");
+                        html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(opponentName)}</b> ടീമിനെതിരെ 🥳</span>
+                                <div class="text-[10px] text-emerald-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം ജയിച്ചു` : '1 പ്രാവശ്യം ജയിച്ചു'}</div>
+                            </div>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+            } else if (type === 'losses') {
+                html += `<div class="text-rose-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ മത്സരങ്ങളുടെ വിവരങ്ങൾ (Total Losses: ${team.losses || 0} 😢)</div>`;
+                
+                let lossGrouped = {};
+                item.teams.forEach(otherTeam => {
+                    if (otherTeam.defeatedDetails) {
+                        otherTeam.defeatedDetails.forEach(itemInfo => {
+                            if (itemInfo.name === team.name) {
+                                if (!lossGrouped[otherTeam.name]) {
+                                    lossGrouped[otherTeam.name] = { count: 0, times: [] };
+                                }
+                                lossGrouped[otherTeam.name].count += 1;
+                                lossGrouped[otherTeam.name].times.push(itemInfo.durationMinutes || 1);
+                            }
+                        });
+                    }
+                });
+
+                const lossEntries = Object.entries(lossGrouped);
+                if (lossEntries.length === 0) {
+                    html += `<div class="text-slate-400 italic">ആരോടും തോറ്റിട്ടില്ല 🥳.</div>`;
+                } else {
+                    html += `<div class="space-y-1.5 pt-1">`;
+                    lossEntries.forEach(([winnerName, data], i) => {
+                        let timesStr = data.times.map(t => `${t}m`).join(", ");
+                        html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-slate-300 font-medium">${i + 1}. <b class="text-white">${escapeHtml(winnerName)}</b> ടീമിനെതിരെ 😢</span>
+                                <div class="text-[10px] text-rose-400 font-bold mt-0.5">${data.count > 1 ? `${data.count} പ്രാവശ്യം തോറ്റു` : '1 പ്രാവശ്യം തോറ്റു'}</div>
+                            </div>
+                            <span class="text-amber-400 text-[10px] font-medium bg-slate-900 px-2 py-1 rounded border border-slate-800">${timesStr}</span>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+            } else if (type === 'played') {
+                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ (Total Played: ${team.played || 0})</div>`;
+                html += `<div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
+                    <div class="flex justify-between"><span>വിജയിച്ചവ 🥳:</span><b class="text-emerald-400">${team.wins}</b></div>
+                    <div class="flex justify-between"><span>തോറ്റവ 😢:</span><b class="text-rose-400">${team.losses || 0}</b></div>
+                    <div class="flex justify-between border-t border-slate-800 pt-1"><span>ആകെ കോർട്ടിൽ ചെലവഴിച്ച സമയം:</span><b class="text-amber-400">${team.totalTimeSpentMinutes || 0} Mins</b></div>
+                </div>`;
+            }
+
+            content.innerHTML = html;
+            modal.classList.remove("hidden");
+        }
+
+        function closeHistoryTeamInfoDetailModal() {
+            const modal = document.getElementById("history-team-info-detail-modal");
             if (modal) modal.classList.add("hidden");
         }
 
