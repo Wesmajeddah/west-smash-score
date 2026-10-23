@@ -174,7 +174,6 @@
             justify-content: center;
         }
 
-        /* Defeated Button Tap Animation Effect */
         .defeated-option-btn:active {
             transform: scale(0.95);
             background-color: rgba(225, 29, 72, 0.25) !important;
@@ -403,18 +402,17 @@
             </div>
         </div>
 
-        <!-- NEW MAIN INTERFACE TOP BAR: Last Defeated Indicator with 'i' Button -->
-        <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-md">
-            <div class="flex items-center gap-2 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-[10px] shrink-0">
+        <!-- COMPACT LAST DEFEATED TOP BAR WITH 'i' BUTTON -->
+        <div class="bg-slate-900 border border-amber-500/30 rounded-xl px-2 py-1.5 flex items-center justify-between shadow-md">
+            <div class="flex items-center gap-1.5 min-w-0">
+                <span class="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-[9px] shrink-0">
                     <i class="fa-solid fa-shield-halved"></i>
                 </span>
                 <div class="min-w-0 truncate">
-                    <div class="text-[9px] text-slate-400 uppercase tracking-wide">Last Defeated Update</div>
-                    <div id="main-top-last-defeated-text" class="text-xs font-bold text-amber-300 truncate">കളികൾ ആരംഭിച്ചിട്ടില്ല</div>
+                    <div id="main-top-last-defeated-text" class="text-[11px] font-bold text-amber-300 truncate">കളികൾ ആരംഭിച്ചിട്ടില്ല</div>
                 </div>
             </div>
-            <button onclick="openPerTeamPlaysModal()" class="w-7 h-7 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-lg flex items-center justify-center text-xs shrink-0 cursor-pointer animated-i-btn" title="വിശദവിവരങ്ങൾ">
+            <button onclick="openLastDefeatedHistoryModal()" class="w-6 h-6 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-lg flex items-center justify-center text-[10px] shrink-0 cursor-pointer animated-i-btn" title="മുൻപ് തോറ്റ വിവരങ്ങൾ">
                 <i class="fa-solid fa-circle-info"></i>
             </button>
         </div>
@@ -566,6 +564,19 @@
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
                 <i class="fa-solid fa-comment-sms text-cyan-200"></i> ടെക്സ്റ്റ് ഷെയർ
             </button>
+        </div>
+    </div>
+
+    <!-- Last Defeated Detailed History Modal (Opened via 'i' button on top bar) -->
+    <div id="last-defeated-history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 space-y-3 relative">
+            <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xs font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-2">
+                🛡️ PREVIOUS DEFEATS & MATCHES
+            </h3>
+            <div id="last-defeated-history-content" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs"></div>
         </div>
     </div>
 
@@ -1082,7 +1093,7 @@
             }
         }
 
-        // Update Main Top Bar Last Defeated Text
+        // Update Main Top Bar Last Defeated Text with Single Line Truncate
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
@@ -1101,10 +1112,57 @@
 
             if (allDefeats.length > 0) {
                 let latest = allDefeats[allDefeats.length - 1];
-                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> തോൽപ്പിച്ചത് <span class="text-rose-400">${escapeHtml(latest.loser)}</span> ടീമിനെ`;
+                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> തോൽപ്പിച്ചത് <span class="text-rose-400">${escapeHtml(latest.loser)}</span>`;
             } else {
                 barEl.textContent = "കളികൾ ആരംഭിച്ചിട്ടില്ല";
             }
+        }
+
+        // Modal for Last Defeated 'i' Button showing history of who defeated whom
+        function openLastDefeatedHistoryModal() {
+            triggerHapticFeedback([30]);
+            const modal = document.getElementById("last-defeated-history-modal");
+            const content = document.getElementById("last-defeated-history-content");
+            if (!modal || !content) return;
+
+            let allDefeats = [];
+            teams.forEach(t => {
+                if (t.defeatedDetails && t.defeatedDetails.length > 0) {
+                    t.defeatedDetails.forEach(d => {
+                        allDefeats.push({
+                            winner: t.name,
+                            loser: d.name,
+                            durationMinutes: d.durationMinutes || 1
+                        });
+                    });
+                }
+            });
+
+            if (allDefeats.length === 0) {
+                content.innerHTML = `<div class="text-slate-400 italic text-center py-4">ഇതുവരെ കളികളൊന്നും നടന്നിട്ടില്ല.</div>`;
+            } else {
+                let html = "";
+                // Show latest first
+                allDefeats.slice().reverse().forEach((item, index) => {
+                    html += `
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="text-emerald-400 font-bold uppercase">${escapeHtml(item.winner)}</span>
+                                <span class="text-slate-300"> തോൽപ്പിച്ചത് </span>
+                                <span class="text-rose-400 font-bold uppercase">${escapeHtml(item.loser)}</span>
+                            </div>
+                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${item.durationMinutes}m</span>
+                        </div>
+                    `;
+                });
+                content.innerHTML = html;
+            }
+            modal.classList.remove("hidden");
+        }
+
+        function closeLastDefeatedHistoryModal() {
+            const modal = document.getElementById("last-defeated-history-modal");
+            if (modal) modal.classList.add("hidden");
         }
 
         function renderHeaderTitle() {
@@ -2232,7 +2290,6 @@
             }
         }
 
-        // Defeated Team Modal with special touch animation (defeated-option-btn)
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
