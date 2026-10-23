@@ -692,7 +692,7 @@
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
             <div class="bg-amber-500/10 border-b border-amber-500/20 py-1 px-3 flex items-center justify-between text-[9px] text-amber-300 font-bold">
                 <span>⏱️ AUTO RESET IN:</span>
-                <span id="end-modal-timer" class="text-amber-400 font-mono text-xs">30:00</span>
+                <span id="end-modal-timer" class="text-amber-400 font-mono text-xs">240:00</span>
             </div>
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
@@ -1109,7 +1109,6 @@
             }
         }
 
-        // Update Main Top Bar Last Defeated Text in English with Truncate
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
@@ -1134,7 +1133,6 @@
             }
         }
 
-        // Very Compact Last Defeated History Modal with Single-line names
         function openLastDefeatedHistoryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("last-defeated-history-modal");
@@ -1742,10 +1740,11 @@
                     const elapsedMs = Date.now() - tournamentStartTimestamp;
                     const elapsedMinutes = Math.floor(elapsedMs / 60000);
 
-                    if (elapsedMinutes >= 90) {
+                    // 6 മണിക്കൂർ (360 മിനിറ്റ്) ഓട്ടോ റീസെറ്റ്
+                    if (elapsedMinutes >= 360) {
                         autoSaveToHistory();
                         resetTournamentStateForNewSession();
-                        showToast("⏰ 1 മണിക്കൂറും 30 മിനിറ്റും കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോ റീസെറ്റ് ആയി!");
+                        showToast("⏰ 6 മണിക്കൂർ കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോ റീസെറ്റ് ആയി!");
                         return;
                     }
                 }
@@ -2095,20 +2094,26 @@
             modal.classList.remove("hidden");
             triggerWinCelebration();
 
-            let endTimerSeconds = 30 * 60;
+            // 4 മണിക്കൂർ (240 മിനിറ്റ് = 14400 സെക്കൻഡ്) കൗണ്ട്ഡൗൺ
+            let endTimerSeconds = 240 * 60;
             if (endMatchAutoResetTimer) clearInterval(endMatchAutoResetTimer);
             endMatchAutoResetTimer = setInterval(() => {
                 endTimerSeconds -= 1;
                 if (modalTimerEl) {
-                    const m = Math.floor(endTimerSeconds / 60);
+                    const h = Math.floor(endTimerSeconds / 3600);
+                    const m = Math.floor((endTimerSeconds % 3600) / 60);
                     const s = endTimerSeconds % 60;
-                    modalTimerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    if (h > 0) {
+                        modalTimerEl.textContent = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    } else {
+                        modalTimerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    }
                 }
                 if (endTimerSeconds <= 0) {
                     clearInterval(endMatchAutoResetTimer);
                     endMatchAutoResetTimer = null;
                     resetTournamentStateForNewSession();
-                    showToast("30 മിനിറ്റ് കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോമാറ്റിക് റീസെറ്റ് ആയി!");
+                    showToast("4 മണിക്കൂർ കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോമാറ്റിക് റീസെറ്റ് ആയി!");
                 }
             }, 1000);
         }
@@ -2347,7 +2352,6 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        // Confirmation Pop-up before finalizing win and defeated team
         function promptConfirmDefeatedTeam(winningTeamId, defeatedTeamId) {
             pendingWinningTeamId = winningTeamId;
             pendingDefeatedTeamId = defeatedTeamId;
