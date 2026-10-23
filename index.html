@@ -154,15 +154,6 @@
             animation: spinReset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes resetBtnGlow {
-            0%, 100% { box-shadow: 0 0 8px rgba(225, 29, 72, 0.3), inset 0 0 5px rgba(225, 29, 72, 0.2); }
-            50% { box-shadow: 0 0 16px rgba(225, 29, 72, 0.7), inset 0 0 10px rgba(225, 29, 72, 0.4); border-color: rgba(244, 63, 94, 0.8); }
-        }
-        .reset-btn-animated {
-            border: 1.5px solid rgba(225, 29, 72, 0.5);
-            animation: resetBtnGlow 2.5s infinite ease-in-out;
-        }
-
         @keyframes iBtnPulse {
             0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(245, 158, 11, 0.6); }
             50% { transform: scale(1.25); box-shadow: 0 0 12px rgba(245, 158, 11, 1); color: #fbbf24; }
@@ -460,38 +451,13 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Summary Section -->
+            <!-- Leaderboard Summary Section (Modified as requested: Only Most Lost To section remains) -->
             <div id="main-leaderboard-section" class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
-                <div>
-                    <div class="text-xs font-semibold text-amber-300 uppercase tracking-wide flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ (Champions)
+                <div class="text-left space-y-1.5">
+                    <div class="text-xs font-bold text-amber-300 uppercase tracking-wide flex items-center gap-1.5 mb-2">
+                        <i class="fa-solid fa-people-arrows text-amber-400"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് (H2H Stats)
                     </div>
-                    <div id="leader-text" class="champions-special-border text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider flex items-center justify-center gap-2">
-                        <span class="text-amber-400 animate-pulse"><i class="fa-solid fa-crown"></i></span>
-                        <span id="champion-name-span" class="relative z-20">ലോഡ് ചെയ്യുന്നു...</span>
-                        <span class="text-amber-400 animate-pulse"><i class="fa-solid fa-crown"></i></span>
-                    </div>
-                </div>
-
-                <div id="podium-text" class="text-xs font-light text-amber-200/90 pt-2 border-t border-amber-500/20 px-1 text-left space-y-1">
-                    <div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
-                    <div>🥉 3-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>
-                </div>
-
-                <div id="fastest-win-text" class="text-xs font-light text-cyan-300 pt-2 border-t border-cyan-500/20 px-1 text-center uppercase break-words whitespace-normal leading-normal">
-                    ⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും
-                </div>
-
-                <div id="loser-text" class="text-xs font-light text-rose-300 pt-2 border-t border-rose-500/20 text-center uppercase">
-                    തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...
-                </div>
-
-                <div class="pt-2 border-t border-amber-500/20 text-left space-y-1.5">
-                    <button onclick="toggleH2HInterface()" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-semibold text-[11px] py-2 px-2 rounded-lg border border-amber-500/30 flex items-center justify-between transition-all cursor-pointer">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-amber-400"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് (H2H Stats)</span>
-                        <i id="h2h-toggle-icon" class="fa-solid fa-chevron-down text-xs"></i>
-                    </button>
-                    <div id="h2h-stats-container" class="hidden bg-slate-950 rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-[11px]">
+                    <div id="h2h-stats-container" class="bg-slate-950 rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-[11px]">
                         <div id="most-lost-to-target" class="text-rose-400 font-medium space-y-1">⚠️ ഏറ്റവും കൂടുതൽ തോറ്റതിന്റെ വിവരങ്ങൾ കണക്കാക്കുന്നു...</div>
                     </div>
                 </div>
@@ -553,12 +519,10 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2">
+            <!-- Hidden Reset button area placed discreetly in the corner / watermark area as requested -->
             <div class="flex items-center gap-1">
-                <button id="reset-btn-el" onclick="resetScores()" class="w-full bg-slate-900 hover:bg-rose-950/80 text-rose-200 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all active:scale-95 shadow-md cursor-pointer reset-btn-animated">
-                    <i id="reset-icon-el" class="fa-solid fa-rotate-right text-rose-400"></i> റീസെറ്റ്
-                </button>
-                <button onclick="openResetAuditModal()" class="bg-slate-900 hover:bg-slate-800 border border-rose-500/40 text-rose-300 w-8 h-10 rounded-xl flex items-center justify-center text-xs shrink-0 cursor-pointer" title="റീസെറ്റ് വിവരങ്ങൾ">
-                    <i class="fa-solid fa-shield-halved text-[10px]"></i>
+                <button onclick="hiddenResetAction()" class="w-full bg-slate-950 text-slate-800 hover:text-slate-700 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all active:scale-95 shadow-none cursor-pointer border border-transparent">
+                    <span class="text-[8px] opacity-20">.</span>
                 </button>
             </div>
             <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-cyan-900/80 hover:bg-cyan-800 text-white font-light py-2.5 px-1 rounded-xl shadow-lg flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-cyan-500/30 cursor-pointer">
@@ -569,30 +533,15 @@
 
     <!-- Very Compact Last Defeated Detailed History Modal (Opened via 'i' button on top bar) -->
     <div id="last-defeated-history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-xs rounded-xl shadow-2xl p-3 space-y-2 relative">
+        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-xl shadow-2xl p-4 space-y-2.5 relative">
             <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-800 text-slate-300 rounded-md flex items-center justify-center text-[10px] cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-[10px] font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-1.5">
-                🛡️ LAST DEFEATED HISTORY
+            <h3 class="text-xs font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-2">
+                🛡️ LAST DEFEATED FULL HISTORY
             </h3>
-            <div id="last-defeated-history-content" class="space-y-1 max-h-52 overflow-y-auto pr-0.5 text-[10px]"></div>
-        </div>
-    </div>
-
-    <!-- Reset Audit Log Modal Window -->
-    <div id="reset-audit-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-                <h3 class="text-xs font-bold text-rose-300 flex items-center gap-2 uppercase tracking-wider">
-                    <i class="fa-solid fa-shield-halved text-rose-400"></i> RESET AUDIT LOGS
-                </h3>
-                <button onclick="closeResetAuditModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="modal-reset-audit-content" class="p-3 space-y-2 overflow-y-auto flex-1 text-xs"></div>
-            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
-                <button onclick="closeResetAuditModal()" class="bg-slate-800 text-amber-300 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക</button>
-            </div>
+            <!-- Enlarged and extended downwards length with full list view -->
+            <div id="last-defeated-history-content" class="space-y-1.5 max-h-[70vh] overflow-y-auto pr-1 text-xs"></div>
         </div>
     </div>
 
@@ -635,9 +584,9 @@
         </div>
     </div>
 
-    <!-- UPDATED: Defeated Team Selection Modal with Enlarged Window & Better Touch Target -->
+    <!-- UPDATED: Defeated Team Selection Modal with Enlarged Window & Lowered Height/Length -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl p-6 text-center space-y-4">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl p-6 text-center space-y-4 my-auto mt-12">
             <div>
                 <div id="winning-team-indicator" class="mb-3 p-3 bg-amber-500/20 border border-amber-500/40 rounded-2xl text-amber-300 font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow">
                     <i class="fa-solid fa-crown text-amber-400 text-base"></i> <span id="winning-team-name-span">WINNER TEAM</span>
@@ -645,7 +594,7 @@
                 <h3 class="text-sm sm:text-base font-extrabold text-amber-300 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക</h3>
                 <p class="text-xs text-slate-400 font-light mt-1">ഏത് ടീമിനെതിരെയാണ് വിജയം അടിയറവ് പറഞ്ഞത്?</p>
             </div>
-            <div id="defeated-team-options" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+            <div id="defeated-team-options" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
             <div class="pt-3 border-t border-slate-800">
                 <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs uppercase cursor-pointer border border-slate-700 transition-all active:scale-95">റദ്ദാക്കുക</button>
             </div>
@@ -687,12 +636,12 @@
         </div>
     </div>
 
-    <!-- End Match Modal Window -->
+    <!-- End Match Modal Window (Contains custom reset option as requested) -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
-            <div class="bg-amber-500/10 border-b border-amber-500/20 py-1 px-3 flex items-center justify-between text-[9px] text-amber-300 font-bold">
-                <span>⏱️ AUTO RESET IN:</span>
-                <span id="end-modal-timer" class="text-amber-400 font-mono text-xs">240:00</span>
+            <div class="bg-amber-500/10 border-b border-amber-500/20 py-1.5 px-3 flex items-center justify-between text-[10px] text-amber-300 font-bold">
+                <span>🔄 RESET TOURNAMENT:</span>
+                <button onclick="resetScoresFromEndMatch()" class="bg-rose-900 hover:bg-rose-800 text-white px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase shadow cursor-pointer">റീസെറ്റ് ചെയ്യുക</button>
             </div>
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
@@ -808,7 +757,7 @@
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
             <div class="p-2.5 bg-slate-950 border-t border-slate-800 grid grid-cols-2 gap-2">
                 <button onclick="clearHistory()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 font-light py-2 rounded-xl text-xs border border-rose-800/50 flex items-center justify-center gap-1 cursor-pointer">
-                    <i class="fa-solid fa-trash-can"></i> ക്ലിയർ ചെയ്യുക
+                    <i class="fa-solid fa-trash-can"></i> എല്ലാം ക്ലിയർ ചെയ്യുക
                 </button>
                 <button onclick="closeHistoryModal()" class="bg-slate-800 text-amber-300 font-light py-2 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക</button>
             </div>
@@ -841,6 +790,16 @@
         </div>
     </div>
 
+    <!-- NEW: Head-to-Head History Details Modal for each team (Opened via 'i' button next to pen) -->
+    <div id="team-h2h-history-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[75] hidden">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-5 space-y-3 relative max-h-[85vh] flex flex-col">
+            <button onclick="closeTeamH2HHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="team-h2h-history-content" class="space-y-2 text-xs overflow-y-auto flex-1 pr-1"></div>
+        </div>
+    </div>
+
     <!-- Prominent Center Pop-up Toast Notification -->
     <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-amber-300 border-2 border-amber-400 font-bold px-5 py-3 rounded-2xl text-xs shadow-[0_0_25px_rgba(245,158,11,0.5)] opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു!</div>
@@ -859,13 +818,11 @@
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let tournamentHistory = [];
-        let resetAuditLog = []; 
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let isMatchEnded = false;
         let timerInterval = null;
         let cooldownInterval = null;
-        let endMatchAutoResetTimer = null;
         let isFirebaseConnected = false;
         let dbRef = null;
         let editingTeamId = null;
@@ -907,7 +864,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v101');
+                const localData = localStorage.getItem('wesma_local_backup_v102');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -915,7 +872,6 @@
                         tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
                         tournamentHistory = parsed.tournamentHistory || [];
-                        resetAuditLog = parsed.resetAuditLog || [];
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
                         
@@ -941,7 +897,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v101');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v102');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -1006,15 +962,11 @@
             globalClickSequence = 0;
             isMatchEnded = false;
             
-            if (endMatchAutoResetTimer) {
-                clearInterval(endMatchAutoResetTimer);
-                endMatchAutoResetTimer = null;
-            }
             closeFinishMatchModal();
 
             saveLocalBackup();
             if (dbRef) {
-                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, resetAuditLog, globalClickSequence, isMatchEnded });
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded });
             }
 
             const gate = document.getElementById("startup-gate");
@@ -1071,7 +1023,6 @@
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         tournamentHistory = data.tournamentHistory || [];
-                        resetAuditLog = data.resetAuditLog || [];
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
                         
@@ -1109,31 +1060,29 @@
             }
         }
 
-        // FIXED BUG: Last defeated mapping now accurately retrieves the absolute last defeated sequence
+        // FIXED BUG: Last defeated mapping now correctly checks sequence
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
 
-            let lastEvent = null;
-            let highestSeq = -1;
-
+            let allDefeats = [];
             teams.forEach(t => {
                 if (t.defeatedDetails && t.defeatedDetails.length > 0) {
                     t.defeatedDetails.forEach(d => {
-                        let seq = d.seq || 0;
-                        if (seq > highestSeq) {
-                            highestSeq = seq;
-                            lastEvent = {
-                                winner: t.name,
-                                loser: d.name
-                            };
-                        }
+                        allDefeats.push({
+                            winner: t.name,
+                            loser: d.name,
+                            seq: d.seq || 0
+                        });
                     });
                 }
             });
 
-            if (lastEvent) {
-                barEl.innerHTML = `<span class="text-white">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(lastEvent.loser)}</span>`;
+            allDefeats.sort((a, b) => b.seq - a.seq);
+
+            if (allDefeats.length > 0) {
+                const latest = allDefeats[0];
+                barEl.innerHTML = `<span class="text-white">${escapeHtml(latest.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(latest.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
             }
@@ -1167,13 +1116,13 @@
                 let html = "";
                 allDefeats.forEach((item) => {
                     html += `
-                        <div class="bg-slate-950 p-1.5 rounded-md border border-slate-800 flex justify-between items-center text-[10px] whitespace-nowrap overflow-hidden">
+                        <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
                             <div class="truncate mr-1">
                                 <span class="text-emerald-400 font-bold uppercase">${escapeHtml(item.winner)}</span>
                                 <span class="text-slate-300"> Defeated </span>
                                 <span class="text-rose-400 font-bold uppercase">${escapeHtml(item.loser)}</span>
                             </div>
-                            <span class="text-amber-400 text-[9px] font-semibold bg-slate-900 px-1 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0">${item.durationMinutes}m</span>
                         </div>
                     `;
                 });
@@ -1247,15 +1196,15 @@
 
         function saveLocalBackup() {
             try {
-                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, resetAuditLog, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v101', JSON.stringify(payload));
+                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
+                localStorage.setItem('wesma_local_backup_v102', JSON.stringify(payload));
             } catch(e) {}
         }
 
         function saveData() {
             saveLocalBackup();
             if (dbRef) {
-                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, resetAuditLog, globalClickSequence, isMatchEnded }).catch((error) => {
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded }).catch((error) => {
                     console.error("Firebase write error:", error);
                 });
             }
@@ -1514,7 +1463,8 @@
                     if (!winnersNames) winnersNames = "No Wins";
 
                     const card = document.createElement("div");
-                    card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow";
+                    card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow relative";
+                    
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
                         teamsListHtml += `
@@ -1540,6 +1490,9 @@
                                 <button onclick="openHistoryRecordDetailModal(${idx})" class="w-7 h-7 bg-amber-500/25 hover:bg-amber-500/40 text-amber-300 rounded-lg flex items-center justify-center border border-amber-500/50 text-xs cursor-pointer animated-i-btn shadow" title="ഈ കളിയുടെ റെക്കോർഡ്സ് പരിശോധിക്കുക">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
+                                <button onclick="deleteSingleHistory(${idx})" class="w-7 h-7 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800 text-xs cursor-pointer shadow" title="ഈ കളിമാത്രം ഡിലീറ്റ് ചെയ്യുക">
+                                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="pt-1">${teamsListHtml}</div>
@@ -1553,6 +1506,21 @@
         function closeHistoryModal() {
             const modal = document.getElementById("history-modal");
             if (modal) modal.classList.add("hidden");
+        }
+
+        function deleteSingleHistory(idx) {
+            triggerHapticFeedback([40]);
+            const pin = prompt("ഈ സെഷൻ ഡിലീറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ PIN!");
+                return;
+            }
+            if (window.confirm("ഈ സെഷൻ റെക്കോർഡ് മാത്രം ഡിലീറ്റ് ചെയ്യണോ?")) {
+                tournamentHistory.splice(idx, 1);
+                saveData();
+                openHistoryModal();
+                showToast("സെഷൻ റെക്കോർഡ് ഡിലീറ്റ് ചെയ്തു!");
+            }
         }
 
         function openHistoryRecordDetailModal(historyIndex) {
@@ -1739,7 +1707,7 @@
             }
         }
 
-        // FIXED BUG: Timer logic properly calculated without resetting unexpectedly
+        // FIXED: 6 hours (360 minutes) exact auto-reset timer as requested
         function startLiveTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -1750,7 +1718,6 @@
                     const elapsedMs = Date.now() - tournamentStartTimestamp;
                     const elapsedMinutes = Math.floor(elapsedMs / 60000);
 
-                    // 6 മണിക്കൂർ (360 മിനിറ്റ്) ഓട്ടോ റീസെറ്റ്
                     if (elapsedMinutes >= 360) {
                         autoSaveToHistory();
                         resetTournamentStateForNewSession();
@@ -1833,65 +1800,11 @@
                 `;
             });
 
-            const dancingPlayersStageCompactHtml = `
-                <div class="dance-stage-compact my-1.5">
-                    <div class="spotlight-small"></div>
-                    <div class="spotlight-small spotlight-right-small"></div>
-                    
-                    <div class="human-player-small player-1-small">
-                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                            <g class="torso">
-                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
-                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
-                                <g class="head">
-                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
-                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
-                                </g>
-                                <g class="arm-left">
-                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
-                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
-                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
-                                </g>
-                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                            </g>
-                        </svg>
-                    </div>
-
-                    <div class="human-player-small player-2-small">
-                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                            <g class="torso">
-                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
-                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-                                <g class="head">
-                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
-                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
-                                </g>
-                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
-                                <g class="arm-right">
-                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
-                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
-                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
-                                </g>
-                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                            </g>
-                        </svg>
-                    </div>
-                </div>
-            `;
-
-            const leaderboardHtml = document.getElementById("main-leaderboard-section").outerHTML;
-
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         ✨ CURRENT MATCH STATUS ✨
                     </div>
-                    
-                    ${dancingPlayersStageCompactHtml}
-
                     <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
@@ -1907,10 +1820,6 @@
                             <span>ടോട്ടൽ സെഷൻ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
-                </div>
-
-                <div class="my-2">
-                    ${leaderboardHtml}
                 </div>
 
                 <div class="space-y-1 text-left pt-1">
@@ -1963,7 +1872,6 @@
             const modal = document.getElementById("finish-match-modal");
             const container = document.getElementById("finish-match-modal-content");
             const dateHeader = document.getElementById("modal-header-date");
-            const modalTimerEl = document.getElementById("end-modal-timer");
             if (!modal || !container) return;
 
             if (dateHeader) {
@@ -2001,65 +1909,11 @@
                 `;
             });
 
-            const dancingPlayersStageCompactHtml = `
-                <div class="dance-stage-compact my-1.5">
-                    <div class="spotlight-small"></div>
-                    <div class="spotlight-small spotlight-right-small"></div>
-                    
-                    <div class="human-player-small player-1-small">
-                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                            <g class="torso">
-                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#f59e0b" />
-                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#000" text-anchor="middle">1</text>
-                                <g class="head">
-                                    <circle cx="50" cy="42" r="12" fill="#fdba74" />
-                                    <path d="M 40 38 Q 50 28 60 38 Q 50 32 40 38 Z" fill="#1e293b" />
-                                </g>
-                                <g class="arm-left">
-                                    <path d="M 36 62 L 20 80 L 10 70" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" />
-                                    <line x1="10" y1="70" x2="-2" y2="55" stroke="#cbd5e1" stroke-width="2" />
-                                    <ellipse cx="-6" cy="48" rx="8" ry="10" stroke="#f59e0b" stroke-width="2" fill="rgba(255,255,255,0.2)" />
-                                </g>
-                                <g class="arm-right"><path d="M 64 62 L 80 75 L 90 60" stroke="#fdba74" stroke-width="6" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-left"><path d="M 42 103 L 38 135 L 28 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-right"><path d="M 58 103 L 62 135 L 72 155" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                            </g>
-                        </svg>
-                    </div>
-
-                    <div class="human-player-small player-2-small">
-                        <svg viewBox="0 0 100 180" class="w-full h-full drop-shadow">
-                            <g class="torso">
-                                <ellipse cx="50" cy="80" rx="16" ry="25" fill="#10b981" />
-                                <text x="50" y="85" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-                                <g class="head">
-                                    <circle cx="50" cy="42" r="12" fill="#fed7aa" />
-                                    <path d="M 38 40 Q 50 26 62 40 Q 50 34 38 40 Z" fill="#020617" />
-                                </g>
-                                <g class="arm-left"><path d="M 36 62 L 18 78 L 8 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" /></g>
-                                <g class="arm-right">
-                                    <path d="M 64 62 L 82 78 L 92 65" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" fill="none" />
-                                    <line x1="92" y1="65" x2="108" y2="50" stroke="#cbd5e1" stroke-width="2" />
-                                    <ellipse cx="112" cy="43" rx="8" ry="10" stroke="#10b981" stroke-width="2" fill="rgba(255,255,255,0.2)" />
-                                </g>
-                                <g class="leg-left"><path d="M 42 103 L 35 132 L 25 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                                <g class="leg-right"><path d="M 58 103 L 65 132 L 75 152" stroke="#e11d48" stroke-width="7" stroke-linecap="round" fill="none" /></g>
-                            </g>
-                        </svg>
-                    </div>
-                </div>
-            `;
-
-            const leaderboardHtml = document.getElementById("main-leaderboard-section").outerHTML;
-
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         ✨ TOURNAMENT CHAMPIONS CELEBRATION ✨
                     </div>
-                    
-                    ${dancingPlayersStageCompactHtml}
-
                     <div class="text-sm font-black text-amber-300 uppercase tracking-wider">
                         ${escapeHtml(championName)}
                     </div>
@@ -2075,10 +1929,6 @@
                             <span>ടോട്ടൽ സെഷൻ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
-                </div>
-
-                <div class="my-2">
-                    ${leaderboardHtml}
                 </div>
 
                 <div class="space-y-1 text-left pt-1">
@@ -2103,29 +1953,6 @@
 
             modal.classList.remove("hidden");
             triggerWinCelebration();
-
-            // 4 മണിക്കൂർ (240 മിനിറ്റ് = 14400 സെക്കൻഡ്) കൗണ്ട്ഡൗൺ
-            let endTimerSeconds = 240 * 60;
-            if (endMatchAutoResetTimer) clearInterval(endMatchAutoResetTimer);
-            endMatchAutoResetTimer = setInterval(() => {
-                endTimerSeconds -= 1;
-                if (modalTimerEl) {
-                    const h = Math.floor(endTimerSeconds / 3600);
-                    const m = Math.floor((endTimerSeconds % 3600) / 60);
-                    const s = endTimerSeconds % 60;
-                    if (h > 0) {
-                        modalTimerEl.textContent = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                    } else {
-                        modalTimerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                    }
-                }
-                if (endTimerSeconds <= 0) {
-                    clearInterval(endMatchAutoResetTimer);
-                    endMatchAutoResetTimer = null;
-                    resetTournamentStateForNewSession();
-                    showToast("4 മണിക്കൂർ കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോമാറ്റിക് റീസെറ്റ് ആയി!");
-                }
-            }, 1000);
         }
 
         function closeFinishMatchModal() {
@@ -2218,9 +2045,14 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-amber-300 py-1 min-w-0" title="Click to edit or delete">
-                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
-                                <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
+                            <div class="text-xs sm:text-sm font-semibold text-slate-100 tracking-wide flex-1 flex items-center justify-between py-1 min-w-0">
+                                <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="cursor-pointer flex items-center hover:text-amber-300 min-w-0 truncate" title="Click to edit or delete">
+                                    <span class="leading-snug break-words pr-1 truncate">${formatSingleLetterAnimatedName(team.name)}</span>
+                                    <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
+                                </div>
+                                <button onclick="openTeamH2HHistory(${team.id})" class="w-6 h-6 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-md flex items-center justify-center text-[10px] shrink-0 cursor-pointer ml-1 animated-i-btn" title="ആരോടൊക്കെ കളിച്ചു എന്ന് അറിയാൻ">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
@@ -2269,6 +2101,65 @@
                 totalPlayDividedEl.textContent = Number.isInteger(dividedVal) ? dividedVal : dividedVal.toFixed(1);
             }
             updateLeaderboard();
+        }
+
+        function openTeamH2HHistory(teamId) {
+            triggerHapticFeedback([30]);
+            const team = teams.find(t => t.id === teamId);
+            const modal = document.getElementById("team-h2h-history-modal");
+            const content = document.getElementById("team-h2h-history-content");
+            if (!team || !modal || !content) return;
+
+            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2">${escapeHtml(team.name)} - കളിച്ച വിവരങ്ങൾ</div>`;
+
+            let opponentMap = {};
+            
+            // Defeats against others
+            if (team.defeatedDetails) {
+                team.defeatedDetails.forEach(d => {
+                    if (!opponentMap[d.name]) opponentMap[d.name] = { wonAgainst: 0, lostAgainst: 0 };
+                    opponentMap[d.name].wonAgainst += 1;
+                });
+            }
+
+            // Defeats by others
+            teams.forEach(other => {
+                if (other.id !== team.id && other.defeatedDetails) {
+                    other.defeatedDetails.forEach(d => {
+                        if (d.name === team.name) {
+                            if (!opponentMap[other.name]) opponentMap[other.name] = { wonAgainst: 0, lostAgainst: 0 };
+                            opponentMap[other.name].lostAgainst += 1;
+                        }
+                    });
+                }
+            });
+
+            const entries = Object.entries(opponentMap);
+            if (entries.length === 0) {
+                html += `<div class="text-slate-400 italic text-center py-4">ഇതുവരെ മറ്റ് ടീമുകളുമായി കളിച്ചിട്ടില്ല.</div>`;
+            } else {
+                html += `<div class="space-y-2 pt-1">`;
+                entries.forEach(([oppName, stats]) => {
+                    html += `
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-200 uppercase">${escapeHtml(oppName)}</span>
+                            <div class="flex gap-2">
+                                <span class="text-emerald-400 font-semibold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">Wins: ${stats.wonAgainst}</span>
+                                <span class="text-rose-400 font-semibold bg-rose-950 px-2 py-0.5 rounded border border-rose-500/30">Loss: ${stats.lostAgainst}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            content.innerHTML = html;
+            modal.classList.remove("hidden");
+        }
+
+        function closeTeamH2HHistoryModal() {
+            const modal = document.getElementById("team-h2h-history-modal");
+            if (modal) modal.classList.add("hidden");
         }
 
         function handleScoreChange(id, delta) {
@@ -2320,7 +2211,6 @@
             }
         }
 
-        // UPDATED: Enlarged window layout for selecting defeated teams cleanly
         function openDefeatedTeamModal(winningTeamId) {
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
@@ -2400,7 +2290,6 @@
             pendingDefeatedTeamId = null;
         }
 
-        // FIXED BUG: Accurately mapping winner and loser defeated sequence
         function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
             const team = teams.find(t => t.id === winningTeamId);
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
@@ -2614,84 +2503,9 @@
             showToast("🎉 പുതിയ ടീമിനെ വിജയകരമായി ചേർത്തു!");
         }
 
-        function toggleH2HInterface() {
-            const container = document.getElementById("h2h-stats-container");
-            const icon = document.getElementById("h2h-toggle-icon");
-            if(!container || !icon) return;
-            if(container.classList.contains("hidden")) {
-                container.classList.remove("hidden");
-                icon.classList.remove("fa-chevron-down");
-                icon.classList.add("fa-chevron-up");
-            } else {
-                container.classList.add("hidden");
-                icon.classList.remove("fa-chevron-up");
-                icon.classList.add("fa-chevron-down");
-            }
-        }
-
         function updateLeaderboard() {
-            const leaderEl = document.getElementById("leader-text");
-            const championSpan = document.getElementById("champion-name-span");
-            const podiumEl = document.getElementById("podium-text");
-            const fastestEl = document.getElementById("fastest-win-text");
-            const loserEl = document.getElementById("loser-text");
             const mostLostToEl = document.getElementById("most-lost-to-target");
-
-            if(!leaderEl || !championSpan) return;
-
-            let sorted = [...teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
-            });
-
-            const maxWins = sorted[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
-
-            if (maxWins === 0) {
-                championSpan.innerHTML = `<span class="text-slate-400 font-light text-xs uppercase">കളികൾ തുടങ്ങിയിട്ടില്ല</span>`;
-                podiumEl.innerHTML = `<div>🥈 2-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div><div>🥉 3-ാം സ്ഥാനം കണക്കാക്കുന്നു...</div>`;
-                fastestEl.innerHTML = `⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
-                loserEl.innerHTML = `തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു...`;
-                if(mostLostToEl) mostLostToEl.innerHTML = `⚠️ ഏറ്റവും കൂടുതൽ തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല`;
-                return;
-            }
-
-            const firstPlaces = sorted.filter(t => t.wins === maxWins);
-            if (firstPlaces.length === 1) {
-                championSpan.innerHTML = `⭐ ${formatPlainName(firstPlaces[0].name)} (${maxWins} ജയം <i class="fa-solid fa-trophy text-amber-400"></i>) ⭐`;
-            } else {
-                let multiHtml = firstPlaces.map(f => `<div class="py-0.5 border-b border-amber-500/20 last:border-0 break-words">⭐ ${formatPlainName(f.name)} (${maxWins} ജയം <i class="fa-solid fa-trophy text-amber-400"></i>)</div>`).join('');
-                championSpan.innerHTML = `<div class="flex flex-col space-y-0.5">${multiHtml}</div>`;
-            }
-
-            let podiumHtml = "";
-            if (sorted.length > 1 && sorted[1].wins > 0) {
-                podiumHtml += `<div class="text-amber-200/90 font-light">🥈 2-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} ജയം <i class="fa-solid fa-trophy text-amber-400 text-[10px]"></i>)</div>`;
-            } else {
-                podiumHtml += `<div class="text-amber-200/80 font-light">🥈 2-ാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
-            }
-
-            if (sorted.length > 2 && sorted[2].wins > 0) {
-                podiumHtml += `<div class="text-amber-200/90 font-light">🥉 3-ാം സ്ഥാനം: <span class="text-white font-light text-xs uppercase">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} ജയം <i class="fa-solid fa-trophy text-amber-400 text-[10px]"></i>)</div>`;
-            } else {
-                podiumHtml += `<div class="text-amber-200/80 font-light">🥉 3-ാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
-            }
-            podiumEl.innerHTML = podiumHtml;
-
-            const teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
-            if (teamsWithTime.length > 0) {
-                teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
-                fastestEl.innerHTML = `⚡ Fastest Win: <span class="text-cyan-200 font-semibold text-xs uppercase inline-block break-words">${escapeHtml(teamsWithTime[0].name)}</span> (${teamsWithTime[0].lastMatchTime} mins)`;
-            } else {
-                fastestEl.innerHTML = `⚡ Fastest Win: കളികൾക്ക് ശേഷം ലഭ്യമാകും`;
-            }
-
-            const lowestTeams = sorted.filter(t => t.wins === minWins);
-            if (lowestTeams.length > 0 && minWins < maxWins) {
-                loserEl.innerHTML = `🚨 തോറ്റ ടീം: <span class="text-rose-200 font-light text-xs uppercase">${lowestTeams.map(l => escapeHtml(l.name)).join(" • ")}</span> (${minWins} ജയം <i class="fa-solid fa-shield text-[10px] text-rose-400"></i>)`;
-            } else {
-                loserEl.innerHTML = `മത്സരം കടുത്ത പോരാട്ടത്തിൽ!`;
-            }
+            if(!mostLostToEl) return;
 
             let lossPairs = [];
             teams.forEach(t => {
@@ -2726,9 +2540,7 @@
                 });
             }
 
-            if (mostLostToEl) {
-                mostLostToEl.innerHTML = lossPairs.length > 0 ? lossPointsHtml : `<div class="text-slate-500 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല.</div>`;
-            }
+            mostLostToEl.innerHTML = lossPairs.length > 0 ? lossPointsHtml : `<div class="text-slate-500 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല.</div>`;
         }
 
         function openWhatsAppChoiceModal(mode) {
@@ -2768,7 +2580,7 @@
             window.open(url, '_blank');
         }
 
-        function resetScores() {
+        function hiddenResetAction() {
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
             if (inputPin !== ADMIN_PIN) {
@@ -2776,64 +2588,21 @@
                 return;
             }
             if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്യണോ? (സേവ് ചെയ്ത ഹിസ്റ്ററി മാഞ്ഞുപോകില്ല)")) {
-                const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                const deviceInfo = getDeviceInformation();
-                
-                resetAuditLog.unshift({
-                    date: nowStr,
-                    device: deviceInfo,
-                    pin: ADMIN_PIN
-                });
-
-                const resetIcon = document.getElementById("reset-icon-el");
-                const captureArea = document.getElementById("capture-area");
-                
-                if (resetIcon) {
-                    resetIcon.classList.add("animate-spin");
-                }
-                if (captureArea) {
-                    captureArea.classList.add("reset-anim-spin");
-                    setTimeout(() => { 
-                        captureArea.classList.remove("reset-anim-spin"); 
-                        if(resetIcon) resetIcon.classList.remove("animate-spin");
-                    }, 800);
-                }
-                
                 resetTournamentStateForNewSession();
                 showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
             }
         }
 
-        function openResetAuditModal() {
-            triggerHapticFeedback([30]);
-            const modal = document.getElementById("reset-audit-modal");
-            const container = document.getElementById("modal-reset-audit-content");
-            if (!modal || !container) return;
-
-            if (!resetAuditLog || resetAuditLog.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">റീസെറ്റ് വിവരങ്ങൾ ലഭ്യമായിട്ടില്ല.</div>`;
-            } else {
-                let html = "";
-                resetAuditLog.forEach((item, index) => {
-                    html += `
-                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 space-y-1">
-                            <div class="flex items-center justify-between font-bold text-amber-300">
-                                <span><i class="fa-solid fa-mobile-screen text-amber-400"></i> RESET #${resetAuditLog.length - index}</span>
-                                <span class="text-[10px] text-slate-400 font-light">${item.date}</span>
-                            </div>
-                            <div class="text-[11px] text-slate-200">${item.device}</div>
-                            <div class="text-[9px] text-emerald-400 font-mono">PIN Authorized: ${item.pin}</div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
+        function resetScoresFromEndMatch() {
+            const pin = prompt("റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ PIN!");
+                return;
             }
-            modal.classList.remove("hidden");
-        }
-
-        function closeResetAuditModal() {
-            const modal = document.getElementById("reset-audit-modal");
-            if (modal) modal.classList.add("hidden");
+            if (window.confirm("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യണോ?")) {
+                resetTournamentStateForNewSession();
+                showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു!");
+            }
         }
 
         let toastTimeout = null;
