@@ -15,8 +15,6 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <!-- html2canvas for auto screenshot capture feature -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         body {
@@ -207,7 +205,7 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* --- COMPACT RACKET DANCE STAGE (NARROW WIDTH) --- */
+        /* --- COMPACT DANCING STAGE (NARROW WIDTH) --- */
         .dance-stage-container {
             position: relative;
             width: 75%;
@@ -232,7 +230,6 @@
             50% { transform: scale(1.2); opacity: 0.9; }
         }
 
-        /* Net in the middle */
         .badminton-net {
             position: absolute;
             bottom: 0;
@@ -245,7 +242,6 @@
             z-index: 2;
         }
 
-        /* Racket Dancing Left Player */
         .racket-player-left {
             position: absolute;
             bottom: 8px;
@@ -254,11 +250,10 @@
         }
         @keyframes racketDanceLeft {
             0% { transform: translateY(0) rotate(0deg) scale(1); }
-            50% { transform: translateY(-12px) rotate(-10deg) scale(1.1); }
-            100% { transform: translateY(-4px) rotate(5deg) scale(1.05); }
+            50% { transform: translateY(-14px) rotate(-15deg) scale(1.12); }
+            100% { transform: translateY(-4px) rotate(8deg) scale(1.05); }
         }
 
-        /* Racket Dancing Right Player */
         .racket-player-right {
             position: absolute;
             bottom: 8px;
@@ -267,31 +262,29 @@
         }
         @keyframes racketDanceRight {
             0% { transform: translateY(0) rotate(0deg) scale(1); }
-            50% { transform: translateY(-12px) rotate(10deg) scale(1.1); }
-            100% { transform: translateY(-4px) rotate(-5deg) scale(1.05); }
+            50% { transform: translateY(-14px) rotate(15deg) scale(1.12); }
+            100% { transform: translateY(-4px) rotate(-8deg) scale(1.05); }
         }
 
-        /* Racket Swing Animation */
         .racket-swing-arm {
             transform-origin: bottom center;
-            animation: racketSwingMotion 0.5s infinite alternate ease-in-out;
+            animation: racketSwingMotion 0.4s infinite alternate ease-in-out;
         }
         @keyframes racketSwingMotion {
-            0% { transform: rotate(-35deg); }
-            100% { transform: rotate(50deg); }
+            0% { transform: rotate(-45deg); }
+            100% { transform: rotate(60deg); }
         }
 
-        /* Shuttlecock Bounce */
         .shuttle-dance-bounce {
             position: absolute;
-            top: 12px;
-            left: 44%;
+            top: 10px;
+            left: 42%;
             font-size: 14px;
-            animation: shuttleBounceMotion 0.6s infinite alternate ease-in-out;
+            animation: shuttleBounceMotion 0.5s infinite alternate ease-in-out;
         }
         @keyframes shuttleBounceMotion {
             0% { transform: translateY(0) scale(0.8) rotate(0deg); }
-            100% { transform: translateY(30px) scale(1.3) rotate(360deg); }
+            100% { transform: translateY(32px) scale(1.35) rotate(360deg); }
         }
 
         /* --- FIREWORKS CONTAINER STYLES --- */
@@ -437,7 +430,7 @@
                 </div>
             </div>
 
-            <!-- Main Interface Leaderboard Section (H2H Stats Restored to Main Face) -->
+            <!-- Main Interface Leaderboard Section -->
             <div id="main-leaderboard-section" class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
                 <div class="pt-1 text-left space-y-1.5">
                     <button onclick="toggleH2HInterface()" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-semibold text-[11px] py-2 px-2 rounded-lg border border-amber-500/30 flex items-center justify-between transition-all cursor-pointer">
@@ -596,9 +589,9 @@
         </div>
     </div>
 
-    <!-- Current Status Share Modal Window with Auto-Screenshot Eye Button -->
+    <!-- Current Status Share Modal Window (Screenshot Option Removed Completely) -->
     <div id="current-status-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div id="screenshot-capture-target" class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
             <div class="p-3.5 bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/80 border-b border-amber-500/40 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase flex items-center gap-1.5">
@@ -607,10 +600,6 @@
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON TOURNAMENT SHARING</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- Special Eye / Screenshot Button -->
-                    <button onclick="captureCurrentStatusScreenshot()" class="w-7 h-7 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg flex items-center justify-center text-xs cursor-pointer shadow-lg transition-all active:scale-95" title="സ്ക്രീൻഷോട്ട് എടുക്കുക (Auto Screenshot)">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
                     <div class="flex flex-col text-right">
                         <div id="current-status-date" class="text-[10px] text-amber-300 font-bold tracking-wider"></div>
                     </div>
@@ -623,7 +612,7 @@
         </div>
     </div>
 
-    <!-- End Match Modal Window (Updated with Malayalam Headings, Funny Commentary, Narrow Racket Dance Animation) -->
+    <!-- End Match Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
             <div id="fireworks-container"></div>
@@ -823,6 +812,15 @@
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
         const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
+        // Funny Malayalam Commentaries Array
+        const funnyCommentaries = [
+            "മര്യാദയ്ക്ക് ഷട്ടിൽ അടിക്കാൻ പറഞ്ഞിട്ട് ഇവർ കോർട്ടിൽ കിടന്ന് പൊളിച്ചടക്കിയല്ലോ! അടുത്ത കളിയിൽ ആവറേജ് കട്ടക്കലിപ്പിൽ കാണാം!",
+            "ശെടാ, തോൽക്കാൻ വേണ്ടി മാത്രം ഇറങ്ങിയതാണോ അതോ അറിയാതെ ജയിച്ചുപോയതാണോ ആവോ! എന്തായാലും പൊളി കളി!",
+            "ഷട്ടിൽ കോർട്ടിൽ വിയർപ്പൊഴുക്കിയ ഈ വിപ്ലവകാരികൾക്ക് ഒരു വലിയ കൈയടി! അടുത്ത കളിയിൽ ഇതിലും ഭയങ്കരമായ അടിയോടടി പ്രതീക്ഷിക്കാം!",
+            "ഇതെന്ത് മാസ്സ് കളിയാണ് സഖാക്കളേ! തോറ്റ ടീമുകൾ ഇപ്പോൾ രോഷംകൊണ്ട് വിറയ്ക്കുന്നുണ്ടായിരിക്കും, സൂക്ഷിച്ചോ!",
+            "കോർട്ടിൽ നിന്ന് ഇറങ്ങുമ്പോൾ നല്ലവണ്ണം ഒന്ന് വെള്ളം കുടിക്കാൻ മറക്കരുത്, അല്ലെങ്കിൽ അടുത്ത കളിയിൽ വീഴും!"
+        ];
+
         function formatHoursAndMins(totalMins) {
             if (!totalMins || totalMins <= 0) return "0h 0m";
             const h = Math.floor(totalMins / 60);
@@ -835,7 +833,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v109');
+                const localData = localStorage.getItem('wesma_local_backup_v110');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -868,7 +866,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v109');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v110');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -984,7 +982,8 @@
         function playChampionVoiceAnnouncement(champName) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const text = `ആശംസകൾ! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ചാമ്പ്യൻമാർ ${champName}! അതിഗംഭീര വിജയം! മാസ്സ് പെർഫോമൻസ്!`;
+                let randomCommentary = funnyCommentaries[Math.floor(Math.random() * funnyCommentaries.length)];
+                const text = `ആശംസകൾ! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ചാമ്പ്യൻമാർ ${champName}! ${randomCommentary}`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
@@ -1214,7 +1213,7 @@
         function saveLocalBackup() {
             try {
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v109', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v110', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -1246,7 +1245,6 @@
                 durationMinutes: currentDurationMinutes
             };
 
-            // Push to history only when End Match is triggered
             tournamentHistory.unshift(record);
             saveData();
             updateHistorySummaryText();
@@ -1766,13 +1764,23 @@
                 return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
-            let topTeam = sorted[0];
-            let topScorerName = topTeam.wins > 0 ? topTeam.name : "None yet";
-            let topScorerWins = topTeam.wins;
+            // Filter out teams that have 0 wins and 0 played matches so zero-play teams don't show up erroneously
+            let activeTeams = sorted.filter(t => (t.wins > 0 || (t.played && t.played > 0)));
+            
+            let topScorerName = "None yet";
+            let topScorerWins = 0;
+            if (activeTeams.length > 0 && activeTeams[0].wins > 0) {
+                topScorerName = activeTeams[0].name;
+                topScorerWins = activeTeams[0].wins;
+            }
 
-            let bottomTeam = sorted[sorted.length - 1];
-            let bottomScorerName = bottomTeam ? bottomTeam.name : "None yet";
-            let bottomScorerWins = bottomTeam ? bottomTeam.wins : 0;
+            let bottomScorerName = "None yet";
+            let bottomScorerWins = 0;
+            if (activeTeams.length > 0) {
+                let bottomTeam = activeTeams[activeTeams.length - 1];
+                bottomScorerName = bottomTeam.name;
+                bottomScorerWins = bottomTeam.wins;
+            }
 
             let totalPlaysCount = calculateTotalPlays();
             let totalMatchesCount = totalPlaysCount / 2;
@@ -1850,38 +1858,6 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        // Auto Screenshot Capture using html2canvas
-        function captureCurrentStatusScreenshot() {
-            triggerHapticFeedback([60]);
-            const targetEl = document.getElementById("screenshot-capture-target");
-            if (!targetEl) return;
-
-            // Hide the eye button temporarily during capture
-            const eyeBtn = targetEl.querySelector('button[title*="സ്ക്രീൻഷോട്ട്"]');
-            if(eyeBtn) eyeBtn.style.display = 'none';
-
-            showToast("📸 സ്ക്രീൻഷോട്ട് എടുത്തുകൊണ്ടിരിക്കുന്നു...");
-
-            html2canvas(targetEl, {
-                backgroundColor: '#030712',
-                scale: 2,
-                logging: false,
-                useCORS: true
-            }).then(canvas => {
-                if(eyeBtn) eyeBtn.style.display = 'flex';
-                
-                const link = document.createElement('a');
-                link.download = `WESMA_Live_Status_${new Date().toISOString().slice(0,10)}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showToast("✅ സ്ക്രീൻഷോട്ട് ഡൗൺലോഡ് ചെയ്തു!");
-            }).catch(err => {
-                if(eyeBtn) eyeBtn.style.display = 'flex';
-                console.error("Screenshot error:", err);
-                showToast("⚠️ സ്ക്രീൻഷോട്ട് എടുക്കുന്നതിൽ പരാജയപ്പെട്ടു!");
-            });
-        }
-
         function toggleEndModalResetDropdown() {
             const dropdown = document.getElementById("end-modal-reset-dropdown");
             if (dropdown) {
@@ -1906,7 +1882,6 @@
             isMatchEnded = true;
             updateMatchStatusBadge();
 
-            // Auto-save to history strictly upon triggering End Match
             autoSaveToHistory();
             saveData();
 
@@ -1958,14 +1933,14 @@
 
             let podiumTextHtml = "";
             if (sorted.length > 1 && sorted[1].wins > 0) {
-                podiumTextHtml += `<div>🥈 രണ്ടാം സ്ഥാനം (Runner-up): <span class="text-white uppercase font-bold">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
+                podiumTextHtml += `<div>2nd Place (Runner-up): <span class="text-white uppercase font-bold">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
             } else {
-                podiumTextHtml += `<div>🥈 രണ്ടാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
+                podiumTextHtml += `<div>2nd Place: Calculating...</div>`;
             }
             if (sorted.length > 2 && sorted[2].wins > 0) {
-                podiumTextHtml += `<div>🥉 മൂന്നാം സ്ഥാനം: <span class="text-white uppercase font-bold">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
+                podiumTextHtml += `<div>3rd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
             } else {
-                podiumTextHtml += `<div>🥉 മൂന്നാം സ്ഥാനം: കണക്കാക്കുന്നു...</div>`;
+                podiumTextHtml += `<div>3rd Place: Calculating...</div>`;
             }
 
             container.innerHTML = `
@@ -1973,12 +1948,12 @@
                     
                     <div class="champion-aura"></div>
 
-                    <!-- NARROW WIDTH RACKET DANCE ANIMATION STAGE -->
+                    <!-- DANCING ANIMATION STAGE -->
                     <div class="dance-stage-container my-1">
                         <div class="badminton-net"></div>
                         <div class="shuttle-dance-bounce">🏸</div>
                         
-                        <!-- Racket Dancing Left Player -->
+                        <!-- Dancing Left Player with Racket -->
                         <div class="racket-player-left flex flex-col items-center">
                             <div class="w-3 h-3 bg-amber-200 rounded-full border border-amber-400 shadow-[0_0_8px_#f59e0b]"></div>
                             <div class="w-2.5 h-4 bg-amber-500 rounded-sm"></div>
@@ -1989,7 +1964,7 @@
                             </div>
                         </div>
 
-                        <!-- Racket Dancing Right Player -->
+                        <!-- Dancing Right Player with Racket -->
                         <div class="racket-player-right flex flex-col items-center">
                             <div class="w-3 h-3 bg-cyan-200 rounded-full border border-cyan-400 shadow-[0_0_8px_#38bdf8]"></div>
                             <div class="w-2.5 h-4 bg-cyan-500 rounded-sm"></div>
@@ -2003,15 +1978,10 @@
 
                     <!-- Highlighted Winner Name -->
                     <div class="bg-slate-950/90 border-2 border-amber-400 rounded-xl p-2.5 shadow-inner relative z-10">
-                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">👑 വെസ്മാ ബാഡ്മിന്റൺ തിളങ്ങുന്ന മഹാവിജയികൾ 👑</div>
+                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">👑 CHAMPIONS 👑</div>
                         <div class="text-base font-black text-amber-300 uppercase tracking-wider mt-0.5 drop-shadow-[0_0_15px_rgba(245,158,11,0.9)]">
                             🌟 ${escapeHtml(championName)} 🌟
                         </div>
-                    </div>
-
-                    <!-- Funny Malayalam Commentary -->
-                    <div class="bg-slate-900/95 border border-amber-500/30 rounded-lg p-2 text-amber-200 text-[10px] italic leading-relaxed relative z-10">
-                        "മര്യാദയ്ക്ക് ഷട്ടിൽ അടിക്കാൻ പറഞ്ഞിട്ട് ഇവർ കോർട്ടിൽ കിടന്ന് പൊളിച്ചടക്കിയല്ലോ! തോറ്റ ടീമുകൾ അടുത്ത കളിയിൽ കട്ടക്കലിപ്പിൽ തിരിച്ചുവരുമെന്ന് പ്രതീക്ഷിക്കാം! 😂🏸"
                     </div>
 
                     <!-- Winner Total Stats + Overall Tournament Stats Added -->
@@ -2029,10 +1999,10 @@
                     </div>
                 </div>
 
-                <!-- Malayalam Labels for Podium and Loser -->
+                <!-- English/Minimalist Labels for Podium and Loser -->
                 <div class="grid grid-cols-1 gap-2 text-xs">
                     <div class="bg-slate-900 border gold-border rounded-xl p-2.5 text-center shadow-lg space-y-1.5">
-                        <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 വിജയകിരീടം ചൂടിയ മഹാമാന്ത്രികരുടെ പൊന്നരങ്ങ്</div>
+                        <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 PODIUM STANDINGS</div>
                         <div class="text-left space-y-1 pt-1 border-t border-amber-500/20">
                             ${podiumTextHtml}
                         </div>
@@ -2040,7 +2010,7 @@
 
                     <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2.5 text-center shadow-lg space-y-1">
                         <div class="font-bold text-rose-400 uppercase tracking-wide flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-rose-500"></i> ആവേശം ചോരാതെ പൊരുതിയ പോരാളി വീരന്മാർ (തോറ്റ ടീമുകൾ)
+                            <i class="fa-solid fa-shield-halved text-rose-500"></i> Defeated Teams (Losers)
                         </div>
                         <div class="text-white font-extrabold uppercase text-xs">${loserNames}</div>
                     </div>
