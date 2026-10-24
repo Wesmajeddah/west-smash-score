@@ -205,71 +205,60 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* --- UNIQUE BADMINTON DANCE ANIMATION STAGE --- */
+        /* --- REDUCED WIDTH & UNIQUE BADMINTON RACKET/SHUTTLE SMASH ANIMATION STAGE --- */
         .dance-stage-container {
             position: relative;
-            width: 100%;
-            height: 100px;
+            width: 75%;
+            max-width: 220px;
+            margin: 0 auto;
+            height: 75px;
             background: radial-gradient(circle at center, #1e293b 0%, #020617 90%);
             border-radius: 1rem;
             overflow: hidden;
-            border: 1.5px solid rgba(245, 158, 11, 0.5);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 15px rgba(245, 158, 11, 0.2);
+            border: 1.5px solid rgba(245, 158, 11, 0.6);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 0 12px rgba(245, 158, 11, 0.25);
         }
 
-        /* Unique Dancing Player 1 (Left Side) */
-        .dancer-left {
+        /* Smashing Racket Left */
+        .smash-racket-left {
             position: absolute;
-            bottom: 10px;
-            left: 22%;
-            animation: playerDanceLeft 1.4s infinite ease-in-out;
+            bottom: 12px;
+            left: 15%;
+            transform-origin: bottom right;
+            animation: racketSmashLeft 1.2s infinite ease-in-out;
         }
 
-        /* Unique Dancing Player 2 (Right Side) */
-        .dancer-right {
+        /* Smashing Racket Right */
+        .smash-racket-right {
             position: absolute;
-            bottom: 10px;
-            right: 22%;
-            animation: playerDanceRight 1.4s infinite ease-in-out;
+            bottom: 12px;
+            right: 15%;
+            transform-origin: bottom left;
+            animation: racketSmashRight 1.2s infinite ease-in-out;
         }
 
-        @keyframes playerDanceLeft {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-10px) rotate(-8deg) scale(1.05); }
-            50% { transform: translateY(0) rotate(0deg) scale(1); }
-            75% { transform: translateY(-14px) rotate(8deg) scale(1.08); }
+        @keyframes racketSmashLeft {
+            0%, 100% { transform: rotate(-20deg) translateY(0); }
+            50% { transform: rotate(35deg) translateY(-8px); }
         }
 
-        @keyframes playerDanceRight {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-14px) rotate(8deg) scale(1.08); }
-            50% { transform: translateY(0) rotate(0deg) scale(1); }
-            75% { transform: translateY(-10px) rotate(-8deg) scale(1.05); }
+        @keyframes racketSmashRight {
+            0%, 100% { transform: rotate(20deg) translateY(0); }
+            50% { transform: rotate(-35deg) translateY(-8px); }
         }
 
-        /* Dancing Racket Swing */
-        .dancing-racket-arm {
-            transform-origin: bottom center;
-            animation: racketDanceSwing 0.7s infinite alternate ease-in-out;
-        }
-
-        @keyframes racketDanceSwing {
-            0% { transform: rotate(-35deg); }
-            100% { transform: rotate(55deg); }
-        }
-
-        /* Shuttle Dancing Bounce in Middle */
-        .shuttle-dance-bounce {
+        /* Flying Shuttlecock in Middle */
+        .flying-shuttle {
             position: absolute;
-            top: 15px;
-            left: 48%;
-            font-size: 16px;
-            animation: shuttleDanceBounce 0.7s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            top: 25px;
+            left: 45%;
+            font-size: 14px;
+            animation: shuttleFlight 1.2s infinite ease-in-out;
         }
 
-        @keyframes shuttleDanceBounce {
-            0% { transform: translateY(0) scale(0.9) rotate(0deg); }
-            100% { transform: translateY(35px) scale(1.3) rotate(180deg); }
+        @keyframes shuttleFlight {
+            0%, 100% { transform: translateY(0) scale(0.9) rotate(-15deg); }
+            50% { transform: translateY(-20px) scale(1.2) rotate(45deg); }
         }
 
         .record-detail-btn {
@@ -394,7 +383,7 @@
                 </div>
             </div>
 
-            <!-- Main Interface Leaderboard Section (H2H Stats Restored to Main Face) -->
+            <!-- Main Interface Leaderboard Section -->
             <div id="main-leaderboard-section" class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
                 <div class="pt-1 text-left space-y-1.5">
                     <button onclick="toggleH2HInterface()" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-semibold text-[11px] py-2 px-2 rounded-lg border border-amber-500/30 flex items-center justify-between transition-all cursor-pointer">
@@ -469,7 +458,7 @@
         </div>
     </div>
 
-    <!-- Last Defeated History Modal (ENLARGED WINDOW WITH CLEAR SMALLER TEXT) -->
+    <!-- Last Defeated History Modal -->
     <div id="last-defeated-history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-xl rounded-2xl shadow-2xl p-4 space-y-3 relative max-h-[85vh] flex flex-col">
             <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer">
@@ -553,14 +542,14 @@
         </div>
     </div>
 
-    <!-- Current Status Share Modal Window (Top Scorer & Most Defeated Only) -->
+    <!-- Current Status Share Modal Window (Fully Refined & Professional Content) -->
     <div id="current-status-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
-                    <div class="text-[9px] text-emerald-400 font-bold tracking-widest mt-0.5">MATCH HIGHLIGHTS</div>
+                    <div class="text-[9px] text-emerald-400 font-bold tracking-widest mt-0.5">MATCH HIGHLIGHTS & STATUS</div>
                 </div>
                 <div class="flex flex-col text-right">
                     <div id="current-status-date" class="text-[10px] text-amber-300 font-bold tracking-wider"></div>
@@ -570,16 +559,16 @@
                 </button>
             </div>
             <div id="current-status-modal-content" class="p-4 space-y-3 overflow-y-auto flex-1 text-xs"></div>
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between px-4">
+                <span class="text-[10px] text-slate-400 font-light italic">ടൂർണമെന്റ് ലൈവ് സ്റ്റാറ്റസ്</span>
+                <button onclick="closeCurrentStatusModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1 rounded-lg text-xs cursor-pointer">ശരി</button>
+            </div>
         </div>
     </div>
 
     <!-- End Match Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
-            <div class="bg-amber-500/10 border-b border-amber-500/20 py-1.5 px-3 flex items-center justify-between text-[10px] text-amber-300 font-bold">
-                <span>⏱️ AUTO RESET IN (6H):</span>
-                <span id="end-modal-timer" class="text-amber-400 font-mono text-xs">360:00</span>
-            </div>
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
@@ -757,7 +746,6 @@
         let isMatchEnded = false;
         let timerInterval = null;
         let cooldownInterval = null;
-        let endMatchAutoResetTimer = null;
         let isFirebaseConnected = false;
         let dbRef = null;
         let editingTeamId = null;
@@ -882,10 +870,6 @@
             globalClickSequence = 0;
             isMatchEnded = false;
             
-            if (endMatchAutoResetTimer) {
-                clearInterval(endMatchAutoResetTimer);
-                endMatchAutoResetTimer = null;
-            }
             closeFinishMatchModal();
 
             saveLocalBackup();
@@ -1618,18 +1602,6 @@
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
                 
-                if (tournamentStartTimestamp && !isMatchEnded) {
-                    const elapsedMs = Date.now() - tournamentStartTimestamp;
-                    const elapsedMinutes = Math.floor(elapsedMs / 60000);
-
-                    if (elapsedMinutes >= 360) {
-                        autoSaveToHistory();
-                        resetTournamentStateForNewSession();
-                        showToast("⏰ 6 മണിക്കൂർ കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോ റീസെറ്റ് ആയി!");
-                        return;
-                    }
-                }
-
                 if (isMatchEnded || !tournamentStartTimestamp) {
                     if (isMatchEnded && lastActionTimestamp && tournamentStartTimestamp) {
                         const elapsedTotal = lastActionTimestamp - tournamentStartTimestamp;
@@ -1687,17 +1659,30 @@
             let mostDefeatedName = (mostDefeatedTeam && mostDefeatedTeam.losses > 0) ? mostDefeatedTeam.name : "None yet";
             let mostDefeatedCount = mostDefeatedTeam ? (mostDefeatedTeam.losses || 0) : 0;
 
+            let totalPlaysCount = calculateTotalPlays();
+            let totalMatchesCount = totalPlaysCount / 2;
+            let elapsedTotal = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
+            let totalHours = Math.floor(elapsedTotal / 3600000);
+            let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
+
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/25 via-slate-900 to-amber-600/25 p-3.5 rounded-2xl border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] space-y-3 text-center relative overflow-hidden">
                     <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5">
-                        ✨ LIVE MATCH HIGHLIGHTS ✨
+                        ✨ WESMA LIVE MATCH STATUS ✨
                     </div>
 
-                    <div class="space-y-2.5 pt-1">
+                    <div class="space-y-2 pt-1">
+                        <div class="bg-slate-950/90 border border-amber-500/40 rounded-xl p-2.5 text-left shadow-inner flex items-center justify-between">
+                            <div>
+                                <div class="text-[9px] text-amber-400 font-bold uppercase tracking-wider">📊 ടൂർണമെന്റ് സംഗ്രഹം</div>
+                                <div class="text-xs font-semibold text-slate-200 mt-0.5">ആകെ മാച്ചുകൾ: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)}</b> | ആകെ സമയം: <b class="text-emerald-400">${totalHours}h ${totalMins}m</b></div>
+                            </div>
+                        </div>
+
                         <div class="bg-slate-950/90 border border-emerald-500/50 rounded-xl p-3 text-left shadow-inner flex items-center justify-between">
                             <div>
                                 <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                    <i class="fa-solid fa-trophy"></i> ഏറ്റവും കൂടുതൽ പോയിന്റ് / ജയം (Top Scorer)
+                                    <i class="fa-solid fa-trophy"></i> നിലവിലെ ലീഡിങ് ടീം (Top Scorer)
                                 </div>
                                 <div class="text-sm font-black text-amber-300 uppercase mt-0.5">${escapeHtml(topScorerName)}</div>
                             </div>
@@ -1707,7 +1692,7 @@
                         <div class="bg-slate-950/90 border border-rose-500/50 rounded-xl p-3 text-left shadow-inner flex items-center justify-between">
                             <div>
                                 <div class="text-[9px] text-rose-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                    <i class="fa-solid fa-shield-halved"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് (Most Defeated)
+                                    <i class="fa-solid fa-shield-halved"></i> ഏറ്റവും കൂടുതൽ തോൽവി (Most Defeated)
                                 </div>
                                 <div class="text-sm font-black text-rose-300 uppercase mt-0.5">${escapeHtml(mostDefeatedName)}</div>
                             </div>
@@ -1754,7 +1739,6 @@
             const modal = document.getElementById("finish-match-modal");
             const container = document.getElementById("finish-match-modal-content");
             const dateHeader = document.getElementById("modal-header-date");
-            const modalTimerEl = document.getElementById("end-modal-timer");
             if (!modal || !container) return;
 
             if (dateHeader) {
@@ -1812,47 +1796,30 @@
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2.5 text-center relative overflow-hidden">
                     
-                    <!-- UNIQUE SHUTTLE DANCE ANIMATION STAGE -->
+                    <!-- REDUCED WIDTH & UNIQUE RACKET SMASH ANIMATION STAGE -->
                     <div class="dance-stage-container my-1">
-                        <div class="shuttle-dance-bounce">🏸</div>
-                        
-                        <!-- Left Dancing Player with Racket -->
-                        <div class="dancer-left flex flex-col items-center">
-                            <div class="w-3.5 h-3.5 bg-amber-200 rounded-full border border-amber-400"></div>
-                            <div class="w-3 h-5 bg-amber-500 rounded-sm"></div>
-                            <div class="dancing-racket-arm w-4 h-1.5 bg-cyan-300 rounded-full -mt-4"></div>
-                            <div class="flex gap-1 mt-1">
-                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
-                            </div>
-                        </div>
-
-                        <!-- Right Dancing Player with Racket -->
-                        <div class="dancer-right flex flex-col items-center">
-                            <div class="w-3.5 h-3.5 bg-cyan-200 rounded-full border border-cyan-400"></div>
-                            <div class="w-3 h-5 bg-cyan-500 rounded-sm"></div>
-                            <div class="dancing-racket-arm w-4 h-1.5 bg-amber-300 rounded-full -mt-4"></div>
-                            <div class="flex gap-1 mt-1">
-                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
-                                <div class="w-1 h-3.5 bg-slate-300 rounded-full"></div>
-                            </div>
-                        </div>
+                        <div class="flying-shuttle">🏸</div>
+                        <div class="smash-racket-left text-amber-300 text-lg">🏸</div>
+                        <div class="smash-racket-right text-cyan-300 text-lg">🏸</div>
                     </div>
 
                     <!-- Highlighted Ultimate Winner Name -->
                     <div class="bg-slate-950/90 border-2 border-amber-400 rounded-xl p-2.5 shadow-inner">
-                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">👑 വിജയിച്ച ചാംപ്യൻമാർ 👑</div>
+                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">👑 ഈ ടൂർണമെന്റിലെ മഹാവിജയികൾ 👑</div>
                         <div class="text-base font-black text-amber-300 uppercase tracking-wider mt-0.5 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]">
                             🌟 ${escapeHtml(championName)} 🌟
                         </div>
                     </div>
 
-                    <!-- Overall Total Match & Time Stats inside End Match Window -->
-                    <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1">
-                        <div class="flex justify-center gap-3">
-                            <span>ആകെ മാച്ചുകൾ: <b class="text-amber-300 font-bold">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b></span>
-                            <span>|</span>
-                            <span>ആകെ സമയം: <b class="text-emerald-400 font-bold">${totalHours}h ${totalMins}m</b></span>
+                    <!-- End Match Time Options Split into 2 Stages -->
+                    <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1.5">
+                        <div class="bg-slate-900/90 border border-amber-500/40 rounded-lg p-1.5 flex justify-between items-center">
+                            <span class="font-bold text-amber-300">1. നിലവിലെ ചാമ്പ്യൻമാരുടെ സമയം & കളികൾ:</span>
+                            <span class="text-emerald-400 font-bold">${winnerPlays} Plays (${formatHoursAndMins(winnerTimeMins)})</span>
+                        </div>
+                        <div class="bg-slate-900/90 border border-amber-500/40 rounded-lg p-1.5 flex justify-between items-center">
+                            <span class="font-bold text-amber-300">2. ആകെ മാച്ചുകളും മൊത്തം സമയവും:</span>
+                            <span class="text-amber-200 font-bold">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches (${totalHours}h ${totalMins}m)</span>
                         </div>
                     </div>
                 </div>
@@ -1860,13 +1827,12 @@
                 <!-- Malayalam Labels for Podium and Loser -->
                 <div class="grid grid-cols-1 gap-2 text-xs">
                     <div class="bg-slate-900 border gold-border rounded-xl p-2.5 text-center shadow-lg space-y-1.5">
-                        <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 പ്രധാന വിജയികളുടെ നിര (പോഡിയം)</div>
+                        <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 മുൻനിര പോഡിയം പോരാളികൾ</div>
                         <div class="text-left space-y-1 pt-1 border-t border-amber-500/20">
                             ${podiumTextHtml}
                         </div>
                     </div>
 
-                    <!-- Malayalam Title for Most Defeated Team -->
                     <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2.5 text-center shadow-lg space-y-1">
                         <div class="font-bold text-rose-400 uppercase tracking-wide flex items-center justify-center gap-1">
                             <i class="fa-solid fa-shield-halved text-rose-500"></i> ഏറ്റവും കൂടുതൽ തോൽവി വഴങ്ങിയ ടീം
@@ -1897,28 +1863,6 @@
 
             modal.classList.remove("hidden");
             triggerWinCelebration();
-
-            let endTimerSeconds = 360 * 60;
-            if (endMatchAutoResetTimer) clearInterval(endMatchAutoResetTimer);
-            endMatchAutoResetTimer = setInterval(() => {
-                endTimerSeconds -= 1;
-                if (modalTimerEl) {
-                    const h = Math.floor(endTimerSeconds / 3600);
-                    const m = Math.floor((endTimerSeconds % 3600) / 60);
-                    const s = endTimerSeconds % 60;
-                    if (h > 0) {
-                        modalTimerEl.textContent = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                    } else {
-                        modalTimerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                    }
-                }
-                if (endTimerSeconds <= 0) {
-                    clearInterval(endMatchAutoResetTimer);
-                    endMatchAutoResetTimer = null;
-                    resetTournamentStateForNewSession();
-                    showToast("6 മണിക്കൂർ കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോമാറ്റിക് റീസെറ്റ് ആയി!");
-                }
-            }, 1000);
         }
 
         function closeFinishMatchModal() {
@@ -1956,7 +1900,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
