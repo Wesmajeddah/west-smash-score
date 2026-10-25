@@ -1251,9 +1251,9 @@
             const sessionDurationMs = Date.now() - tournamentStartTimestamp;
             const sessionDurationMins = Math.round(sessionDurationMs / 60000);
 
-            // Check if session duration is at least 1 hour 15 minutes (75 minutes)
-            if (sessionDurationMins < 75) {
-                return; // Do not save if less than 1 hour 15 minutes
+            // Changed from 75 minutes to 60 minutes (1 hour)
+            if (sessionDurationMins < 60) {
+                return; 
             }
 
             const dateStr = new Date(tournamentStartTimestamp).toLocaleDateString('en-GB', { 
@@ -1448,12 +1448,15 @@
                 }
             } else if (type === 'played') {
                 html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
-                html += `<div class="grid grid-cols-2 gap-2 my-1">
-                    <div class="bg-emerald-950/80 border border-emerald-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-emerald-400 uppercase block font-bold">Total Wins / ടോട്ടൽ ജയം</span><span class="text-sm font-black text-emerald-300">${team.wins} 🏆</span></div>
-                    <div class="bg-rose-950/80 border border-rose-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-rose-400 uppercase block font-bold">Total Losses / ടോട്ടൽ തോൽവി</span><span class="text-sm font-black text-rose-300">${team.losses || 0} ❌</span></div>
+                
+                // Made Win & Loss columns very compact/small as requested
+                html += `<div class="grid grid-cols-2 gap-1 my-1">
+                    <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
                 </div>`;
+                
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
-                    html += `<div class="text-slate-400 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches played.</div>`;
+                    html += `<div class="text-slate-400 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
@@ -1488,7 +1491,7 @@
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
             if (!tournamentHistory || tournamentHistory.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">സേവ് ചെയ്ത സെഷൻ ഡാറ്റ ലഭ്യമല്ല. (1 മണിക്കൂർ 15 മിനിറ്റിൽ കൂടുതലുള്ളവ മാത്രം) / No saved sessions found (minimum 1h 15m required).</div>`;
+                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">സേവ് ചെയ്ത സെഷൻ ഡാറ്റ ലഭ്യമല്ല. (1 മണിക്കൂറിൽ കൂടുതലുള്ളവ മാത്രം) / No saved sessions found (minimum 1h required).</div>`;
             } else {
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
@@ -1696,10 +1699,13 @@
                 }
             } else if (type === 'played') {
                 html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
-                html += `<div class="grid grid-cols-2 gap-2 my-1">
-                    <div class="bg-emerald-950/80 border border-emerald-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-emerald-400 uppercase block font-bold">Total Wins / ടോട്ടൽ ജയം</span><span class="text-sm font-black text-emerald-300">${team.wins} 🏆</span></div>
-                    <div class="bg-rose-950/80 border border-rose-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-rose-400 uppercase block font-bold">Total Losses / ടോട്ടൽ തോൽവി</span><span class="text-sm font-black text-rose-300">${team.losses || 0} ❌</span></div>
+                
+                // Made Win & Loss columns very compact/small as requested
+                html += `<div class="grid grid-cols-2 gap-1 my-1">
+                    <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
                 </div>`;
+                
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
                     html += `<div class="text-slate-400 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches.</div>`;
                 } else {
@@ -1933,7 +1939,7 @@
             isMatchEnded = true;
             updateMatchStatusBadge();
 
-            // Save to history when End Match is clicked (only if at least 1 hour 15 mins)
+            // Save to history when End Match is clicked (only if at least 1 hour)
             autoSaveToHistory();
             saveData();
 
