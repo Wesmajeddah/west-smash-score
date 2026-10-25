@@ -589,7 +589,7 @@
         </div>
     </div>
 
-    <!-- Current Status Share Modal Window (Screenshot Option Removed Completely) -->
+    <!-- Current Status Share Modal Window -->
     <div id="current-status-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
             <div class="p-3.5 bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/80 border-b border-amber-500/40 flex items-center justify-between relative px-4">
@@ -617,7 +617,7 @@
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
             <div id="fireworks-container"></div>
             <div class="bg-amber-500/10 border-b border-amber-500/20 py-1.5 px-3 flex items-center justify-between text-[10px] text-amber-300 font-bold">
-                <span>⏱️ ഓട്ടോ റീസെറ്റ് (6 മണിക്കൂർ):</span>
+                <span>⏱️ Auto Reset (6 Hours):</span>
                 <span id="end-modal-timer" class="text-amber-400 font-mono text-xs">360:00</span>
             </div>
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
@@ -812,13 +812,13 @@
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
         const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
-        // Funny Malayalam Commentaries Array
+        // Funny Malayalam Commentaries (Zero 'Sakhakkal')
         const funnyCommentaries = [
-            "മര്യാദയ്ക്ക് ഷട്ടിൽ അടിക്കാൻ പറഞ്ഞിട്ട് ഇവർ കോർട്ടിൽ കിടന്ന് പൊളിച്ചടക്കിയല്ലോ! അടുത്ത കളിയിൽ ആവറേജ് കട്ടക്കലിപ്പിൽ കാണാം!",
-            "ശെടാ, തോൽക്കാൻ വേണ്ടി മാത്രം ഇറങ്ങിയതാണോ അതോ അറിയാതെ ജയിച്ചുപോയതാണോ ആവോ! എന്തായാലും പൊളി കളി!",
-            "ഷട്ടിൽ കോർട്ടിൽ വിയർപ്പൊഴുക്കിയ ഈ വിപ്ലവകാരികൾക്ക് ഒരു വലിയ കൈയടി! അടുത്ത കളിയിൽ ഇതിലും ഭയങ്കരമായ അടിയോടടി പ്രതീക്ഷിക്കാം!",
-            "ഇതെന്ത് മാസ്സ് കളിയാണ് സഖാക്കളേ! തോറ്റ ടീമുകൾ ഇപ്പോൾ രോഷംകൊണ്ട് വിറയ്ക്കുന്നുണ്ടായിരിക്കും, സൂക്ഷിച്ചോ!",
-            "കോർട്ടിൽ നിന്ന് ഇറങ്ങുമ്പോൾ നല്ലവണ്ണം ഒന്ന് വെള്ളം കുടിക്കാൻ മറക്കരുത്, അല്ലെങ്കിൽ അടുത്ത കളിയിൽ വീഴും!"
+            "അളിയാ പൊളിച്ചടുക്കി കേട്ടോ! കോർട്ടിൽ കിടന്ന് ഷട്ടിൽ അടിച്ച് തകർത്തു കളഞ്ഞു ഇവർ! അടുത്ത കളിയിൽ ഇതിലും വലിയ വെടിക്കെട്ട് പ്രതീക്ഷിക്കാം!",
+            "ശെടാ, തോൽക്കാൻ വേണ്ടി മാത്രം വണ്ടിയിറങ്ങിയതാണോ അതോ അറിയാതെ ജയിച്ചുപോയതാണോ എന്തോ! എന്തായാലും പക്കാ അടിയോടടി പെർഫോമൻസ്!",
+            "ബാഡ്മിന്റൺ കോർട്ടിൽ വിയർപ്പൊഴുക്കിയ ഈ വിപ്ലവകാരികൾക്ക് ഒരു കിടിലൻ കൈയടി! എതിരാളികൾ ഇപ്പോൾ വെള്ളം കുടിക്കുന്നുണ്ടാകും!",
+            "ഇതെന്ത് മാസ്സ് കളിയാണ് ഭയ്യാ! ശരിക്കും കോർട്ട് കത്തിച്ചു കളഞ്ഞു! അടുത്ത കളിയിൽ കാണാം ബാക്കി കണക്ക് തീർക്കൽ!",
+            "ഷട്ടിൽ കോർട്ടിലെ ഒളിപ്പോരാളികൾ! എതിരാളികളെ വിറപ്പിച്ച ഈ ചാമ്പ്യൻമാർക്ക് സ്പെഷ്യൽ സല്യൂട്ട്!"
         ];
 
         function formatHoursAndMins(totalMins) {
@@ -983,7 +983,7 @@
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 let randomCommentary = funnyCommentaries[Math.floor(Math.random() * funnyCommentaries.length)];
-                const text = `ആശംസകൾ! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ചാമ്പ്യൻമാർ ${champName}! ${randomCommentary}`;
+                const text = `അഭിനന്ദനങ്ങൾ! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ചാമ്പ്യൻമാർ ${champName}! ${randomCommentary}`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
@@ -1764,7 +1764,6 @@
                 return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
-            // Filter out teams that have 0 wins and 0 played matches so zero-play teams don't show up erroneously
             let activeTeams = sorted.filter(t => (t.wins > 0 || (t.played && t.played > 0)));
             
             let topScorerName = "None yet";
@@ -1799,11 +1798,28 @@
             if (lossPairs.length > 0) {
                 lossPairs.sort((a, b) => b.count - a.count);
                 let topPair = lossPairs[0];
-                h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനെതിരെ ${topPair.count} പ്രാവശ്യം പരാജയപ്പെട്ടു.`;
+                h2hText = `${topPair.loser} team lost ${topPair.count} times against ${topPair.winner} team.`;
+            }
+
+            // Defeated teams list extraction for prominent display
+            let defeatedTeamsListHtml = "";
+            let uniqueDefeated = [];
+            teams.forEach(t => {
+                if(t.defeatedDetails) {
+                    t.defeatedDetails.forEach(d => {
+                        if(!uniqueDefeated.includes(d.name)) uniqueDefeated.push(d.name);
+                    });
+                }
+            });
+
+            if(uniqueDefeated.length > 0) {
+                defeatedTeamsListHtml = uniqueDefeated.map(name => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${escapeHtml(name)}</span>`).join(" ");
+            } else {
+                defeatedTeamsListHtml = `<span class="text-slate-400 italic text-[10px]">No defeats recorded yet</span>`;
             }
 
             container.innerHTML = `
-                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-cyan-600/20 p-4 rounded-2xl border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.35)] space-y-3.5 text-center relative overflow-hidden">
+                <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-cyan-600/20 p-4 rounded-2xl border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.35)] space-y-4 text-center relative overflow-hidden">
                     <div class="text-[11px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5 border-b border-amber-500/30 pb-2">
                         <span class="live-dot-green"></span> LIVE MATCH BATTLE SHARING HUB
                     </div>
@@ -1813,7 +1829,7 @@
                         <div class="bg-slate-950/95 border-2 border-emerald-500/60 rounded-xl p-3 shadow-md flex items-center justify-between">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                                    <i class="fa-solid fa-crown text-amber-400"></i> നിലവിൽ മുന്നിൽ നിൽക്കുന്ന ടീം (Leader)
+                                    <i class="fa-solid fa-crown text-amber-400"></i> Leading Team (Leader)
                                 </div>
                                 <div class="text-sm font-black text-amber-300 uppercase mt-1 truncate">${escapeHtml(topScorerName)}</div>
                             </div>
@@ -1827,7 +1843,7 @@
                         <div class="bg-slate-950/95 border-2 border-slate-700/80 rounded-xl p-3 shadow-md flex items-center justify-between">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                                    <i class="fa-solid fa-shield text-slate-400"></i> നിലവിൽ പിന്നിൽ നിൽക്കുന്ന ടീം
+                                    <i class="fa-solid fa-shield text-slate-400"></i> Trailing Team
                                 </div>
                                 <div class="text-sm font-black text-slate-200 uppercase mt-1 truncate">${escapeHtml(bottomScorerName)}</div>
                             </div>
@@ -1837,14 +1853,24 @@
                             </div>
                         </div>
 
-                        <!-- Match Highlights Summary Card -->
-                        <div class="bg-slate-950/95 border border-amber-500/40 rounded-xl p-3 shadow-md space-y-1.5">
-                            <div class="text-[9px] text-amber-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                                <i class="fa-solid fa-bolt text-amber-400"></i> മാച്ച് വിശേഷങ്ങൾ & ഹൈലൈറ്റ്സ്
+                        <!-- Match Highlights Summary Card (MADE LARGER & PROMINENT) -->
+                        <div class="bg-slate-950/95 border-2 border-amber-500/60 rounded-xl p-4 shadow-xl space-y-3">
+                            <div class="text-[11px] text-amber-400 font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-amber-500/30 pb-2">
+                                <i class="fa-solid fa-bolt text-amber-400 text-sm"></i> MATCH HIGHLIGHTS & STATS
                             </div>
-                            <div class="text-[11px] text-slate-200 font-medium leading-relaxed">
-                                • ആകെ കളിച്ച മാച്ചുകൾ: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)<br>
-                                • പ്രധാന പോരാട്ട വീര്യം: ${h2hText}
+                            <div class="text-[11px] text-slate-200 font-medium leading-relaxed space-y-2">
+                                <div>• Total Matches Played: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
+                                <div>• Intense Head-to-Head: <span class="text-amber-200 font-semibold">${h2hText}</span></div>
+                            </div>
+
+                            <!-- Special Defeated Teams Pop-out Showcase Inside Highlights -->
+                            <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2.5 space-y-1.5 mt-2">
+                                <div class="text-[10px] text-rose-400 font-extrabold uppercase flex items-center gap-1">
+                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> Defeated Teams Tracker
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    ${defeatedTeamsListHtml}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1943,6 +1969,7 @@
                 podiumTextHtml += `<div>3rd Place: Calculating...</div>`;
             }
 
+            // ENGLISH LABELS & COMEDY VOICE INTEGRATED FOR END MATCH
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-3 rounded-2xl border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.5)] space-y-2.5 text-center relative overflow-hidden">
                     
@@ -1984,22 +2011,22 @@
                         </div>
                     </div>
 
-                    <!-- Winner Total Stats + Overall Tournament Stats Added -->
+                    <!-- Winner Total Stats + Overall Tournament Stats (IN ENGLISH) -->
                     <div class="text-[10px] text-slate-300 font-light pt-1 border-t border-amber-500/30 space-y-1 relative z-10">
                         <div class="flex justify-around">
-                            <span>വിജയികളുടെ ആകെ കളികൾ: <b class="text-amber-300 font-bold">${winnerPlays} Plays</b></span>
+                            <span>Winner Total Plays: <b class="text-amber-300 font-bold">${winnerPlays} Plays</b></span>
                             <span>|</span>
-                            <span>വിജയികളുടെ ആകെ സമയം: <b class="text-emerald-400 font-bold">${formatHoursAndMins(winnerTimeMins)}</b></span>
+                            <span>Winner Total Time: <b class="text-emerald-400 font-bold">${formatHoursAndMins(winnerTimeMins)}</b></span>
                         </div>
                         <div class="flex justify-around border-t border-slate-800 pt-1">
-                            <span>ടോട്ടൽ ടൂർണമെന്റ് കളികൾ: <b class="text-cyan-300 font-bold">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b></span>
+                            <span>Total Tournament Matches: <b class="text-cyan-300 font-bold">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b></span>
                             <span>|</span>
-                            <span>ടോട്ടൽ സമയം: <b class="text-amber-400 font-bold">${totalHours}h ${totalMins}m</b></span>
+                            <span>Total Duration: <b class="text-amber-400 font-bold">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- English/Minimalist Labels for Podium and Loser -->
+                <!-- Podium and Loser (IN ENGLISH) -->
                 <div class="grid grid-cols-1 gap-2 text-xs">
                     <div class="bg-slate-900 border gold-border rounded-xl p-2.5 text-center shadow-lg space-y-1.5">
                         <div class="font-bold text-amber-300 uppercase tracking-wide">🏆 PODIUM STANDINGS</div>
@@ -2018,7 +2045,7 @@
 
                 <div class="space-y-1 text-left pt-1">
                     <div class="text-[11px] font-bold text-amber-300 uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-list-check text-amber-400"></i> ടൂർണമെന്റ് ഫൈനൽ സ്കോർ ഷീറ്റ്:
+                        <i class="fa-solid fa-list-check text-amber-400"></i> Tournament Final Score Sheet:
                     </div>
                     <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
                         <table class="w-full text-left border-collapse">
@@ -2059,7 +2086,7 @@
                     clearInterval(endMatchAutoResetTimer);
                     endMatchAutoResetTimer = null;
                     resetTournamentStateForNewSession();
-                    showToast("6 മണിക്കൂർ കഴിഞ്ഞതിനാൽ ടൂർണമെന്റ് ഓട്ടോമാറ്റിക് റീസെറ്റ് ആയി!");
+                    showToast("6 hours passed, tournament auto-reset!");
                 }
             }, 1000);
         }
