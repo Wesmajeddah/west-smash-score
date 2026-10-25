@@ -205,29 +205,27 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* Men's Badminton Dancing Performance Stage */
+        /* Redesigned Men's Badminton Champion Stage */
         .dance-stage-container {
             position: relative;
-            width: 50%;
-            max-width: 140px;
-            margin: 0 auto;
-            height: 45px;
-            background: radial-gradient(circle at center, #1e293b 0%, #020617 90%);
-            border-radius: 0.5rem;
+            width: 100%;
+            height: 70px;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            border-radius: 0.75rem;
             overflow: hidden;
-            border: 1px solid rgba(245, 158, 11, 0.6);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.9), 0 0 8px rgba(245, 158, 11, 0.3);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 0 10px rgba(245, 158, 11, 0.2);
         }
 
         .champion-aura {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%);
+            background: radial-gradient(circle at center, rgba(245,158,11,0.2) 0%, transparent 75%);
             animation: auraPulse 2s infinite ease-in-out;
         }
         @keyframes auraPulse {
-            0%, 100% { transform: scale(0.9); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.9; }
+            0%, 100% { opacity: 0.4; transform: scale(0.95); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
         .badminton-net {
@@ -236,46 +234,79 @@
             left: 50%;
             transform: translateX(-50%);
             width: 2px;
-            height: 25px;
-            background: repeating-linear-gradient(0deg, #f59e0b, #f59e0b 2px, transparent 2px, transparent 4px);
+            height: 38px;
+            background: repeating-linear-gradient(0deg, #f59e0b, #f59e0b 3px, transparent 3px, transparent 6px);
             z-index: 2;
         }
 
-        .mens-player-jump-left {
+        /* Male Badminton Players Unique Animation */
+        .mens-player-left {
             position: absolute;
-            bottom: 4px;
-            left: 20%;
-            font-size: 14px;
-            animation: smashJumpLeft 0.6s infinite alternate ease-in-out;
+            bottom: 6px;
+            left: 18%;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            animation: smashJumpLeft 1.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes smashJumpLeft {
-            0% { transform: translateY(0) rotate(-10deg); }
-            100% { transform: translateY(-12px) rotate(15deg); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-16px) scale(1.1) rotate(-8deg); }
         }
 
-        .mens-player-jump-right {
+        .mens-player-right {
             position: absolute;
-            bottom: 4px;
-            right: 20%;
-            font-size: 14px;
-            animation: smashJumpRight 0.6s infinite alternate ease-in-out;
+            bottom: 6px;
+            right: 18%;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            animation: smashJumpRight 1.2s infinite cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
         }
         @keyframes smashJumpRight {
-            0% { transform: translateY(0) rotate(10deg); }
-            100% { transform: translateY(-12px) rotate(-15deg); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-16px) scale(1.1) rotate(8deg); }
         }
 
         .shuttle-smash-motion {
             position: absolute;
-            top: 4px;
-            left: 45%;
-            font-size: 9px;
-            animation: shuttleSmashPath 0.6s infinite linear;
+            top: 10px;
+            left: 25%;
+            font-size: 11px;
+            animation: shuttleRally 1.2s infinite ease-in-out alternate;
+            z-index: 5;
         }
-        @keyframes shuttleSmashPath {
-            0% { transform: translate(-10px, 0) rotate(0deg); }
-            50% { transform: translate(5px, 15px) rotate(180deg); }
-            100% { transform: translate(-10px, 0) rotate(360deg); }
+        @keyframes shuttleRally {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(70px, 20px) rotate(180deg) scale(1.3); }
+            100% { transform: translate(140px, -5px) rotate(360deg); }
+        }
+
+        .spotlight-beam-left {
+            position: absolute;
+            top: -20px;
+            left: 10%;
+            width: 40px;
+            height: 100px;
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.3) 0%, transparent 100%);
+            transform: rotate(-25deg);
+            pointer-events: none;
+            animation: beamGlow 2s infinite alternate ease-in-out;
+        }
+        .spotlight-beam-right {
+            position: absolute;
+            top: -20px;
+            right: 10%;
+            width: 40px;
+            height: 100px;
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.3) 0%, transparent 100%);
+            transform: rotate(25deg);
+            pointer-events: none;
+            animation: beamGlow 2s infinite alternate ease-in-out 1s;
+        }
+        @keyframes beamGlow {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
         }
 
         #fireworks-container {
@@ -1416,7 +1447,11 @@
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Played: (${team.played || 0})</div>`;
+                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
+                html += `<div class="grid grid-cols-2 gap-2 my-1">
+                    <div class="bg-emerald-950/80 border border-emerald-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-emerald-400 uppercase block font-bold">Total Wins / ടോട്ടൽ ജയം</span><span class="text-sm font-black text-emerald-300">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-950/80 border border-rose-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-rose-400 uppercase block font-bold">Total Losses / ടോട്ടൽ തോൽവി</span><span class="text-sm font-black text-rose-300">${team.losses || 0} ❌</span></div>
+                </div>`;
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
                     html += `<div class="text-slate-400 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches played.</div>`;
                 } else {
@@ -1660,7 +1695,11 @@
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Played: (${team.played || 0})</div>`;
+                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
+                html += `<div class="grid grid-cols-2 gap-2 my-1">
+                    <div class="bg-emerald-950/80 border border-emerald-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-emerald-400 uppercase block font-bold">Total Wins / ടോട്ടൽ ജയം</span><span class="text-sm font-black text-emerald-300">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-950/80 border border-rose-500/40 p-2 rounded-lg text-center"><span class="text-[10px] text-rose-400 uppercase block font-bold">Total Losses / ടോട്ടൽ തോൽവി</span><span class="text-sm font-black text-rose-300">${team.losses || 0} ❌</span></div>
+                </div>`;
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
                     html += `<div class="text-slate-400 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches.</div>`;
                 } else {
@@ -1959,12 +1998,21 @@
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2 rounded-xl border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="champion-aura"></div>
                     
-                    <!-- Men's Badminton Dancing/Smashing Performance Stage -->
+                    <!-- Unique Men's Badminton Stage Animation -->
                     <div class="dance-stage-container my-1">
+                        <div class="spotlight-beam-left"></div>
+                        <div class="spotlight-beam-right"></div>
                         <div class="badminton-net"></div>
                         <div class="shuttle-smash-motion">🏸</div>
-                        <div class="mens-player-jump-left">🏃‍♂️💥</div>
-                        <div class="mens-player-jump-right">🏸🤸‍♂️</div>
+                        
+                        <div class="mens-player-left">
+                            <span class="text-base">🏃‍♂️</span>
+                            <span class="text-xs">💥</span>
+                        </div>
+                        <div class="mens-player-right">
+                            <span class="text-xs">🏸</span>
+                            <span class="text-base">🏃‍♂️</span>
+                        </div>
                     </div>
 
                     <div class="bg-slate-950/90 border border-amber-400 rounded-lg p-1.5 shadow-inner relative z-10">
@@ -1975,12 +2023,14 @@
                     </div>
 
                     <div class="bg-slate-950/80 rounded-lg p-1 border border-amber-500/30 text-[8px] text-slate-300 font-light space-y-0.5 relative z-10">
-                        <div class="flex justify-around">
+                        <div class="flex justify-around items-center">
                             <span>Plays: <b class="text-amber-300 font-bold">${winnerPlays}</b></span>
                             <span>|</span>
                             <span>Time: <b class="text-emerald-400 font-bold">${formatHoursAndMins(winnerTimeMins)}</b></span>
                             <span>|</span>
                             <span>Total Matches: <b class="text-cyan-300 font-bold">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)}</b></span>
+                            <span>|</span>
+                            <span>Total Time: <b class="text-amber-400 font-bold">${totalHours}h ${totalMins}m</b></span>
                         </div>
                     </div>
                 </div>
@@ -1995,7 +2045,7 @@
 
                     <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow-md space-y-0.5">
                         <div class="font-bold text-rose-400 uppercase tracking-wide text-[10px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-rose-500"></i> കുറവ് ജയം / Lowest Wins
+                            <i class="fa-solid fa-shield-halved text-rose-500"></i> തോറ്റ ടീം / Defeated Team
                         </div>
                         <div class="text-white font-extrabold uppercase text-[10px]">${loserNames}</div>
                     </div>
