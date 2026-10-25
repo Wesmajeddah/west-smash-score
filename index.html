@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter, Great Vibes & Cinzel / Montserrat for Logo Style -->
+    <!-- Google Fonts: Inter & Great Vibes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -26,43 +26,35 @@
         }
         
         .wesma-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 900;
-            letter-spacing: 3px;
-            font-size: 1.45rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-size: 1.35rem;
             text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
+            display: flex;
+            align-items: baseline;
             justify-content: center;
             overflow: visible;
-            color: #d4af37;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        }
-
-        .logo-w-container {
-            display: inline-flex;
-            align-items: baseline;
-            position: relative;
-            margin-right: 2px;
         }
 
         .special-w {
-            font-family: 'Cinzel', serif;
-            font-size: 1.25em;
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.35em;
             display: inline-block;
-            color: #d4af37;
+            transform: translateY(3px);
+            color: #F59E0B;
             font-weight: 900;
             transform-style: preserve-3d;
             animation: ultraSlowFlipHeaderW 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes ultraSlowFlipHeaderW {
             0%, 85%, 100% { 
-                transform: rotateX(0deg) scale(1); 
-                color: #d4af37; 
+                transform: translateY(3px) rotateX(0deg) scale(1); 
+                color: #F59E0B; 
                 text-shadow: none;
             }
             92%, 97% { 
-                transform: rotateX(360deg) scale(1.25); 
+                transform: translateY(3px) rotateX(360deg) scale(1.35); 
                 color: var(--w-rand-color, #38BDF8); 
                 text-shadow: 0 0 16px var(--w-rand-color, rgba(56, 189, 248, 0.9));
             }
@@ -71,18 +63,18 @@
         .animated-letter {
             display: inline-block;
             transform-style: preserve-3d;
-            font-weight: 900;
-            color: #d4af37;
+            font-weight: 800;
+            color: #F59E0B;
             animation: ultraSlowFlip 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes ultraSlowFlip {
             0%, 85%, 100% { 
                 transform: rotateX(0deg) scale(1); 
-                color: #d4af37; 
+                color: #F59E0B; 
                 text-shadow: none; 
             }
             92%, 97% { 
-                transform: rotateX(360deg) scale(1.25); 
+                transform: rotateX(360deg) scale(1.35); 
                 color: var(--rand-color, #EC4899); 
                 text-shadow: 0 0 16px var(--rand-color, rgba(236, 72, 153, 0.9)); 
             }
@@ -213,6 +205,7 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
+        /* Redesigned Men's Badminton Champion Stage */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -246,6 +239,7 @@
             z-index: 2;
         }
 
+        /* Male Badminton Players Unique Animation */
         .mens-player-left {
             position: absolute;
             bottom: 6px;
@@ -392,19 +386,9 @@
             <span id="header-date-badge-small" class="text-[9px] text-amber-300/80 font-light tracking-wider"></span>
         </div>
 
-        <!-- Header Banner with Updated Logo Design -->
-        <div id="share-header-banner" class="text-center py-2 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0 flex items-center justify-center">
-            <div class="py-0.5 flex items-center justify-center gap-2">
-                <!-- Inline SVG/HTML representation of the exact logo graphic from user attachment -->
-                <div class="inline-flex items-center justify-center mr-1" style="transform: translateY(-1px);">
-                    <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));">
-                        <!-- Shuttlecock Icon Graphic -->
-                        <path d="M50 8C50 8 41 22 36 34C33.5 40 37 45 42 45C47 45 50 41 50 41C50 41 53 45 58 45C63 45 66.5 40 64 34C59 22 50 8 50 8Z" fill="#d4af37" stroke="#927321" stroke-width="2"/>
-                        <path d="M42 45L50 56L58 45" stroke="#927321" stroke-width="2" fill="#b89728"/>
-                        <!-- Cork Base -->
-                        <ellipse cx="50" cy="53" rx="8" ry="5" fill="#d4af37" stroke="#927321" stroke-width="1.5"/>
-                    </svg>
-                </div>
+        <!-- Header Banner -->
+        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
+            <div class="py-0.5">
                 <div id="header-title-container" class="wesma-title leading-tight"></div>
             </div>
         </div>
@@ -1192,15 +1176,17 @@
             const headerContainer = document.getElementById("header-title-container");
             if(!headerContainer) return;
 
-            let letters = [{ char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
-            let delays = [5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
+            let letters = [{ char: 'W', isW: true }, { char: 'E', isW: false }, { char: 'S', isW: false }, { char: 'M', isW: false }, { char: 'A', isW: false }];
+            let delays = [2.0, 5.0, 8.0, 11.0, 14.0].sort(() => Math.random() - 0.5);
 
-            let randomColorW = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-            let titleHtml = `<span class="special-w" style="--w-rand-color: ${randomColorW}; animation-delay: 2.0s;">W</span>`;
-            
+            let titleHtml = "";
             letters.forEach((item, idx) => {
                 let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
+                if (item.isW) {
+                    titleHtml += `<span class="special-w" style="--w-rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">W</span>`;
+                } else {
+                    titleHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${delays[idx].toFixed(1)}s;">${escapeHtml(item.char)}</span>`;
+                }
             });
             headerContainer.innerHTML = titleHtml;
         }
@@ -1265,6 +1251,7 @@
             const sessionDurationMs = Date.now() - tournamentStartTimestamp;
             const sessionDurationMins = Math.round(sessionDurationMs / 60000);
 
+            // Changed from 75 minutes to 60 minutes (1 hour)
             if (sessionDurationMins < 60) {
                 return; 
             }
@@ -1462,6 +1449,7 @@
             } else if (type === 'played') {
                 html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
                 
+                // Made Win & Loss columns very compact/small as requested
                 html += `<div class="grid grid-cols-2 gap-1 my-1">
                     <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
                     <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
@@ -1712,6 +1700,7 @@
             } else if (type === 'played') {
                 html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
                 
+                // Made Win & Loss columns very compact/small as requested
                 html += `<div class="grid grid-cols-2 gap-1 my-1">
                     <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
                     <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
@@ -1950,6 +1939,7 @@
             isMatchEnded = true;
             updateMatchStatusBadge();
 
+            // Save to history when End Match is clicked (only if at least 1 hour)
             autoSaveToHistory();
             saveData();
 
@@ -2014,6 +2004,7 @@
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2 rounded-xl border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="champion-aura"></div>
                     
+                    <!-- Unique Men's Badminton Stage Animation -->
                     <div class="dance-stage-container my-1">
                         <div class="spotlight-beam-left"></div>
                         <div class="spotlight-beam-right"></div>
@@ -2127,7 +2118,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
