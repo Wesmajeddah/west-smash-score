@@ -205,6 +205,7 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
+        /* Redesigned Men's Badminton Champion Stage */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -238,6 +239,7 @@
             z-index: 2;
         }
 
+        /* Male Badminton Players Unique Animation */
         .mens-player-left {
             position: absolute;
             bottom: 6px;
@@ -340,17 +342,10 @@
             gap: 3px;
             transition: all 0.15s ease-in-out;
             box-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
-            white-space: nowrap;
         }
         .record-detail-btn:active {
             transform: scale(0.92);
             background: rgba(245, 158, 11, 0.5);
-        }
-
-        .single-line-text {
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
         }
     </style>
 </head>
@@ -647,6 +642,7 @@
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-amber-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-amber-200/80 font-light tracking-wider">BADMINTON CLUB</div>
+                    <div class="text-[9px] text-amber-400 font-bold tracking-widest mt-0.5">SINCE 2026</div>
                 </div>
                 <div class="flex items-center gap-2">
                     <div id="modal-header-date" class="text-[10px] text-amber-300 font-bold tracking-wider"></div>
@@ -1121,7 +1117,7 @@
 
             if (allDefeats.length > 0) {
                 let lastEvent = allDefeats[0];
-                barEl.innerHTML = `<span class="text-white">${escapeHtml(lastEvent.winner)}</span> Defeated <span class="text-rose-400">${escapeHtml(lastEvent.loser)}</span>`;
+                barEl.innerHTML = `<span class="text-white">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-400">${escapeHtml(lastEvent.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
             }
@@ -1255,6 +1251,7 @@
             const sessionDurationMs = Date.now() - tournamentStartTimestamp;
             const sessionDurationMins = Math.round(sessionDurationMs / 60000);
 
+            // Changed from 75 minutes to 60 minutes (1 hour)
             if (sessionDurationMins < 60) {
                 return; 
             }
@@ -1297,11 +1294,11 @@
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 html += `
                     <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-200 single-line-text pr-2">${escapeHtml(t.name)}</span>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 whitespace-nowrap">${played} Plays</span>
-                            <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 whitespace-nowrap">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
-                            <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1 whitespace-nowrap">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
+                        <span class="font-bold text-slate-200">${escapeHtml(t.name)}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${played} Plays</span>
+                            <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
+                            <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
                         </div>
                     </div>
                 `;
@@ -1336,11 +1333,11 @@
                 html += `
                     <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-100">
-                            <span class="flex items-center gap-1 pl-0.5 min-w-0 flex-1 truncate">
-                                <span class="text-amber-400 font-black shrink-0">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider single-line-text flex-1">${escapeHtml(t.name)}</span>
+                            <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
+                                <span class="text-amber-400 font-black">#${idx + 1}</span>
+                                <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-amber-300 font-bold bg-slate-950/90 px-2 py-0.5 rounded border border-amber-500/30 text-[9px] shrink-0 whitespace-nowrap ml-1">
+                            <span class="text-amber-300 font-bold bg-slate-950/90 px-2 py-0.5 rounded border border-amber-500/30 text-[9px] shrink-0">
                                 TIME: ${formattedTime}
                             </span>
                         </div>
@@ -1348,31 +1345,31 @@
                             <div class="bg-slate-950/95 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="record-detail-btn cursor-pointer whitespace-nowrap" title="വിശദവിവരങ്ങൾ">
+                                    <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-emerald-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1 whitespace-nowrap">${t.wins} <i class="fa-solid fa-trophy text-[10px]"></i></span>
+                                <span class="text-emerald-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[10px]"></i></span>
                             </div>
 
                             <div class="bg-slate-950/95 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="record-detail-btn cursor-pointer whitespace-nowrap" title="വിശദവിവരങ്ങൾ">
+                                    <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-rose-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1 whitespace-nowrap">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[10px]"></i></span>
+                                <span class="text-rose-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[10px]"></i></span>
                             </div>
 
                             <div class="bg-slate-950/95 border border-amber-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
-                                    <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="record-detail-btn cursor-pointer whitespace-nowrap" title="വിശദവിവരങ്ങൾ">
+                                    <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-amber-200 text-sm font-black mt-0.5 flex items-center justify-center gap-1 whitespace-nowrap">${t.played || 0} <i class="fa-solid fa-chart-line text-[10px]"></i></span>
+                                <span class="text-amber-200 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.played || 0} <i class="fa-solid fa-chart-line text-[10px]"></i></span>
                             </div>
                         </div>
                     </div>
@@ -1397,10 +1394,10 @@
             const content = document.getElementById("team-info-detail-content");
             if (!modal || !content) return;
 
-            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2 single-line-text">${escapeHtml(team.name)}</div>`;
+            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2">${escapeHtml(team.name)}</div>`;
 
             if (type === 'wins') {
-                html += `<div class="text-emerald-400 font-semibold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-trophy"></i> ജയിച്ച കളികൾ / Wins: (${team.wins})</div>`;
+                html += `<div class="text-emerald-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> ജയിച്ച കളികൾ / Wins: (${team.wins})</div>`;
                 if (!team.matchHistoryLog || team.matchHistoryLog.filter(m => m.result === 'WIN').length === 0) {
                     html += `<div class="text-slate-400 italic">ആരെയും തോൽപ്പിച്ചിട്ടില്ല / No wins yet.</div>`;
                 } else {
@@ -1408,17 +1405,17 @@
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="flex-1 min-w-0 pr-2 single-line-text">
-                                <span class="text-amber-400 font-bold shrink-0">#${idx + 1}:</span> 
-                                <span class="text-slate-300">Defeated: <b class="text-white">${escapeHtml(m.opponent)}</b></span>
+                            <div>
+                                <span class="text-amber-400 font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-300">തോൽപ്പിച്ചത് / Defeated: <b class="text-white">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0 whitespace-nowrap">${m.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'losses') {
-                html += `<div class="text-rose-400 font-semibold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ കളികൾ / Losses: (${team.losses || 0})</div>`;
+                html += `<div class="text-rose-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ കളികൾ / Losses: (${team.losses || 0})</div>`;
                 
                 let lossMatches = [];
                 teams.forEach(otherTeam => {
@@ -1440,21 +1437,22 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="flex-1 min-w-0 pr-2 single-line-text">
-                                <span class="text-rose-400 font-bold shrink-0">#${idx + 1}:</span> 
-                                <span class="text-slate-300">Lost to: <b class="text-white">${escapeHtml(m.winner)}</b></span>
+                            <div>
+                                <span class="text-rose-400 font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-300">തോറ്റത് / Lost to: <b class="text-white">${escapeHtml(m.winner)}</b></span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0 whitespace-nowrap">${m.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
+                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
                 
+                // Made Win & Loss columns very compact/small as requested
                 html += `<div class="grid grid-cols-2 gap-1 my-1">
-                    <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center whitespace-nowrap"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
-                    <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center whitespace-nowrap"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
+                    <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
                 </div>`;
                 
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
@@ -1464,13 +1462,13 @@
                     team.matchHistoryLog.forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400';
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="flex-1 min-w-0 pr-2 single-line-text">
-                                <span class="text-amber-400 font-bold shrink-0">#${idx + 1}:</span> 
+                            <div>
+                                <span class="text-amber-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">vs <b class="text-white">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="${resColor} font-extrabold uppercase whitespace-nowrap">${m.result}</span>
-                                <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 whitespace-nowrap">${m.durationMinutes}m</span>
+                            <div class="flex items-center gap-2">
+                                <span class="${resColor} font-extrabold uppercase">${m.result}</span>
+                                <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${m.durationMinutes}m</span>
                             </div>
                         </div>`;
                     });
@@ -1509,8 +1507,8 @@
                     sortedTeams.forEach((t, i) => {
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-xs font-light text-slate-300 py-1 border-b border-slate-900">
-                                <span class="single-line-text flex-1 pr-2">${i + 1}. ${escapeHtml(t.name)}</span>
-                                <div class="flex gap-3 shrink-0 whitespace-nowrap">
+                                <span>${i + 1}. ${escapeHtml(t.name)}</span>
+                                <div class="flex gap-3">
                                     <span class="text-emerald-400 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                                     <span class="text-rose-400 font-semibold">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
                                 </div>
@@ -1519,11 +1517,11 @@
                     });
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <div class="flex-1 min-w-0 pr-2">
-                                <div class="text-xs font-semibold text-amber-300 single-line-text">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-400"></i> ${winnersNames}</div>
-                                <div class="text-[10px] font-light text-slate-400 whitespace-nowrap">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
+                            <div>
+                                <div class="text-xs font-semibold text-amber-300">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-400"></i> ${winnersNames}</div>
+                                <div class="text-[10px] font-light text-slate-400">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="flex items-center gap-1.5">
                                 <button onclick="deleteSingleHistory(${idx})" class="w-6 h-6 bg-rose-950 hover:bg-rose-900 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 text-[10px] cursor-pointer" title="ഈ ഹിസ്റ്ററി മാത്രം ഡിലീറ്റ് ചെയ്യുക / Delete History">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
@@ -1584,11 +1582,11 @@
                 html += `
                     <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-100">
-                            <span class="flex items-center gap-1 pl-0.5 min-w-0 flex-1 truncate">
-                                <span class="text-amber-400 font-black shrink-0">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider single-line-text flex-1">${escapeHtml(t.name)}</span>
+                            <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
+                                <span class="text-amber-400 font-black">#${idx + 1}</span>
+                                <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-amber-300 font-bold bg-slate-950/90 px-2 py-0.5 rounded border border-amber-500/30 text-[9px] shrink-0 whitespace-nowrap ml-1">
+                            <span class="text-amber-300 font-bold bg-slate-950/90 px-2 py-0.5 rounded border border-amber-500/30 text-[9px] shrink-0">
                                 TIME: ${formattedTime}
                             </span>
                         </div>
@@ -1596,31 +1594,31 @@
                             <div class="bg-slate-950/95 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
-                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'wins')" class="record-detail-btn cursor-pointer whitespace-nowrap" title="വിശദവിവരങ്ങൾ">
+                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-emerald-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1 whitespace-nowrap">${t.wins} <i class="fa-solid fa-trophy text-[10px]"></i></span>
+                                <span class="text-emerald-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[10px]"></i></span>
                             </div>
 
                             <div class="bg-slate-950/95 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
-                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'losses')" class="record-detail-btn cursor-pointer whitespace-nowrap" title="വിശദവിവരങ്ങൾ">
+                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-rose-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1 whitespace-nowrap">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[10px]"></i></span>
+                                <span class="text-rose-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[10px]"></i></span>
                             </div>
 
                             <div class="bg-slate-950/95 border border-amber-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
-                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'played')" class="record-detail-btn cursor-pointer whitespace-nowrap" title="വിശദവിവരങ്ങൾ">
+                                    <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-amber-200 text-sm font-black mt-0.5 flex items-center justify-center gap-1 whitespace-nowrap">${t.played || 0} <i class="fa-solid fa-chart-line text-[10px]"></i></span>
+                                <span class="text-amber-200 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.played || 0} <i class="fa-solid fa-chart-line text-[10px]"></i></span>
                             </div>
                         </div>
                     </div>
@@ -1647,10 +1645,10 @@
             const content = document.getElementById("history-team-info-detail-content");
             if (!modal || !content) return;
 
-            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2 single-line-text">${escapeHtml(team.name)}</div>`;
+            let html = `<div class="font-bold text-amber-300 text-sm uppercase text-center border-b border-slate-800 pb-2">${escapeHtml(team.name)}</div>`;
 
             if (type === 'wins') {
-                html += `<div class="text-emerald-400 font-semibold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-trophy"></i> ജയിച്ച കളികൾ / Wins: (${team.wins})</div>`;
+                html += `<div class="text-emerald-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> ജയിച്ച കളികൾ / Wins: (${team.wins})</div>`;
                 if (!team.matchHistoryLog || team.matchHistoryLog.filter(m => m.result === 'WIN').length === 0) {
                     html += `<div class="text-slate-400 italic">ആരെയും തോൽപ്പിച്ചിട്ടില്ല / No wins.</div>`;
                 } else {
@@ -1658,17 +1656,17 @@
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="flex-1 min-w-0 pr-2 single-line-text">
-                                <span class="text-amber-400 font-bold shrink-0">#${idx + 1}:</span> 
-                                <span class="text-slate-300">Defeated: <b class="text-white">${escapeHtml(m.opponent)}</b></span>
+                            <div>
+                                <span class="text-amber-400 font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-300">തോൽപ്പിച്ചത് / Defeated: <b class="text-white">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0 whitespace-nowrap">${m.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'losses') {
-                html += `<div class="text-rose-400 font-semibold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ കളികൾ / Losses: (${team.losses || 0})</div>`;
+                html += `<div class="text-rose-400 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ കളികൾ / Losses: (${team.losses || 0})</div>`;
                 
                 let lossMatches = [];
                 item.teams.forEach(otherTeam => {
@@ -1690,21 +1688,22 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="flex-1 min-w-0 pr-2 single-line-text">
-                                <span class="text-rose-400 font-bold shrink-0">#${idx + 1}:</span> 
-                                <span class="text-slate-300">Lost to: <b class="text-white">${escapeHtml(m.winner)}</b></span>
+                            <div>
+                                <span class="text-rose-400 font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-300">തോറ്റത് / Lost to: <b class="text-white">${escapeHtml(m.winner)}</b></span>
                             </div>
-                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shrink-0 whitespace-nowrap">${m.durationMinutes}m</span>
+                            <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
+                html += `<div class="text-amber-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${team.played || 0})</div>`;
                 
+                // Made Win & Loss columns very compact/small as requested
                 html += `<div class="grid grid-cols-2 gap-1 my-1">
-                    <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center whitespace-nowrap"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
-                    <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center whitespace-nowrap"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
+                    <div class="bg-emerald-950/80 border border-emerald-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-400 uppercase font-bold">Win:</span> <span class="text-xs font-black text-emerald-300">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-950/80 border border-rose-500/40 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-400 uppercase font-bold">Loss:</span> <span class="text-xs font-black text-rose-300">${team.losses || 0} ❌</span></div>
                 </div>`;
                 
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
@@ -1714,13 +1713,13 @@
                     team.matchHistoryLog.forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400';
                         html += `<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                            <div class="flex-1 min-w-0 pr-2 single-line-text">
-                                <span class="text-amber-400 font-bold shrink-0">#${idx + 1}:</span> 
+                            <div>
+                                <span class="text-amber-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">vs <b class="text-white">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="${resColor} font-extrabold uppercase whitespace-nowrap">${m.result}</span>
-                                <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 whitespace-nowrap">${m.durationMinutes}m</span>
+                            <div class="flex items-center gap-2">
+                                <span class="${resColor} font-extrabold uppercase">${m.result}</span>
+                                <span class="text-amber-400 text-[10px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${m.durationMinutes}m</span>
                             </div>
                         </div>`;
                     });
@@ -1773,7 +1772,7 @@
                 const totalHours = Math.floor(elapsedTotal / 3600000);
                 const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
                 const totalSecs = Math.floor((elapsedTotal % 60000) / 1000);
-                if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}s`;
+                if(totalDurationEl) totalDurationEl.textContent = `${totalHours}h ${totalMins}m ${totalSecs}`;
 
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
@@ -1799,21 +1798,23 @@
 
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
+                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
+            let activeTeams = sorted.filter(t => (t.wins > 0 || (t.played && t.played > 0)));
+            
             let topScorerName = "ആരുമില്ല / None";
             let topScorerWins = 0;
-            if (sorted.length > 0 && sorted[0].wins > 0) {
-                topScorerName = sorted[0].name;
-                topScorerWins = sorted[0].wins;
+            if (activeTeams.length > 0 && activeTeams[0].wins > 0) {
+                topScorerName = activeTeams[0].name;
+                topScorerWins = activeTeams[0].wins;
             }
 
             let secondPlaceName = "ആരുമില്ല / None";
             let secondPlaceWins = 0;
-            if (sorted.length > 1 && sorted[1].wins > 0) {
-                secondPlaceName = sorted[1].name;
-                secondPlaceWins = sorted[1].wins;
+            if (activeTeams.length > 1 && activeTeams[1].wins > 0) {
+                secondPlaceName = activeTeams[1].name;
+                secondPlaceWins = activeTeams[1].wins;
             }
 
             let totalPlaysCount = calculateTotalPlays();
@@ -1836,15 +1837,20 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            let mostDefeatedTeams = [...teams].sort((a, b) => (b.losses || 0) - (a.losses || 0));
-            let maxLosses = mostDefeatedTeams[0]?.losses || 0;
-            let topLoserHtml = "";
+            let defeatedTeamsListHtml = "";
+            let uniqueDefeated = [];
+            teams.forEach(t => {
+                if(t.defeatedDetails) {
+                    t.defeatedDetails.forEach(d => {
+                        if(!uniqueDefeated.includes(d.name)) uniqueDefeated.push(d.name);
+                    });
+                }
+            });
 
-            if (maxLosses > 0) {
-                let topLosers = mostDefeatedTeams.filter(t => t.losses === maxLosses);
-                topLoserHtml = topLosers.map(t => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase single-line-text inline-block max-w-full">${escapeHtml(t.name)} (${t.losses} Losses)</span>`).join(" ");
+            if(uniqueDefeated.length > 0) {
+                defeatedTeamsListHtml = uniqueDefeated.map(name => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${escapeHtml(name)}</span>`).join(" ");
             } else {
-                topLoserHtml = `<span class="text-slate-400 italic text-[10px]">തോൽവികളൊന്നും ഇതുവരെ രേഖപ്പെടുത്തിയിട്ടില്ല / No defeats recorded</span>`;
+                defeatedTeamsListHtml = `<span class="text-slate-400 italic text-[10px]">തോൽവികളൊന്നും ഇതുവരെ രേഖപ്പെടുത്തിയിട്ടില്ല / No defeats recorded</span>`;
             }
 
             container.innerHTML = `
@@ -1859,11 +1865,11 @@
                                 <div class="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-crown text-amber-400"></i> ഒന്നാം സ്ഥാനക്കാർ / 1st Place
                                 </div>
-                                <div class="text-sm font-black text-amber-300 uppercase mt-1 single-line-text">${escapeHtml(topScorerName)}</div>
+                                <div class="text-sm font-black text-amber-300 uppercase mt-1 truncate">${escapeHtml(topScorerName)}</div>
                             </div>
                             <div class="bg-emerald-950/90 border border-emerald-500/50 rounded-lg px-3 py-1.5 text-center shrink-0">
-                                <span class="text-[8px] text-emerald-300 uppercase block font-bold whitespace-nowrap">Wins / ജയങ്ങൾ</span>
-                                <span class="text-sm font-black text-emerald-300 whitespace-nowrap">${topScorerWins} 🏆</span>
+                                <span class="text-[8px] text-emerald-300 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
+                                <span class="text-sm font-black text-emerald-300">${topScorerWins} 🏆</span>
                             </div>
                         </div>
 
@@ -1872,11 +1878,11 @@
                                 <div class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-medal text-slate-300"></i> രണ്ടാം സ്ഥാനക്കാർ / 2nd Place
                                 </div>
-                                <div class="text-sm font-black text-slate-200 uppercase mt-1 single-line-text">${escapeHtml(secondPlaceName)}</div>
+                                <div class="text-sm font-black text-slate-200 uppercase mt-1 truncate">${escapeHtml(secondPlaceName)}</div>
                             </div>
                             <div class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-center shrink-0">
-                                <span class="text-[8px] text-slate-400 uppercase block font-bold whitespace-nowrap">Wins / ജയങ്ങൾ</span>
-                                <span class="text-sm font-black text-slate-300 whitespace-nowrap">${secondPlaceWins} 🏆</span>
+                                <span class="text-[8px] text-slate-400 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
+                                <span class="text-sm font-black text-slate-300">${secondPlaceWins} 🏆</span>
                             </div>
                         </div>
 
@@ -1891,10 +1897,10 @@
 
                             <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2.5 space-y-1.5 mt-2">
                                 <div class="text-[10px] text-rose-400 font-extrabold uppercase flex items-center gap-1">
-                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team
+                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> തോൽവി നേരിട്ട ടീമുകൾ / Defeated Teams
                                 </div>
                                 <div class="flex flex-wrap gap-1.5 pt-1">
-                                    ${topLoserHtml}
+                                    ${defeatedTeamsListHtml}
                                 </div>
                             </div>
                         </div>
@@ -1933,6 +1939,7 @@
             isMatchEnded = true;
             updateMatchStatusBadge();
 
+            // Save to history when End Match is clicked (only if at least 1 hour)
             autoSaveToHistory();
             saveData();
 
@@ -1947,7 +1954,7 @@
 
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
+                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
             let elapsedTotal = (lastActionTimestamp && tournamentStartTimestamp) ? (lastActionTimestamp - tournamentStartTimestamp) : 0;
@@ -1962,8 +1969,9 @@
             let totalPlaysCount = calculateTotalPlays();
             let totalMatchesCount = totalPlaysCount / 2;
 
-            const maxLosses = Math.max(...sorted.map(t => t.losses || 0));
-            let loserTeams = sorted.filter(t => (t.losses || 0) === maxLosses && maxLosses > 0 && t.id !== winnerTeam.id);
+            const maxWins = sorted[0].wins;
+            const minWins = sorted[sorted.length - 1].wins;
+            let loserTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins && t.id !== winnerTeam.id);
             let loserNames = loserTeams.length > 0 ? loserTeams.map(l => escapeHtml(l.name)).join(" • ") : "ഇല്ല / None";
 
             let teamsTableHtml = "";
@@ -1972,30 +1980,31 @@
                 let isWinnerRow = (i === 0 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'} single-line-text">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
-                        <td class="py-1 px-1 whitespace-nowrap">${played}</td>
-                        <td class="py-1 px-1 font-bold text-emerald-400 whitespace-nowrap">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
-                        <td class="py-1 px-1 font-bold text-rose-400 whitespace-nowrap">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
+                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
+                        <td class="py-1 px-1">${played}</td>
+                        <td class="py-1 px-1 font-bold text-emerald-400">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
+                        <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
                     </tr>
                 `;
             });
 
             let podiumTextHtml = "";
             if (sorted.length > 1 && sorted[1].wins > 0) {
-                podiumTextHtml += `<div class="single-line-text">2nd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
+                podiumTextHtml += `<div>2nd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
             } else {
-                podiumTextHtml += `<div class="single-line-text">2nd Place: -</div>`;
+                podiumTextHtml += `<div>2nd Place: -</div>`;
             }
             if (sorted.length > 2 && sorted[2].wins > 0) {
-                podiumTextHtml += `<div class="single-line-text">3rd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
+                podiumTextHtml += `<div>3rd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
             } else {
-                podiumTextHtml += `<div class="single-line-text">3rd Place: -</div>`;
+                podiumTextHtml += `<div>3rd Place: -</div>`;
             }
 
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2 rounded-xl border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="champion-aura"></div>
                     
+                    <!-- Unique Men's Badminton Stage Animation -->
                     <div class="dance-stage-container my-1">
                         <div class="spotlight-beam-left"></div>
                         <div class="spotlight-beam-right"></div>
@@ -2014,13 +2023,13 @@
 
                     <div class="bg-slate-950/90 border border-amber-400 rounded-lg p-1.5 shadow-inner relative z-10">
                         <div class="text-[8px] text-amber-300 uppercase tracking-widest font-bold">👑 ചാമ്പ്യന്മാർ / Champions 👑</div>
-                        <div class="text-xs font-black text-amber-300 uppercase tracking-wider mt-0.5 single-line-text">
+                        <div class="text-xs font-black text-amber-300 uppercase tracking-wider mt-0.5">
                             🌟 ${escapeHtml(championName)} 🌟
                         </div>
                     </div>
 
                     <div class="bg-slate-950/80 rounded-lg p-1 border border-amber-500/30 text-[8px] text-slate-300 font-light space-y-0.5 relative z-10">
-                        <div class="flex justify-around items-center whitespace-nowrap">
+                        <div class="flex justify-around items-center">
                             <span>Plays: <b class="text-amber-300 font-bold">${winnerPlays}</b></span>
                             <span>|</span>
                             <span>Time: <b class="text-emerald-400 font-bold">${formatHoursAndMins(winnerTimeMins)}</b></span>
@@ -2042,9 +2051,9 @@
 
                     <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow-md space-y-0.5">
                         <div class="font-bold text-rose-400 uppercase tracking-wide text-[10px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-rose-500"></i> ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team
+                            <i class="fa-solid fa-shield-halved text-rose-500"></i> തോറ്റ ടീം / Defeated Team
                         </div>
-                        <div class="text-white font-extrabold uppercase text-[10px] single-line-text">${loserNames}</div>
+                        <div class="text-white font-extrabold uppercase text-[10px]">${loserNames}</div>
                     </div>
                 </div>
 
@@ -2109,7 +2118,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const maxLosses = Math.max(...teams.map(t => t.losses || 0));
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -2120,7 +2129,7 @@
 
             let rankedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
+                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
             const now = Date.now();
@@ -2132,7 +2141,7 @@
                 const isSecond = (team.id === rankedTeams[1]?.id && rankedTeams[1]?.wins > 0);
                 const isThird = (team.id === rankedTeams[2]?.id && rankedTeams[2]?.wins > 0);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
-                const isLoser = (team.losses === maxLosses && maxLosses > 0 && !isWinner);
+                const isLoser = (team.wins === minWins && minWins < maxWins && !isWinner && !isSecond && !isThird);
                 
                 const playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
                 const lossesCount = team.losses || 0;
@@ -2183,8 +2192,8 @@
                             </button>
                             
                             <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30 min-w-[42px]">
-                                <span class="text-xs text-amber-400 font-semibold flex items-center gap-1 whitespace-nowrap">${team.wins} <i class="fa-solid fa-trophy text-[9px] text-amber-400"></i></span>
-                                <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1 whitespace-nowrap">${lossesCount} <i class="fa-solid fa-shield text-[8px] text-rose-400"></i></span>
+                                <span class="text-xs text-amber-400 font-semibold flex items-center gap-1">${team.wins} <i class="fa-solid fa-trophy text-[9px] text-amber-400"></i></span>
+                                <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1">${lossesCount} <i class="fa-solid fa-shield text-[8px] text-rose-400"></i></span>
                             </div>
                             
                             <div class="relative">
@@ -2299,10 +2308,10 @@
                     btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3.5 px-4 rounded-2xl border-2 border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 defeated-option-btn shadow-md";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
-                            <span class="uppercase tracking-wider font-extrabold text-amber-300 text-xs sm:text-sm single-line-text pr-2">${escapeHtml(t.name)}</span>
-                            <span class="text-[10px] text-rose-300 font-bold bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/40 uppercase whitespace-nowrap">തോറ്റ ടീം സെലക്ട് ചെയ്യുക / Select Defeated</span>
+                            <span class="uppercase tracking-wider font-extrabold text-amber-300 text-xs sm:text-sm">${escapeHtml(t.name)}</span>
+                            <span class="text-[10px] text-rose-300 font-bold bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/40 uppercase">തോറ്റ ടീം സെലക്ട് ചെയ്യുക / Select Defeated</span>
                         </div>
-                        <div class="text-[10px] text-slate-400 font-light italic pointer-events-none single-line-text">${lastDefeatedText}</div>
+                        <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
                     btn.onclick = function() { promptConfirmDefeatedTeam(winningTeamId, t.id); };
                     container.appendChild(btn);
@@ -2368,7 +2377,7 @@
 
             const now = Date.now();
             const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
-            const intervalMinutes = Math.min(30, Math.max(1, Math.round((now - referenceTime) / 60000)));
+            const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
             
             team.matchInterval = intervalMinutes;
             team.lastMatchTime = intervalMinutes;
