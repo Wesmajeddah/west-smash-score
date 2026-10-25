@@ -268,18 +268,19 @@
             50% { transform: translateY(-16px) scale(1.1) rotate(8deg); }
         }
 
+        /* Shuttlecock only moving back and forth without racket */
         .shuttle-smash-motion {
             position: absolute;
-            top: 10px;
-            left: 25%;
+            top: 15px;
+            left: 22%;
             font-size: 11px;
-            animation: shuttleRally 1.2s infinite ease-in-out alternate;
+            animation: shuttleRallyOnly 1.2s infinite ease-in-out alternate;
             z-index: 5;
         }
-        @keyframes shuttleRally {
+        @keyframes shuttleRallyOnly {
             0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(70px, 20px) rotate(180deg) scale(1.3); }
-            100% { transform: translate(140px, -5px) rotate(360deg); }
+            50% { transform: translate(80px, 15px) rotate(180deg) scale(1.2); }
+            100% { transform: translate(150px, -5px) rotate(360deg); }
         }
 
         .spotlight-beam-left {
@@ -329,19 +330,27 @@
             100% { transform: translate(var(--tx), var(--ty)) scale(0.1); opacity: 0; }
         }
 
+        /* Extremely small width for WIN/LOSS INFO buttons in Records */
         .record-detail-btn {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.4));
             border: 1px solid rgba(245, 158, 11, 0.6);
             color: #fef08a;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 9px;
+            padding: 1px 3px !important;
+            border-radius: 4px;
+            font-size: 7px !important;
             font-weight: 800;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 1px;
             transition: all 0.15s ease-in-out;
-            box-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
+            width: 32px !important;
+            max-width: 32px !important;
+            min-width: 32px !important;
+            justify-content: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .record-detail-btn:active {
             transform: scale(0.92);
@@ -1251,9 +1260,9 @@
             const sessionDurationMs = Date.now() - tournamentStartTimestamp;
             const sessionDurationMins = Math.round(sessionDurationMs / 60000);
 
-            // Check if session duration is at least 1 hour 15 minutes (75 minutes)
-            if (sessionDurationMins < 75) {
-                return; // Do not save if less than 1 hour 15 minutes
+            // History saving time changed to 1 hour (60 minutes)
+            if (sessionDurationMins < 60) {
+                return; // Do not save if less than 1 hour
             }
 
             const dateStr = new Date(tournamentStartTimestamp).toLocaleDateString('en-GB', { 
@@ -1346,7 +1355,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                        INFO
                                     </button>
                                 </div>
                                 <span class="text-emerald-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[10px]"></i></span>
@@ -1356,7 +1365,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                        INFO
                                     </button>
                                 </div>
                                 <span class="text-rose-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[10px]"></i></span>
@@ -1366,7 +1375,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                        INFO
                                     </button>
                                 </div>
                                 <span class="text-amber-200 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.played || 0} <i class="fa-solid fa-chart-line text-[10px]"></i></span>
@@ -1488,7 +1497,7 @@
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
             if (!tournamentHistory || tournamentHistory.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">സേവ് ചെയ്ത സെഷൻ ഡാറ്റ ലഭ്യമല്ല. (1 മണിക്കൂർ 15 മിനിറ്റിൽ കൂടുതലുള്ളവ മാത്രം) / No saved sessions found (minimum 1h 15m required).</div>`;
+                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">സേവ് ചെയ്ത സെഷൻ ഡാറ്റ ലഭ്യമല്ല. (1 മണിക്കൂറിൽ കൂടുതലുള്ളവ മാത്രം) / No saved sessions found (minimum 1h required).</div>`;
             } else {
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
@@ -1592,7 +1601,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[9px]">WIN</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                        INFO
                                     </button>
                                 </div>
                                 <span class="text-emerald-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[10px]"></i></span>
@@ -1602,7 +1611,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[9px]">LOSS</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                        INFO
                                     </button>
                                 </div>
                                 <span class="text-rose-300 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[10px]"></i></span>
@@ -1612,7 +1621,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-300 font-extrabold uppercase text-[9px]">MATCH</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
-                                        <i class="fa-solid fa-list-ul"></i> INFO
+                                        INFO
                                     </button>
                                 </div>
                                 <span class="text-amber-200 text-sm font-black mt-0.5 flex items-center justify-center gap-1">${t.played || 0} <i class="fa-solid fa-chart-line text-[10px]"></i></span>
@@ -1933,7 +1942,6 @@
             isMatchEnded = true;
             updateMatchStatusBadge();
 
-            // Save to history when End Match is clicked (only if at least 1 hour 15 mins)
             autoSaveToHistory();
             saveData();
 
@@ -1998,7 +2006,7 @@
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2 rounded-xl border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="champion-aura"></div>
                     
-                    <!-- Unique Men's Badminton Stage Animation -->
+                    <!-- Men's Badminton Stage Animation with Shuttlecock only moving back and forth -->
                     <div class="dance-stage-container my-1">
                         <div class="spotlight-beam-left"></div>
                         <div class="spotlight-beam-right"></div>
@@ -2010,7 +2018,6 @@
                             <span class="text-xs">💥</span>
                         </div>
                         <div class="mens-player-right">
-                            <span class="text-xs">🏸</span>
                             <span class="text-base">🏃‍♂️</span>
                         </div>
                     </div>
@@ -2112,7 +2119,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
