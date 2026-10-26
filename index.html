@@ -1865,13 +1865,32 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            let defeatedTeamsHtml = "";
-            let teamsWithLosses = teams.filter(t => (t.losses || 0) > 0).sort((a, b) => (b.losses || 0) - (a.losses || 0));
-            if (teamsWithLosses.length > 0) {
-                defeatedTeamsHtml = teamsWithLosses.map(t => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${escapeHtml(t.name)} (${t.losses} Losses)</span>`).join(" ");
-            } else {
-                defeatedTeamsHtml = `<span class="text-slate-400 italic text-[10px]">തോൽവികളൊന്നും ഇതുവരെ രേഖപ്പെടുത്തിയിട്ടില്ല / No defeats recorded</span>`;
+            // തോറ്റ ടീം (ഏറ്റവും ഒടുവിലത്തെ തോൽവി) കണ്ടെത്തുക
+            let allDefeats = [];
+            teams.forEach(t => {
+                if (t.defeatedDetails && t.defeatedDetails.length > 0) {
+                    t.defeatedDetails.forEach(d => {
+                        allDefeats.push({
+                            winner: t.name,
+                            loser: d.name,
+                            seq: d.seq || 0
+                        });
+                    });
+                }
+            });
+            allDefeats.sort((a, b) => b.seq - a.seq);
+
+            let lastDefeatedDisplay = "കളികൾ നടന്നിട്ടില്ല / No matches played";
+            if (allDefeats.length > 0) {
+                let lastEvent = allDefeats[0];
+                lastDefeatedDisplay = `<b class="text-white">${escapeHtml(lastEvent.winner)}</b> ടീം തോൽപ്പിച്ചത് <b class="text-rose-400">${escapeHtml(lastEvent.loser)}</b> ടീമിനെയാണ്`;
             }
+
+            // കൂടുതൽ തോൽവികൾ ഏറ്റുവാങ്ങിയ ടീം കണ്ടെത്തുക
+            let sortedByLosses = [...teams].sort((a, b) => (b.losses || 0) - (a.losses || 0));
+            let maxLossesVal = sortedByLosses[0]?.losses || 0;
+            let mostDefeatedTeams = sortedByLosses.filter(t => (t.losses || 0) === maxLossesVal && maxLossesVal > 0);
+            let mostDefeatedNames = mostDefeatedTeams.length > 0 ? mostDefeatedTeams.map(t => `${escapeHtml(t.name)} (${t.losses} Losses)`).join(" • ") : "ഇല്ല / None";
 
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-cyan-600/20 p-4 rounded-2xl border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.35)] space-y-4 text-center relative overflow-hidden">
@@ -1915,12 +1934,20 @@
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-amber-200 font-semibold">${h2hText}</span></div>
                             </div>
 
-                            <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2.5 space-y-1.5 mt-2">
+                            <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2.5 space-y-2 mt-2">
                                 <div class="text-[10px] text-rose-400 font-extrabold uppercase flex items-center gap-1">
-                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> തോറ്റ ടീം / Defeated Team
+                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> തോറ്റ ടീം (ഒടുവിലത്തെ കളി) / Defeated Team
                                 </div>
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    ${defeatedTeamsHtml}
+                                <div class="text-white font-bold text-[11px] text-left">
+                                    ${lastDefeatedDisplay}
+                                </div>
+                                <div class="pt-2 border-t border-rose-500/20 text-left">
+                                    <div class="text-[10px] text-rose-300 font-extrabold uppercase flex items-center gap-1">
+                                        <i class="fa-solid fa-circle-exclamation text-rose-400"></i> ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team
+                                    </div>
+                                    <div class="text-white font-black text-[11px] uppercase mt-1">
+                                        ${mostDefeatedNames}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2150,7 +2177,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
