@@ -135,6 +135,15 @@
             box-shadow: 0 0 15px rgba(244, 63, 94, 0.7);
         }
 
+        /* Highlight state when a defeated team is clicked */
+        .defeated-option-selected {
+            transform: scale(1.03) !important;
+            background: rgba(225, 29, 72, 0.3) !important;
+            border-color: #f43f5e !important;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.9), inset 0 0 10px rgba(244, 63, 94, 0.5) !important;
+            transition: all 0.2s ease-in-out;
+        }
+
         @keyframes teamCardGlow1 {
             0%, 100% { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
             50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
@@ -1917,7 +1926,7 @@
 
                             <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2.5 space-y-1.5 mt-2">
                                 <div class="text-[10px] text-rose-400 font-extrabold uppercase flex items-center gap-1">
-                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> തോറ്റ ടീം / Defeated Team
+                                    <i class="fa-solid fa-shield-halved text-rose-400"></i> തോറ്റ ടീമുകൾ / Defeated Teams
                                 </div>
                                 <div class="flex flex-wrap gap-1.5 pt-1">
                                     ${defeatedTeamsHtml}
@@ -2338,6 +2347,7 @@
 
                     const btn = document.createElement("button");
                     btn.type = "button";
+                    btn.id = `defeated-btn-${t.id}`;
                     btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3.5 px-4 rounded-2xl border-2 border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 defeated-option-btn shadow-md";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
@@ -2346,7 +2356,7 @@
                         </div>
                         <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
-                    btn.onclick = function() { promptConfirmDefeatedTeam(winningTeamId, t.id); };
+                    btn.onclick = function() { selectDefeatedTeamWithConfirmation(winningTeamId, t.id, btn); };
                     container.appendChild(btn);
                 }
             });
@@ -2358,6 +2368,26 @@
             if (modal) modal.classList.add("hidden");
         }
 
+        function selectDefeatedTeamWithConfirmation(winningTeamId, defeatedTeamId, btnElement) {
+            // Haptic feedback & visual selection effect
+            triggerHapticFeedback([50, 40, 50]);
+            
+            // Remove previous highlights if any
+            document.querySelectorAll('.defeated-option-btn').forEach(b => {
+                b.classList.remove('defeated-option-selected');
+            });
+            
+            // Highlight current button
+            btnElement.classList.add('defeated-option-selected');
+            
+            // Delay before prompting confirmation popup to let user see selection for ~2-3 seconds
+            setTimeout(() => {
+                closeDefeatedTeamModal();
+                btnElement.classList.remove('defeated-option-selected');
+                promptConfirmDefeatedTeam(winningTeamId, defeatedTeamId);
+            }, 2200);
+        }
+
         function promptConfirmDefeatedTeam(winningTeamId, defeatedTeamId) {
             pendingWinningTeamId = winningTeamId;
             pendingDefeatedTeamId = defeatedTeamId;
@@ -2365,8 +2395,6 @@
             const winningTeam = teams.find(t => t.id === winningTeamId);
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
             if (!winningTeam || !defeatedTeam) return;
-
-            closeDefeatedTeamModal();
 
             const confirmModal = document.getElementById("confirm-defeated-modal");
             const msgEl = document.getElementById("confirm-defeated-msg");
