@@ -135,6 +135,7 @@
             box-shadow: 0 0 15px rgba(244, 63, 94, 0.7);
         }
 
+        /* Highlight state when a defeated team is clicked */
         .defeated-option-selected {
             transform: scale(1.03) !important;
             background: rgba(225, 29, 72, 0.3) !important;
@@ -188,6 +189,7 @@
             background: linear-gradient(180deg, #f59e0b 0%, #10b981 50%, #e11d48 100%);
         }
 
+        /* Special Highlight Animation for Win/Loss Score Box in Main UI */
         @keyframes winLossPulseHighlight {
             0%, 100% { 
                 border-color: rgba(245, 158, 11, 0.6); 
@@ -1872,17 +1874,12 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            // Exclude 1st and 2nd place winners from the defeated teams list in Current Status modal
-            let topScorerTeamId = activeTeams.length > 0 ? activeTeams[0].id : null;
-            let secondPlaceTeamId = activeTeams.length > 1 ? activeTeams[1].id : null;
-
             let defeatedTeamsHtml = "";
-            let teamsWithLosses = teams.filter(t => (t.losses || 0) > 0 && t.id !== topScorerTeamId && t.id !== secondPlaceTeamId).sort((a, b) => (b.losses || 0) - (a.losses || 0));
-            
+            let teamsWithLosses = teams.filter(t => (t.losses || 0) > 0).sort((a, b) => (b.losses || 0) - (a.losses || 0));
             if (teamsWithLosses.length > 0) {
                 defeatedTeamsHtml = teamsWithLosses.map(t => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${escapeHtml(t.name)} (${t.losses} Losses)</span>`).join(" ");
             } else {
-                defeatedTeamsHtml = `<span class="text-slate-400 italic text-[10px]">മറ്റു തോൽവികളൊന്നും ഇതുവരെ രേഖപ്പെടുത്തിയിട്ടില്ല / No other defeats recorded</span>`;
+                defeatedTeamsHtml = `<span class="text-slate-400 italic text-[10px]">തോൽവികളൊന്നും ഇതുവരെ രേഖപ്പെടുത്തിയിട്ടില്ല / No defeats recorded</span>`;
             }
 
             container.innerHTML = `
@@ -2162,7 +2159,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sorted[sorted.length - 1].wins;
+            const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -2222,6 +2219,7 @@
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
+                        <!-- Play box smaller, Win/Loss score box with special highlight animation -->
                         <div class="flex items-center gap-1.5 shrink-0 relative">
                             <div class="w-5 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700 relative scale-95" title="Total Played & Details">
                                 <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-amber-500 text-slate-950 rounded-full flex items-center justify-center text-[6px] font-bold shadow cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -2371,14 +2369,18 @@
         }
 
         function selectDefeatedTeamWithConfirmation(winningTeamId, defeatedTeamId, btnElement) {
+            // Haptic feedback & visual selection effect
             triggerHapticFeedback([50, 40, 50]);
             
+            // Remove previous highlights if any
             document.querySelectorAll('.defeated-option-btn').forEach(b => {
                 b.classList.remove('defeated-option-selected');
             });
             
+            // Highlight current button
             btnElement.classList.add('defeated-option-selected');
             
+            // Delay before prompting confirmation popup to let user see selection for ~2-3 seconds
             setTimeout(() => {
                 closeDefeatedTeamModal();
                 btnElement.classList.remove('defeated-option-selected');
