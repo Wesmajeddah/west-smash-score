@@ -205,7 +205,6 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* Redesigned Men's Badminton Champion Stage */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -239,7 +238,6 @@
             z-index: 2;
         }
 
-        /* Highly Dynamic Funny Champion Stage Animation */
         .mens-player-left {
             position: absolute;
             bottom: 4px;
@@ -832,7 +830,6 @@
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
         const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
-        // Praising Champion & Criticizing Loser Voice Commentary Arrays
         const championPraiseCommentaries = [
             "മികച്ച പോരാട്ടവീര്യത്തോടെയും അത്യുഗ്രൻ സ്മാഷുകളോടെയും എതിരാളികളെ നിലംപരിശാക്കി വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിലെ അജയ്യരായ ചാമ്പ്യന്മാരായി മാറിയിരിക്കുകയാണ് ഇവർ! / Ultimate dominant victory by today's true champions!",
             "അവിശ്വസനീയമായ പ്രകടനം! കോർട്ടിൽ എതിരാളികൾക്ക് യാതൊരു അവസരവും നൽകാതെ കിരീടം ചൂടിയ തികച്ചും അർഹിച്ച വിജയം! / Exceptional performance and well-deserved championship win!",
@@ -1852,7 +1849,6 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            // Fixed Current Status Defeated Teams bug: Now correctly displaying the team with the highest total losses
             let mostDefeatedTeamName = "ആരുമില്ല / None";
             let maxLossesCount = -1;
             teams.forEach(t => {
@@ -1973,7 +1969,6 @@
                 return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
-            // Bug fix: Accurate session duration calculation matching the main session duration timer
             let elapsedTotal = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
             let totalHours = Math.floor(elapsedTotal / 3600000);
             let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
@@ -1986,18 +1981,45 @@
             let totalPlaysCount = calculateTotalPlays();
             let totalMatchesCount = totalPlaysCount / 2;
 
-            const maxWins = sorted[0].wins;
+            // Updated Rank calculation for End Match to handle ties correctly (same position for same wins)
+            let rankedListWithPositions = [];
+            let currentRank = 1;
+            sorted.forEach((t, i) => {
+                if (i > 0 && t.wins < sorted[i - 1].wins) {
+                    currentRank = i + 1;
+                }
+                rankedListWithPositions.push({ ...t, rank: currentRank });
+            });
+
+            let firstPlaceTeams = rankedListWithPositions.filter(t => t.rank === 1 && t.wins > 0);
+            let secondPlaceTeams = rankedListWithPositions.filter(t => t.rank === 2);
+            let thirdPlaceTeams = rankedListWithPositions.filter(t => t.rank === 3);
+
+            let championNamesDisplay = firstPlaceTeams.map(t => escapeHtml(t.name)).join(" & ");
+            if (!championNamesDisplay) championNamesDisplay = "NO WINNER";
+
+            let podiumTextHtml = "";
+            let secondNames = secondPlaceTeams.length > 0 ? secondPlaceTeams.map(t => `<span class="text-white uppercase font-bold">${escapeHtml(t.name)}</span>`).join(" • ") : "-";
+            let thirdNames = thirdPlaceTeams.length > 0 ? thirdPlaceTeams.map(t => `<span class="text-white uppercase font-bold">${escapeHtml(t.name)}</span>`).join(" • ") : "-";
+            
+            let secondWinsVal = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
+            let thirdWinsVal = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
+
+            podiumTextHtml += `<div>2nd Place: ${secondNames} (${secondWinsVal} Wins)</div>`;
+            podiumTextHtml += `<div>3rd Place: ${thirdNames} (${thirdWinsVal} Wins)</div>`;
+
+            let maxWins = sorted[0].wins;
             const minWins = sorted[sorted.length - 1].wins;
-            let loserTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins && t.id !== winnerTeam.id);
+            let loserTeams = sorted.filter(t => t.wins === minWins && minWins < maxWins);
             let loserNames = loserTeams.length > 0 ? loserTeams.map(l => escapeHtml(l.name)).join(" • ") : (sorted[sorted.length - 1]?.name || "ഇല്ല / None");
 
             let teamsTableHtml = "";
-            sorted.forEach((t, i) => {
+            rankedListWithPositions.forEach((t, i) => {
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
-                let isWinnerRow = (i === 0 && t.wins > 0);
+                let isWinnerRow = (t.rank === 1 && t.wins > 0);
                 teamsTableHtml += `
                     <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${i + 1}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-400">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -2005,23 +2027,10 @@
                 `;
             });
 
-            let podiumTextHtml = "";
-            if (sorted.length > 1 && sorted[1].wins > 0) {
-                podiumTextHtml += `<div>2nd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[1].name)}</span> (${sorted[1].wins} Wins)</div>`;
-            } else {
-                podiumTextHtml += `<div>2nd Place: -</div>`;
-            }
-            if (sorted.length > 2 && sorted[2].wins > 0) {
-                podiumTextHtml += `<div>3rd Place: <span class="text-white uppercase font-bold">${escapeHtml(sorted[2].name)}</span> (${sorted[2].wins} Wins)</div>`;
-            } else {
-                podiumTextHtml += `<div>3rd Place: -</div>`;
-            }
-
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2 rounded-xl border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="champion-aura"></div>
                     
-                    <!-- Highly Dynamic Funny Men's Badminton Stage Animation -->
                     <div class="dance-stage-container my-1">
                         <div class="spotlight-beam-left"></div>
                         <div class="spotlight-beam-right"></div>
@@ -2041,7 +2050,7 @@
                     <div class="bg-slate-950/90 border border-amber-400 rounded-lg p-1.5 shadow-inner relative z-10">
                         <div class="text-[8px] text-amber-300 uppercase tracking-widest font-bold">👑 വെസ്മാ ചാമ്പ്യന്മാർ / WESMA CHAMPIONS 👑</div>
                         <div class="text-xs font-black text-amber-300 uppercase tracking-wider mt-0.5">
-                            🌟 ${escapeHtml(championName)} 🌟
+                            🌟 ${championNamesDisplay} 🌟
                         </div>
                     </div>
 
@@ -2097,7 +2106,7 @@
             modal.classList.remove("hidden");
             triggerWinCelebration();
             triggerFireworksEffect();
-            playFunnyVoiceAnnouncement(championName, loserNames);
+            playFunnyVoiceAnnouncement(championNamesDisplay, loserNames);
         }
 
         function closeFinishMatchModal() {
@@ -2195,26 +2204,27 @@
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
+                        <!-- UI Adjusted: Smaller play/info box, larger win/loss/plus control boxes -->
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <div class="w-7 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700 relative" title="Total Played & Details">
-                                <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-amber-500 text-slate-950 rounded-full flex items-center justify-center text-[8px] font-bold shadow cursor-pointer" title="വിശദവിവരങ്ങൾ">
+                            <div class="w-6 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700 relative" title="Total Played & Details">
+                                <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-amber-500 text-slate-950 rounded-full flex items-center justify-center text-[7px] font-bold shadow cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
                                 <span class="text-[7px] text-slate-400 font-light leading-none">Play</span>
-                                <span class="text-xs text-amber-300 font-semibold">${playedCount}</span>
+                                <span class="text-[11px] text-amber-300 font-semibold">${playedCount}</span>
                             </div>
                             
                             <button type="button" onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-12 bg-rose-950 text-rose-300 rounded-lg flex items-center justify-center border border-rose-800/60 active:scale-95 transition-all cursor-pointer" title="Minus (-1 with PIN)">
                                 <i class="fa-solid fa-minus text-[10px]"></i>
                             </button>
                             
-                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2 py-1 border border-amber-500/30 min-w-[42px]">
-                                <span class="text-xs text-amber-400 font-semibold flex items-center gap-1">${team.wins} <i class="fa-solid fa-trophy text-[9px] text-amber-400"></i></span>
-                                <span class="text-[10px] text-rose-400 font-semibold flex items-center gap-1">${lossesCount} <i class="fa-solid fa-shield text-[8px] text-rose-400"></i></span>
+                            <div class="flex flex-col items-center justify-center bg-slate-950 rounded-lg px-2.5 py-1 border border-amber-500/30 min-w-[50px]">
+                                <span class="text-xs text-amber-400 font-bold flex items-center gap-1">${team.wins} <i class="fa-solid fa-trophy text-[9px] text-amber-400"></i></span>
+                                <span class="text-[10px] text-rose-400 font-bold flex items-center gap-1">${lossesCount} <i class="fa-solid fa-shield text-[8px] text-rose-400"></i></span>
                             </div>
                             
                             <div class="relative">
-                                <button type="button" id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-11 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-lg active:scale-95 transition-all cursor-pointer" title="Win +1">
+                                <button type="button" id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-12 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-lg active:scale-95 transition-all cursor-pointer" title="Win +1">
                                     <i class="fa-solid fa-plus text-base font-bold"></i>
                                 </button>
                                 <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm rounded-lg flex items-center justify-center border border-emerald-500/40 ${inCooldown ? '' : 'hidden'} z-10">
