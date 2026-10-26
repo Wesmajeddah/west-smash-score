@@ -205,7 +205,6 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* Redesigned Men's Badminton Champion Stage */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -239,7 +238,6 @@
             z-index: 2;
         }
 
-        /* Highly Dynamic Funny Champion Stage Animation */
         .mens-player-left {
             position: absolute;
             bottom: 4px;
@@ -832,21 +830,6 @@
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
         const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
-        // Ultra-funny comedy voice commentary arrays
-        const championFunnyCommentaries = [
-            "ഹാഹാ! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിൽ എതിരാളികളെ വിറപ്പിച്ച് കളം വാണ ചാമ്പ്യന്മാർ ഇതാ! ജയിച്ചെങ്കിലും ഇവർക്ക് നടക്കാൻ വയ്യ! / Hilarious victory by today's champions!",
-            "പൊളിച്ചുടുക്കി കേട്ടോ! ഷട്ടിൽ അടിച്ചു പറത്തി ഇവർ കോർട്ട് കയ്യേറിയിരിക്കുകയാണ്! അടുത്തവന്മാർ റെഡിയായി ഇരുന്നോ! / Absolute comedy of destruction on court!",
-            "ശെടാ, കളിക്കാൻ ഇറങ്ങിയത് കപ്പടിക്കാൻ ആയിരുന്നോ അതോ നാട്ടുകാരെ ചിരിപ്പിക്കാനോ! എന്തായാലും ഇന്നത്തെ കലിപ്പൻ ചാമ്പ്യന്മാർ സൂപ്പർ! / Hilarious champions crowned today!",
-            "ബാഡ്മിന്റൺ കോർട്ടിലെ അസ്സൽ വെടിക്കെട്ട്! ചിരിച്ച് ചിരിച്ച് എതിരാളികൾ വീണു! കിടിലൻ വിജയം! / Laugh-out-loud ultimate champions!"
-        ];
-
-        const loserFunnyCommentaries = [
-            "പാവം തോറ്റ ടീം! അടുത്ത തവണയെങ്കിലും ഷട്ടിൽ റാക്കറ്റ് തലതിരിച്ച് പിടിക്കാതെ നോക്കണേ! / Hilarious defeat, better luck next time!",
-            "എതിരാളികളുടെ സ്മാഷ് കണ്ട് വിറച്ചോടിയ ഈ ടീമിന് ഒരു ബിഗ് സല്യൂട്ട്! അടുത്ത കളിയിൽ എങ്കിലും ജയിക്കുമോ ആവോ! / Epic funny defeat on court!",
-            "കോർട്ടിൽ നിന്ന് ഓടി രക്ഷപ്പെടാൻ നോക്കിയതാണെങ്കിലും നടന്നില്ല! ചിരിച്ച് മണ്ണുഘടമാക്കിയ തോൽവി! / Unstoppable comedy of errors!",
-            "സാരമില്ല സുഹൃത്തുക്കളെ, തോൽവി വിജയത്തിന്റെ പടവാണ്, പക്ഷേ ഇത് പടവല്ല പടുകുഴി! അടുത്ത കളിയിൽ പൊളിക്കാം! / Hilarious loss commentary!"
-        ];
-
         function formatHoursAndMins(totalMins) {
             if (!totalMins || totalMins <= 0) return "0h 0m";
             const h = Math.floor(totalMins / 60);
@@ -1005,17 +988,14 @@
             triggerHapticFeedback([60, 40, 80]);
         }
 
-        function playFunnyVoiceAnnouncement(champName, loserName) {
+        function playMotivationalVoiceAnnouncement(champName, loserNames) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                let randomChampCommentary = championFunnyCommentaries[Math.floor(Math.random() * championFunnyCommentaries.length)];
-                let randomLoserCommentary = loserFunnyCommentaries[Math.floor(Math.random() * loserFunnyCommentaries.length)];
-                
-                const text = `വിശ്രമമില്ലാത്ത ചിരിയുടെ വെടിക്കെട്ട്! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ചാമ്പ്യന്മാർ ${champName}! ${randomChampCommentary} അതുപോലെ ഏറ്റവും കൂടുതൽ അടിവാങ്ങി തോറ്റ ${loserName} ടീമിന് പ്രത്യേക ആശ്വാസ സമ്മാനം! ${randomLoserCommentary}`;
+                const text = `വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റ് വിജയകരമായി പൂർത്തിയായിരിക്കുന്നു. ഇന്നത്തെ മത്സരങ്ങളിൽ മികച്ച പ്രകടനം കാഴ്ചവെച്ച് ഒന്നാം സ്ഥാനത്തെത്തിയ ചാമ്പ്യന്മാർ ${champName}. അഭിനന്ദനങ്ങൾ! കൂടാതെ മികച്ച പോരാട്ടം കാഴ്ചവെച്ച മറ്റെല്ലാ ടീമുകൾക്കും അഭിനന്ദനങ്ങൾ.`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
-                utterance.pitch = 1.15;
+                utterance.pitch = 1.0;
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -1791,9 +1771,14 @@
 
                 if (lastActionTimestamp) {
                     const matchDiffMs = Date.now() - lastActionTimestamp;
-                    const matchMins = Math.floor(matchDiffMs / 60000);
-                    const matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
-                    if(currentTimerEl) currentTimerEl.textContent = `${matchMins}m ${matchSecs}s`;
+                    let matchTotalMins = Math.floor(matchDiffMs / 60000);
+                    let matchSecs = Math.floor((matchDiffMs % 60000) / 1000);
+                    
+                    // Logical fix: Ensure current match duration never exceeds total session duration
+                    if (elapsedTotal < matchDiffMs) {
+                        matchTotalMins = totalMins;
+                    }
+                    if(currentTimerEl) currentTimerEl.textContent = `${matchTotalMins}m ${matchSecs}s`;
                 } else {
                     if(currentTimerEl) currentTimerEl.textContent = "0h 0m 0s";
                 }
@@ -1852,7 +1837,6 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            // Fixed Current Status Defeated Teams bug: Now correctly displaying the team with the highest total losses
             let mostDefeatedTeamName = "ആരുമില്ല / None";
             let maxLossesCount = -1;
             teams.forEach(t => {
@@ -1973,7 +1957,6 @@
                 return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
             });
 
-            // Bug fix: Accurate session duration calculation matching the main session duration timer
             let elapsedTotal = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
             let totalHours = Math.floor(elapsedTotal / 3600000);
             let totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
@@ -2021,7 +2004,6 @@
                 <div class="bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-600/20 p-2 rounded-xl border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] space-y-1.5 text-center relative overflow-hidden">
                     <div class="champion-aura"></div>
                     
-                    <!-- Highly Dynamic Funny Men's Badminton Stage Animation -->
                     <div class="dance-stage-container my-1">
                         <div class="spotlight-beam-left"></div>
                         <div class="spotlight-beam-right"></div>
@@ -2039,7 +2021,7 @@
                     </div>
 
                     <div class="bg-slate-950/90 border border-amber-400 rounded-lg p-1.5 shadow-inner relative z-10">
-                        <div class="text-[8px] text-amber-300 uppercase tracking-widest font-bold">👑 ചിരിപ്പിക്കുന്ന ചാമ്പ്യന്മാർ / Comedy Champions 👑</div>
+                        <div class="text-[8px] text-amber-300 uppercase tracking-widest font-bold">👑 WESMA CHAMPIONS 👑</div>
                         <div class="text-xs font-black text-amber-300 uppercase tracking-wider mt-0.5">
                             🌟 ${escapeHtml(championName)} 🌟
                         </div>
@@ -2097,7 +2079,7 @@
             modal.classList.remove("hidden");
             triggerWinCelebration();
             triggerFireworksEffect();
-            playFunnyVoiceAnnouncement(championName, loserNames);
+            playMotivationalVoiceAnnouncement(championName, loserNames);
         }
 
         function closeFinishMatchModal() {
@@ -2135,7 +2117,7 @@
             
             let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
             const maxWins = sortedTeams[0].wins;
-            const minWins = sortedTeams[sortedTeams.length - 1].wins;
+            const minWins = sorted[sorted.length - 1].wins;
             
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -2394,8 +2376,16 @@
 
             const now = Date.now();
             const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
-            const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
+            let intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
             
+            // Logical fix: Ensure individual match time cannot exceed total session duration
+            if (tournamentStartTimestamp) {
+                const totalSessionMins = Math.floor((now - tournamentStartTimestamp) / 60000);
+                if (intervalMinutes > totalSessionMins && totalSessionMins > 0) {
+                    intervalMinutes = totalSessionMins;
+                }
+            }
+
             team.matchInterval = intervalMinutes;
             team.lastMatchTime = intervalMinutes;
             
