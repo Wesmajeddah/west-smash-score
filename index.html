@@ -832,19 +832,19 @@
         const flipPopColorsList = ["#38BDF8", "#EC4899", "#4ADE80", "#FACC15", "#A855F7", "#FB923C", "#2DD4BF"];
         const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
-        // Ultra-funny comedy voice commentary arrays
-        const championFunnyCommentaries = [
-            "ഹാഹാ! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിൽ എതിരാളികളെ വിറപ്പിച്ച് കളം വാണ ചാമ്പ്യന്മാർ ഇതാ! ജയിച്ചെങ്കിലും ഇവർക്ക് നടക്കാൻ വയ്യ! / Hilarious victory by today's champions!",
-            "പൊളിച്ചുടുക്കി കേട്ടോ! ഷട്ടിൽ അടിച്ചു പറത്തി ഇവർ കോർട്ട് കയ്യേറിയിരിക്കുകയാണ്! അടുത്തവന്മാർ റെഡിയായി ഇരുന്നോ! / Absolute comedy of destruction on court!",
-            "ശെടാ, കളിക്കാൻ ഇറങ്ങിയത് കപ്പടിക്കാൻ ആയിരുന്നോ അതോ നാട്ടുകാരെ ചിരിപ്പിക്കാനോ! എന്തായാലും ഇന്നത്തെ കലിപ്പൻ ചാമ്പ്യന്മാർ സൂപ്പർ! / Hilarious champions crowned today!",
-            "ബാഡ്മിന്റൺ കോർട്ടിലെ അസ്സൽ വെടിക്കെട്ട്! ചിരിച്ച് ചിരിച്ച് എതിരാളികൾ വീണു! കിടിലൻ വിജയം! / Laugh-out-loud ultimate champions!"
+        // Praising Champion & Criticizing Loser Voice Commentary Arrays
+        const championPraiseCommentaries = [
+            "മികച്ച പോരാട്ടവീര്യത്തോടെയും അത്യുഗ്രൻ സ്മാഷുകളോടെയും എതിരാളികളെ നിലംപരിശാക്കി വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിലെ അജയ്യരായ ചാമ്പ്യന്മാരായി മാറിയിരിക്കുകയാണ് ഇവർ! / Ultimate dominant victory by today's true champions!",
+            "അവിശ്വസനീയമായ പ്രകടനം! കോർട്ടിൽ എതിരാളികൾക്ക് യാതൊരു അവസരവും നൽകാതെ കിരീടം ചൂടിയ തികച്ചും അർഹിച്ച വിജയം! / Exceptional performance and well-deserved championship win!",
+            "തന്ത്രപരമായ കളിമികവും അതിവേഗ റാലികളും കൊണ്ട് ടൂർണമെന്റിലുടനീളം ആധിപത്യം പുലർത്തിയ ചാമ്പ്യന്മാർക്ക് ബിഗ് സല്യൂട്ട്! / Phenomenal display of skills and tactics to win the tournament!",
+            "ഇതാണ് യഥാർത്ഥ ബാഡ്മിന്റൺ മാജിക്! കോർട്ടിനെ ആവേശത്തിലാഴ്ത്തി അതിഗംഭീരമായി വിജയം സ്വന്തമാക്കിയ ചാമ്പ്യന്മാർക്ക് അഭിനന്ദനങ്ങൾ! / Brilliant performance to capture the championship title!"
         ];
 
-        const loserFunnyCommentaries = [
-            "പാവം തോറ്റ ടീം! അടുത്ത തവണയെങ്കിലും ഷട്ടിൽ റാക്കറ്റ് തലതിരിച്ച് പിടിക്കാതെ നോക്കണേ! / Hilarious defeat, better luck next time!",
-            "എതിരാളികളുടെ സ്മാഷ് കണ്ട് വിറച്ചോടിയ ഈ ടീമിന് ഒരു ബിഗ് സല്യൂട്ട്! അടുത്ത കളിയിൽ എങ്കിലും ജയിക്കുമോ ആവോ! / Epic funny defeat on court!",
-            "കോർട്ടിൽ നിന്ന് ഓടി രക്ഷപ്പെടാൻ നോക്കിയതാണെങ്കിലും നടന്നില്ല! ചിരിച്ച് മണ്ണുഘടമാക്കിയ തോൽവി! / Unstoppable comedy of errors!",
-            "സാരമില്ല സുഹൃത്തുക്കളെ, തോൽവി വിജയത്തിന്റെ പടവാണ്, പക്ഷേ ഇത് പടവല്ല പടുകുഴി! അടുത്ത കളിയിൽ പൊളിക്കാം! / Hilarious loss commentary!"
+        const loserCriticizeCommentaries = [
+            "എതിരാളികളുടെ സ്മാഷുകൾക്ക് മുന്നിൽ തടഞ്ഞുനിൽക്കാൻ കഴിയാതെ ദാരുണമായ തോൽവി ഏറ്റുവാങ്ങേണ്ടി വന്ന ടീം! ഇനിയെങ്കിലും കളി കൂടുതൽ ഗൗരവത്തോടെ പഠിക്കേണ്ടിയിരിക്കുന്നു! / Poor display and heavy defeat, needs massive improvement!",
+            "നിരാശാജനകമായ പ്രകടനം! കോർട്ടിൽ പൊരുതിനിൽക്കാൻ പോലും സാധിക്കാതെ വലിയ പരാജയം ഏറ്റുവാങ്ങിയ ഇവർ അടുത്ത തവണയെങ്കിലും കൂടുതൽ പരിശീലനം നടത്തി ഇറങ്ങുക! / Very disappointing execution on court, must practice much harder!",
+            "ശരിയായ തന്ത്രങ്ങളോ കൂട്ടായ്മയോ ഇല്ലാതെ കളം വിടേണ്ടി വന്ന ടീം! പരാജയത്തിൽ നിന്ന് പാഠങ്ങൾ ഉൾക്കൊണ്ട് കളി മെച്ചപ്പെടുത്തുമെന്ന് കരുതാം! / Total failure in teamwork and strategy, very poor overall play!",
+            "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം! മികച്ച പ്രകടനം പുറത്തെടുക്കാൻ തീർത്തും പരാജയപ്പെട്ടു! / Completely outplayed by opponents with an underwhelming performance!"
         ];
 
         function formatHoursAndMins(totalMins) {
@@ -1008,10 +1008,10 @@
         function playFunnyVoiceAnnouncement(champName, loserName) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                let randomChampCommentary = championFunnyCommentaries[Math.floor(Math.random() * championFunnyCommentaries.length)];
-                let randomLoserCommentary = loserFunnyCommentaries[Math.floor(Math.random() * loserFunnyCommentaries.length)];
+                let randomChampCommentary = championPraiseCommentaries[Math.floor(Math.random() * championPraiseCommentaries.length)];
+                let randomLoserCommentary = loserCriticizeCommentaries[Math.floor(Math.random() * loserCriticizeCommentaries.length)];
                 
-                const text = `വിശ്രമമില്ലാത്ത ചിരിയുടെ വെടിക്കെട്ട്! ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ചാമ്പ്യന്മാർ ${champName}! ${randomChampCommentary} അതുപോലെ ഏറ്റവും കൂടുതൽ അടിവാങ്ങി തോറ്റ ${loserName} ടീമിന് പ്രത്യേക ആശ്വാസ സമ്മാനം! ${randomLoserCommentary}`;
+                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChampCommentary} എന്നാൽ ${loserName} ടീം വളരെ മോശം പ്രകടനമാണ് കാഴ്ചവെച്ചത്. ${randomLoserCommentary}`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
@@ -2039,7 +2039,7 @@
                     </div>
 
                     <div class="bg-slate-950/90 border border-amber-400 rounded-lg p-1.5 shadow-inner relative z-10">
-                        <div class="text-[8px] text-amber-300 uppercase tracking-widest font-bold">👑 ചിരിപ്പിക്കുന്ന ചാമ്പ്യന്മാർ / Comedy Champions 👑</div>
+                        <div class="text-[8px] text-amber-300 uppercase tracking-widest font-bold">👑 വെസ്മാ ചാമ്പ്യന്മാർ / WESMA CHAMPIONS 👑</div>
                         <div class="text-xs font-black text-amber-300 uppercase tracking-wider mt-0.5">
                             🌟 ${escapeHtml(championName)} 🌟
                         </div>
