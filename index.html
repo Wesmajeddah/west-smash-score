@@ -1875,11 +1875,11 @@
             }
 
             let defeatedTeamsHtml = "";
-            let teamsWithLosses = teams.filter(t => (t.losses || 0) > 0).sort((a, b) => (b.losses || 0) - (a.losses || 0));
-            if (teamsWithLosses.length > 0) {
-                defeatedTeamsHtml = teamsWithLosses.map(t => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${escapeHtml(t.name)} (${t.losses} Losses)</span>`).join(" ");
+            let teamsWithLossesOnly = teams.filter(t => (t.wins === 0 && (t.losses || 0) > 0)).sort((a, b) => (b.losses || 0) - (a.losses || 0));
+            if (teamsWithLossesOnly.length > 0) {
+                defeatedTeamsHtml = teamsWithLossesOnly.map(t => `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${escapeHtml(t.name)} (${t.losses} Losses)</span>`).join(" ");
             } else {
-                defeatedTeamsHtml = `<span class="text-slate-400 italic text-[10px]">തോൽവികളൊന്നും ഇതുവരെ രേഖപ്പെടുത്തിയിട്ടില്ല / No defeats recorded</span>`;
+                defeatedTeamsHtml = `<span class="text-slate-400 italic text-[10px]">തോൽവികൾ മാത്രമുള്ള ടീമുകളില്ല / No strictly defeated teams</span>`;
             }
 
             container.innerHTML = `
