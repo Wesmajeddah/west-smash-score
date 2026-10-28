@@ -90,12 +90,12 @@
             white-space: nowrap !important;
             vertical-align: middle !important;
             box-sizing: border-box !important;
-            font-size: 8px !important;
+            font-size: 7px !important;
             font-weight: 800 !important;
-            padding: 1px 4px !important;
+            padding: 1px 3px !important;
             border-radius: 3px !important;
-            height: 15px !important;
-            letter-spacing: 0.3px !important;
+            height: 14px !important;
+            letter-spacing: 0.2px !important;
             text-rendering: optimizeLegibility !important;
             -webkit-font-smoothing: antialiased !important;
             margin: 0 !important;
@@ -601,7 +601,7 @@
         </div>
     </div>
 
-    <!-- Defeated Team Selection Modal (Auto 3s confirmation with haptic & red highlight) -->
+    <!-- Defeated Team Selection Modal -->
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-lg rounded-3xl shadow-2xl p-6 text-center space-y-4 max-h-[90vh] flex flex-col">
             <div>
@@ -638,6 +638,24 @@
                 </div>
             </div>
             <div id="current-status-modal-content" class="p-4 space-y-3.5 overflow-y-auto flex-1 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- End Match Password Verification Modal -->
+    <div id="end-match-password-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[70] hidden">
+        <div class="bg-slate-900 border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3">
+            <div class="w-10 h-10 mx-auto bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center border border-rose-500/30 text-sm">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-sm font-semibold text-amber-300">എൻഡ് മാച്ച് പാസ്‌വേർഡ് / End Match Password</h3>
+            <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകുക / Enter Admin PIN (1234)</p>
+            <div class="space-y-2 pt-1">
+                <input type="password" id="end-match-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-amber-300 focus:outline-none focus:border-amber-500">
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="closeEndMatchPasswordModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button onclick="verifyEndMatchPassword()" class="w-full bg-rose-700 hover:bg-rose-600 text-white font-semibold py-2 rounded-xl text-xs shadow cursor-pointer">ഉറപ്പിക്കുക / Confirm</button>
+            </div>
         </div>
     </div>
 
@@ -763,7 +781,7 @@
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="text-xs font-semibold text-amber-300 flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> TOURNAMENT LOGS
+                    <i class="fa-solid fa-trophy text-amber-400"></i> TOURNAMENT LOGS (1 HOUR MAX)
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -838,17 +856,17 @@
         const badgeColorsList = ["bg-amber-500", "bg-blue-600", "bg-emerald-600", "bg-rose-600", "bg-purple-600", "bg-cyan-600", "bg-indigo-600", "bg-pink-600"];
 
         const championPraiseCommentaries = [
-            "മികച്ച പോരാട്ടവീര്യത്തോടെയും അത്യുഗ്രൻ സ്മാഷുകളോടെയും എതിരാളികളെ നിലംപരിശാക്കി വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിലെ അജയ്യരായ ചാമ്പ്യന്മാരായി മാറിയിരിക്കുകയാണ് ഇവർ! / Ultimate dominant victory by today's true champions!",
-            "അവിശ്വസനീയമായ പ്രകടനം! കോർട്ടിൽ എതിരാളികൾക്ക് യാതൊരു അവസരവും നൽകാതെ കിരീടം ചൂടിയ തികച്ചും അർഹിച്ച വിജയം! / Exceptional performance and well-deserved championship win!",
-            "തന്ത്രപരമായ കളിമികവും അതിവേഗ റാലികളും കൊണ്ട് ടൂർണമെന്റിലുടനീളം ആധിപത്യം പുലർത്തിയ ചാമ്പ്യന്മാർക്ക് ബിഗ് സല്യൂട്ട്! / Phenomenal display of skills and tactics to win the tournament!",
-            "ഇതാണ് യഥാർത്ഥ ബാഡ്മിന്റൺ മാജിക്! കോർട്ടിനെ ആവേശത്തിലാഴ്ത്തി അതിഗംഭീരമായി വിജയം സ്വന്തമാക്കിയ ചാമ്പ്യന്മാർക്ക് അഭിനന്ദനങ്ങൾ! / Brilliant performance to capture the championship title!"
+            "മികച്ച പോരാട്ടവീര്യത്തോടെയും അത്യുഗ്രൻ സ്മാഷുകളോടെയും എതിരാളികളെ നിലംപരിശാക്കി വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിലെ അജയ്യരായ ചാമ്പ്യന്മാരായി മാറിയിരിക്കുകയാണ് ഇവർ!",
+            "അവിശ്വസനീയമായ പ്രകടനം! കോർട്ടിൽ എതിരാളികൾക്ക് യാതൊരു അവസരവും നൽകാതെ കിരീടം ചൂടിയ തികച്ചും അർഹിച്ച വിജയം!",
+            "തന്ത്രപരമായ കളിമികവും അതിവേഗ റാലികളും കൊണ്ട് ടൂർണമെന്റിലുടനീളം ആധിപത്യം പുലർത്തിയ ചാമ്പ്യന്മാർക്ക് ബിഗ് സല്യൂട്ട്!",
+            "ഇതാണ് യഥാർത്ഥ ബാഡ്മിന്റൺ മാജിക്! കോർട്ടിനെ ആവേശത്തിലാഴ്ത്തി അതിഗംഭീരമായി വിജയം സ്വന്തമാക്കിയ ചാമ്പ്യന്മാർക്ക് അഭിനന്ദനങ്ങൾ!"
         ];
 
         const loserCriticizeCommentaries = [
-            "എതിരാളികളുടെ സ്മാഷുകൾക്ക് മുന്നിൽ തടഞ്ഞുനിൽക്കാൻ കഴിയാതെ ദാരുണമായ തോൽവി ഏറ്റുവാങ്ങേണ്ടി വന്ന ടീം! ഇനിയെങ്കിലും കളി കൂടുതൽ ഗൗരവത്തോടെ പഠിക്കേണ്ടിയിരിക്കുന്നു! / Poor display and heavy defeat, needs massive improvement!",
-            "നിരാശാജനകമായ പ്രകടനം! കോർട്ടിൽ പൊരുതിനിൽക്കാൻ പോലും സാധിക്കാതെ വലിയ പരാജയം ഏറ്റുവാങ്ങിയ ഇവർ അടുത്ത തവണയെങ്കിലും കൂടുതൽ പരിശീലനം നടത്തി ഇറങ്ങുക! / Very disappointing execution on court, must practice much harder!",
-            "ശരിയായ തന്ത്രങ്ങളോ കൂട്ടായ്മയോ ഇല്ലാതെ കളം വിടേണ്ടി വന്ന ടീം! പരാജയത്തിൽ നിന്ന് പാഠങ്ങൾ ഉൾക്കൊണ്ട് കളി മെച്ചപ്പെടുത്തുമെന്ന് കരുതാം! / Total failure in teamwork and strategy, very poor overall play!",
-            "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം! മികച്ച പ്രകടനം പുറത്തെടുക്കാൻ തീർത്തും പരാജയപ്പെട്ടു! / Completely outplayed by opponents with an underwhelming performance!"
+            "എതിരാളികളുടെ സ്മാഷുകൾക്ക് മുന്നിൽ തടഞ്ഞുനിൽക്കാൻ കഴിയാതെ ദാരുണമായ തോൽവി ഏറ്റുവാങ്ങേണ്ടി വന്ന ടീം!",
+            "നിരാശാജനകമായ പ്രകടനം! കോർട്ടിൽ പൊരുതിനിൽക്കാൻ പോലും സാധിക്കാതെ വലിയ പരാജയം ഏറ്റുവാങ്ങിയ ഇവർ!",
+            "ശരിയായ തന്ത്രങ്ങളോ കൂട്ടായ്മയോ ഇല്ലാതെ കളം വിടേണ്ടി വന്ന ടീം!",
+            "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം!"
         ];
 
         function formatHoursAndMins(totalMins) {
@@ -861,7 +879,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v130');
+                const localData = localStorage.getItem('wesma_local_backup_v131');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -871,6 +889,10 @@
                         tournamentHistory = parsed.tournamentHistory || [];
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
+
+                        // 1 മണിക്കൂറിന് താഴെയുള്ള ഹിസ്റ്ററി മാത്രം നിലനിർത്തുക
+                        const oneHourAgo = Date.now() - (60 * 60 * 1000);
+                        tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
 
                         if (tournamentStartTimestamp && !isMatchEnded) {
                             const gate = document.getElementById("startup-gate");
@@ -894,7 +916,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v130');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v131');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -943,25 +965,6 @@
             render();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
-        }
-
-        function resetTournamentStateForNewSession() {
-            teams.forEach(t => { 
-                t.wins = 0; t.losses = 0; t.played = 0; 
-                t.lastMatchTime = 0; t.lastClickTime = 0; 
-                t.clickOrder = 0; t.matchInterval = 0; 
-                t.totalTimeSpentMinutes = 0; t.defeatedDetails = []; t.matchHistoryLog = [];
-            });
-            tournamentStartTimestamp = Date.now();
-            lastActionTimestamp = Date.now();
-            globalClickSequence = 0;
-            isMatchEnded = false;
-            
-            closeFinishMatchModal();
-            saveData();
-            updateMatchStatusBadge();
-            updateMainTopLastDefeatedBar();
-            showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! / Tournament Reset!");
         }
 
         function playBestSound() {
@@ -1060,6 +1063,10 @@
                         tournamentHistory = data.tournamentHistory || [];
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
+
+                        // 1 മണിക്കൂറിനുള്ളിലെ ഹിസ്റ്ററി മാത്രം ഫിൽട്ടർ ചെയ്യുക
+                        const oneHourAgo = Date.now() - (60 * 60 * 1000);
+                        tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
                         
                         saveLocalBackup();
                     }
@@ -1228,8 +1235,12 @@
 
         function saveLocalBackup() {
             try {
+                // 1 മണിക്കൂറിനുള്ളിലെ ഹിസ്റ്ററി മാത്രം സേവ് ചെയ്യുക
+                const oneHourAgo = Date.now() - (60 * 60 * 1000);
+                tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v130', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v131', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -1262,6 +1273,10 @@
                 totalPlays: totalPlays,
                 durationMinutes: sessionDurationMins
             };
+
+            // 1 മണിക്കൂറിനുള്ളിൽ സേവ് ചെയ്തവ മാത്രം നിലനിർത്തുക
+            const oneHourAgo = Date.now() - (60 * 60 * 1000);
+            tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
 
             tournamentHistory.unshift(record);
             saveData();
@@ -1486,8 +1501,13 @@
             const modal = document.getElementById("history-modal");
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
+
+            // 1 മണിക്കൂറിനുള്ളിലെ ഹിസ്റ്ററി മാത്രം ഫിൽട്ടർ ചെയ്യുക
+            const oneHourAgo = Date.now() - (60 * 60 * 1000);
+            tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+
             if (!tournamentHistory || tournamentHistory.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">സേവ് ചെയ്ത സെഷൻ ഡാറ്റ ലഭ്യമല്ല. / No saved sessions found.</div>`;
+                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">കഴിഞ്ഞ 1 മണിക്കൂറിനുള്ളിൽ സേവ് ചെയ്ത സെഷനുകൾ ഒന്നുമില്ല. / No sessions in last 1 hour.</div>`;
             } else {
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
@@ -1779,9 +1799,10 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
+            // വിൻ അടിസ്ഥാനത്തിലും ഏറ്റവും കൂടുതൽ തോൽവിയുടെ അടിസ്ഥാനത്തിലും സോർട്ട് ചെയ്യുന്നു
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
+                return (b.losses || 0) - (a.losses || 0);
             });
 
             let topScorerName = sorted.length > 0 ? sorted[0].name : "ആരുമില്ല / None";
@@ -1807,6 +1828,15 @@
                 lossPairs.sort((a, b) => b.count - a.count);
                 let topPair = lossPairs[0];
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
+            }
+
+            // ഏറ്റവും കൂടുതൽ തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു (Most losses)
+            let mostDefeatedTeam = "ആരുമില്ല / None";
+            if (teams.length > 0) {
+                let teamsByLosses = [...teams].sort((a, b) => (b.losses || 0) - (a.losses || 0));
+                if (teamsByLosses[0].losses > 0) {
+                    mostDefeatedTeam = `${teamsByLosses[0].name} (${teamsByLosses[0].losses} Losses)`;
+                }
             }
 
             let defeatedTeamsHtml = "";
@@ -1855,7 +1885,11 @@
                                 <i class="fa-solid fa-bolt text-amber-400 text-sm"></i> മത്സര വിശേഷങ്ങൾ / Highlights
                             </div>
                             <div class="text-[11px] text-slate-200 font-medium leading-relaxed space-y-2">
-                                <div>• ആകെ മത്സരങ്ങൾ / Total Matches: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
+                                <div>• Total Match: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
+                                <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2 mt-1">
+                                    <div class="text-[9px] text-rose-400 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
+                                    <div class="text-xs font-black text-white uppercase mt-0.5">${escapeHtml(mostDefeatedTeam)}</div>
+                                </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-amber-200 font-semibold">${h2hText}</span></div>
                             </div>
 
@@ -1884,7 +1918,31 @@
             if (dropdown) dropdown.classList.toggle("hidden");
         }
 
+        // പാസ്‌വേർഡ് ചോദിച്ചതിന് ശേഷം മാത്രം എൻഡ് മാച്ച് തുറക്കൽ
         function manualFinishMatch() {
+            triggerHapticFeedback([40]);
+            const modal = document.getElementById("end-match-password-modal");
+            const pinInput = document.getElementById("end-match-admin-pin");
+            if(pinInput) pinInput.value = "";
+            if(modal) modal.classList.remove("hidden");
+        }
+
+        function closeEndMatchPasswordModal() {
+            const modal = document.getElementById("end-match-password-modal");
+            if(modal) modal.classList.add("hidden");
+        }
+
+        function verifyEndMatchPassword() {
+            const pinInput = document.getElementById("end-match-admin-pin").value;
+            if (pinInput !== ADMIN_PIN) {
+                alert("തെറ്റായ Admin PIN! / Incorrect PIN!");
+                return;
+            }
+            closeEndMatchPasswordModal();
+            proceedFinishMatch();
+        }
+
+        function proceedFinishMatch() {
             triggerHapticFeedback([100, 50, 100]);
             
             if (calculateTotalPlays() === 0) {
@@ -1906,7 +1964,11 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
+            // വിൻ അടിസ്ഥാനത്തിലും ഏറ്റവും കൂടുതൽ തോൽവിയുടെ അടിസ്ഥാനത്തിലും കൃത്യമായി സോർട്ട് ചെയ്യപ്പെടുന്നു
+            let sortedTeams = [...teams].sort((a, b) => {
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                return (b.losses || 0) - (a.losses || 0);
+            });
             
             let rankedListWithPositions = [];
             let currentRank = 1;
@@ -1929,9 +1991,9 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            let minWins = sortedTeams[sortedTeams.length - 1].wins;
-            let loserTeams = sortedTeams.filter(t => t.wins === minWins && minWins < firstPlaceTeams[0].wins);
-            let loserNames = loserTeams.length > 0 ? loserTeams.map(l => escapeHtml(l.name)).join(" • ") : "None";
+            // ഏറ്റവും കൂടുതൽ തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു (Most losses)
+            let loserTeams = [...rankedListWithPositions].sort((a, b) => (b.losses || 0) - (a.losses || 0));
+            let loserNames = loserTeams.length > 0 ? escapeHtml(loserTeams[0].name) : "None";
             let loserLossCount = loserTeams.length > 0 ? (loserTeams[0].losses || 0) : 0;
 
             let teamsTableHtml = "";
@@ -1960,24 +2022,24 @@
                     <div class="mens-player-right"><span class="text-xs">🤸‍♂️</span></div>
                 </div>
 
-                <!-- Prominent Champions Box -->
-                <div class="bg-gradient-to-r from-amber-600/30 via-amber-500/20 to-amber-600/30 border-2 border-amber-400 rounded-2xl p-2.5 shadow-[0_0_20px_rgba(245,158,11,0.5)] text-center space-y-1 relative">
-                    <div class="text-[9px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-crown text-amber-400 text-xs"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-400 text-xs"></i>
+                <!-- Prominent Champions Box (വലിപ്പം കൂട്ടിയിരിക്കുന്നു) -->
+                <div class="bg-gradient-to-r from-amber-600/30 via-amber-500/20 to-amber-600/30 border-2 border-amber-400 rounded-2xl p-3 shadow-[0_0_20px_rgba(245,158,11,0.5)] text-center space-y-1.5 relative">
+                    <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-crown text-amber-400 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-400 text-sm"></i>
                     </div>
-                    <div class="text-xs sm:text-sm font-black text-amber-200 uppercase tracking-wide leading-tight break-words px-1">
+                    <div class="text-base sm:text-lg font-black text-amber-200 uppercase tracking-wide leading-snug break-words px-1">
                         ✨ ${championNamesDisplay} ✨
                     </div>
-                    <div class="text-[9px] text-emerald-300 font-bold bg-slate-950/80 px-2 py-0.5 rounded-full inline-block border border-emerald-500/40">
+                    <div class="text-[10px] text-emerald-300 font-bold bg-slate-950/80 px-2.5 py-0.5 rounded-full inline-block border border-emerald-500/40">
                         🏆 Wins: ${firstWins}
                     </div>
                 </div>
 
-                <!-- 2nd, 3rd and Losers Highlight Grid -->
+                <!-- 2nd, 3rd Highlight Grid -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
                     <div class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-center shadow space-y-0.5">
                         <div class="font-bold text-slate-300 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-medal text-slate-400"></i> 2nd Place
+                            <i class="fa-solid fa-medal text-slate-400"></i> 2nd Place / രണ്ടാം സ്ഥാനം
                         </div>
                         <div class="text-white font-bold uppercase text-[10px] break-words">${secondNamesDisplay}</div>
                         <div class="text-[8px] text-amber-300 font-bold">Wins: ${secondWins}</div>
@@ -1985,17 +2047,17 @@
 
                     <div class="bg-slate-900 border border-amber-700/50 rounded-xl p-2 text-center shadow space-y-0.5">
                         <div class="font-bold text-amber-600 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-award text-amber-500"></i> 3rd Place
+                            <i class="fa-solid fa-award text-amber-500"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
                         <div class="text-white font-bold uppercase text-[10px] break-words">${thirdNamesDisplay}</div>
                         <div class="text-[8px] text-amber-300 font-bold">Wins: ${thirdWins}</div>
                     </div>
                 </div>
 
-                <!-- Defeated / Loser Info Box -->
+                <!-- Defeated / Loser Info Box (ആദ്യം മലയാളം പിന്നെ ഇംഗ്ലീഷ്) -->
                 <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow space-y-0.5">
                     <div class="font-bold text-rose-400 uppercase text-[8px] flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-shield-halved text-rose-500"></i> Defeated Team (Most Losses)
+                        <i class="fa-solid fa-shield-halved text-rose-500"></i> ഏറ്റവും കൂടുതൽ തോറ്റ ടീം (Defeated Team)
                     </div>
                     <div class="text-white font-bold uppercase text-[9px] break-words">${loserNames}</div>
                     <div class="text-[8px] text-rose-300">Losses: ${loserLossCount}</div>
@@ -2061,7 +2123,12 @@
             if(!container) return;
             container.innerHTML = "";
             
-            let sortedTeams = [...teams].sort((a, b) => b.wins - a.wins);
+            // വിൻ അടിസ്ഥാനത്തിലും ഏറ്റവും കൂടുതൽ തോൽവിയുടെ അടിസ്ഥാനത്തിലും സോർട്ട് ചെയ്യപ്പെടുന്നു
+            let sortedTeams = [...teams].sort((a, b) => {
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                return (b.losses || 0) - (a.losses || 0);
+            });
+
             const maxWins = sortedTeams[0].wins;
             const minWins = sortedTeams[sortedTeams.length - 1].wins;
             
@@ -2074,7 +2141,17 @@
 
             let rankedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.lastMatchTime || 999) - (b.lastMatchTime || 999);
+                return (b.losses || 0) - (a.losses || 0);
+            });
+
+            // റാങ്ക് പൊസിഷനുകൾ കൃത്യമായി നൽകുന്നു
+            let currentPos = 1;
+            let teamRanksMap = {};
+            rankedTeams.forEach((t, i) => {
+                if (i > 0 && t.wins < rankedTeams[i - 1].wins) {
+                    currentPos = i + 1;
+                }
+                teamRanksMap[t.id] = currentPos;
             });
 
             const now = Date.now();
@@ -2082,11 +2159,12 @@
                 const diff = now - (team.lastClickTime || 0);
                 const inCooldown = diff < 60000;
                 
-                const isWinner = (team.wins === maxWins && maxWins > 0 && team.wins === rankedTeams[0]?.wins);
-                const isSecond = (team.wins === rankedTeams[1]?.wins && rankedTeams[1]?.wins > 0);
-                const isThird = (team.wins === rankedTeams[2]?.wins && rankedTeams[2]?.wins > 0);
+                const rankPos = teamRanksMap[team.id] || 1;
+                const isWinner = (rankPos === 1 && team.wins > 0);
+                const isSecond = (rankPos === 2);
+                const isThird = (rankPos === 3);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
-                const isLoser = (team.wins === minWins && minWins < maxWins && !isWinner);
+                const isLoser = (rankPos >= 4 || (team.wins === minWins && minWins < maxWins && !isWinner));
                 
                 const playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
                 const lossesCount = team.losses || 0;
@@ -2094,21 +2172,22 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
+                // ആവശ്യപ്രകാരം റാങ്ക് ബാഡ്ജുകൾ ചെറുതാക്കി ഫസ്റ്റ്, സെക്കൻഡ്, തേർഡ്, ലാസ്റ്റ് രീതിയിലാക്കിയിരിക്കുന്നു
                 if (isWinner) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-amber-400 text-slate-950 shadow-sm"><i class="fa-solid fa-crown text-[6px] mr-0.5"></i>Rank 1</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-amber-400 text-slate-950 shadow-sm"><i class="fa-solid fa-crown text-[5px] mr-0.5"></i>1st</span>`;
                 } else if (isSecond) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-slate-200 text-slate-950 shadow-sm"><i class="fa-solid fa-medal text-[6px] mr-0.5"></i>Rank 2</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-slate-200 text-slate-950 shadow-sm"><i class="fa-solid fa-medal text-[5px] mr-0.5"></i>2nd</span>`;
                 } else if (isThird) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-amber-700 text-amber-100 shadow-sm"><i class="fa-solid fa-award text-[6px] mr-0.5"></i>Rank 3</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-amber-700 text-amber-100 shadow-sm"><i class="fa-solid fa-award text-[5px] mr-0.5"></i>3rd</span>`;
                 } else if (isFastest) {
                     extraCardClass = "fastest-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-cyan-500 text-slate-950 shadow-sm"><i class="fa-solid fa-bolt text-[6px] mr-0.5"></i>Fast</span>`;
-                } else if (isLoser) {
+                    specialBadgeHtml = `<span class="rank-badge bg-cyan-500 text-slate-950 shadow-sm"><i class="fa-solid fa-bolt text-[5px] mr-0.5"></i>Fast</span>`;
+                } else {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-rose-900 text-rose-200 shadow-sm"><i class="fa-solid fa-shield text-[6px] mr-0.5"></i>Low</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-rose-900 text-rose-200 shadow-sm"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>Last</span>`;
                 }
 
                 const card = document.createElement("div");
@@ -2279,11 +2358,9 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        // Direct 3-second Auto execution without extra confirmation modal
         function selectDefeatedTeamAuto(winningTeamId, defeatedTeamId, btnElement) {
             if (autoWinTimeout) clearTimeout(autoWinTimeout);
 
-            // 1. Haptic feedback & Red selection highlight immediately
             triggerHapticFeedback([80, 50, 80]);
             
             document.querySelectorAll('.defeated-option-btn').forEach(b => {
@@ -2291,7 +2368,6 @@
             });
             btnElement.classList.add('defeated-option-selected');
 
-            // 2. Wait exactly 3 seconds, then record win & trigger sound/voice
             autoWinTimeout = setTimeout(() => {
                 closeDefeatedTeamModal();
                 confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId);
