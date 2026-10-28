@@ -890,7 +890,6 @@
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
 
-                        // 1 മണിക്കൂറിന് താഴെയുള്ള ഹിസ്റ്ററി മാത്രം നിലനിർത്തുക
                         const oneHourAgo = Date.now() - (60 * 60 * 1000);
                         tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
 
@@ -1064,7 +1063,6 @@
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
 
-                        // 1 മണിക്കൂറിനുള്ളിലെ ഹിസ്റ്ററി മാത്രം ഫിൽട്ടർ ചെയ്യുക
                         const oneHourAgo = Date.now() - (60 * 60 * 1000);
                         tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
                         
@@ -1235,7 +1233,6 @@
 
         function saveLocalBackup() {
             try {
-                // 1 മണിക്കൂറിനുള്ളിലെ ഹിസ്റ്ററി മാത്രം സേവ് ചെയ്യുക
                 const oneHourAgo = Date.now() - (60 * 60 * 1000);
                 tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
 
@@ -1274,7 +1271,6 @@
                 durationMinutes: sessionDurationMins
             };
 
-            // 1 മണിക്കൂറിനുള്ളിൽ സേവ് ചെയ്തവ മാത്രം നിലനിർത്തുക
             const oneHourAgo = Date.now() - (60 * 60 * 1000);
             tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
 
@@ -1502,7 +1498,6 @@
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
 
-            // 1 മണിക്കൂറിനുള്ളിലെ ഹിസ്റ്ററി മാത്രം ഫിൽട്ടർ ചെയ്യുക
             const oneHourAgo = Date.now() - (60 * 60 * 1000);
             tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
 
@@ -1799,7 +1794,6 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            // വിൻ അടിസ്ഥാനത്തിലും ഏറ്റവും കൂടുതൽ തോൽവിയുടെ അടിസ്ഥാനത്തിലും സോർട്ട് ചെയ്യുന്നു
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -1830,7 +1824,6 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            // ഏറ്റവും കൂടുതൽ തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു (Most losses)
             let mostDefeatedTeam = "ആരുമില്ല / None";
             if (teams.length > 0) {
                 let teamsByLosses = [...teams].sort((a, b) => (b.losses || 0) - (a.losses || 0));
@@ -1918,7 +1911,6 @@
             if (dropdown) dropdown.classList.toggle("hidden");
         }
 
-        // പാസ്‌വേർഡ് ചോദിച്ചതിന് ശേഷം മാത്രം എൻഡ് മാച്ച് തുറക്കൽ
         function manualFinishMatch() {
             triggerHapticFeedback([40]);
             const modal = document.getElementById("end-match-password-modal");
@@ -1964,7 +1956,6 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            // വിൻ അടിസ്ഥാനത്തിലും ഏറ്റവും കൂടുതൽ തോൽവിയുടെ അടിസ്ഥാനത്തിലും കൃത്യമായി സോർട്ട് ചെയ്യപ്പെടുന്നു
             let sortedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -1991,7 +1982,6 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // ഏറ്റവും കൂടുതൽ തോറ്റ ടീമിനെ കണ്ടെത്തുന്നു (Most losses)
             let loserTeams = [...rankedListWithPositions].sort((a, b) => (b.losses || 0) - (a.losses || 0));
             let loserNames = loserTeams.length > 0 ? escapeHtml(loserTeams[0].name) : "None";
             let loserLossCount = loserTeams.length > 0 ? (loserTeams[0].losses || 0) : 0;
@@ -2022,7 +2012,7 @@
                     <div class="mens-player-right"><span class="text-xs">🤸‍♂️</span></div>
                 </div>
 
-                <!-- Prominent Champions Box (വലിപ്പം കൂട്ടിയിരിക്കുന്നു) -->
+                <!-- Prominent Champions Box -->
                 <div class="bg-gradient-to-r from-amber-600/30 via-amber-500/20 to-amber-600/30 border-2 border-amber-400 rounded-2xl p-3 shadow-[0_0_20px_rgba(245,158,11,0.5)] text-center space-y-1.5 relative">
                     <div class="text-[10px] text-amber-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-crown text-amber-400 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-400 text-sm"></i>
@@ -2054,7 +2044,7 @@
                     </div>
                 </div>
 
-                <!-- Defeated / Loser Info Box (ആദ്യം മലയാളം പിന്നെ ഇംഗ്ലീഷ്) -->
+                <!-- Defeated / Loser Info Box -->
                 <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow space-y-0.5">
                     <div class="font-bold text-rose-400 uppercase text-[8px] flex items-center justify-center gap-1">
                         <i class="fa-solid fa-shield-halved text-rose-500"></i> ഏറ്റവും കൂടുതൽ തോറ്റ ടീം (Defeated Team)
@@ -2123,7 +2113,6 @@
             if(!container) return;
             container.innerHTML = "";
             
-            // വിൻ അടിസ്ഥാനത്തിലും ഏറ്റവും കൂടുതൽ തോൽവിയുടെ അടിസ്ഥാനത്തിലും സോർട്ട് ചെയ്യപ്പെടുന്നു
             let sortedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -2144,7 +2133,6 @@
                 return (b.losses || 0) - (a.losses || 0);
             });
 
-            // റാങ്ക് പൊസിഷനുകൾ കൃത്യമായി നൽകുന്നു
             let currentPos = 1;
             let teamRanksMap = {};
             rankedTeams.forEach((t, i) => {
@@ -2172,7 +2160,6 @@
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
                 
-                // ആവശ്യപ്രകാരം റാങ്ക് ബാഡ്ജുകൾ ചെറുതാക്കി ഫസ്റ്റ്, സെക്കൻഡ്, തേർഡ്, ലാസ്റ്റ് രീതിയിലാക്കിയിരിക്കുന്നു
                 if (isWinner) {
                     extraCardClass = "winner-card";
                     specialBadgeHtml = `<span class="rank-badge bg-amber-400 text-slate-950 shadow-sm"><i class="fa-solid fa-crown text-[5px] mr-0.5"></i>1st</span>`;
@@ -2710,6 +2697,21 @@
 
             let url = type === 'business' ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
             window.open(url, '_blank');
+        }
+
+        // ടോട്ടൽ ഇന്റർഫേസ് റീസെറ്റ് ആവുന്ന ഫങ്ഷൻ (ഹിസ്റ്ററി ഒഴികെ)
+        function resetTournamentStateForNewSession() {
+            teams = JSON.parse(JSON.stringify(defaultTeams));
+            tournamentStartTimestamp = Date.now();
+            lastActionTimestamp = Date.now();
+            globalClickSequence = 0;
+            isMatchEnded = false;
+            
+            saveData();
+            updateMatchStatusBadge();
+            updateMainTopLastDefeatedBar();
+            render();
+            showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! / Tournament Reset!");
         }
 
         function resetScores() {
