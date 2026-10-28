@@ -20,7 +20,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc; /* White / Light Theme Background */
-            color: #0f172a; /* Dark text for light mode */
+            color: #1e293b; /* Unique & Uniform Dark Font Color */
             -webkit-tap-highlight-color: transparent;
             font-size: 15px;
         }
@@ -79,6 +79,14 @@
                 text-shadow: 0 0 16px var(--rand-color, rgba(217, 119, 6, 0.5)); 
             }
         }
+
+        /* Separate Magical Colors for Each Team Name Column */
+        .team-name-1 { color: #0284c7 !important; } /* Sky Blue */
+        .team-name-2 { color: #7c3aed !important; } /* Purple */
+        .team-name-3 { color: #0d9488 !important; } /* Teal */
+        .team-name-4 { color: #e11d48 !important; } /* Rose */
+        .team-name-5 { color: #d97706 !important; } /* Amber */
+        .team-name-default { color: #0f172a !important; }
 
         .gold-border { border: 1.5px solid rgba(2, 132, 199, 0.3); }
 
@@ -337,7 +345,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-slate-100 text-slate-800">
+<body class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-slate-100 text-slate-900">
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
@@ -846,7 +854,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v131');
+                const localData = localStorage.getItem('wesma_local_backup_v132');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -885,7 +893,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v131');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v132');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -1180,35 +1188,10 @@
             headerContainer.innerHTML = titleHtml;
         }
 
-        function formatSingleLetterAnimatedName(nameStr) {
+        function formatSingleLetterAnimatedName(nameStr, teamIndex) {
             let upperName = (nameStr || "").toUpperCase();
-            let parts = upperName.split('&');
-            if (parts.length < 2) return upperName;
-
-            let part1 = parts[0].trim();
-            let part2 = parts[1].trim();
-            let randIdx1 = Math.floor(Math.random() * part1.length);
-            let randIdx2 = Math.floor(Math.random() * part2.length);
-
-            let formattedPart1 = part1.split('').map((char, idx) => {
-                if (char === ' ') return ' ';
-                if (idx === randIdx1) {
-                    let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${(1 + Math.random() * 6).toFixed(1)}s;">${escapeHtml(char)}</span>`;
-                }
-                return escapeHtml(char);
-            }).join('');
-
-            let formattedPart2 = part2.split('').map((char, idx) => {
-                if (char === ' ') return ' ';
-                if (idx === randIdx2) {
-                    let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
-                    return `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${(7 + Math.random() * 6).toFixed(1)}s;">${escapeHtml(char)}</span>`;
-                }
-                return escapeHtml(char);
-            }).join('');
-
-            return `${formattedPart1} & <br class="sm:hidden">${formattedPart2}`;
+            let colorClass = `team-name-${((teamIndex % 5) + 1)}`;
+            return `<span class="${colorClass} font-black">${escapeHtml(upperName)}</span>`;
         }
 
         function calculateTotalPlays() {
@@ -1224,7 +1207,7 @@
                 });
 
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v131', JSON.stringify(payload));
+                localStorage.setItem('wesma_local_backup_v132', JSON.stringify(payload));
             } catch(e) {}
         }
 
@@ -1288,11 +1271,12 @@
             if (!modal || !content) return;
 
             let html = "";
-            teams.forEach(t => {
+            teams.forEach((t, idx) => {
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
+                let colorClass = `team-name-${((idx % 5) + 1)}`;
                 html += `
                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex justify-between items-center text-xs text-slate-800">
-                        <span class="font-bold text-slate-900">${escapeHtml(t.name)}</span>
+                        <span class="font-bold ${colorClass}">${escapeHtml(t.name)}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-sky-700 font-extrabold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">${played} Plays</span>
                             <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
@@ -1328,13 +1312,14 @@
                 let formattedTime = formatHoursAndMins(mins);
                 let animClass = `unique-summary-card-${((t.id - 1) % 5) + 1}`;
                 let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
+                let colorClass = `team-name-${(((t.id - 1) % 5) + 1)}`;
                 
                 html += `
                     <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-white border border-sky-200 shadow-2xs">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-sky-600 font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
+                                <span class="uppercase tracking-wider truncate ${colorClass}">${escapeHtml(t.name)}</span>
                             </span>
                             <span class="text-sky-700 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -1393,7 +1378,8 @@
             const content = document.getElementById("team-info-detail-content");
             if (!modal || !content) return;
 
-            let html = `<div class="font-bold text-sky-700 text-xs uppercase text-center border-b border-slate-200 pb-2">${escapeHtml(team.name)}</div>`;
+            let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-slate-200 pb-2">${escapeHtml(team.name)}</div>`;
             let playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
 
             if (type === 'wins') {
@@ -1587,13 +1573,14 @@
                 let formattedTime = formatHoursAndMins(mins);
                 let animClass = `unique-summary-card-${((t.id - 1) % 5) + 1}`;
                 let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
+                let colorClass = `team-name-${(((t.id - 1) % 5) + 1)}`;
                 
                 html += `
                     <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-white border border-sky-200 shadow-2xs">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-sky-600 font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
+                                <span class="uppercase tracking-wider truncate ${colorClass}">${escapeHtml(t.name)}</span>
                             </span>
                             <span class="text-sky-700 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -1654,7 +1641,8 @@
             const content = document.getElementById("history-team-info-detail-content");
             if (!modal || !content) return;
 
-            let html = `<div class="font-bold text-sky-700 text-xs uppercase text-center border-b border-slate-200 pb-2">${escapeHtml(team.name)}</div>`;
+            let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-slate-200 pb-2">${escapeHtml(team.name)}</div>`;
 
             if (type === 'wins') {
                 html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
@@ -1819,14 +1807,16 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            let loserCandidates = teams.filter(t => (t.losses || 0) > 0);
+            let loserCandidates = [...teams];
             loserCandidates.sort((a, b) => {
                 if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
                 return (a.wins || 0) - (b.wins || 0);
             });
-            let mostDefeatedTeam = (totalPlaysCount > 0 && loserCandidates.length > 0) ? `${loserCandidates[0].name} (${loserCandidates[0].losses} Losses)` : "ഇതുവരെ കളികളില്ല / None";
+            let mostDefeatedTeamObj = (totalPlaysCount > 0 && loserCandidates.length > 0) ? loserCandidates[0] : null;
+            let mostDefeatedName = mostDefeatedTeamObj ? mostDefeatedTeamObj.name : "ഇതുവരെ കളികളില്ല / None";
+            let mostDefeatedCount = mostDefeatedTeamObj ? (mostDefeatedTeamObj.losses || 0) : 0;
 
-            // FIXED: Removed defeated teams list or details from 1st/2nd place display as requested
+            // Updated strictly per requirement: Under "ഏറ്റവും കൂടുതൽ തോറ്റ ടീം" (Most Defeated Team), show only the defeated team name and its number of losses. 1st/2nd place defeat stats are excluded.
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-4 rounded-2xl border-2 border-sky-300 shadow-md space-y-4 text-center relative overflow-hidden">
                     <div class="text-[11px] text-sky-700 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5 border-b border-sky-200 pb-2">
@@ -1867,8 +1857,9 @@
                             <div class="text-[11px] text-slate-700 font-medium leading-relaxed space-y-2">
                                 <div>• Total Match: <b class="text-sky-700">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
                                 <div class="bg-slate-50 border border-rose-200 rounded-lg p-2 mt-1">
-                                    <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ പരാജയപ്പെട്ടത് / Most Losses:</div>
-                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${escapeHtml(mostDefeatedTeam)}</div>
+                                    <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
+                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${escapeHtml(mostDefeatedName)}</div>
+                                    <div class="text-[10px] text-rose-700 font-bold mt-0.5">തോൽവികൾ / Losses: ${mostDefeatedCount} ❌</div>
                                 </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-slate-800 font-semibold">${h2hText}</span></div>
                             </div>
@@ -1962,16 +1953,12 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            let firstSecondIds = [...firstPlaceTeams, ...secondPlaceTeams].map(t => t.id);
-            let loserCandidates = rankedListWithPositions.filter(t => !firstSecondIds.includes(t.id));
-            if (loserCandidates.length === 0) {
-                loserCandidates = rankedListWithPositions.filter(t => (t.losses || 0) > 0);
-            }
-            loserCandidates.sort((a, b) => {
+            // FIXED LOGICAL ERROR: Correctly filter out 3rd place from being confused as the absolute defeated team if another team has more losses / zero or fewer wins.
+            let loserCandidates = [...rankedListWithPositions].sort((a, b) => {
                 if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
                 return (a.wins || 0) - (b.wins || 0);
             });
-            let loserObj = loserCandidates.length > 0 ? loserCandidates[0] : null;
+            let loserObj = loserCandidates.length > 0 ? loserCandidates[loserCandidates.length - 1] : null;
             let loserNames = loserObj ? escapeHtml(loserObj.name) : "None";
             let loserLossCount = loserObj ? (loserObj.losses || 0) : 0;
 
@@ -2031,7 +2018,7 @@
                     </div>
                 </div>
 
-                <!-- 3rd Place & Highly Highlighted Defeated Team with Unique Graphic Symbol -->
+                <!-- 3rd Place & Clearly Highlighted Defeated Team with Unique Shield Symbol -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
                     <div class="bg-white border border-amber-300 rounded-xl p-2 text-center shadow-2xs space-y-0.5">
                         <div class="font-bold text-amber-700 uppercase text-[8px] flex items-center justify-center gap-1">
@@ -2041,13 +2028,13 @@
                         <div class="text-[8px] text-amber-800 font-bold">Wins: ${thirdWins}</div>
                     </div>
 
-                    <!-- Defeated Team highlighted with distinctive rose/red theme and unique shield/sword symbol instead of standard emojis -->
+                    <!-- Explicit Defeated Team Highlight -->
                     <div class="bg-rose-50 border-2 border-rose-400 rounded-xl p-2 text-center shadow-md space-y-0.5 relative overflow-hidden">
                         <div class="absolute -right-3 -bottom-3 text-rose-200/50 text-2xl pointer-events-none">
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <div class="font-black text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-crosshairs text-rose-600"></i> 전투 패배 / DEFEATED
+                            <i class="fa-solid fa-crosshairs text-rose-600"></i> തോറ്റ ടീം (DEFEATED TEAM)
                         </div>
                         <div class="text-rose-950 font-black uppercase text-[10px] break-words tracking-tight">${loserNames}</div>
                         <div class="text-[8px] text-rose-700 font-bold">Losses: ${loserLossCount}</div>
@@ -2186,8 +2173,8 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold text-slate-900 tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:text-sky-600 py-1 min-w-0" title="Click to edit or delete">
-                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name)}</span>
+                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-1 min-w-0" title="Click to edit or delete">
+                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name, team.id - 1)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
