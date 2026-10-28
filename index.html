@@ -106,6 +106,11 @@
             border: 1.5px solid #d4af37 !important;
             box-shadow: 0 0 12px rgba(212, 175, 55, 0.25) !important;
         }
+        .second-place-card {
+            background: #090d16 !important;
+            border: 1.5px solid rgba(56, 189, 248, 0.7) !important;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
+        }
         .fastest-card {
             background: #090d16 !important;
             border: 1.5px solid rgba(6, 182, 212, 0.6) !important;
@@ -374,26 +379,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
 
-    <!-- Startup Gate Modal -->
-    <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
-            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
-                <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="96" fill="#D4AF37" />
-                    <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#D4AF37" stroke-width="1.5" />
-                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div>
-                <h2 class="text-sm font-semibold text-amber-300 tracking-wider">WESMA BADMINTON</h2>
-                <p class="text-xs text-slate-400 font-light mt-1 tracking-widest text-amber-200 uppercase">WELCOME TO TOURNAMENT</p>
-            </div>
-            <button type="button" onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-semibold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                <i class="fa-solid fa-play"></i> START TOURNAMENT
-            </button>
-        </div>
-    </div>
-    
     <!-- Printable Share Area Container -->
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-950 p-2.5 rounded-2xl">
         
@@ -605,8 +590,10 @@
     <div id="defeated-team-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border-2 gold-border w-full max-w-lg rounded-3xl shadow-2xl p-6 text-center space-y-4 max-h-[90vh] flex flex-col">
             <div>
-                <div id="winning-team-indicator" class="mb-3 p-3 bg-amber-500/20 border border-amber-500/40 rounded-2xl text-amber-300 font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow">
-                    <i class="fa-solid fa-crown text-amber-400 text-base"></i> <span id="winning-team-name-span">WINNER TEAM</span>
+                <!-- വിജയിച്ച ടീമും അതിന്റെ താഴെ അവസാനമായി തോൽപ്പിച്ച ടീമും -->
+                <div id="winning-team-indicator" class="mb-3 p-3 bg-amber-500/20 border border-amber-500/40 rounded-2xl text-amber-300 font-bold text-xs uppercase tracking-wide flex flex-col items-center justify-center gap-1 shadow">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-crown text-amber-400 text-sm"></i> <span id="winning-team-name-span">WINNER TEAM</span></div>
+                    <div id="winner-last-defeated-info" class="text-[10px] text-slate-300 font-light lowercase"></div>
                 </div>
                 <h3 class="text-sm sm:text-base font-extrabold text-amber-300 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക / Select Defeated Team</h3>
             </div>
@@ -888,17 +875,11 @@
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
 
-                        // ഹിസ്റ്ററി ഫിൽട്ടറിംഗ്: കൃത്യം 1 മണിക്കൂറിൽ (60 മിനിറ്റ് / 3600000 മിസ്) കൂടിയവ മാത്രം നിലനിർത്തുന്നു
                         const oneHourMs = 60 * 60 * 1000;
                         tournamentHistory = tournamentHistory.filter(h => {
                             let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
                             return duration >= oneHourMs;
                         });
-
-                        if (tournamentStartTimestamp && !isMatchEnded) {
-                            const gate = document.getElementById("startup-gate");
-                            if(gate) gate.classList.add("hidden");
-                        }
                     }
                 }
             } catch(e) {
@@ -944,28 +925,6 @@
             if (window.navigator && window.navigator.vibrate) {
                 window.navigator.vibrate(pattern);
             }
-        }
-
-        function launchApp() {
-            initAudioContext();
-            triggerHapticFeedback([40, 60, 40]);
-            
-            const gate = document.getElementById("startup-gate");
-            if (gate) {
-                gate.style.display = "none";
-                gate.classList.add("hidden");
-            }
-            
-            isMatchEnded = false;
-            if (!tournamentStartTimestamp) {
-                tournamentStartTimestamp = Date.now();
-                lastActionTimestamp = Date.now();
-                globalClickSequence = 0;
-            }
-            saveData();
-            render();
-            updateMatchStatusBadge();
-            updateMainTopLastDefeatedBar();
         }
 
         function playBestSound() {
@@ -1054,13 +1013,19 @@
             render();
             updateMainTopLastDefeatedBar();
 
+            // നിർദ്ദേശം: മറ്റ് ഫോണുകളിലെ ലിങ്കുകൾ യൂസ് ചെയ്യുമ്പോൾ സ്റ്റാർട്ട് ടൂർണമെന്റ് (Startup Gate) ഓട്ടോമാറ്റിക്കായി റീസെറ്റ് ആവുകയോ ഗേറ്റ് കാണിക്കുകയോ ചെയ്യരുത്. ഡയറക്ട് ആപ്ലിക്കേഷൻ ലോഡ് ആകണം.
+            if (!tournamentStartTimestamp) {
+                tournamentStartTimestamp = Date.now();
+                lastActionTimestamp = Date.now();
+            }
+
             if (dbRef) {
                 dbRef.on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data && data.teams && Array.isArray(data.teams) && data.teams.length > 0) {
                         teams = data.teams;
-                        tournamentStartTimestamp = data.tournamentStartTimestamp || null;
-                        lastActionTimestamp = data.lastActionTimestamp || null;
+                        tournamentStartTimestamp = data.tournamentStartTimestamp || tournamentStartTimestamp;
+                        lastActionTimestamp = data.lastActionTimestamp || lastActionTimestamp;
                         tournamentHistory = data.tournamentHistory || [];
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
@@ -1267,7 +1232,6 @@
             const sessionDurationMs = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
             const sessionDurationMins = Math.max(1, Math.round(sessionDurationMs / 60000));
 
-            // നിർദ്ദേശം: 1 മണിക്കൂറിൽ (60 മിനിറ്റിൽ) താഴെയുള്ള ഹിസ്റ്ററികൾ സേവ് ആവരുത്.
             if (sessionDurationMins < 60) return;
 
             const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', { 
@@ -1339,7 +1303,6 @@
             const container = document.getElementById("modal-time-summary-content");
             if (!modal || !container) return;
 
-            // നിർദ്ദേശം: സമയവ്യത്യാസത്തിന്റെ പേരിൽ അല്ല, പോയിന്റ് നിലയുടെ അടിസ്ഥാനത്തിൽ മാത്രം സോർട്ട് ചെയ്യുക.
             let sortedTeamsForSummary = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (a.losses || 0) - (b.losses || 0);
@@ -1812,7 +1775,6 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            // പോയിന്റ് നിലയുടെ (wins) അടിസ്ഥാനത്തിൽ മാത്രം സോർട്ട് ചെയ്യുന്നു
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -1843,16 +1805,23 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            // നിർദ്ദേശം: ഏറ്റവും കൂടുതൽ തോറ്റ ടീം എന്നാൽ ഏറ്റവും കൂടുതൽ തോൽവികൾ ഏറ്റുവാങ്ങിയത് (losses ഏറ്റവും കൂടുതൽ)
+            // നിർദ്ദേശം: ഏറ്റവും കൂടുതൽ പരാജയപ്പെട്ട, ഏറ്റവും കൂടുതൽ കളി കളിച്ച് ഏറ്റവും കൂടുതൽ പരാജയം ഏറ്റുവാങ്ങിയവരുടെ ടീം (losses ഏറ്റവും കൂടുതൽ ഉള്ളത്)
             let mostDefeatedTeam = "ആരുമില്ല / None";
             if (teams.length > 0) {
-                let teamsByLosses = [...teams].sort((a, b) => (b.losses || 0) - (a.losses || 0));
+                let teamsByLosses = [...teams].sort((a, b) => {
+                    let lossesA = a.losses || 0;
+                    let lossesB = b.losses || 0;
+                    if (lossesB !== lossesA) return lossesB - lossesA;
+                    let playedA = Math.max(a.played || 0, (a.wins + (a.losses || 0)));
+                    let playedB = Math.max(b.played || 0, (b.wins + (b.losses || 0)));
+                    return playedB - playedA;
+                });
                 if (teamsByLosses[0].losses > 0) {
                     mostDefeatedTeam = `${teamsByLosses[0].name} (${teamsByLosses[0].losses} Losses)`;
                 }
             }
 
-            // നിർദ്ദേശം: കറന്റ് സ്റ്റാറ്റസ് ഓപ്പൺ ചെയ്യുമ്പോൾ അതിൽ തോറ്റ ടീം എന്ന ഭാഗത്ത് വിജയിച്ച ടീമിന്റെ തോൽവി രേഖപ്പെടുത്തരുത് (അതായത് strictly wins == 0 ആയതോ അല്ലെങ്കിൽ losses കൂടുതൽ ഉള്ളവ)
+            // നിർദ്ദേശം: കറന്റ് സ്റ്റാറ്റസ് ഷെയർ ഓപ്പൺ ചെയ്യുമ്പോൾ വിജയികളുടെ തോൽവി അവിടെ നൽകേണ്ട ആവശ്യമില്ല. തോറ്റ ടീമിന്റെ മാത്രം മതി.
             let defeatedTeamsHtml = "";
             let teamsWithLossesOnly = teams.filter(t => (t.wins === 0 && (t.losses || 0) > 0)).sort((a, b) => (b.losses || 0) - (a.losses || 0));
             if (teamsWithLossesOnly.length > 0) {
@@ -1901,7 +1870,7 @@
                             <div class="text-[11px] text-slate-200 font-medium leading-relaxed space-y-2">
                                 <div>• Total Match: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
                                 <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2 mt-1">
-                                    <div class="text-[9px] text-rose-400 font-extrabold uppercase">തോറ്റ ടീം (Most Losses):</div>
+                                    <div class="text-[9px] text-rose-400 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം (Most Losses):</div>
                                     <div class="text-xs font-black text-white uppercase mt-0.5">${escapeHtml(mostDefeatedTeam)}</div>
                                 </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-amber-200 font-semibold">${h2hText}</span></div>
@@ -1977,7 +1946,6 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            // നിർദ്ദേശം: പോയിന്റ് നിലയുടെ അടിസ്ഥാനത്തിൽ മാത്രം ടീമുകളെ റാങ്ക് ചെയ്യുക (സമയവ്യത്യാസം ബാധകമല്ല)
             let sortedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -2004,7 +1972,6 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // നിർദ്ദേശം: എൻഡ് മാച്ച് ഓപ്പൺ ചെയ്യുമ്പോൾ "ഏറ്റവും കൂടുതൽ തോറ്റ ടീം" എന്ന് എഴുതിയ ഭാഗം "തോറ്റ ടീം" എന്നാക്കുക (കൂടാതെ ഏറ്റവും കൂടുതൽ തോൽവികൾ ഏറ്റുവാങ്ങിയത്)
             let loserTeams = [...rankedListWithPositions].sort((a, b) => (b.losses || 0) - (a.losses || 0));
             let loserNames = loserTeams.length > 0 ? escapeHtml(loserTeams[0].name) : "None";
             let loserLossCount = loserTeams.length > 0 ? (loserTeams[0].losses || 0) : 0;
@@ -2013,9 +1980,13 @@
             rankedListWithPositions.forEach((t) => {
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 let isWinnerRow = (t.rank === 1);
+                let isSecondRow = (t.rank === 2);
+                let rowBgClass = isWinnerRow ? 'bg-amber-500/10 font-bold' : (isSecondRow ? 'bg-sky-500/10 font-bold' : '');
+                let nameColorClass = isWinnerRow ? 'text-amber-300' : (isSecondRow ? 'text-sky-300' : 'text-slate-300');
+                
                 teamsTableHtml += `
-                    <tr class="border-b border-slate-800/80 text-center text-slate-200 ${isWinnerRow ? 'bg-amber-500/10 font-bold' : ''}">
-                        <td class="py-1 px-1 text-left font-semibold ${isWinnerRow ? 'text-amber-300' : 'text-slate-300'}">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : ''}</td>
+                    <tr class="border-b border-slate-800/80 text-center text-slate-200 ${rowBgClass}">
+                        <td class="py-1 px-1 text-left font-semibold ${nameColorClass}">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-400"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-sky-400"></i>' : '')}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-400">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-400">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -2048,16 +2019,21 @@
                     </div>
                 </div>
 
-                <!-- 2nd, 3rd Highlight Grid -->
-                <div class="grid grid-cols-2 gap-1.5 text-xs">
-                    <div class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-center shadow space-y-0.5">
-                        <div class="font-bold text-slate-300 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-medal text-slate-400"></i> 2nd Place / രണ്ടാം സ്ഥാനം
-                        </div>
-                        <div class="text-white font-bold uppercase text-[10px] break-words">${secondNamesDisplay}</div>
-                        <div class="text-[8px] text-amber-300 font-bold">Wins: ${secondWins}</div>
+                <!-- നിർദ്ദേശം: എൻഡ് മാച്ചിലെ രണ്ടാം സ്ഥാനക്കാർക്കും ഒരു സ്പെഷ്യൽ കളർ ടൂണോ അല്ലെങ്കിൽ എന്തെങ്കിലും ഒരു ആകർഷകമായ ബോക്സ് -->
+                <div class="bg-gradient-to-r from-sky-600/30 via-cyan-500/20 to-sky-600/30 border-2 border-sky-400 rounded-2xl p-2.5 shadow-[0_0_15px_rgba(56,189,248,0.4)] text-center space-y-1 relative">
+                    <div class="text-[9px] text-sky-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-medal text-sky-400 text-xs"></i> 2ND PLACE RUNNER UP <i class="fa-solid fa-medal text-sky-400 text-xs"></i>
                     </div>
+                    <div class="text-sm font-black text-sky-100 uppercase tracking-wide break-words px-1">
+                        🥈 ${secondNamesDisplay} 🥈
+                    </div>
+                    <div class="text-[9px] text-sky-200 font-bold bg-slate-950/80 px-2 py-0.5 rounded-full inline-block border border-sky-500/40">
+                        🏆 Wins: ${secondWins}
+                    </div>
+                </div>
 
+                <!-- 3rd Highlight Grid & Loser Box -->
+                <div class="grid grid-cols-2 gap-1.5 text-xs">
                     <div class="bg-slate-900 border border-amber-700/50 rounded-xl p-2 text-center shadow space-y-0.5">
                         <div class="font-bold text-amber-600 uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-award text-amber-500"></i> 3rd Place / മൂന്നാം സ്ഥാനം
@@ -2065,15 +2041,14 @@
                         <div class="text-white font-bold uppercase text-[10px] break-words">${thirdNamesDisplay}</div>
                         <div class="text-[8px] text-amber-300 font-bold">Wins: ${thirdWins}</div>
                     </div>
-                </div>
 
-                <!-- Defeated / Loser Info Box -->
-                <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow space-y-0.5">
-                    <div class="font-bold text-rose-400 uppercase text-[8px] flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-shield-halved text-rose-500"></i> തോറ്റ ടീം (Defeated Team)
+                    <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow space-y-0.5">
+                        <div class="font-bold text-rose-400 uppercase text-[8px] flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-rose-500"></i> തോറ്റ ടീം (Defeated Team)
+                        </div>
+                        <div class="text-white font-bold uppercase text-[9px] break-words">${loserNames}</div>
+                        <div class="text-[8px] text-rose-300">Losses: ${loserLossCount}</div>
                     </div>
-                    <div class="text-white font-bold uppercase text-[9px] break-words">${loserNames}</div>
-                    <div class="text-[8px] text-rose-300">Losses: ${loserLossCount}</div>
                 </div>
 
                 <!-- Full Summary Table -->
@@ -2136,7 +2111,6 @@
             if(!container) return;
             container.innerHTML = "";
             
-            // നിർദ്ദേശം: ഒരേ പോയിന്റ് നിലയുള്ള ടീമുകളെ കൃത്യമായ പോയിന്റ് മാത്രം അടിസ്ഥാനമാക്കി കാണിക്കുന്നു (ലോജിക്കൽ എറർ പരിഹരിച്ചു)
             let sortedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -2187,8 +2161,8 @@
                     extraCardClass = "winner-card";
                     specialBadgeHtml = `<span class="rank-badge bg-amber-400 text-slate-950 shadow-sm"><i class="fa-solid fa-crown text-[5px] mr-0.5"></i>1st</span>`;
                 } else if (isSecond) {
-                    extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-slate-200 text-slate-950 shadow-sm"><i class="fa-solid fa-medal text-[5px] mr-0.5"></i>2nd</span>`;
+                    extraCardClass = "second-place-card";
+                    specialBadgeHtml = `<span class="rank-badge bg-sky-400 text-slate-950 shadow-sm"><i class="fa-solid fa-medal text-[5px] mr-0.5"></i>2nd</span>`;
                 } else if (isThird) {
                     extraCardClass = "winner-card";
                     specialBadgeHtml = `<span class="rank-badge bg-amber-700 text-amber-100 shadow-sm"><i class="fa-solid fa-award text-[5px] mr-0.5"></i>3rd</span>`;
@@ -2321,6 +2295,7 @@
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
             const winningNameSpan = document.getElementById("winning-team-name-span");
+            const lastDefeatedInfoSpan = document.getElementById("winner-last-defeated-info");
             if (!modal || !container) return;
 
             const winningTeam = teams.find(t => t.id === winningTeamId);
@@ -2328,7 +2303,18 @@
                 winningNameSpan.textContent = `WINNER: ${winningTeam.name}`;
             }
 
-            // നിർദ്ദേശം: പ്ലസ് ബട്ടൺ അമർത്തി തോറ്റ ടീമിനെ സെലക്ട് ചെയ്യുമ്പോൾ അവിടെ 3 സെക്കൻഡ് എന്ന ചെറിയ മലയാളത്തിൽ എഴുതിയ ഭാഗം പൂർണ്ണമായി നീക്കം ചെയ്തു (ഇന്റർഫേസ് വലുതായി കാണാൻ).
+            // നിർദ്ദേശം: ആ വിജയിച്ച ടീം ഏറ്റവും അവസാനം ആരെയാണ് തോൽപ്പിച്ചത് എന്ന് അതിന്റെ അടിയിൽ ചെറുതായി ചേർക്കുക
+            if (lastDefeatedInfoSpan && winningTeam) {
+                if (winningTeam.defeatedDetails && winningTeam.defeatedDetails.length > 0) {
+                    let lastDefeat = winningTeam.defeatedDetails[winningTeam.defeatedDetails.length - 1];
+                    lastDefeatedInfoSpan.textContent = `അവസാനം തോൽപ്പിച്ചത് / Last defeated: ${lastDefeat.name}`;
+                    lastDefeatedInfoSpan.classList.remove("hidden");
+                } else {
+                    lastDefeatedInfoSpan.textContent = `ഇതുവരെ ആരെയും തോൽപ്പിച്ചിട്ടില്ല / No previous defeats recorded`;
+                    lastDefeatedInfoSpan.classList.remove("hidden");
+                }
+            }
+
             container.innerHTML = "";
             teams.forEach(t => {
                 if (t.id !== winningTeamId) {
@@ -2348,10 +2334,15 @@
                         </div>
                         <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
-                    // ക്ലിക്ക് ചെയ്യുമ്പോൾ ഡിലേ ഇല്ലാതെ ഉടൻ വിജയം രേഖപ്പെടുത്തും
+                    // നിർദ്ദേശം: തോറ്റ ടീമിനെ സെലക്ട് ചെയ്യുമ്പോൾ ഹെപ്റ്റിക് ഫീഡ്ബാക്കും റെഡ് കളറും (ഡെസിഗ്നേറ്റഡ് ക്ലാസ് വഴി) വരണം, മൂന്ന് സെക്കൻഡ് ഡിലേയും ഉണ്ട് (പക്ഷേ എവിടെയും എഴുതി കാണിക്കരുത്).
                     btn.onclick = function() {
-                        closeDefeatedTeamModal();
-                        confirmWinAndDefeatedTeam(winningTeamId, t.id);
+                        triggerHapticFeedback([60, 40, 60]);
+                        btn.classList.add('defeated-option-selected');
+                        
+                        setTimeout(() => {
+                            closeDefeatedTeamModal();
+                            confirmWinAndDefeatedTeam(winningTeamId, t.id);
+                        }, 3000);
                     };
                     container.appendChild(btn);
                 }
@@ -2702,7 +2693,6 @@
             window.open(url, '_blank');
         }
 
-        // ടോട്ടൽ ഇന്റർഫേസ് റീസെറ്റ് ആവുന്ന ഫങ്ഷൻ (ഹിസ്റ്ററി ഒഴികെ)
         function resetTournamentStateForNewSession() {
             teams = JSON.parse(JSON.stringify(defaultTeams));
             tournamentStartTimestamp = Date.now();
