@@ -609,7 +609,6 @@
                     <i class="fa-solid fa-crown text-amber-400 text-base"></i> <span id="winning-team-name-span">WINNER TEAM</span>
                 </div>
                 <h3 class="text-sm sm:text-base font-extrabold text-amber-300 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക / Select Defeated Team</h3>
-                <p class="text-xs text-slate-400 font-light mt-1">ടീമിൽ ക്ലിക്ക് ചെയ്താൽ 3 സെക്കൻഡിനുള്ളിൽ ഓട്ടോമാറ്റിക്കായി വിജയം രേഖപ്പെടുത്തും. / Automatic win record in 3s after click.</p>
             </div>
             <div id="defeated-team-options" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
             <div class="pt-3 border-t border-slate-800">
@@ -781,7 +780,7 @@
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="text-xs font-semibold text-amber-300 flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> TOURNAMENT LOGS (1 HOUR MAX)
+                    <i class="fa-solid fa-trophy text-amber-400"></i> TOURNAMENT LOGS (1 HOUR+)
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -848,7 +847,6 @@
         let audioContext = null;
         let globalClickSequence = 0;
         let pendingWinningTeamId = null;
-        let autoWinTimeout = null;
         let lastActionSnapshot = null;
         let lastActionDescription = "";
 
@@ -890,8 +888,12 @@
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
 
-                        const oneHourAgo = Date.now() - (60 * 60 * 1000);
-                        tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+                        // ഹിസ്റ്ററി ഫിൽട്ടറിംഗ്: കൃത്യം 1 മണിക്കൂറിൽ (60 മിനിറ്റ് / 3600000 മിസ്) കൂടിയവ മാത്രം നിലനിർത്തുന്നു
+                        const oneHourMs = 60 * 60 * 1000;
+                        tournamentHistory = tournamentHistory.filter(h => {
+                            let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
+                            return duration >= oneHourMs;
+                        });
 
                         if (tournamentStartTimestamp && !isMatchEnded) {
                             const gate = document.getElementById("startup-gate");
@@ -1063,8 +1065,11 @@
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
 
-                        const oneHourAgo = Date.now() - (60 * 60 * 1000);
-                        tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+                        const oneHourMs = 60 * 60 * 1000;
+                        tournamentHistory = tournamentHistory.filter(h => {
+                            let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
+                            return duration >= oneHourMs;
+                        });
                         
                         saveLocalBackup();
                     }
@@ -1233,8 +1238,11 @@
 
         function saveLocalBackup() {
             try {
-                const oneHourAgo = Date.now() - (60 * 60 * 1000);
-                tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+                const oneHourMs = 60 * 60 * 1000;
+                tournamentHistory = tournamentHistory.filter(h => {
+                    let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
+                    return duration >= oneHourMs;
+                });
 
                 const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
                 localStorage.setItem('wesma_local_backup_v131', JSON.stringify(payload));
@@ -1259,6 +1267,9 @@
             const sessionDurationMs = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
             const sessionDurationMins = Math.max(1, Math.round(sessionDurationMs / 60000));
 
+            // നിർദ്ദേശം: 1 മണിക്കൂറിൽ (60 മിനിറ്റിൽ) താഴെയുള്ള ഹിസ്റ്ററികൾ സേവ് ആവരുത്.
+            if (sessionDurationMins < 60) return;
+
             const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
             });
@@ -1271,8 +1282,11 @@
                 durationMinutes: sessionDurationMins
             };
 
-            const oneHourAgo = Date.now() - (60 * 60 * 1000);
-            tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+            const oneHourMs = 60 * 60 * 1000;
+            tournamentHistory = tournamentHistory.filter(h => {
+                let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
+                return duration >= oneHourMs;
+            });
 
             tournamentHistory.unshift(record);
             saveData();
@@ -1325,6 +1339,7 @@
             const container = document.getElementById("modal-time-summary-content");
             if (!modal || !container) return;
 
+            // നിർദ്ദേശം: സമയവ്യത്യാസത്തിന്റെ പേരിൽ അല്ല, പോയിന്റ് നിലയുടെ അടിസ്ഥാനത്തിൽ മാത്രം സോർട്ട് ചെയ്യുക.
             let sortedTeamsForSummary = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (a.losses || 0) - (b.losses || 0);
@@ -1498,11 +1513,14 @@
             const container = document.getElementById("modal-history-content");
             if (!modal || !container) return;
 
-            const oneHourAgo = Date.now() - (60 * 60 * 1000);
-            tournamentHistory = tournamentHistory.filter(h => h.id >= oneHourAgo);
+            const oneHourMs = 60 * 60 * 1000;
+            tournamentHistory = tournamentHistory.filter(h => {
+                let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
+                return duration >= oneHourMs;
+            });
 
             if (!tournamentHistory || tournamentHistory.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">കഴിഞ്ഞ 1 മണിക്കൂറിനുള്ളിൽ സേവ് ചെയ്ത സെഷനുകൾ ഒന്നുമില്ല. / No sessions in last 1 hour.</div>`;
+                container.innerHTML = `<div class="text-slate-500 font-light text-center py-6 text-xs">1 മണിക്കൂറിൽ കൂടുതലുള്ള സെഷൻ റെക്കോർഡുകൾ ഒന്നുമില്ല. / No sessions over 1 hour.</div>`;
             } else {
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
@@ -1794,6 +1812,7 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
+            // പോയിന്റ് നിലയുടെ (wins) അടിസ്ഥാനത്തിൽ മാത്രം സോർട്ട് ചെയ്യുന്നു
             let sorted = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -1824,6 +1843,7 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
+            // നിർദ്ദേശം: ഏറ്റവും കൂടുതൽ തോറ്റ ടീം എന്നാൽ ഏറ്റവും കൂടുതൽ തോൽവികൾ ഏറ്റുവാങ്ങിയത് (losses ഏറ്റവും കൂടുതൽ)
             let mostDefeatedTeam = "ആരുമില്ല / None";
             if (teams.length > 0) {
                 let teamsByLosses = [...teams].sort((a, b) => (b.losses || 0) - (a.losses || 0));
@@ -1832,6 +1852,7 @@
                 }
             }
 
+            // നിർദ്ദേശം: കറന്റ് സ്റ്റാറ്റസ് ഓപ്പൺ ചെയ്യുമ്പോൾ അതിൽ തോറ്റ ടീം എന്ന ഭാഗത്ത് വിജയിച്ച ടീമിന്റെ തോൽവി രേഖപ്പെടുത്തരുത് (അതായത് strictly wins == 0 ആയതോ അല്ലെങ്കിൽ losses കൂടുതൽ ഉള്ളവ)
             let defeatedTeamsHtml = "";
             let teamsWithLossesOnly = teams.filter(t => (t.wins === 0 && (t.losses || 0) > 0)).sort((a, b) => (b.losses || 0) - (a.losses || 0));
             if (teamsWithLossesOnly.length > 0) {
@@ -1880,7 +1901,7 @@
                             <div class="text-[11px] text-slate-200 font-medium leading-relaxed space-y-2">
                                 <div>• Total Match: <b class="text-amber-300">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
                                 <div class="bg-slate-900 border border-rose-500/40 rounded-lg p-2 mt-1">
-                                    <div class="text-[9px] text-rose-400 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
+                                    <div class="text-[9px] text-rose-400 font-extrabold uppercase">തോറ്റ ടീം (Most Losses):</div>
                                     <div class="text-xs font-black text-white uppercase mt-0.5">${escapeHtml(mostDefeatedTeam)}</div>
                                 </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-amber-200 font-semibold">${h2hText}</span></div>
@@ -1956,6 +1977,7 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
+            // നിർദ്ദേശം: പോയിന്റ് നിലയുടെ അടിസ്ഥാനത്തിൽ മാത്രം ടീമുകളെ റാങ്ക് ചെയ്യുക (സമയവ്യത്യാസം ബാധകമല്ല)
             let sortedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -1982,6 +2004,7 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
+            // നിർദ്ദേശം: എൻഡ് മാച്ച് ഓപ്പൺ ചെയ്യുമ്പോൾ "ഏറ്റവും കൂടുതൽ തോറ്റ ടീം" എന്ന് എഴുതിയ ഭാഗം "തോറ്റ ടീം" എന്നാക്കുക (കൂടാതെ ഏറ്റവും കൂടുതൽ തോൽവികൾ ഏറ്റുവാങ്ങിയത്)
             let loserTeams = [...rankedListWithPositions].sort((a, b) => (b.losses || 0) - (a.losses || 0));
             let loserNames = loserTeams.length > 0 ? escapeHtml(loserTeams[0].name) : "None";
             let loserLossCount = loserTeams.length > 0 ? (loserTeams[0].losses || 0) : 0;
@@ -2047,7 +2070,7 @@
                 <!-- Defeated / Loser Info Box -->
                 <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow space-y-0.5">
                     <div class="font-bold text-rose-400 uppercase text-[8px] flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-shield-halved text-rose-500"></i> ഏറ്റവും കൂടുതൽ തോറ്റ ടീം (Defeated Team)
+                        <i class="fa-solid fa-shield-halved text-rose-500"></i> തോറ്റ ടീം (Defeated Team)
                     </div>
                     <div class="text-white font-bold uppercase text-[9px] break-words">${loserNames}</div>
                     <div class="text-[8px] text-rose-300">Losses: ${loserLossCount}</div>
@@ -2113,6 +2136,7 @@
             if(!container) return;
             container.innerHTML = "";
             
+            // നിർദ്ദേശം: ഒരേ പോയിന്റ് നിലയുള്ള ടീമുകളെ കൃത്യമായ പോയിന്റ് മാത്രം അടിസ്ഥാനമാക്കി കാണിക്കുന്നു (ലോജിക്കൽ എറർ പരിഹരിച്ചു)
             let sortedTeams = [...teams].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
                 return (b.losses || 0) - (a.losses || 0);
@@ -2152,7 +2176,6 @@
                 const isSecond = (rankPos === 2);
                 const isThird = (rankPos === 3);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
-                const isLoser = (rankPos >= 4 || (team.wins === minWins && minWins < maxWins && !isWinner));
                 
                 const playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
                 const lossesCount = team.losses || 0;
@@ -2295,11 +2318,6 @@
         }
 
         function openDefeatedTeamModal(winningTeamId) {
-            if (autoWinTimeout) {
-                clearTimeout(autoWinTimeout);
-                autoWinTimeout = null;
-            }
-
             const modal = document.getElementById("defeated-team-modal");
             const container = document.getElementById("defeated-team-options");
             const winningNameSpan = document.getElementById("winning-team-name-span");
@@ -2310,6 +2328,7 @@
                 winningNameSpan.textContent = `WINNER: ${winningTeam.name}`;
             }
 
+            // നിർദ്ദേശം: പ്ലസ് ബട്ടൺ അമർത്തി തോറ്റ ടീമിനെ സെലക്ട് ചെയ്യുമ്പോൾ അവിടെ 3 സെക്കൻഡ് എന്ന ചെറിയ മലയാളത്തിൽ എഴുതിയ ഭാഗം പൂർണ്ണമായി നീക്കം ചെയ്തു (ഇന്റർഫേസ് വലുതായി കാണാൻ).
             container.innerHTML = "";
             teams.forEach(t => {
                 if (t.id !== winningTeamId) {
@@ -2329,7 +2348,11 @@
                         </div>
                         <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
-                    btn.onclick = function() { selectDefeatedTeamAuto(winningTeamId, t.id, btn); };
+                    // ക്ലിക്ക് ചെയ്യുമ്പോൾ ഡിലേ ഇല്ലാതെ ഉടൻ വിജയം രേഖപ്പെടുത്തും
+                    btn.onclick = function() {
+                        closeDefeatedTeamModal();
+                        confirmWinAndDefeatedTeam(winningTeamId, t.id);
+                    };
                     container.appendChild(btn);
                 }
             });
@@ -2337,28 +2360,8 @@
         }
 
         function closeDefeatedTeamModal() {
-            if (autoWinTimeout) {
-                clearTimeout(autoWinTimeout);
-                autoWinTimeout = null;
-            }
             const modal = document.getElementById("defeated-team-modal");
             if (modal) modal.classList.add("hidden");
-        }
-
-        function selectDefeatedTeamAuto(winningTeamId, defeatedTeamId, btnElement) {
-            if (autoWinTimeout) clearTimeout(autoWinTimeout);
-
-            triggerHapticFeedback([80, 50, 80]);
-            
-            document.querySelectorAll('.defeated-option-btn').forEach(b => {
-                b.classList.remove('defeated-option-selected');
-            });
-            btnElement.classList.add('defeated-option-selected');
-
-            autoWinTimeout = setTimeout(() => {
-                closeDefeatedTeamModal();
-                confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId);
-            }, 3000);
         }
 
         function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
