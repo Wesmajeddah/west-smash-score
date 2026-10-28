@@ -19,7 +19,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #060913;
+            background-color: #0f172a; /* Changed from #060913 to normal slate tone */
             color: #f1f5f9;
             -webkit-tap-highlight-color: transparent;
             font-size: 15px;
@@ -42,7 +42,7 @@
             font-size: 1.35em;
             display: inline-block;
             transform: translateY(3px);
-            color: #0ea5e9;
+            color: #38bdf8; /* Adjusted to normal blue tone */
             font-weight: 900;
             transform-style: preserve-3d;
             animation: ultraSlowFlipHeaderW 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
@@ -50,7 +50,7 @@
         @keyframes ultraSlowFlipHeaderW {
             0%, 85%, 100% { 
                 transform: translateY(3px) rotateX(0deg) scale(1); 
-                color: #0ea5e9; 
+                color: #38bdf8; 
                 text-shadow: none;
             }
             92%, 97% { 
@@ -64,13 +64,13 @@
             display: inline-block;
             transform-style: preserve-3d;
             font-weight: 800;
-            color: #0ea5e9;
+            color: #38bdf8; /* Adjusted to normal blue tone */
             animation: ultraSlowFlip 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes ultraSlowFlip {
             0%, 85%, 100% { 
                 transform: rotateX(0deg) scale(1); 
-                color: #0ea5e9; 
+                color: #38bdf8; 
                 text-shadow: none; 
             }
             92%, 97% { 
@@ -80,7 +80,7 @@
             }
         }
 
-        .gold-border { border: 1.5px solid rgba(14, 165, 233, 0.35); }
+        .gold-border { border: 1.5px solid rgba(56, 189, 248, 0.25); }
 
         .rank-badge {
             display: inline-flex !important;
@@ -102,26 +102,26 @@
         }
 
         .winner-card {
-            background: #0b1329 !important;
+            background: #1e293b !important; /* Normal slate card background */
             border: 1.5px solid #f59e0b !important;
             box-shadow: 0 0 14px rgba(245, 158, 11, 0.25) !important;
         }
         .second-card {
-            background: #0b1329 !important;
-            border: 1.5px solid #0ea5e9 !important;
-            box-shadow: 0 0 14px rgba(14, 165, 233, 0.25) !important;
+            background: #1e293b !important;
+            border: 1.5px solid #38bdf8 !important;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.25) !important;
         }
         .third-card {
-            background: #0b1329 !important;
+            background: #1e293b !important;
             border: 1.5px solid rgba(217, 119, 6, 0.6) !important;
             box-shadow: 0 0 12px rgba(217, 119, 6, 0.2) !important;
         }
         .fastest-card {
-            background: #0b1329 !important;
+            background: #1e293b !important;
             border: 1.5px solid rgba(6, 182, 212, 0.6) !important;
         }
         .loser-card {
-            background: #0b1329 !important;
+            background: #1e293b !important;
             border: 1.5px solid rgba(244, 63, 94, 0.4) !important;
         }
         @keyframes leafPulse {
@@ -134,7 +134,7 @@
         }
 
         .static-watermark {
-            color: #0ea5e9;
+            color: #38bdf8;
             font-weight: 700;
         }
 
@@ -155,17 +155,17 @@
 
         @keyframes winLossPulseHighlight {
             0%, 100% { 
-                border-color: rgba(14, 165, 233, 0.5); 
-                box-shadow: 0 0 8px rgba(14, 165, 233, 0.2), inset 0 0 5px rgba(14, 165, 233, 0.1); 
+                border-color: rgba(56, 189, 248, 0.5); 
+                box-shadow: 0 0 8px rgba(56, 189, 248, 0.2), inset 0 0 5px rgba(56, 189, 248, 0.1); 
             }
             50% { 
-                border-color: rgba(14, 165, 233, 0.9); 
-                box-shadow: 0 0 16px rgba(14, 165, 233, 0.5), inset 0 0 10px rgba(14, 165, 233, 0.3); 
+                border-color: rgba(56, 189, 248, 0.9); 
+                box-shadow: 0 0 16px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.3); 
             }
         }
         .win-loss-highlight-box {
             animation: winLossPulseHighlight 2s infinite ease-in-out;
-            background: linear-gradient(135deg, rgba(11, 19, 41, 0.98), rgba(15, 23, 42, 0.9));
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.9));
         }
 
         @keyframes liveDotPulseGreen {
@@ -197,11 +197,11 @@
             position: relative;
             width: 100%;
             height: 75px;
-            background: linear-gradient(180deg, #0b1329 0%, #030712 100%);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border-radius: 0.75rem;
             overflow: hidden;
-            border: 1px solid rgba(14, 165, 233, 0.4);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 0 10px rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 0 10px rgba(56, 189, 248, 0.15);
         }
 
         .champion-aura {
@@ -222,7 +222,7 @@
             transform: translateX(-50%);
             width: 2px;
             height: 42px;
-            background: repeating-linear-gradient(0deg, #0ea5e9, #0ea5e9 3px, transparent 3px, transparent 6px);
+            background: repeating-linear-gradient(0deg, #38bdf8, #38bdf8 3px, transparent 3px, transparent 6px);
             z-index: 2;
         }
 
@@ -276,7 +276,7 @@
             left: 10%;
             width: 40px;
             height: 100px;
-            background: linear-gradient(180deg, rgba(14, 165, 233, 0.3) 0%, transparent 100%);
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.3) 0%, transparent 100%);
             transform: rotate(-25deg);
             pointer-events: none;
             animation: beamGlow 1.5s infinite alternate ease-in-out;
@@ -318,8 +318,8 @@
         }
 
         .record-detail-btn {
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(14, 116, 144, 0.3));
-            border: 1px solid rgba(14, 165, 233, 0.5);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 116, 144, 0.3));
+            border: 1px solid rgba(56, 189, 248, 0.5);
             color: #bae6fd;
             padding: 2px 5px;
             border-radius: 4px;
@@ -329,24 +329,24 @@
             align-items: center;
             gap: 2px;
             transition: all 0.15s ease-in-out;
-            box-shadow: 0 0 4px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 0 4px rgba(56, 189, 248, 0.2);
         }
         .record-detail-btn:active {
             transform: scale(0.92);
-            background: rgba(14, 165, 233, 0.4);
+            background: rgba(56, 189, 248, 0.4);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-2 select-none">
+<body class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-slate-900">
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4">
-            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(14,165,233,0.5)]">
+            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(56,189,248,0.5)]">
                 <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="96" fill="#0EA5E9" />
-                    <circle cx="100" cy="100" r="90" fill="#060913" stroke="#0EA5E9" stroke-width="1.5" />
-                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#0EA5E9" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="100" cy="100" r="96" fill="#38BDF8" />
+                    <circle cx="100" cy="100" r="90" fill="#1e293b" stroke="#38BDF8" stroke-width="1.5" />
+                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#38BDF8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div>
@@ -360,7 +360,7 @@
     </div>
     
     <!-- Printable Share Area Container -->
-    <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-[#030712] p-2.5 rounded-2xl">
+    <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-slate-900 p-2.5 rounded-2xl">
         
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-slate-800/80">
             <div class="flex items-center gap-2">
@@ -375,14 +375,14 @@
         </div>
 
         <!-- Header Banner -->
-        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-900 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
+        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-slate-800 border gold-border rounded-2xl shadow-xl relative overflow-hidden space-y-0">
             <div class="py-0.5">
                 <div id="header-title-container" class="wesma-title leading-tight"></div>
             </div>
         </div>
 
         <!-- Outer Defeated Bar -->
-        <div class="bg-slate-900 border border-sky-500/30 rounded-lg px-2 py-1 flex items-center justify-between shadow-sm gap-1.5">
+        <div class="bg-slate-800 border border-sky-500/30 rounded-lg px-2 py-1 flex items-center justify-between shadow-sm gap-1.5">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                 <span class="w-3.5 h-3.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-[7px] shrink-0">
                     <i class="fa-solid fa-shield-halved"></i>
@@ -400,13 +400,13 @@
         <div id="main-content-area" class="space-y-2.5">
             <div id="teams-list" class="space-y-2.5"></div>
 
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 shadow-md">
-                <div class="flex items-center justify-between px-2 py-1 bg-[#030712] rounded-lg border border-sky-500/20">
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2 shadow-md">
+                <div class="flex items-center justify-between px-2 py-1 bg-slate-900 rounded-lg border border-sky-500/20">
                     <span class="text-xs font-light text-slate-300 flex items-center gap-2">
                         <i class="fa-solid fa-gamepad text-sky-400"></i> Total Plays :
                     </span>
                     <div class="flex items-center gap-1.5">
-                        <div class="flex items-center gap-1 bg-[#030712] px-2.5 py-0.5 rounded-lg shadow-inner border border-sky-500/20">
+                        <div class="flex items-center gap-1 bg-slate-900 px-2.5 py-0.5 rounded-lg shadow-inner border border-sky-500/20">
                             <span id="total-play-val" class="text-sky-400 font-semibold text-xs min-w-[15px] text-center">
                                 0
                             </span>
@@ -415,7 +415,7 @@
                                 <i class="fa-solid fa-circle-info"></i>
                             </button>
                         </div>
-                        <div class="flex items-center gap-1 bg-slate-900 px-2 py-0.5 rounded-lg border border-sky-500/30">
+                        <div class="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded-lg border border-sky-500/30">
                             <span id="total-play-divided-val" class="text-sky-300 font-bold text-xs">
                                 0
                             </span>
@@ -424,14 +424,14 @@
                     </div>
                 </div>
                 
-                <div class="text-xs text-slate-400 bg-[#030712] px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
+                <div class="text-xs text-slate-400 bg-slate-900 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
                         <i class="fa-solid fa-stopwatch text-emerald-400 text-xs"></i> Current Match Duration:
                     </span>
                     <span id="current-match-timer" class="text-emerald-400 text-xs font-semibold">0h 0m 0s</span>
                 </div>
 
-                <div class="text-xs text-slate-400 bg-[#030712] px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
+                <div class="text-xs text-slate-400 bg-slate-900 px-3 py-2 rounded-lg flex items-center justify-between border border-slate-800">
                     <span class="flex items-center gap-1.5 font-light text-slate-300">
                         <i class="fa-solid fa-clock-rotate-left text-sky-400 text-xs"></i> Session Duration:
                     </span>
@@ -440,13 +440,13 @@
             </div>
 
             <!-- Main Interface Leaderboard Section -->
-            <div id="main-leaderboard-section" class="bg-slate-900 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
+            <div id="main-leaderboard-section" class="bg-slate-800 border gold-border rounded-xl p-3 text-center shadow-lg space-y-2">
                 <div class="pt-1 text-left space-y-1.5">
                     <button onclick="toggleH2HInterface()" class="w-full bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-semibold text-[11px] py-2 px-2 rounded-lg border border-sky-500/30 flex items-center justify-between transition-all cursor-pointer">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-sky-400"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് / Most Lost H2H</span>
                         <i id="h2h-toggle-icon" class="fa-solid fa-chevron-down text-xs"></i>
                     </button>
-                    <div id="h2h-stats-container" class="hidden bg-[#030712] rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-[11px]">
+                    <div id="h2h-stats-container" class="hidden bg-slate-900 rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-[11px]">
                         <div id="most-lost-to-target" class="text-rose-400 font-medium space-y-1">⚠️ ഏറ്റവും കൂടുതൽ തോറ്റതിന്റെ വിവരങ്ങൾ കണക്കാക്കുന്നു... / Calculating most lost stats...</div>
                     </div>
                 </div>
@@ -456,7 +456,7 @@
 
     <!-- Match Controls & Compact Summary -->
     <div class="w-full max-w-xl pt-2 space-y-2">
-        <div class="bg-slate-900 border border-sky-500/30 rounded-xl p-2.5 shadow-md flex items-center justify-between">
+        <div class="bg-slate-800 border border-sky-500/30 rounded-xl p-2.5 shadow-md flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie text-sky-400 text-sm"></i>
                 <div>
@@ -470,7 +470,7 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-            <div class="flex items-center justify-between bg-slate-900 border border-sky-500/40 rounded-xl px-2.5 py-2 shadow-md">
+            <div class="flex items-center justify-between bg-slate-800 border border-sky-500/40 rounded-xl px-2.5 py-2 shadow-md">
                 <span class="text-[10px] text-sky-300 font-bold flex items-center gap-1">
                     <span class="live-dot-green"></span> STATUS:
                 </span>
@@ -478,7 +478,7 @@
                     <i class="fa-solid fa-share-nodes"></i> SHARE
                 </button>
             </div>
-            <div class="flex items-center justify-between bg-slate-900 border border-rose-500/40 rounded-xl px-2 py-2 shadow-md">
+            <div class="flex items-center justify-between bg-slate-800 border border-rose-500/40 rounded-xl px-2 py-2 shadow-md">
                 <span class="text-[8px] text-rose-300 font-bold flex items-center gap-0.5 uppercase tracking-tighter shrink-0">
                     <i class="fa-solid fa-flag-checkered text-sky-300 text-[8px]"></i> TOURNAMENT:
                 </span>
@@ -488,7 +488,7 @@
             </div>
         </div>
 
-        <div class="bg-slate-900 border border-sky-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
+        <div class="bg-slate-800 border border-sky-500/30 rounded-xl px-3 py-2 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2">
                 <button onclick="openUndoModal()" class="text-[10px] bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                     🔄 UNDO
@@ -550,7 +550,7 @@
                 <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-time-summary-content" class="p-2 space-y-1.5 overflow-y-auto flex-1"></div>
-            <div class="p-2 bg-[#030712] border-t border-slate-800 text-right">
+            <div class="p-2 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeTimeSummaryModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
             </div>
         </div>
@@ -617,7 +617,7 @@
             <h3 class="text-sm font-semibold text-sky-300">എൻഡ് മാച്ച് പാസ്‌വേർഡ് / End Match Password</h3>
             <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകുക / Enter Admin PIN (1234)</p>
             <div class="space-y-2 pt-1">
-                <input type="password" id="end-match-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-sky-300 focus:outline-none focus:border-sky-500">
+                <input type="password" id="end-match-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-sky-300 focus:outline-none focus:border-sky-500">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeEndMatchPasswordModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -631,7 +631,7 @@
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative">
             <div id="fireworks-container"></div>
             
-            <div class="p-3 bg-[#030712] border-b border-slate-800 flex items-center justify-between relative px-4">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
                     <div class="text-sm font-black text-sky-400 tracking-widest uppercase">WESMA</div>
                     <div class="text-[9px] text-sky-200/80 font-light tracking-wider">BADMINTON CLUB</div>
@@ -667,8 +667,8 @@
             <h3 class="text-sm font-semibold text-sky-300">ടീം പേര് മാറ്റുക / Edit Name</h3>
             <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് മാറ്റുക / Enter Admin PIN (1234)</p>
             <div class="space-y-2 pt-1">
-                <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-sky-300 focus:outline-none focus:border-sky-500">
-                <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര് / New Name" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-sky-500 uppercase">
+                <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-sky-300 focus:outline-none focus:border-sky-500">
+                <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര് / New Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-sky-500 uppercase">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeCustomNameModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -691,8 +691,8 @@
             <h3 class="text-sm font-semibold text-sky-300">പുതിയ ടീമിനെ ചേർക്കുക / Add Team</h3>
             <p class="text-xs text-slate-400 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ ടീമിന്റെ പേര് നൽകുക / Enter Admin PIN (1234)</p>
             <div class="space-y-2 pt-1">
-                <input type="password" id="add-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-sky-300 focus:outline-none focus:border-sky-500">
-                <input type="text" id="new-team-name-input" placeholder="ടീം പേര് / Team Name" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-emerald-500 uppercase">
+                <input type="password" id="add-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-sky-300 focus:outline-none focus:border-sky-500">
+                <input type="text" id="new-team-name-input" placeholder="ടീം പേര് / Team Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center text-slate-200 focus:outline-none focus:border-emerald-500 uppercase">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeAddTeamModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -728,7 +728,7 @@
                 <h3 class="text-lg font-black text-sky-300 tracking-wider uppercase">ACTION REVERSAL CENTER</h3>
                 <p class="text-[11px] text-slate-400 uppercase tracking-widest mt-1">Undo & Score Control</p>
             </div>
-            <div class="bg-[#030712] border border-slate-800 rounded-2xl p-4 text-left space-y-2 shadow-inner">
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-left space-y-2 shadow-inner">
                 <div class="text-[11px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                     <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> LAST ACTION RECORDED
                 </div>
@@ -746,14 +746,14 @@
     <!-- History Popup Modal -->
     <div id="history-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div class="bg-slate-900 border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-3 bg-[#030712] border-b border-slate-800 flex items-center justify-between">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="text-xs font-semibold text-sky-300 flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-sky-400"></i> TOURNAMENT LOGS (1 HOUR+)
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
-            <div class="p-2.5 bg-[#030712] border-t border-slate-800 text-right">
+            <div class="p-2.5 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeHistoryModal()" class="bg-slate-800 text-sky-300 font-light py-2 px-4 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
             </div>
         </div>
@@ -769,7 +769,7 @@
                 <button onclick="closeHistoryRecordDetailModal()" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="history-record-detail-content" class="p-2 space-y-1.5 overflow-y-auto flex-1"></div>
-            <div class="p-2 bg-[#030712] border-t border-slate-800 text-right">
+            <div class="p-2 bg-slate-950 border-t border-slate-800 text-right">
                 <button onclick="closeHistoryRecordDetailModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
             </div>
         </div>
@@ -786,7 +786,7 @@
     </div>
 
     <!-- Prominent Center Pop-up Toast Notification -->
-    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-sky-300 border-2 border-sky-400 font-bold px-5 py-3 rounded-2xl text-xs shadow-[0_0_25px_rgba(14,165,233,0.5)] opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-sky-300 border-2 border-sky-400 font-bold px-5 py-3 rounded-2xl text-xs shadow-[0_0_25px_rgba(56,189,248,0.5)] opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു! / Score updated!</div>
     </div>
 
@@ -819,7 +819,7 @@
         let lastActionSnapshot = null;
         let lastActionDescription = "";
 
-        const flipPopColorsList = ["#0EA5E9", "#FACC15", "#4ADE80", "#EC4899", "#A855F7", "#FB923C", "#2DD4BF"];
+        const flipPopColorsList = ["#38bdf8", "#FACC15", "#4ADE80", "#EC4899", "#A855F7", "#FB923C", "#2DD4BF"];
         const badgeColorsList = ["bg-sky-500", "bg-blue-600", "bg-teal-600", "bg-rose-600", "bg-indigo-600", "bg-cyan-600", "bg-amber-500", "bg-pink-600"];
 
         const championPraiseCommentaries = [
@@ -984,7 +984,7 @@
             if (!container) return;
             container.innerHTML = "";
 
-            const colors = ['#0ea5e9', '#f59e0b', '#4ade80', '#ec4899', '#a855f7', '#facc15', '#ffffff'];
+            const colors = ['#38bdf8', '#f59e0b', '#4ade80', '#ec4899', '#a855f7', '#facc15', '#ffffff'];
             
             for (let i = 0; i < 9; i++) {
                 setTimeout(() => {
@@ -1140,7 +1140,7 @@
                 let html = "";
                 allDefeats.forEach((item, index) => {
                     html += `
-                        <div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px] gap-2">
+                        <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px] gap-2">
                             <div class="min-w-0 flex-1 break-words leading-tight">
                                 <span class="text-sky-400 font-bold">#${allDefeats.length - index}</span> 
                                 <span class="text-emerald-400 font-bold uppercase">${escapeHtml(item.winner)}</span>
@@ -1291,7 +1291,7 @@
             teams.forEach(t => {
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 html += `
-                    <div class="bg-[#030712] p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
                         <span class="font-bold text-slate-200">${escapeHtml(t.name)}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-sky-400 font-extrabold bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">${played} Plays</span>
@@ -1330,18 +1330,18 @@
                 let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 
                 html += `
-                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-slate-900 border border-sky-500/20">
+                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-slate-800 border border-sky-500/20">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-100">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-sky-400 font-black">#${idx + 1}</span>
                                 <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-sky-300 font-bold bg-[#030712] px-2 py-0.5 rounded border border-sky-500/30 text-[9px] shrink-0">
+                            <span class="text-sky-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-sky-500/30 text-[9px] shrink-0">
                                 TIME: ${formattedTime}
                             </span>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 text-[9px]">
-                            <div class="bg-[#030712] border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[8px]">WIN</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -1351,7 +1351,7 @@
                                 <span class="text-emerald-300 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-[#030712] border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[8px]">LOSS</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -1361,7 +1361,7 @@
                                 <span class="text-rose-300 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-[#030712] border border-sky-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950 border border-sky-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-sky-300 font-extrabold uppercase text-[8px]">MATCH</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -1404,7 +1404,7 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
+                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
                             <div>
                                 <span class="text-sky-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">തോൽപ്പിച്ചത് / Defeated: <b class="text-white">${escapeHtml(m.opponent)}</b></span>
@@ -1436,7 +1436,7 @@
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
+                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
                             <div>
                                 <span class="text-rose-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">തോറ്റത് / Lost to: <b class="text-white">${escapeHtml(m.winner)}</b></span>
@@ -1460,7 +1460,7 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400';
-                        html += `<div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
+                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
                             <div>
                                 <span class="text-sky-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">vs <b class="text-white">${escapeHtml(m.opponent)}</b></span>
@@ -1508,7 +1508,7 @@
                     if (!winnersNames) winnersNames = "No Wins";
 
                     const card = document.createElement("div");
-                    card.className = "bg-[#030712] border border-slate-800 rounded-xl p-3 space-y-2 shadow relative";
+                    card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 shadow relative";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
                         let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
@@ -1589,18 +1589,18 @@
                 let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 
                 html += `
-                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-slate-900 border border-sky-500/20">
+                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-slate-800 border border-sky-500/20">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-100">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-sky-400 font-black">#${idx + 1}</span>
                                 <span class="uppercase tracking-wider truncate">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-sky-300 font-bold bg-[#030712] px-2 py-0.5 rounded border border-sky-500/30 text-[9px] shrink-0">
+                            <span class="text-sky-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-sky-500/30 text-[9px] shrink-0">
                                 TIME: ${formattedTime}
                             </span>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 text-[9px]">
-                            <div class="bg-[#030712] border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950 border border-emerald-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-emerald-400 font-extrabold uppercase text-[8px]">WIN</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -1610,7 +1610,7 @@
                                 <span class="text-emerald-300 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-[#030712] border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950 border border-rose-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-rose-400 font-extrabold uppercase text-[8px]">LOSS</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -1620,7 +1620,7 @@
                                 <span class="text-rose-300 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-[#030712] border border-sky-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-slate-950 border border-sky-500/40 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-sky-300 font-extrabold uppercase text-[8px]">MATCH</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
@@ -1664,7 +1664,7 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
+                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
                             <div>
                                 <span class="text-sky-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">Defeated: <b class="text-white">${escapeHtml(m.opponent)}</b></span>
@@ -1696,7 +1696,7 @@
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
+                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
                             <div>
                                 <span class="text-rose-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">Lost to: <b class="text-white">${escapeHtml(m.winner)}</b></span>
@@ -1716,7 +1716,7 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400';
-                        html += `<div class="bg-[#030712] p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
+                        html += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-[10px]">
                             <div>
                                 <span class="text-sky-400 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-300">vs <b class="text-white">${escapeHtml(m.opponent)}</b></span>
@@ -1794,13 +1794,14 @@
                 return (a.losses || 0) - (b.losses || 0);
             });
 
-            let topScorerName = sorted.length > 0 ? sorted[0].name : "ആരുമില്ല / None";
-            let topScorerWins = sorted.length > 0 ? sorted[0].wins : 0;
-            let secondPlaceName = sorted.length > 1 ? sorted[1].name : "ആരുമില്ല / None";
-            let secondPlaceWins = sorted.length > 1 ? sorted[1].wins : 0;
-
+            // FIXED: Show real data or empty state if 0 matches played
             let totalPlaysCount = calculateTotalPlays();
             let totalMatchesCount = totalPlaysCount / 2;
+
+            let topScorerName = (totalPlaysCount > 0 && sorted.length > 0) ? sorted[0].name : "ഇതുവരെ കളികളില്ല / No Matches";
+            let topScorerWins = (totalPlaysCount > 0 && sorted.length > 0) ? sorted[0].wins : 0;
+            let secondPlaceName = (totalPlaysCount > 0 && sorted.length > 1) ? sorted[1].name : "ഇതുവരെ കളികളില്ല / No Matches";
+            let secondPlaceWins = (totalPlaysCount > 0 && sorted.length > 1) ? sorted[1].wins : 0;
 
             let h2hText = "മത്സരങ്ങൾ പുരോഗമിക്കുന്നു... / Matches in progress...";
             let lossPairs = [];
@@ -1825,7 +1826,7 @@
                 if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
                 return (a.wins || 0) - (b.wins || 0);
             });
-            let mostDefeatedTeam = loserCandidates.length > 0 ? `${loserCandidates[0].name} (${loserCandidates[0].losses} Losses)` : "ആരുമില്ല / None";
+            let mostDefeatedTeam = (totalPlaysCount > 0 && loserCandidates.length > 0) ? `${loserCandidates[0].name} (${loserCandidates[0].losses} Losses)` : "ഇതുവരെ കളികളില്ല / None";
 
             let defeatedTeamsHtml = "";
             let teamsWithAnyLosses = teams.filter(t => (t.losses || 0) > 0).sort((a, b) => (b.losses || 0) - (a.losses || 0));
@@ -1836,13 +1837,13 @@
             }
 
             container.innerHTML = `
-                <div class="bg-gradient-to-br from-sky-500/15 via-slate-900 to-cyan-600/15 p-4 rounded-2xl border-2 border-sky-400/80 shadow-[0_0_25px_rgba(14,165,233,0.3)] space-y-4 text-center relative overflow-hidden">
+                <div class="bg-gradient-to-br from-sky-500/15 via-slate-900 to-cyan-600/15 p-4 rounded-2xl border-2 border-sky-400/80 shadow-[0_0_25px_rgba(56,189,248,0.3)] space-y-4 text-center relative overflow-hidden">
                     <div class="text-[11px] text-sky-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5 border-b border-sky-500/30 pb-2">
                         <span class="live-dot-green"></span> തത്സമയ മത്സര വിവരങ്ങൾ / Live Match Stats
                     </div>
 
                     <div class="space-y-3 pt-0.5 text-left">
-                        <div class="bg-[#030712] border-2 border-emerald-500/60 rounded-xl p-3 shadow-md flex items-center justify-between">
+                        <div class="bg-slate-950 border-2 border-emerald-500/60 rounded-xl p-3 shadow-md flex items-center justify-between">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-crown text-sky-400"></i> ഒന്നാം സ്ഥാനം / 1st Place
@@ -1855,7 +1856,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-[#030712] border-2 border-sky-500/60 rounded-xl p-3 shadow-md flex items-center justify-between">
+                        <div class="bg-slate-950 border-2 border-sky-500/60 rounded-xl p-3 shadow-md flex items-center justify-between">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-sky-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-medal text-sky-300"></i> രണ്ടാം സ്ഥാനം / 2nd Place
@@ -1868,7 +1869,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-[#030712] border-2 border-sky-500/60 rounded-xl p-4 shadow-xl space-y-3">
+                        <div class="bg-slate-950 border-2 border-sky-500/60 rounded-xl p-4 shadow-xl space-y-3">
                             <div class="text-[11px] text-sky-400 font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-sky-500/30 pb-2">
                                 <i class="fa-solid fa-bolt text-sky-400 text-sm"></i> മത്സര വിശേഷങ്ങൾ / Highlights
                             </div>
@@ -1979,8 +1980,9 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // Correct loser calculation ensuring top champions are never labeled as defeated
-            let loserCandidates = rankedListWithPositions.filter(t => (t.losses || 0) > 0 && t.rank > 2);
+            // Correct loser calculation ensuring top champions are never labeled as defeated & excluded from 1st/2nd place
+            let firstSecondIds = [...firstPlaceTeams, ...secondPlaceTeams].map(t => t.id);
+            let loserCandidates = rankedListWithPositions.filter(t => !firstSecondIds.includes(t.id));
             if (loserCandidates.length === 0) {
                 loserCandidates = rankedListWithPositions.filter(t => (t.losses || 0) > 0);
             }
@@ -2023,14 +2025,14 @@
                 </div>
 
                 <!-- Prominent Champions Box (Most prominent & largest) -->
-                <div class="bg-gradient-to-r from-sky-600/30 via-sky-500/20 to-sky-600/30 border-2 border-sky-400 rounded-2xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.4)] text-center space-y-2 relative">
+                <div class="bg-gradient-to-r from-sky-600/30 via-sky-500/20 to-sky-600/30 border-2 border-sky-400 rounded-2xl p-4 shadow-[0_0_25px_rgba(56,189,248,0.4)] text-center space-y-2 relative">
                     <div class="text-[11px] text-sky-300 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-crown text-sky-400 text-base"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-sky-400 text-base"></i>
                     </div>
                     <div class="text-lg sm:text-xl font-black text-sky-100 uppercase tracking-wide leading-snug break-words px-1">
                         ✨ ${championNamesDisplay} ✨
                     </div>
-                    <div class="text-[11px] text-emerald-300 font-bold bg-[#030712]/90 px-3 py-1 rounded-full inline-block border border-emerald-500/40">
+                    <div class="text-[11px] text-emerald-300 font-bold bg-slate-950/90 px-3 py-1 rounded-full inline-block border border-emerald-500/40">
                         🏆 Wins: ${firstWins}
                     </div>
                 </div>
@@ -2043,14 +2045,14 @@
                     <div class="text-xs sm:text-sm font-black text-sky-200 uppercase tracking-wide leading-snug break-words px-1">
                         🌟 ${secondNamesDisplay} 🌟
                     </div>
-                    <div class="text-[9px] text-sky-300 font-bold bg-[#030712]/80 px-2.5 py-0.5 rounded-full inline-block border border-sky-500/30">
+                    <div class="text-[9px] text-sky-300 font-bold bg-slate-950/80 px-2.5 py-0.5 rounded-full inline-block border border-sky-500/30">
                         🥈 Wins: ${secondWins}
                     </div>
                 </div>
 
-                <!-- 3rd Place & Defeated Grid -->
+                <!-- 3rd Place & Defeated Grid - FIXED: Separated Defeated Team as standard clean card without overpowering 1st/2nd place -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
-                    <div class="bg-slate-900 border border-amber-700/50 rounded-xl p-2 text-center shadow space-y-0.5">
+                    <div class="bg-slate-800 border border-amber-700/50 rounded-xl p-2 text-center shadow space-y-0.5">
                         <div class="font-bold text-amber-500 uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-award text-amber-400"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
@@ -2058,12 +2060,12 @@
                         <div class="text-[8px] text-amber-300 font-bold">Wins: ${thirdWins}</div>
                     </div>
 
-                    <div class="bg-slate-900 border border-rose-500/40 rounded-xl p-2 text-center shadow space-y-0.5">
-                        <div class="font-bold text-rose-400 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-rose-500"></i> തോറ്റ ടീം (Defeated Team)
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-center shadow space-y-0.5">
+                        <div class="font-bold text-slate-400 uppercase text-[8px] flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-slate-400"></i> തോറ്റ ടീം (Defeated Team)
                         </div>
-                        <div class="text-white font-bold uppercase text-[9px] break-words">${loserNames}</div>
-                        <div class="text-[8px] text-rose-300">Losses: ${loserLossCount}</div>
+                        <div class="text-slate-300 font-semibold uppercase text-[9px] break-words">${loserNames}</div>
+                        <div class="text-[8px] text-slate-400">Losses: ${loserLossCount}</div>
                     </div>
                 </div>
 
@@ -2072,7 +2074,7 @@
                     <div class="text-[10px] font-bold text-sky-300 uppercase flex items-center gap-1">
                         <i class="fa-solid fa-list-check text-sky-400"></i> ഫൈനൽ സ്കോർ ഷീറ്റ്:
                     </div>
-                    <div class="overflow-x-auto bg-[#030712] rounded-xl border border-slate-800 p-1">
+                    <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800 p-1">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-slate-800 text-[8px] text-slate-400 uppercase text-center">
@@ -2193,7 +2195,7 @@
                 }
 
                 const card = document.createElement("div");
-                card.className = `relative bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col shadow-md gap-2 ${extraCardClass}`;
+                card.className = `relative bg-slate-800 border border-slate-700 rounded-xl p-3 flex flex-col shadow-md gap-2 ${extraCardClass}`;
                 card.innerHTML = `
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
@@ -2205,7 +2207,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <div class="w-5 h-12 bg-slate-800 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700 relative scale-95" title="Total Played & Details">
+                            <div class="w-5 h-12 bg-slate-900 text-slate-300 rounded-lg flex flex-col items-center justify-center border border-slate-700 relative scale-95" title="Total Played & Details">
                                 <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-sky-500 text-slate-950 rounded-full flex items-center justify-center text-[6px] font-bold shadow cursor-pointer">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
@@ -2235,7 +2237,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 font-light pt-1.5 border-t border-slate-800/60 px-1">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 font-light pt-1.5 border-t border-slate-700/60 px-1">
                         <span class="italic">Match Rotation Status</span>
                         <span class="text-sky-300 font-semibold">Order: #${team.clickOrder || 0} | Interval: ${team.matchInterval || 0}m</span>
                     </div>
@@ -2348,7 +2350,8 @@
 
                     const btn = document.createElement("button");
                     btn.type = "button";
-                    btn.className = "w-full bg-[#030712] hover:bg-slate-800 text-slate-100 font-extrabold py-3.5 px-4 rounded-2xl border border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 defeated-option-btn shadow-md";
+                    // FIXED: Maintained red selection highlighting on click and prevented multiple selections with a 3-second explicit lock
+                    btn.className = "w-full bg-slate-950 hover:bg-slate-800 text-slate-100 font-extrabold py-3.5 px-4 rounded-2xl border border-slate-700/80 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 defeated-option-btn shadow-md";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
                             <span class="uppercase tracking-wider font-extrabold text-sky-300 text-xs sm:text-sm">${escapeHtml(t.name)}</span>
@@ -2357,24 +2360,27 @@
                         <div class="text-[10px] text-slate-400 font-light italic pointer-events-none">${lastDefeatedText}</div>
                     `;
                     
-                    // Ensured exact single selection locking on very first tap/click, preventing any multi-touch race condition
                     let isSelectionProcessed = false;
                     btn.onclick = function(e) {
                         e.stopPropagation();
                         if (isSelectionProcessed) return;
                         isSelectionProcessed = true;
 
-                        // Immediately disable all buttons in the modal to block subsequent double touches
+                        // Disable all buttons in the modal instantly to strictly prevent multi-touch/multiple selection race conditions
                         const allButtons = container.querySelectorAll('button');
-                        allButtons.forEach(b => b.disabled = true);
+                        allButtons.forEach(b => {
+                            b.disabled = true;
+                            b.style.pointerEvents = 'none';
+                        });
 
                         triggerHapticFeedback([60]);
                         btn.classList.add('defeated-option-selected');
                         
+                        // Retain red selection highlight for 3 seconds before executing confirmation & closing modal
                         setTimeout(() => {
                             closeDefeatedTeamModal();
                             confirmWinAndDefeatedTeam(winningTeamId, t.id);
-                        }, 120);
+                        }, 3000);
                     };
                     container.appendChild(btn);
                 }
