@@ -230,7 +230,7 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* NEW CUSTOM BADMINTON RALLY & CHASE ANIMATION */
+        /* NEW UNIQUE ANIMATION: DANCING WINNER THROWING RACKET AT RUNNING LOSER WITH COCK */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -252,78 +252,52 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .court-net {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            width: 2px;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.6);
-            border-left: 1px dashed rgba(255,255,255,0.8);
-            transform: translateX(-50%);
-            z-index: 3;
-        }
-
-        /* Player 1 (Attacker / Winner) */
-        .player-attacker {
+        /* Winner Dancing Player */
+        .player-dancer {
             position: absolute;
             bottom: 4px;
-            font-size: 20px;
+            left: 15%;
+            font-size: 22px;
             z-index: 4;
-            animation: attackerSequence 6s infinite ease-in-out;
+            animation: winnerDanceJoy 1.2s infinite ease-in-out;
         }
 
-        /* Player 2 (Defeated / Running away) */
-        .player-defender {
+        /* Thrown Badminton Racket Animation */
+        .thrown-racket-anim {
             position: absolute;
-            bottom: 4px;
-            font-size: 20px;
-            z-index: 4;
-            animation: defenderSequence 6s infinite ease-in-out;
-        }
-
-        /* Shuttlecock Rally Path */
-        .shuttle-cock-anim {
-            position: absolute;
-            font-size: 14px;
+            bottom: 22px;
+            font-size: 16px;
             z-index: 5;
-            animation: shuttleRallySequence 6s infinite linear;
+            animation: racketFlyThrow 3s infinite linear;
         }
 
-        @keyframes attackerSequence {
-            /* Rally Phase (0% - 60%): Standing left & playing */
-            0%, 50% { left: 15%; transform: scaleX(1); }
-            25% { transform: scaleX(1) translateY(-6px); }
-            /* Smash Phase (60%): Big Jump */
-            60% { left: 30%; transform: translateY(-20px) scale(1.2); }
-            /* Chase Phase (70% - 100%): Running right chasing loser */
-            75% { left: 55%; transform: translateY(0) scaleX(1); }
-            90% { left: 75%; transform: translateY(-4px) scaleX(1); }
-            100% { left: 15%; transform: scaleX(1); }
+        /* Loser Running with Shuttlecock */
+        .player-[#loser-cock-runner] {
+            position: absolute;
+            bottom: 4px;
+            font-size: 22px;
+            z-index: 4;
+            animation: loserRunCockPanic 3s infinite linear;
         }
 
-        @keyframes defenderSequence {
-            /* Rally Phase (0% - 60%): Standing right & returning shuttle */
-            0%, 50% { left: 75%; transform: scaleX(-1); }
-            35% { transform: scaleX(-1) translateY(-6px); }
-            /* Defeat Phase (60%): Getting hit / Panicking */
-            60% { left: 70%; transform: scaleX(1) rotate(15deg); }
-            /* Run Away Phase (70% - 100%): Running out to the right in panic */
-            75% { left: 85%; transform: scaleX(1) translateY(-8px); }
-            85% { left: 95%; opacity: 0; transform: scaleX(1); }
-            95% { left: 75%; opacity: 0; }
-            100% { left: 75%; opacity: 1; transform: scaleX(-1); }
+        @keyframes winnerDanceJoy {
+            0%, 100% { transform: translateY(0) rotate(-10deg) scale(1); }
+            50% { transform: translateY(-12px) rotate(10deg) scale(1.15); filter: drop-shadow(0 4px 8px rgba(252,211,77,0.6)); }
         }
 
-        @keyframes shuttleRallySequence {
-            0% { left: 18%; top: 35px; opacity: 1; }
-            20% { left: 45%; top: 10px; }
-            40% { left: 72%; top: 35px; }
-            55% { left: 45%; top: 12px; }
-            /* Smash Hit & Drop */
-            60% { left: 28%; top: 20px; }
-            68% { left: 80%; top: 50px; opacity: 0; }
-            100% { left: 18%; top: 35px; opacity: 0; }
+        @keyframes racketFlyThrow {
+            0% { left: 22%; transform: rotate(0deg) scale(0.9); opacity: 0; }
+            10% { opacity: 1; }
+            70% { left: 75%; transform: rotate(1080deg) scale(1.1); opacity: 1; }
+            80%, 100% { left: 85%; transform: rotate(1260deg) scale(0.5); opacity: 0; }
+        }
+
+        @keyframes loserRunCockPanic {
+            0% { left: 35%; transform: scaleX(1); }
+            60% { left: 78%; transform: scaleX(1) translateY(-4px); }
+            80% { left: 95%; opacity: 0; transform: scaleX(1); }
+            85% { left: 30%; opacity: 0; }
+            100% { left: 35%; opacity: 1; transform: scaleX(1); }
         }
 
         .stadium-spotlight {
@@ -740,19 +714,29 @@
         </div>
     </div>
 
-    <!-- Custom Name Editing Popup Modal -->
+    <!-- Custom Name Editing Popup Modal with ON/OFF Status Toggle Built-in -->
     <div id="custom-name-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-white border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-slate-800">
             <div class="w-10 h-10 mx-auto bg-[#f5f0eb] text-[#5c4033] rounded-full flex items-center justify-center border border-[#d7ccc8] text-sm">
                 <i class="fa-solid fa-pen-to-square"></i>
             </div>
-            <h3 class="text-sm font-semibold text-slate-800">ടീം പേര് മാറ്റുക / Edit Name</h3>
-            <p class="text-xs text-slate-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് മാറ്റുക / Enter Admin PIN (1234)</p>
+            <h3 class="text-sm font-semibold text-slate-800">ടീം വിവരങ്ങൾ / Edit Team</h3>
+            <p class="text-xs text-slate-500 font-light">പേര് മാറ്റാനും ON/OFF ചെയ്യാനും PIN (1234) നൽകുക</p>
+            
             <div class="space-y-2 pt-1">
                 <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-[#5c4033]">
                 <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര് / New Name" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-[#5c4033] uppercase">
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-2">
+
+            <!-- Integrated ON / OFF Status Selector inside Edit Modal -->
+            <div class="bg-[#fcfbf9] border border-[#e6decb] p-2 rounded-xl flex items-center justify-between my-1">
+                <span class="text-[11px] font-bold text-slate-700">ടീം സ്റ്റാറ്റസ്:</span>
+                <button id="modal-status-toggle-btn" onclick="toggleModalTeamStatus()" class="text-[10px] font-extrabold px-3 py-1 rounded-lg border transition-all cursor-pointer">
+                    ACTIVE (ON)
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
                 <button onclick="closeCustomNameModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
                 <button onclick="submitCustomTeamName()" class="w-full bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">സേവ് ചെയ്യുക / Save</button>
             </div>
@@ -894,6 +878,7 @@
         let isFirebaseConnected = false;
         let dbRef = null;
         let editingTeamId = null;
+        let tempModalTeamDisabledState = false;
         let currentShareMode = 'text';
         let audioContext = null;
         let globalClickSequence = 0;
@@ -905,7 +890,7 @@
         const flipPopColorsList = ["#5c4033", "#8c6239", "#4a3525", "#722f37", "#37474f", "#6d4c41", "#2c221e"];
         const badgeColorsList = ["bg-[#5c4033]", "bg-[#6d4c41]", "bg-[#37474f]", "bg-[#722f37]", "bg-[#8c6239]", "bg-[#4e342e]", "bg-[#263238]"];
 
-        // DYNAMIC TITLE TITLES ARRAY (10+ MOTIVATIONAL BADGES)
+        // DYNAMIC BADGES LIST FOR TOP PERFORMER ONLY
         const dynamicTitles = [
             "MOST DOMINANT",
             "SMASH KINGS",
@@ -913,11 +898,9 @@
             "COURT MASTERS",
             "SUPREME CHAMPIONS",
             "POWER HITTERS",
-            "INVINCEABLE DUO",
+            "INVINCIBLE DUO",
             "ULTIMATE WARRIORS",
-            "MATCH WINNERS",
             "GOLDEN SMASHERS",
-            "TACTICAL GENIUSES",
             "BADMINTON LEGENDS"
         ];
 
@@ -955,39 +938,6 @@
             });
         }
 
-        // HISTORY BASED DANGEROUS / DYNAMIC TITLE EVALUATION
-        function getHistoricalDangerousTeams() {
-            if (!tournamentHistory || tournamentHistory.length === 0) return [];
-            let teamWinStats = {};
-
-            tournamentHistory.forEach(session => {
-                if (session.teams && Array.isArray(session.teams)) {
-                    let sorted = getInternationalSortedTeams(session.teams);
-                    if (sorted.length > 0 && sorted[0].wins > 0) {
-                        let topWins = sorted[0].wins;
-                        let sessionWinners = sorted.filter(t => t.wins === topWins);
-                        sessionWinners.forEach(w => {
-                            let key = w.name.trim().toUpperCase();
-                            teamWinStats[key] = (teamWinStats[key] || 0) + 1;
-                        });
-                    }
-                }
-            });
-
-            let highestSessionWins = 0;
-            let dangerousNames = [];
-            for (let name in teamWinStats) {
-                if (teamWinStats[name] > highestSessionWins) {
-                    highestSessionWins = teamWinStats[name];
-                    dangerousNames = [name];
-                } else if (teamWinStats[name] === highestSessionWins && highestSessionWins > 0) {
-                    dangerousNames.push(name);
-                }
-            }
-            return dangerousNames;
-        }
-
-        // Helper function to pick a consistent dynamic title based on team ID or wins
         function getDynamicBadgeTitle(team) {
             if (!team) return dynamicTitles[0];
             let index = (team.id + (team.wins || 0)) % dynamicTitles.length;
@@ -1380,17 +1330,6 @@
 
         function calculateTotalPlays() {
             return teams.reduce((sum, team) => sum + (team.isDisabled ? 0 : (team.played || 0)), 0);
-        }
-
-        function toggleTeamDisable(id) {
-            triggerHapticFeedback([40]);
-            const team = teams.find(t => t.id === id);
-            if (!team) return;
-
-            team.isDisabled = !team.isDisabled;
-            saveData();
-            render();
-            showToast(team.isDisabled ? `⚠️ ${team.name} ടീം ഓഫ് ചെയ്തു (Absent)` : `✅ ${team.name} ടീം ഓൺ ചെയ്തു (Active)`);
         }
 
         function saveLocalBackup() {
@@ -2246,19 +2185,19 @@
             });
 
             container.innerHTML = `
-                <!-- CUSTOM ANIMATED BADMINTON PLAYER MATCH & CHASE STAGE -->
+                <!-- UNIQUE CUSTOM ANIMATION: DANCING WINNER THROWING RACKET AT RUNNING LOSER WITH COCK -->
                 <div class="dance-stage-container my-1 relative overflow-hidden">
                     <div class="stadium-spotlight"></div>
                     <div class="court-floor"></div>
-                    <div class="court-net"></div>
-                    <div class="shuttle-cock-anim">🪶</div>
-                    <!-- Attacker Player with Racket -->
-                    <div class="player-attacker" title="Attacking Champion">
-                        <span>🏃‍♂️🎾</span>
+                    <!-- Dancing Winner -->
+                    <div class="player-dancer" title="Dancing Winner">
+                        <span>🕺🏆</span>
                     </div>
-                    <!-- Defender Player running away -->
-                    <div class="player-defender" title="Defeated Player Running Away">
-                        <span>🏃‍♂️💨</span>
+                    <!-- Flying Thrown Racket -->
+                    <div class="thrown-racket-anim">🎾</div>
+                    <!-- Loser Running Away with Shuttlecock -->
+                    <div class="player-loser-cock-runner" title="Loser Running Away with Cock">
+                        <span>🏃‍♂️🪶</span>
                     </div>
                 </div>
 
@@ -2338,7 +2277,7 @@
             triggerFireworksEffect();
             playFunnyVoiceAnnouncement(championNamesDisplay, "");
 
-            // SILENT AUTO SCREENSHOT IN BACKGROUND ONLY (NO DOWNLOAD / NO SAVING FILE)
+            // SILENT AUTO SCREENSHOT IN BACKGROUND ONLY
             setTimeout(() => {
                 const targetCard = document.getElementById("screenshot-target-card");
                 if (targetCard && typeof html2canvas !== 'undefined') {
@@ -2351,7 +2290,7 @@
                         windowWidth: targetCard.scrollWidth,
                         windowHeight: targetCard.scrollHeight
                     }).then(canvas => {
-                        // Background screenshot rendering completed without triggering file download
+                        // Background screenshot generated seamlessly
                     }).catch(err => {
                         console.log("Silent screenshot error:", err);
                     });
@@ -2393,7 +2332,12 @@
             container.innerHTML = "";
             
             let sortedTeams = getInternationalSortedTeams(teams);
-            let dangerousTeamNames = getHistoricalDangerousTeams();
+
+            // Determine highest winning team to award title only to top performer
+            let maxWinsOverall = 0;
+            if (sortedTeams.length > 0 && sortedTeams[0].wins > 0) {
+                maxWinsOverall = sortedTeams[0].wins;
+            }
 
             let teamsWithTime = teams.filter(t => !t.isDisabled && t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -2449,11 +2393,11 @@
                     specialBadgeHtml = `<span class="rank-badge bg-slate-200 text-slate-600 border border-slate-300 shadow-xs"><i class="fa-solid fa-user-slash text-[5px] mr-0.5"></i>ABSENT</span>`;
                 }
 
-                // DYNAMICALLY CHANGING BADGES BASED ON WINS & TEAMS (10+ MOTIVATIONAL BADGES)
+                // DYNAMICALLY AWARD TITLE BADGE ONLY TO TOP POINT-GAINING WINNER TEAM
                 let dangerousBadgeHtml = "";
-                if (team.wins > 0) {
+                if (team.wins > 0 && team.wins === maxWinsOverall && !team.isDisabled) {
                     let titleText = getDynamicBadgeTitle(team);
-                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs" title="Tournament Achievement Title"><i class="fa-solid fa-fire text-[5px] mr-0.5"></i>${titleText}</span>`;
+                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs" title="Top Performer Title"><i class="fa-solid fa-fire text-[5px] mr-0.5"></i>${titleText}</span>`;
                 }
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
@@ -2469,18 +2413,15 @@
                                 ${dangerousBadgeHtml}
                                 <div class="flex items-center gap-1.5 min-w-0">
                                     ${specialBadgeHtml}
-                                    <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-0.5 min-w-0" title="Click to edit or delete">
+                                    <!-- Dynamic Name Display with integrated Edit Pen Icon -->
+                                    <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-0.5 min-w-0" title="Click to edit name, status or delete">
                                         <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}</span>
-                                        <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
+                                        <i class="fa-solid fa-pen text-[10px] text-[#8c6239] shrink-0 ml-1 hover:scale-125 transition-all"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 relative">
-                            <!-- ULTRA COMPACT ON / OFF BUTTON (GREEN DOT / O WRITING ONLY) -->
-                            <button onclick="toggleTeamDisable(${team.id})" class="text-[9px] font-black uppercase w-5 h-5 rounded-full border transition-all cursor-pointer flex items-center justify-center shrink-0 ${team.isDisabled ? 'bg-slate-200 text-slate-600 border-slate-300' : 'bg-emerald-500 text-white border-emerald-600 shadow-2xs'}" title="വന്നില്ലെങ്കിൽ ഡിസേബിൾ ചെയ്യാം (ON/OFF)">
-                                ${team.isDisabled ? 'O' : 'O'}
-                            </button>
 
                             <div class="w-5 h-12 bg-white/90 text-slate-700 rounded-lg flex flex-col items-center justify-center border border-slate-200 relative scale-95 shadow-2xs" title="Total Played & Details">
                                 <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-[#5c4033] text-white rounded-full flex items-center justify-center text-[6px] font-bold shadow-2xs cursor-pointer">
@@ -2773,12 +2714,38 @@
         function openCustomNameModal(id, currentName) {
             triggerHapticFeedback([30]);
             editingTeamId = id;
+            const team = teams.find(t => t.id === id);
+            
             const modal = document.getElementById("custom-name-modal");
             const nameInput = document.getElementById("edit-team-name-input");
             const pinInput = document.getElementById("edit-admin-pin");
+            
             if(nameInput) nameInput.value = currentName;
             if(pinInput) pinInput.value = "";
+            
+            if (team) {
+                tempModalTeamDisabledState = team.isDisabled || false;
+                updateModalStatusToggleUI();
+            }
+
             if(modal) modal.classList.remove("hidden");
+        }
+
+        function toggleModalTeamStatus() {
+            tempModalTeamDisabledState = !tempModalTeamDisabledState;
+            updateModalStatusToggleUI();
+        }
+
+        function updateModalStatusToggleUI() {
+            const btn = document.getElementById("modal-status-toggle-btn");
+            if (!btn) return;
+            if (tempModalTeamDisabledState) {
+                btn.className = "text-[10px] font-extrabold px-3 py-1 rounded-lg border transition-all cursor-pointer bg-slate-200 text-slate-700 border-slate-300";
+                btn.textContent = "ABSENT (OFF)";
+            } else {
+                btn.className = "text-[10px] font-extrabold px-3 py-1 rounded-lg border transition-all cursor-pointer bg-emerald-500 text-white border-emerald-600 shadow-2xs";
+                btn.textContent = "ACTIVE (ON)";
+            }
         }
 
         function closeCustomNameModal() {
@@ -2804,6 +2771,7 @@
             if (team) {
                 const oldName = team.name;
                 team.name = nameInput;
+                team.isDisabled = tempModalTeamDisabledState;
 
                 teams.forEach(t => {
                     if (t.defeatedDetails) {
@@ -2838,7 +2806,7 @@
 
                 saveData();
                 render();
-                showToast("ടീമിന്റെ പേര് എല്ലാ സ്ഥലങ്ങളിലും അപ്ഡേറ്റ് ചെയ്തു! / Name updated!");
+                showToast("ടീം വിവരങ്ങളും സ്റ്റാറ്റസും അപ്ഡേറ്റ് ചെയ്തു!");
             }
             closeCustomNameModal();
         }
