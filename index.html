@@ -236,108 +236,97 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
+        /* NEW UNIQUE BADMINTON DOUBLES SMASH & RALLY STAGE ANIMATION */
         .dance-stage-container {
             position: relative;
             width: 100%;
             height: 75px;
-            background: linear-gradient(180deg, #f7f5f0 0%, #e7e2d9 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border-radius: 0.75rem;
             overflow: hidden;
-            border: 1px solid rgba(140, 98, 57, 0.3);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05), 0 0 10px rgba(140, 98, 57, 0.1);
+            border: 1px solid rgba(140, 98, 57, 0.4);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 10px rgba(140, 98, 57, 0.2);
         }
 
-        .champion-aura {
+        .court-lines {
             position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(140,98,57,0.15) 0%, transparent 75%);
-            animation: auraPulse 1.5s infinite ease-in-out;
-        }
-        @keyframes auraPulse {
-            0%, 100% { opacity: 0.4; transform: scale(0.95); }
-            50% { opacity: 0.9; transform: scale(1.1); }
+            bottom: 4px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        .badminton-net {
+        .badminton-net-pro {
             position: absolute;
-            bottom: 0;
+            bottom: 4px;
             left: 50%;
             transform: translateX(-50%);
-            width: 2px;
-            height: 42px;
-            background: repeating-linear-gradient(0deg, #5c4033, #5c4033 3px, transparent 3px, transparent 6px);
-            z-index: 2;
+            width: 3px;
+            height: 48px;
+            background: repeating-linear-gradient(0deg, #f8fafc, #f8fafc 3px, transparent 3px, transparent 6px);
+            z-index: 3;
+            box-shadow: 0 0 8px rgba(255,255,255,0.6);
         }
 
-        .mens-player-left {
+        .doubles-team-left {
             position: absolute;
-            bottom: 4px;
-            left: 15%;
+            bottom: 6px;
+            left: 12%;
             display: flex;
+            gap: 6px;
             align-items: flex-end;
-            gap: 2px;
-            animation: crazySmashLeft 0.9s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97);
+            animation: doublesJumpLeft 1.2s infinite ease-in-out;
         }
-        @keyframes crazySmashLeft {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            30% { transform: translateY(-22px) rotate(-15deg) scale(1.2); }
-            60% { transform: translateY(0) rotate(5deg) scale(0.95); }
+        @keyframes doublesJumpLeft {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            35% { transform: translateY(-24px) rotate(-10deg) scale(1.1); }
+            70% { transform: translateY(0) rotate(5deg); }
         }
 
-        .mens-player-right {
+        .doubles-team-right {
             position: absolute;
-            bottom: 4px;
-            right: 15%;
+            bottom: 6px;
+            right: 12%;
             display: flex;
+            gap: 6px;
             align-items: flex-end;
-            gap: 2px;
-            animation: crazySmashRight 0.9s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.45s;
+            animation: doublesJumpRight 1.2s infinite ease-in-out 0.6s;
         }
-        @keyframes crazySmashRight {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            30% { transform: translateY(-22px) rotate(15deg) scale(1.2); }
-            60% { transform: translateY(0) rotate(-5deg) scale(0.95); }
-        }
-
-        .shuttle-smash-motion {
-            position: absolute;
-            top: 8px;
-            left: 20%;
-            font-size: 13px;
-            animation: wildShuttle 0.9s infinite ease-in-out alternate;
-            z-index: 5;
-        }
-        @keyframes wildShuttle {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-            50% { transform: translate(90px, 25px) rotate(220deg) scale(1.4); }
-            100% { transform: translate(180px, -8px) rotate(410deg) scale(1); }
+        @keyframes doublesJumpRight {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            35% { transform: translateY(-24px) rotate(10deg) scale(1.1); }
+            70% { transform: translateY(0) rotate(-5deg); }
         }
 
-        .spotlight-beam-left {
+        .pro-shuttle-fly {
             position: absolute;
-            top: -20px;
-            left: 10%;
-            width: 40px;
-            height: 100px;
-            background: linear-gradient(180deg, rgba(92, 64, 51, 0.2) 0%, transparent 100%);
-            transform: rotate(-25deg);
-            pointer-events: none;
-            animation: beamGlow 1.5s infinite alternate ease-in-out;
+            top: 12px;
+            left: 25%;
+            font-size: 14px;
+            animation: shuttleTrajectory 1.2s infinite linear;
+            z-index: 6;
         }
-        .spotlight-beam-right {
+        @keyframes shuttleTrajectory {
+            0% { transform: translate(0, 25px) rotate(0deg) scale(1); opacity: 0.8; }
+            50% { transform: translate(110px, -15px) rotate(180deg) scale(1.3); opacity: 1; }
+            100% { transform: translate(220px, 25px) rotate(360deg) scale(1); opacity: 0.8; }
+        }
+
+        .stadium-spotlight {
             position: absolute;
-            top: -20px;
-            right: 10%;
-            width: 40px;
-            height: 100px;
-            background: linear-gradient(180deg, rgba(140, 98, 57, 0.2) 0%, transparent 100%);
-            transform: rotate(25deg);
+            top: -10px;
+            left: 30%;
+            width: 60px;
+            height: 90px;
+            background: radial-gradient(circle, rgba(252, 211, 77, 0.25) 0%, transparent 70%);
+            transform: rotate(-15deg);
             pointer-events: none;
-            animation: beamGlow 1.5s infinite alternate ease-in-out 0.75s;
+            animation: spotlightSweep 3s infinite alternate ease-in-out;
         }
-        @keyframes beamGlow {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.9; }
+        @keyframes spotlightSweep {
+            0% { transform: translateX(-40px) rotate(-20deg); opacity: 0.4; }
+            100% { transform: translateX(60px) rotate(20deg); opacity: 0.9; }
         }
 
         #fireworks-container {
@@ -1129,7 +1118,7 @@
                 let randomChamp = championPraiseCommentaries[Math.floor(Math.random() * championPraiseCommentaries.length)];
                 let randomLoser = loserCriticizeCommentaries[Math.floor(Math.random() * loserCriticizeCommentaries.length)];
                 
-                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChamp} എന്നാൽ പരാജയപ്പെട്ട ടീമുകൾ ${loserName}.`;
+                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChamp} എന്നാൽ പരാജയപ്പെട്ട ടീമുകൾ.`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
@@ -2182,9 +2171,24 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // Updated logic to collect ALL teams ranked 4th or lower as Defeated Teams (തോറ്റ ടീം)
+            // Updated logic to display each defeated team (4th & below) with their losses in a single line
             let loserTeamsList = rankedListWithPositions.filter(t => t.rank > 3);
-            let loserNames = loserTeamsList.length > 0 ? loserTeamsList.map(t => escapeHtml(t.name)).join(" & ") : "None";
+            let loserHtmlContent = "";
+            if (loserTeamsList.length > 0) {
+                loserHtmlContent = `<div class="space-y-1 text-left">`;
+                loserTeamsList.forEach(lt => {
+                    let ltLosses = lt.losses || 0;
+                    loserHtmlContent += `
+                        <div class="flex items-center justify-between text-[10px] font-bold bg-white/80 px-2 py-1 rounded border border-rose-200">
+                            <span class="uppercase text-slate-900 truncate pr-2 name-wrapper">${escapeHtml(lt.name)}</span>
+                            <span class="text-rose-700 shrink-0 font-black">${ltLosses} Losses ❌</span>
+                        </div>
+                    `;
+                });
+                loserHtmlContent += `</div>`;
+            } else {
+                loserHtmlContent = `<div class="text-[10px] text-slate-500 italic py-2 text-center">No defeated teams</div>`;
+            }
 
             let teamsTableHtml = "";
             rankedListWithPositions.forEach((t) => {
@@ -2207,15 +2211,18 @@
             });
 
             container.innerHTML = `
-                <!-- Compact Animation Stage -->
+                <!-- Unique Badminton Doubles Smash & Rally Stage Animation -->
                 <div class="dance-stage-container my-1 relative overflow-hidden">
-                    <div class="champion-aura"></div>
-                    <div class="spotlight-beam-left"></div>
-                    <div class="spotlight-beam-right"></div>
-                    <div class="badminton-net"></div>
-                    <div class="shuttle-smash-motion">🏸</div>
-                    <div class="mens-player-left"><span class="text-xs">🤸‍♂️</span></div>
-                    <div class="mens-player-right"><span class="text-xs">🤸‍♂️</span></div>
+                    <div class="stadium-spotlight"></div>
+                    <div class="court-lines"></div>
+                    <div class="badminton-net-pro"></div>
+                    <div class="pro-shuttle-fly">🏸</div>
+                    <div class="doubles-team-left">
+                        <span class="text-xs filter drop-shadow">👥</span>
+                    </div>
+                    <div class="doubles-team-right">
+                        <span class="text-xs filter drop-shadow">👥</span>
+                    </div>
                 </div>
 
                 <!-- Prominent Champions Box -->
@@ -2258,15 +2265,13 @@
                         <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
-                    <div class="bg-rose-50 border-2 border-rose-400 rounded-xl p-2 text-center shadow-md space-y-0.5 relative overflow-hidden">
-                        <div class="absolute -right-3 -bottom-3 text-rose-200/50 text-2xl pointer-events-none">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
-                        <div class="font-black text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1">
+                    <div class="bg-rose-50 border-2 border-rose-400 rounded-xl p-2 text-center shadow-md space-y-1 relative overflow-hidden flex flex-col justify-between">
+                        <div class="font-black text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1 border-b border-rose-200 pb-1">
                             <i class="fa-solid fa-crosshairs text-rose-600"></i> തോറ്റ ടീം (DEFEATED TEAM)
                         </div>
-                        <div class="text-rose-950 font-black uppercase text-[10px] break-words tracking-tight name-wrapper">${loserNames}</div>
-                        <div class="text-[8px] text-rose-700 font-bold">Other Teams (4th & Below)</div>
+                        <div class="flex-1 overflow-y-auto py-0.5">
+                            ${loserHtmlContent}
+                        </div>
                     </div>
                 </div>
 
@@ -2294,7 +2299,7 @@
             modal.classList.remove("hidden");
             triggerWinCelebration();
             triggerFireworksEffect();
-            playFunnyVoiceAnnouncement(championNamesDisplay, loserNames);
+            playFunnyVoiceAnnouncement(championNamesDisplay, "");
 
             // ACCURATE SCREENSHOT SAVE AFTER 3 SECONDS
             setTimeout(() => {
@@ -3041,7 +3046,7 @@
             const toast = document.getElementById("toast");
             if(!toast) return;
             toast.style.opacity = "0";
-            toast.style.transform = "translate(-50%, -50%) scale(0.9)";
+            toast.style.transform = "translate(-50%, -50++) scale(0.9)";
             toast.style.pointerEvents = "none";
             if (toastTimeout) clearTimeout(toastTimeout);
         }
