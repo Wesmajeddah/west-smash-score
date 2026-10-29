@@ -27,7 +27,6 @@
             font-size: 15px;
         }
 
-        /* Touch Lock Class */
         .app-touch-locked {
             pointer-events: none !important;
             opacity: 0.4;
@@ -350,12 +349,21 @@
             background: rgba(140, 98, 57, 0.2);
         }
 
-        /* Improved Text Wrapping Classes for International Names (Fixes text cutoff) */
         .name-wrapper {
             word-break: break-word;
             overflow-wrap: break-word;
             white-space: normal;
             line-height: 1.25;
+        }
+
+        /* Screenshot Capture Specific Alignment Overrides */
+        .html2canvas-container-fix {
+            box-sizing: border-box !important;
+            padding-bottom: 12px !important;
+            overflow: hidden !important;
+        }
+        .html2canvas-container-fix * {
+            box-sizing: border-box !important;
         }
     </style>
 </head>
@@ -392,12 +400,10 @@
                 <span id="match-status-badge" class="bg-emerald-50 border border-emerald-300 text-emerald-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider">
                     <span id="match-status-dot" class="live-dot-green"></span> <span id="match-status-text">LIVE</span>
                 </span>
-                <!-- START Button (Smaller size, active even during touch lock) -->
                 <button onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-play text-[7px]"></i> START
                 </button>
             </div>
-            <!-- Clear Date Display -->
             <div id="header-date-badge-small" class="bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] px-2 py-0.5 rounded-md tracking-wider shadow-2xs"></div>
         </div>
 
@@ -550,7 +556,7 @@
             </div>
             <div>
                 <h3 class="text-sm font-black text-[#5c4033] uppercase tracking-wider">ടൈമർ സ്റ്റാർട്ട് / പുതിയ കളി</h3>
-                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭించాలా? / Start fresh game & unlock touch?</p>
+                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭിച്ചాలా? / Start fresh game & unlock touch?</p>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeStartMatchConfirmModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2.5 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -673,7 +679,7 @@
 
     <!-- End Match Modal Window (Target for Auto Screenshot) -->
     <div id="finish-match-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div id="screenshot-target-card" class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-slate-800">
+        <div id="screenshot-target-card" class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-slate-800 html2canvas-container-fix">
             <div id="fireworks-container"></div>
             
             <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between relative px-4">
@@ -699,7 +705,7 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div id="finish-match-modal-content" class="p-3 space-y-2 overflow-y-auto flex-1 text-xs"></div>
+            <div id="finish-match-modal-content" class="p-3.5 space-y-2.5 overflow-y-auto flex-1 text-xs pb-4"></div>
         </div>
     </div>
 
@@ -882,7 +888,7 @@
             "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം!"
         ];
 
-        // INTERNATIONAL STANDARD TIE-BREAKER SORTING FUNCTION
+        // BWF INTERNATIONAL STANDARD TIE-BREAKER SORTING FUNCTION
         function getInternationalSortedTeams(teamsArray) {
             return [...teamsArray].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
@@ -1874,26 +1880,38 @@
             let totalMatchesCount = totalPlaysCount / 2;
 
             let sortedTeams = getInternationalSortedTeams(teams);
-            let teamsWithWins = sortedTeams.filter(t => (t.wins || 0) > 0);
+            
+            let activeTeamsWithWins = sortedTeams.filter(t => (t.wins || 0) > 0);
+            let firstPlaceIds = [];
+            let secondPlaceIds = [];
+
+            if (activeTeamsWithWins.length > 0) {
+                let maxWins = activeTeamsWithWins[0].wins;
+                let firstTeams = activeTeamsWithWins.filter(t => t.wins === maxWins);
+                firstPlaceIds = firstTeams.map(t => t.id);
+
+                let remainingSec = activeTeamsWithWins.filter(t => t.wins < maxWins);
+                if (remainingSec.length > 0) {
+                    let secondMaxWins = remainingSec[0].wins;
+                    let secondTeams = remainingSec.filter(t => t.wins === secondMaxWins);
+                    secondPlaceIds = secondTeams.map(t => t.id);
+                }
+            }
 
             let topScorerName = "ഇതുവരെ കളികളില്ല / No Matches";
             let topScorerWins = 0;
-
             let secondPlaceName = "None";
             let secondPlaceWins = 0;
 
-            if (teamsWithWins.length > 0) {
-                let maxWins = teamsWithWins[0].wins;
-                let firstRankTeams = teamsWithWins.filter(t => t.wins === maxWins);
-                topScorerName = firstRankTeams.map(t => escapeHtml(t.name)).join(" & ");
-                topScorerWins = maxWins;
+            if (activeTeamsWithWins.length > 0) {
+                let firstTeams = sortedTeams.filter(t => firstPlaceIds.includes(t.id));
+                topScorerName = firstTeams.map(t => escapeHtml(t.name)).join(" & ");
+                topScorerWins = firstTeams.length > 0 ? firstTeams[0].wins : 0;
 
-                let remainingTeams = teamsWithWins.filter(t => t.wins < maxWins);
-                if (remainingTeams.length > 0) {
-                    let secondMaxWins = remainingTeams[0].wins;
-                    let secondRankTeams = remainingTeams.filter(t => t.wins === secondMaxWins);
-                    secondPlaceName = secondRankTeams.map(t => escapeHtml(t.name)).join(" & ");
-                    secondPlaceWins = secondMaxWins;
+                let secondTeams = sortedTeams.filter(t => secondPlaceIds.includes(t.id));
+                if (secondTeams.length > 0) {
+                    secondPlaceName = secondTeams.map(t => escapeHtml(t.name)).join(" & ");
+                    secondPlaceWins = secondTeams[0].wins;
                 }
             }
 
@@ -1914,21 +1932,23 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            let loserCandidates = [...teams].sort((a, b) => {
-                if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
-                return (a.wins || 0) - (b.wins || 0);
-            });
+            let remainingTeamsForBottom = sortedTeams.filter(t => !firstPlaceIds.includes(t.id) && !secondPlaceIds.includes(t.id));
 
-            let mostDefeatedName = "ഇതുവരെ കളികളില്ല / None";
-            let mostDefeatedCount = 0;
-
-            if (totalPlaysCount > 0 && loserCandidates.length > 0) {
-                let maxLosses = loserCandidates[0].losses || 0;
-                let minWins = loserCandidates[0].wins || 0;
-                let tiedLosers = loserCandidates.filter(t => (t.losses || 0) === maxLosses && (t.wins || 0) === minWins);
-                
-                mostDefeatedName = tiedLosers.map(t => escapeHtml(t.name)).join(" & ");
-                mostDefeatedCount = maxLosses;
+            let bottomBoxHtml = "";
+            if (remainingTeamsForBottom.length === 0) {
+                bottomBoxHtml = `<div class="text-slate-400 italic text-center py-2">മറ്റ് ടീമുകളുടെ വിവരങ്ങൾ ലഭ്യമല്ല / No other teams.</div>`;
+            } else {
+                bottomBoxHtml = `<div class="space-y-1.5 pt-1">`;
+                remainingTeamsForBottom.forEach(t => {
+                    let losses = t.losses || 0;
+                    bottomBoxHtml += `
+                        <div class="bg-[#fcfbf9] border border-[#e6decb] rounded-lg p-2 flex items-center justify-between gap-2 text-xs">
+                            <span class="font-bold text-slate-800 uppercase name-wrapper flex-1">${escapeHtml(t.name)}</span>
+                            <span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 shrink-0">തോൽവികൾ / Losses: ${losses} ❌</span>
+                        </div>
+                    `;
+                });
+                bottomBoxHtml += `</div>`;
             }
 
             container.innerHTML = `
@@ -1964,17 +1984,19 @@
                             </div>
                         </div>
 
+                        <div class="bg-white border-2 border-rose-200 rounded-xl p-3 shadow-md space-y-2">
+                            <div class="text-[10px] text-rose-700 font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-rose-100 pb-1.5">
+                                <i class="fa-solid fa-shield-halved text-rose-600"></i> മറ്റ് ടീമുകളുടെ തോൽവികൾ / Other Teams' Losses
+                            </div>
+                            ${bottomBoxHtml}
+                        </div>
+
                         <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-4 shadow-md space-y-3">
                             <div class="text-[11px] text-[#5c4033] font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-[#d7ccc8] pb-2">
                                 <i class="fa-solid fa-bolt text-[#8c6239] text-sm"></i> മത്സര വിശേഷങ്ങൾ / Highlights
                             </div>
                             <div class="text-[11px] text-slate-700 font-medium leading-relaxed space-y-2">
                                 <div>• Total Match: <b class="text-[#5c4033]">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
-                                <div class="bg-[#fcfbf9] border border-rose-200 rounded-lg p-2 mt-1">
-                                    <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
-                                    <div class="text-xs font-black text-slate-900 uppercase mt-1 name-wrapper">${mostDefeatedName}</div>
-                                    <div class="text-[10px] text-rose-700 font-bold mt-0.5">തോൽവികൾ / Losses: ${mostDefeatedCount} ❌</div>
-                                </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-slate-800 font-semibold">${h2hText}</span></div>
                             </div>
                         </div>
@@ -2134,28 +2156,32 @@
                 </div>
 
                 <!-- Prominent Champions Box -->
-                <div class="bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-4 shadow-md text-center space-y-2 relative">
-                    <div class="text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-crown text-amber-600 text-base"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-base"></i>
+                <div class="bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
+                    <div class="text-[10px] sm:text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-crown text-amber-600 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-sm"></i>
                     </div>
-                    <div class="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
+                    <div class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
                         ✨ ${championNamesDisplay} ✨
                     </div>
-                    <div class="text-[11px] text-emerald-700 font-bold bg-white px-3 py-1 rounded-full inline-block border border-emerald-300 shadow-2xs">
-                        🏆 Wins: ${firstWins}
+                    <div class="inline-block pt-0.5">
+                        <span class="text-[10px] text-emerald-800 font-extrabold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
+                            🏆 Wins: ${firstWins}
+                        </span>
                     </div>
                 </div>
 
                 <!-- Balanced 2nd Place Section -->
-                <div class="bg-gradient-to-r from-[#fcfbf9] via-white to-[#fcfbf9] border border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs text-center space-y-1 relative">
+                <div class="bg-gradient-to-r from-[#fcfbf9] via-white to-[#fcfbf9] border border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs text-center space-y-1 relative overflow-hidden">
                     <div class="text-[9px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-medal text-[#8c6239] text-xs"></i> 2nd PLACE / രണ്ടാം സ്ഥാനം
                     </div>
                     <div class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
                         🌟 ${secondNamesDisplay} 🌟
                     </div>
-                    <div class="text-[9px] text-[#5c4033] font-bold bg-white px-2.5 py-0.5 rounded-full inline-block border border-[#d7ccc8]">
-                        🥈 Wins: ${secondWins}
+                    <div class="inline-block">
+                        <span class="text-[9px] text-[#5c4033] font-bold bg-white px-2 py-0.5 rounded-full border border-[#d7ccc8]">
+                            🥈 Wins: ${secondWins}
+                        </span>
                     </div>
                 </div>
 
@@ -2169,7 +2195,6 @@
                         <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
-                    <!-- Defeated Team Highlight -->
                     <div class="bg-rose-50 border-2 border-rose-400 rounded-xl p-2 text-center shadow-md space-y-0.5 relative overflow-hidden">
                         <div class="absolute -right-3 -bottom-3 text-rose-200/50 text-2xl pointer-events-none">
                             <i class="fa-solid fa-shield-halved"></i>
@@ -2208,15 +2233,47 @@
             triggerFireworksEffect();
             playFunnyVoiceAnnouncement(championNamesDisplay, loserNames);
 
+            // ACCURATE SCREENSHOT SAVE AFTER 3 SECONDS
             setTimeout(() => {
                 const targetCard = document.getElementById("screenshot-target-card");
                 if (targetCard && typeof html2canvas !== 'undefined') {
-                    html2canvas(targetCard, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+                    html2canvas(targetCard, { 
+                        backgroundColor: '#ffffff', 
+                        scale: 3, 
+                        useCORS: true, 
+                        scrollX: 0, 
+                        scrollY: 0,
+                        windowWidth: targetCard.scrollWidth,
+                        windowHeight: targetCard.scrollHeight
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const fileName = `WESMA_Tournament_Result_${Date.now()}.png`;
+
+                        // Direct Download Link Trigger
                         const link = document.createElement('a');
-                        link.download = `WESMA_Tournament_Result_${Date.now()}.png`;
-                        link.href = canvas.toDataURL('image/png');
+                        link.download = fileName;
+                        link.href = imgData;
+                        document.body.appendChild(link);
                         link.click();
-                        showToast("📸 മാച്ച് റിസൾട്ട് സ്ക്രീൻഷോട്ട് സേവ് ചെയ്തു!");
+                        document.body.removeChild(link);
+
+                        // Mobile Image Share / Save API if available
+                        if (navigator.share && navigator.canShare) {
+                            fetch(imgData)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                    const file = new File([blob], fileName, { type: 'image/png' });
+                                    if (navigator.canShare({ files: [file] })) {
+                                        navigator.share({
+                                            files: [file],
+                                            title: 'WESMA Tournament Result',
+                                            text: 'WESMA Badminton Club - Tournament Final Result'
+                                        }).catch(() => {});
+                                    }
+                                });
+                        }
+
+                        showToast("📸 റിസൾട്ട് സ്ക്രീൻഷോട്ട് ഗാലറിയിലേക്ക് സേവ് ചെയ്തു!");
                     }).catch(err => {
                         console.log("Screenshot error:", err);
                     });
@@ -2909,3 +2966,4 @@
     </script>
 </body>
 </html>
+```eof
