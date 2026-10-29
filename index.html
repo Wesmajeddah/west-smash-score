@@ -829,8 +829,8 @@
         ];
 
         const loserCriticizeCommentaries = [
-            "എതിരാളികളുടെ സ്മാഷുകൾക്ക് മുന്നിൽ തടഞ്ഞുനിൽക്കാൻ കഴിയാതെ ദാരുണമായ തോൽവി ഏറ്റുവാങ്ങേണ്ടി വന്ന ടീം!",
-            "നിരാശാജനകമായ പ്രകടനം! കോർട്ടിൽ പൊരുതിനിൽക്കാൻ പോലും സാധിക്കാതെ വലിയ പരാജയം ഏറ്റുവാങ്ങിയ ഇവർ!",
+            "എതിരാളികളുടെ സ്മാഷുകൾക്ക് മുന്നിൽ തടഞ്ഞുനിൽക്കാൻ കഴിയാതെ തോൽവി ഏറ്റുവാങ്ങേണ്ടി വന്ന ടീം!",
+            "നിരാശാജനകമായ പ്രകടനം! കോർട്ടിൽ പൊരുതിനിൽക്കാൻ പോലും സാധിക്കാതെ പരാജയം ഏറ്റുവാങ്ങിയ ഇവർ!",
             "ശരിയായ തന്ത്രങ്ങളോ കൂട്ടായ്മയോ ഇല്ലാതെ കളം വിടേണ്ടി വന്ന ടീം!",
             "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം!"
         ];
@@ -1768,11 +1768,11 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            // GROUP TEAMS BY WINS FOR ACCURATE TIE-BREAKING POSITIONS
-            let teamsWithWins = teams.filter(t => (t.wins || 0) > 0).sort((a, b) => b.wins - a.wins || (a.losses || 0) - (b.losses || 0));
-
             let totalPlaysCount = calculateTotalPlays();
             let totalMatchesCount = totalPlaysCount / 2;
+
+            // ABSOLUTE STRICT TIE-BREAKING POSITION LOGIC FOR CURRENT STATUS
+            let teamsWithWins = teams.filter(t => (t.wins || 0) > 0).sort((a, b) => b.wins - a.wins || (a.losses || 0) - (b.losses || 0));
 
             let topScorerName = "ഇതുവരെ കളികളില്ല / No Matches";
             let topScorerWins = 0;
@@ -1812,13 +1812,23 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
+            // ACCURATE TIED DEFEATED TEAMS LOGIC FOR CURRENT STATUS SHARE
             let loserCandidates = [...teams].sort((a, b) => {
                 if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
                 return (a.wins || 0) - (b.wins || 0);
             });
-            let mostDefeatedTeamObj = (totalPlaysCount > 0 && loserCandidates.length > 0) ? loserCandidates[0] : null;
-            let mostDefeatedName = mostDefeatedTeamObj ? mostDefeatedTeamObj.name : "ഇതുവരെ കളികളില്ല / None";
-            let mostDefeatedCount = mostDefeatedTeamObj ? (mostDefeatedTeamObj.losses || 0) : 0;
+
+            let mostDefeatedName = "ഇതുവരെ കളികളില്ല / None";
+            let mostDefeatedCount = 0;
+
+            if (totalPlaysCount > 0 && loserCandidates.length > 0) {
+                let maxLosses = loserCandidates[0].losses || 0;
+                let minWins = loserCandidates[0].wins || 0;
+                let tiedLosers = loserCandidates.filter(t => (t.losses || 0) === maxLosses && (t.wins || 0) === minWins);
+                
+                mostDefeatedName = tiedLosers.map(t => escapeHtml(t.name)).join(" & ");
+                mostDefeatedCount = maxLosses;
+            }
 
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-4 rounded-2xl border-2 border-sky-300 shadow-md space-y-4 text-center relative overflow-hidden">
@@ -1832,7 +1842,7 @@
                                 <div class="text-[9px] text-emerald-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-crown text-amber-500"></i> ഒന്നാം സ്ഥാനം / 1st Place
                                 </div>
-                                <div class="text-sm font-black text-slate-900 uppercase mt-1 truncate">${topScorerName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 truncate">${topScorerName}</div>
                             </div>
                             <div class="bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-emerald-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
@@ -1845,7 +1855,7 @@
                                 <div class="text-[9px] text-sky-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-medal text-sky-600"></i> രണ്ടാം സ്ഥാനം / 2nd Place
                                 </div>
-                                <div class="text-sm font-black text-slate-900 uppercase mt-1 truncate">${secondPlaceName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 truncate">${secondPlaceName}</div>
                             </div>
                             <div class="bg-sky-50 border border-sky-300 rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-sky-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
@@ -1861,7 +1871,7 @@
                                 <div>• Total Match: <b class="text-sky-700">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
                                 <div class="bg-slate-50 border border-rose-200 rounded-lg p-2 mt-1">
                                     <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
-                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${escapeHtml(mostDefeatedName)}</div>
+                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${mostDefeatedName}</div>
                                     <div class="text-[10px] text-rose-700 font-bold mt-0.5">തോൽവികൾ / Losses: ${mostDefeatedCount} ❌</div>
                                 </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-slate-800 font-semibold">${h2hText}</span></div>
@@ -1976,13 +1986,23 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
+            // ACCURATE TIED DEFEATED TEAMS LOGIC FOR END MATCH MODAL
             let loserCandidates = [...rankedListWithPositions].sort((a, b) => {
                 if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
                 return (a.wins || 0) - (b.wins || 0);
             });
-            let loserObj = loserCandidates.length > 0 ? loserCandidates[0] : null;
-            let loserNames = loserObj ? escapeHtml(loserObj.name) : "None";
-            let loserLossCount = loserObj ? (loserObj.losses || 0) : 0;
+
+            let loserNames = "None";
+            let loserLossCount = 0;
+
+            if (loserCandidates.length > 0) {
+                let maxLosses = loserCandidates[0].losses || 0;
+                let minWins = loserCandidates[0].wins || 0;
+                let tiedLosers = loserCandidates.filter(t => (t.losses || 0) === maxLosses && (t.wins || 0) === minWins);
+
+                loserNames = tiedLosers.map(t => escapeHtml(t.name)).join(" & ");
+                loserLossCount = maxLosses;
+            }
 
             let teamsTableHtml = "";
             rankedListWithPositions.forEach((t) => {
