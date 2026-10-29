@@ -15,8 +15,6 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <!-- html2canvas for Auto Screenshot -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         body {
@@ -663,7 +661,7 @@
         </div>
     </div>
 
-    <!-- End Match Modal Window (Target for Auto Screenshot) -->
+    <!-- End Match Modal Window -->
     <div id="finish-match-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
         <div id="screenshot-target-card" class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-slate-800">
             <div id="fireworks-container"></div>
@@ -1261,8 +1259,18 @@
 
         function formatSingleLetterAnimatedName(nameStr, teamIndex) {
             let upperName = (nameStr || "").toUpperCase();
-            let colorClass = `team-name-${((teamIndex % 5) + 1)}`;
-            return `<span class="${colorClass} font-black">${escapeHtml(upperName)}</span>`;
+            let lettersHtml = "";
+            for (let i = 0; i < upperName.length; i++) {
+                let ch = upperName[i];
+                if (ch === ' ') {
+                    lettersHtml += ' ';
+                } else {
+                    let randomColor = flipPopColorsList[Math.floor(Math.random() * flipPopColorsList.length)];
+                    let randomDelay = (Math.random() * 8).toFixed(1);
+                    lettersHtml += `<span class="animated-letter" style="--rand-color: ${randomColor}; animation-delay: ${randomDelay}s;">${ch}</span>`;
+                }
+            }
+            return lettersHtml;
         }
 
         function calculateTotalPlays() {
@@ -1896,16 +1904,21 @@
                 return (a.wins || 0) - (b.wins || 0);
             });
 
-            let mostDefeatedName = "ഇതുവരെ കളികളില്ല / None";
-            let mostDefeatedCount = 0;
-
-            if (totalPlaysCount > 0 && loserCandidates.length > 0) {
-                let maxLosses = loserCandidates[0].losses || 0;
-                let minWins = loserCandidates[0].wins || 0;
-                let tiedLosers = loserCandidates.filter(t => (t.losses || 0) === maxLosses && (t.wins || 0) === minWins);
-                
-                mostDefeatedName = tiedLosers.map(t => escapeHtml(t.name)).join(" & ");
-                mostDefeatedCount = maxLosses;
+            // തോറ്റ ടീമുകളുടെ ലിസ്റ്റ് തയ്യാറാക്കൽ (wins == 0 അല്ലെങ്കിൽ losses > 0 ഉള്ളവർ)
+            let defeatedTeamsListHtml = "";
+            let allLosers = teams.filter(t => (t.wins || 0) === 0 || (t.losses || 0) > 0).sort((a, b) => (b.losses || 0) - (a.losses || 0));
+            
+            if (allLosers.length > 0) {
+                allLosers.forEach(lt => {
+                    defeatedTeamsListHtml += `
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-800 py-1 border-b border-rose-100 last:border-none">
+                            <span class="uppercase tracking-tight truncate pr-2">• ${escapeHtml(lt.name)}</span>
+                            <span class="text-rose-600 font-black bg-rose-50 px-2 py-0.5 rounded border border-rose-200 shrink-0">${lt.losses || 0} Losses</span>
+                        </div>
+                    `;
+                });
+            } else {
+                defeatedTeamsListHtml = `<div class="text-slate-400 italic text-center">തോറ്റ ടീമുകൾ ഇതുവരെയില്ല / No defeated teams yet</div>`;
             }
 
             container.innerHTML = `
@@ -1941,17 +1954,22 @@
                             </div>
                         </div>
 
+                        <!-- Defeated Teams List Column Added at Bottom -->
+                        <div class="bg-white border-2 border-rose-300 rounded-xl p-3.5 shadow-md space-y-2">
+                            <div class="text-[11px] text-rose-700 font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-rose-200 pb-1.5">
+                                <i class="fa-solid fa-shield-halved text-rose-600 text-sm"></i> തോറ്റ ടീമുകൾ (Defeated Teams)
+                            </div>
+                            <div class="space-y-1 max-h-36 overflow-y-auto pr-1">
+                                ${defeatedTeamsListHtml}
+                            </div>
+                        </div>
+
                         <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-4 shadow-md space-y-3">
                             <div class="text-[11px] text-[#5c4033] font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-[#d7ccc8] pb-2">
                                 <i class="fa-solid fa-bolt text-[#8c6239] text-sm"></i> മത്സര വിശേഷങ്ങൾ / Highlights
                             </div>
                             <div class="text-[11px] text-slate-700 font-medium leading-relaxed space-y-2">
                                 <div>• Total Match: <b class="text-[#5c4033]">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
-                                <div class="bg-[#fcfbf9] border border-rose-200 rounded-lg p-2 mt-1">
-                                    <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
-                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${mostDefeatedName}</div>
-                                    <div class="text-[10px] text-rose-700 font-bold mt-0.5">തോൽവികൾ / Losses: ${mostDefeatedCount} ❌</div>
-                                </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-slate-800 font-semibold">${h2hText}</span></div>
                             </div>
                         </div>
@@ -2063,21 +2081,33 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            let loserCandidates = [...rankedListWithPositions].sort((a, b) => {
-                if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
-                return (a.wins || 0) - (b.wins || 0);
-            });
+            // എല്ലാ തോറ്റ ടീമുകളെയും കൃത്യമായി കണ്ടെത്തുന്നു (വിജയികൾ അല്ലാത്തതോ അല്ലെങ്കിൽ ലോസസ് ഉള്ളവരോ ആയ എല്ലാ ടീമുകൾ)
+            let winningTeamIds = [...firstPlaceTeams, ...secondPlaceTeams, ...thirdPlaceTeams].map(t => t.id);
+            let defeatedTeamsList = rankedListWithPositions.filter(t => !winningTeamIds.includes(t.id) || (t.losses || 0) > 0);
+            if (defeatedTeamsList.length === 0) {
+                defeatedTeamsList = rankedListWithPositions.filter(t => !winningTeamIds.includes(t.id));
+            }
 
-            let loserNames = "None";
-            let loserLossCount = 0;
-
-            if (loserCandidates.length > 0) {
-                let maxLosses = loserCandidates[0].losses || 0;
-                let minWins = loserCandidates[0].wins || 0;
-                let tiedLosers = loserCandidates.filter(t => (t.losses || 0) === maxLosses && (t.wins || 0) === minWins);
-
-                loserNames = tiedLosers.map(t => escapeHtml(t.name)).join(" & ");
-                loserLossCount = maxLosses;
+            let defeatedTeamsHtml = "";
+            if (defeatedTeamsList.length > 0) {
+                defeatedTeamsList.forEach(dt => {
+                    defeatedTeamsHtml += `
+                        <div class="bg-rose-50 border border-rose-300 rounded-xl p-2 text-center shadow-2xs space-y-0.5">
+                            <div class="font-bold text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-shield-halved text-rose-600"></i> തോറ്റ ടീം / Defeated
+                            </div>
+                            <div class="text-rose-950 font-black uppercase text-[10px] break-words">${escapeHtml(dt.name)}</div>
+                            <div class="text-[8px] text-rose-700 font-bold">Losses: ${dt.losses || 0} ❌</div>
+                        </div>
+                    `;
+                });
+            } else {
+                defeatedTeamsHtml = `
+                    <div class="bg-rose-50 border border-rose-300 rounded-xl p-2 text-center shadow-2xs space-y-0.5">
+                        <div class="font-bold text-rose-700 uppercase text-[8px]">തോറ്റ ടീം</div>
+                        <div class="text-rose-950 font-black uppercase text-[10px]">None</div>
+                    </div>
+                `;
             }
 
             let teamsTableHtml = "";
@@ -2138,7 +2168,7 @@
                     </div>
                 </div>
 
-                <!-- 3rd Place & Defeated Team Highlight -->
+                <!-- 3rd Place & Defeated Teams Highlight Grid -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
                     <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl p-2 text-center shadow-2xs space-y-0.5">
                         <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
@@ -2148,16 +2178,9 @@
                         <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
-                    <!-- Defeated Team Highlight -->
-                    <div class="bg-rose-50 border-2 border-rose-400 rounded-xl p-2 text-center shadow-md space-y-0.5 relative overflow-hidden">
-                        <div class="absolute -right-3 -bottom-3 text-rose-200/50 text-2xl pointer-events-none">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
-                        <div class="font-black text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-crosshairs text-rose-600"></i> തോറ്റ ടീം (DEFEATED TEAM)
-                        </div>
-                        <div class="text-rose-950 font-black uppercase text-[10px] break-words tracking-tight">${loserNames}</div>
-                        <div class="text-[8px] text-rose-700 font-bold">Losses: ${loserLossCount}</div>
+                    <!-- Defeated Teams Container -->
+                    <div class="space-y-1 overflow-y-auto max-h-28 pr-0.5">
+                        ${defeatedTeamsHtml}
                     </div>
                 </div>
 
@@ -2185,23 +2208,9 @@
             modal.classList.remove("hidden");
             triggerWinCelebration();
             triggerFireworksEffect();
-            playFunnyVoiceAnnouncement(championNamesDisplay, loserNames);
-
-            // Auto Screenshot after 3 seconds of opening End Match modal (Captures only the match interface card without phone date/time)
-            setTimeout(() => {
-                const targetCard = document.getElementById("screenshot-target-card");
-                if (targetCard && typeof html2canvas !== 'undefined') {
-                    html2canvas(targetCard, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-                        const link = document.createElement('a');
-                        link.download = `WESMA_Tournament_Result_${Date.now()}.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                        showToast("📸 മാച്ച് റിസൾട്ട് സ്ക്രീൻഷോട്ട് സേവ് ചെയ്തു!");
-                    }).catch(err => {
-                        console.log("Screenshot error:", err);
-                    });
-                }
-            }, 3000);
+            playFunnyVoiceAnnouncement(championNamesDisplay, (defeatedTeamIds => {
+                return defeatedTeamsList.map(dt => dt.name).join(" & ");
+            })());
         }
 
         function closeFinishMatchModal() {
