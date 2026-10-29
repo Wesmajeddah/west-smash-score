@@ -25,7 +25,7 @@
             font-size: 15px;
         }
 
-        /* 6 Hours Touch Lock Class */
+        /* Touch Lock Class */
         .app-touch-locked {
             pointer-events: none !important;
             opacity: 0.4;
@@ -375,19 +375,20 @@
     <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-white p-2.5 rounded-2xl shadow-md border border-[#e6decb]">
         
         <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-[#e6decb]">
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5 font-bold text-[#5c4033]">
-                    <i class="fa-solid fa-shuttlecock text-[#8c6239] text-[9px]"></i> WESMA BADMINTON CLUB
+            <div class="flex items-center gap-1.5">
+                <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1 font-bold text-[#5c4033]">
+                    <i class="fa-solid fa-shuttlecock text-[#8c6239] text-[9px]"></i> WESMA
                 </span>
                 <span id="match-status-badge" class="bg-emerald-50 border border-emerald-300 text-emerald-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider">
                     <span id="match-status-dot" class="live-dot-green"></span> <span id="match-status-text">LIVE</span>
                 </span>
-                <!-- START Button (Active even during touch lock) -->
-                <button onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[9px] px-2.5 py-1 rounded-md shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer">
-                    <i class="fa-solid fa-play text-[8px]"></i> START
+                <!-- START Button (Smaller size, active even during touch lock) -->
+                <button onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-play text-[7px]"></i> START
                 </button>
             </div>
-            <span id="header-date-badge-small" class="text-[9px] text-slate-500 font-medium tracking-wider"></span>
+            <!-- Clear Date Display -->
+            <div id="header-date-badge-small" class="bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] px-2 py-0.5 rounded-md tracking-wider shadow-2xs"></div>
         </div>
 
         <!-- Header Banner -->
@@ -839,6 +840,7 @@
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let isMatchEnded = false;
+        let isTournamentLocked = false; // New flag for touch lock after reset
         let timerInterval = null;
         let cooldownInterval = null;
         let isFirebaseConnected = false;
@@ -851,7 +853,6 @@
         let autoWinTimeout = null;
         let lastActionSnapshot = null;
         let lastActionDescription = "";
-        let lastActivityTimestamp = Date.now();
 
         const flipPopColorsList = ["#5c4033", "#8c6239", "#4a3525", "#722f37", "#37474f", "#6d4c41", "#2c221e"];
         const badgeColorsList = ["bg-[#5c4033]", "bg-[#6d4c41]", "bg-[#37474f]", "bg-[#722f37]", "bg-[#8c6239]", "bg-[#4e342e]", "bg-[#263238]"];
@@ -880,7 +881,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v134');
+                const localData = localStorage.getItem('wesma_local_backup_v135');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -890,7 +891,7 @@
                         tournamentHistory = parsed.tournamentHistory || [];
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
-                        lastActivityTimestamp = parsed.lastActivityTimestamp || Date.now();
+                        isTournamentLocked = parsed.isTournamentLocked || false;
 
                         const oneHourMs = 60 * 60 * 1000;
                         tournamentHistory = tournamentHistory.filter(h => {
@@ -915,7 +916,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v134');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v135');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -955,16 +956,17 @@
             }
             
             isMatchEnded = false;
+            isTournamentLocked = false;
             if (!tournamentStartTimestamp) {
                 tournamentStartTimestamp = Date.now();
                 lastActionTimestamp = Date.now();
                 globalClickSequence = 0;
             }
-            lastActivityTimestamp = Date.now();
             saveData();
             render();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
+            applyTouchLockState();
         }
 
         function openStartMatchConfirmModal() {
@@ -984,17 +986,14 @@
 
             tournamentStartTimestamp = Date.now();
             lastActionTimestamp = Date.now();
-            lastActivityTimestamp = Date.now();
             isMatchEnded = false;
+            isTournamentLocked = false;
             
-            // Remove touch lock instantly
-            const masterBody = document.getElementById("master-body-container");
-            if (masterBody) masterBody.classList.remove("app-touch-locked");
-
             saveData();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
             render();
+            applyTouchLockState();
             showToast("⏱️ പുതിയ കളി / ടൈമർ സ്റ്റാർട്ട് ചെയ്തു!");
         }
 
@@ -1078,7 +1077,7 @@
         function initData() {
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            if(dateBadgeSmall) dateBadgeSmall.innerHTML = `${todayStr}`;
+            if(dateBadgeSmall) dateBadgeSmall.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
 
             renderHeaderTitle();
             render();
@@ -1095,7 +1094,7 @@
                 globalClickSequence = 0;
             }
 
-            checkSixHoursTouchLock();
+            applyTouchLockState();
 
             if (dbRef) {
                 dbRef.on('value', (snapshot) => {
@@ -1107,7 +1106,7 @@
                         tournamentHistory = data.tournamentHistory || [];
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
-                        lastActivityTimestamp = data.lastActivityTimestamp || lastActivityTimestamp;
+                        isTournamentLocked = data.isTournamentLocked || false;
 
                         const oneHourMs = 60 * 60 * 1000;
                         tournamentHistory = tournamentHistory.filter(h => {
@@ -1121,7 +1120,7 @@
                     updateHistorySummaryText();
                     updateMatchStatusBadge();
                     updateMainTopLastDefeatedBar();
-                    checkSixHoursTouchLock();
+                    applyTouchLockState();
                 }, (error) => {
                     console.error("Firebase read error:", error);
                     render();
@@ -1134,14 +1133,12 @@
             updateHistorySummaryText();
         }
 
-        // 6 Hours Check Function
-        function checkSixHoursTouchLock() {
-            const sixHoursMs = 6 * 60 * 60 * 1000;
-            const now = Date.now();
+        // Apply Touch Lock State Based on isTournamentLocked flag
+        function applyTouchLockState() {
             const masterBody = document.getElementById("master-body-container");
             if (!masterBody) return;
 
-            if (lastActivityTimestamp && (now - lastActivityTimestamp > sixHoursMs)) {
+            if (isTournamentLocked) {
                 masterBody.classList.add("app-touch-locked");
             } else {
                 masterBody.classList.remove("app-touch-locked");
@@ -1154,10 +1151,10 @@
             const text = document.getElementById("match-status-text");
             if (!badge || !dot || !text) return;
 
-            if (isMatchEnded) {
+            if (isMatchEnded || isTournamentLocked) {
                 badge.className = "bg-rose-50 border border-rose-300 text-rose-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider";
                 dot.className = "live-dot-red";
-                text.textContent = "MATCH STOPPED";
+                text.textContent = isTournamentLocked ? "LOCKED" : "MATCH STOPPED";
             } else {
                 badge.className = "bg-emerald-50 border border-emerald-300 text-emerald-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider";
                 dot.className = "live-dot-green";
@@ -1278,16 +1275,15 @@
                     return duration >= oneHourMs;
                 });
 
-                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded, lastActivityTimestamp };
-                localStorage.setItem('wesma_local_backup_v134', JSON.stringify(payload));
+                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded, isTournamentLocked };
+                localStorage.setItem('wesma_local_backup_v135', JSON.stringify(payload));
             } catch(e) {}
         }
 
         function saveData() {
-            lastActivityTimestamp = Date.now();
             saveLocalBackup();
             if (dbRef) {
-                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded, lastActivityTimestamp }).catch((error) => {
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded, isTournamentLocked }).catch((error) => {
                     console.error("Firebase write error:", error);
                 });
             }
@@ -1807,10 +1803,8 @@
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
                 
-                checkSixHoursTouchLock();
-
-                if (isMatchEnded || !tournamentStartTimestamp) {
-                    if (isMatchEnded && lastActionTimestamp && tournamentStartTimestamp) {
+                if (isTournamentLocked || isMatchEnded || !tournamentStartTimestamp) {
+                    if ((isMatchEnded || isTournamentLocked) && lastActionTimestamp && tournamentStartTimestamp) {
                         const elapsedTotal = lastActionTimestamp - tournamentStartTimestamp;
                         const totalHours = Math.floor(elapsedTotal / 3600000);
                         const totalMins = Math.floor((elapsedTotal % 3600000) / 60000);
@@ -2830,18 +2824,16 @@
             teams = JSON.parse(JSON.stringify(defaultTeams));
             tournamentStartTimestamp = Date.now();
             lastActionTimestamp = Date.now();
-            lastActivityTimestamp = Date.now();
             globalClickSequence = 0;
             isMatchEnded = false;
+            isTournamentLocked = true; // Lock the app entirely until START is pressed
             
-            const masterBody = document.getElementById("master-body-container");
-            if (masterBody) masterBody.classList.remove("app-touch-locked");
-
             saveData();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
             render();
-            showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! / Tournament Reset!");
+            applyTouchLockState();
+            showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! സ്റ്റാർട്ട് അമർത്തുക / Reset! Press Start");
         }
 
         function resetScores() {
