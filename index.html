@@ -121,6 +121,22 @@
             margin: 0 !important;
         }
 
+        .dangerous-badge {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+            color: #ffffff !important;
+            font-size: 7px !important;
+            font-weight: 900 !important;
+            padding: 1px 4px !important;
+            border-radius: 4px !important;
+            box-shadow: 0 0 6px rgba(220, 38, 38, 0.4) !important;
+            border: 1px solid #fca5a5 !important;
+            animation: pulseDangerous 1.5s infinite ease-in-out;
+        }
+        @keyframes pulseDangerous {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.85; }
+        }
+
         .winner-card {
             border: 2px solid #8c6239 !important;
             box-shadow: 0 4px 14px rgba(140, 98, 57, 0.2) !important;
@@ -356,7 +372,6 @@
             line-height: 1.25;
         }
 
-        /* Screenshot Capture Specific Alignment Overrides */
         .html2canvas-container-fix {
             box-sizing: border-box !important;
             padding-bottom: 12px !important;
@@ -548,7 +563,7 @@
         </div>
     </div>
 
-    <!-- Start Match Confirmation Popup Modal (Active during touch lock) -->
+    <!-- Start Match Confirmation Popup Modal -->
     <div id="start-match-confirm-modal" style="pointer-events: auto !important;" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-4 z-[70] hidden">
         <div class="bg-white border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-6 text-center space-y-4 text-slate-800">
             <div class="w-12 h-12 mx-auto bg-[#f5f0eb] text-[#5c4033] rounded-2xl flex items-center justify-center border border-[#d7ccc8] text-lg shadow-sm">
@@ -556,7 +571,7 @@
             </div>
             <div>
                 <h3 class="text-sm font-black text-[#5c4033] uppercase tracking-wider">ടൈമർ സ്റ്റാർട്ട് / പുതിയ കളി</h3>
-                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭിച്ചాలా? / Start fresh game & unlock touch?</p>
+                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭിച്ചാലോ? / Start fresh game & unlock touch?</p>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeStartMatchConfirmModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2.5 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -906,6 +921,38 @@
                 let bPlayed = Math.max(b.played || 0, 1);
                 return (b.wins / bPlayed) - (a.wins / aPlayed);
             });
+        }
+
+        // HISTORY BASED DANGEROUS / MOST DOMINANT TEAM EVALUATION
+        function getHistoricalDangerousTeams() {
+            if (!tournamentHistory || tournamentHistory.length === 0) return [];
+            let teamWinStats = {};
+
+            tournamentHistory.forEach(session => {
+                if (session.teams && Array.isArray(session.teams)) {
+                    let sorted = getInternationalSortedTeams(session.teams);
+                    if (sorted.length > 0 && sorted[0].wins > 0) {
+                        let topWins = sorted[0].wins;
+                        let sessionWinners = sorted.filter(t => t.wins === topWins);
+                        sessionWinners.forEach(w => {
+                            let key = w.name.trim().toUpperCase();
+                            teamWinStats[key] = (teamWinStats[key] || 0) + 1;
+                        });
+                    }
+                }
+            });
+
+            let highestSessionWins = 0;
+            let dangerousNames = [];
+            for (let name in teamWinStats) {
+                if (teamWinStats[name] > highestSessionWins) {
+                    highestSessionWins = teamWinStats[name];
+                    dangerousNames = [name];
+                } else if (teamWinStats[name] === highestSessionWins && highestSessionWins > 0) {
+                    dangerousNames.push(name);
+                }
+            }
+            return dangerousNames;
         }
 
         function formatHoursAndMins(totalMins) {
@@ -1291,12 +1338,6 @@
                 }
             });
             headerContainer.innerHTML = titleHtml;
-        }
-
-        function formatSingleLetterAnimatedName(nameStr, teamIndex) {
-            let upperName = (nameStr || "").toUpperCase();
-            let colorClass = `team-name-${((teamIndex % 5) + 1)}`;
-            return `<span class="${colorClass} font-black">${escapeHtml(upperName)}</span>`;
         }
 
         function calculateTotalPlays() {
@@ -1932,23 +1973,31 @@
                 h2hText = `${topPair.loser} ടീം ${topPair.winner} ടീമിനോട് ${topPair.count} തവണ തോറ്റു / Lost ${topPair.count} times.`;
             }
 
-            let remainingTeamsForBottom = sortedTeams.filter(t => !firstPlaceIds.includes(t.id) && !secondPlaceIds.includes(t.id));
+            // CRITICAL FIX: EXCLUDE 1ST & 2ND PLACE TEAMS & SHOW ONLY MAXIMUM LOSSES FOR OTHER TEAMS
+            let otherTeamsForBottom = sortedTeams.filter(t => !firstPlaceIds.includes(t.id) && !secondPlaceIds.includes(t.id));
 
             let bottomBoxHtml = "";
-            if (remainingTeamsForBottom.length === 0) {
+            if (otherTeamsForBottom.length === 0) {
                 bottomBoxHtml = `<div class="text-slate-400 italic text-center py-2">മറ്റ് ടീമുകളുടെ വിവരങ്ങൾ ലഭ്യമല്ല / No other teams.</div>`;
             } else {
-                bottomBoxHtml = `<div class="space-y-1.5 pt-1">`;
-                remainingTeamsForBottom.forEach(t => {
-                    let losses = t.losses || 0;
-                    bottomBoxHtml += `
-                        <div class="bg-[#fcfbf9] border border-[#e6decb] rounded-lg p-2 flex items-center justify-between gap-2 text-xs">
-                            <span class="font-bold text-slate-800 uppercase name-wrapper flex-1">${escapeHtml(t.name)}</span>
-                            <span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 shrink-0">തോൽവികൾ / Losses: ${losses} ❌</span>
-                        </div>
-                    `;
-                });
-                bottomBoxHtml += `</div>`;
+                let maxLossValue = Math.max(...otherTeamsForBottom.map(t => t.losses || 0));
+                let highestLossTeams = otherTeamsForBottom.filter(t => (t.losses || 0) === maxLossValue && maxLossValue > 0);
+
+                if (highestLossTeams.length === 0) {
+                    bottomBoxHtml = `<div class="text-slate-400 italic text-center py-2">ഇതുവരെ തോൽവികൾ ഉണ്ടായിട്ടില്ല / No losses recorded yet.</div>`;
+                } else {
+                    bottomBoxHtml = `<div class="space-y-1.5 pt-1">`;
+                    highestLossTeams.forEach(t => {
+                        let losses = t.losses || 0;
+                        bottomBoxHtml += `
+                            <div class="bg-[#fcfbf9] border border-rose-300 rounded-lg p-2 flex items-center justify-between gap-2 text-xs shadow-2xs">
+                                <span class="font-black text-rose-950 uppercase name-wrapper flex-1">${escapeHtml(t.name)}</span>
+                                <span class="text-rose-700 font-extrabold bg-rose-50 px-2 py-0.5 rounded border border-rose-300 shrink-0">ഏറ്റവും കൂടുതൽ തോൽവി / Max Losses: ${losses} ❌</span>
+                            </div>
+                        `;
+                    });
+                    bottomBoxHtml += `</div>`;
+                }
             }
 
             container.innerHTML = `
@@ -1986,7 +2035,7 @@
 
                         <div class="bg-white border-2 border-rose-200 rounded-xl p-3 shadow-md space-y-2">
                             <div class="text-[10px] text-rose-700 font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-rose-100 pb-1.5">
-                                <i class="fa-solid fa-shield-halved text-rose-600"></i> മറ്റ് ടീമുകളുടെ തോൽവികൾ / Other Teams' Losses
+                                <i class="fa-solid fa-shield-halved text-rose-600"></i> ഏറ്റവും കൂടുതൽ തോൽവി ഏറ്റുവാങ്ങിയ ടീം / Maximum Losses
                             </div>
                             ${bottomBoxHtml}
                         </div>
@@ -2315,6 +2364,7 @@
             container.innerHTML = "";
             
             let sortedTeams = getInternationalSortedTeams(teams);
+            let dangerousTeamNames = getHistoricalDangerousTeams();
 
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -2345,6 +2395,7 @@
                 const isSecond = (rankPos === 2 && team.wins > 0);
                 const isThird = (rankPos === 3 && team.wins > 0);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0);
+                const isDangerousTeam = dangerousTeamNames.includes(team.name.trim().toUpperCase());
                 
                 const playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
                 const lossesCount = team.losses || 0;
@@ -2368,6 +2419,12 @@
                     specialBadgeHtml = `<span class="rank-badge bg-rose-100 text-rose-700 border border-rose-300 shadow-xs"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>${rankPos}th</span>`;
                 }
 
+                // DANGEROUS / STRONG TEAM BADGE ADDITION FROM HISTORY
+                let dangerousBadgeHtml = "";
+                if (isDangerousTeam) {
+                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs shrink-0" title="All-Time Most Dominant Team from History"><i class="fa-solid fa-fire text-[6px] mr-0.5"></i>DANGEROUS</span>`;
+                }
+
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
 
                 const card = document.createElement("div");
@@ -2377,6 +2434,7 @@
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
+                            ${dangerousBadgeHtml}
                             <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-1 min-w-0" title="Click to edit or delete">
                                 <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
@@ -2966,4 +3024,3 @@
     </script>
 </body>
 </html>
-```eof
