@@ -230,7 +230,7 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* MALE BADMINTON PLAYERS DANCE & SHUTTLE ANIMATION */
+        /* NEW CUSTOM BADMINTON RALLY & CHASE ANIMATION */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -252,48 +252,78 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .dancing-player-left {
+        .court-net {
             position: absolute;
-            bottom: 4px;
-            left: 28%;
-            display: flex;
-            align-items: flex-end;
-            font-size: 20px;
-            animation: championDanceLeft 1.2s infinite ease-in-out;
-            z-index: 4;
-        }
-        @keyframes championDanceLeft {
-            0%, 100% { transform: translateY(0) rotate(-6deg) scale(1); }
-            50% { transform: translateY(-16px) rotate(6deg) scale(1.15); filter: drop-shadow(0 4px 8px rgba(252,211,77,0.5)); }
-        }
-
-        .dancing-player-right {
-            position: absolute;
-            bottom: 4px;
-            right: 28%;
-            display: flex;
-            align-items: flex-end;
-            font-size: 20px;
-            animation: championDanceRight 1.2s infinite ease-in-out 0.6s;
-            z-index: 4;
-        }
-        @keyframes championDanceRight {
-            0%, 100% { transform: translateY(0) rotate(6deg) scale(1); }
-            50% { transform: translateY(-16px) rotate(-6deg) scale(1.15); filter: drop-shadow(0 4px 8px rgba(252,211,77,0.5)); }
-        }
-
-        .floating-shuttle-cock {
-            position: absolute;
-            top: 12px;
+            bottom: 10px;
             left: 50%;
+            width: 2px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            border-left: 1px dashed rgba(255,255,255,0.8);
             transform: translateX(-50%);
-            font-size: 16px;
-            animation: shuttleFloatBounce 1s infinite alternate ease-in-out;
-            z-index: 5;
+            z-index: 3;
         }
-        @keyframes shuttleFloatBounce {
-            0% { transform: translate(-50%, 0) rotate(0deg) scale(1); }
-            100% { transform: translate(-50%, -10px) rotate(180deg) scale(1.2); }
+
+        /* Player 1 (Attacker / Winner) */
+        .player-attacker {
+            position: absolute;
+            bottom: 4px;
+            font-size: 20px;
+            z-index: 4;
+            animation: attackerSequence 6s infinite ease-in-out;
+        }
+
+        /* Player 2 (Defeated / Running away) */
+        .player-defender {
+            position: absolute;
+            bottom: 4px;
+            font-size: 20px;
+            z-index: 4;
+            animation: defenderSequence 6s infinite ease-in-out;
+        }
+
+        /* Shuttlecock Rally Path */
+        .shuttle-cock-anim {
+            position: absolute;
+            font-size: 14px;
+            z-index: 5;
+            animation: shuttleRallySequence 6s infinite linear;
+        }
+
+        @keyframes attackerSequence {
+            /* Rally Phase (0% - 60%): Standing left & playing */
+            0%, 50% { left: 15%; transform: scaleX(1); }
+            25% { transform: scaleX(1) translateY(-6px); }
+            /* Smash Phase (60%): Big Jump */
+            60% { left: 30%; transform: translateY(-20px) scale(1.2); }
+            /* Chase Phase (70% - 100%): Running right chasing loser */
+            75% { left: 55%; transform: translateY(0) scaleX(1); }
+            90% { left: 75%; transform: translateY(-4px) scaleX(1); }
+            100% { left: 15%; transform: scaleX(1); }
+        }
+
+        @keyframes defenderSequence {
+            /* Rally Phase (0% - 60%): Standing right & returning shuttle */
+            0%, 50% { left: 75%; transform: scaleX(-1); }
+            35% { transform: scaleX(-1) translateY(-6px); }
+            /* Defeat Phase (60%): Getting hit / Panicking */
+            60% { left: 70%; transform: scaleX(1) rotate(15deg); }
+            /* Run Away Phase (70% - 100%): Running out to the right in panic */
+            75% { left: 85%; transform: scaleX(1) translateY(-8px); }
+            85% { left: 95%; opacity: 0; transform: scaleX(1); }
+            95% { left: 75%; opacity: 0; }
+            100% { left: 75%; opacity: 1; transform: scaleX(-1); }
+        }
+
+        @keyframes shuttleRallySequence {
+            0% { left: 18%; top: 35px; opacity: 1; }
+            20% { left: 45%; top: 10px; }
+            40% { left: 72%; top: 35px; }
+            55% { left: 45%; top: 12px; }
+            /* Smash Hit & Drop */
+            60% { left: 28%; top: 20px; }
+            68% { left: 80%; top: 50px; opacity: 0; }
+            100% { left: 18%; top: 35px; opacity: 0; }
         }
 
         .stadium-spotlight {
@@ -875,6 +905,22 @@
         const flipPopColorsList = ["#5c4033", "#8c6239", "#4a3525", "#722f37", "#37474f", "#6d4c41", "#2c221e"];
         const badgeColorsList = ["bg-[#5c4033]", "bg-[#6d4c41]", "bg-[#37474f]", "bg-[#722f37]", "bg-[#8c6239]", "bg-[#4e342e]", "bg-[#263238]"];
 
+        // DYNAMIC TITLE TITLES ARRAY (10+ MOTIVATIONAL BADGES)
+        const dynamicTitles = [
+            "MOST DOMINANT",
+            "SMASH KINGS",
+            "UNSTOPPABLE",
+            "COURT MASTERS",
+            "SUPREME CHAMPIONS",
+            "POWER HITTERS",
+            "INVINCEABLE DUO",
+            "ULTIMATE WARRIORS",
+            "MATCH WINNERS",
+            "GOLDEN SMASHERS",
+            "TACTICAL GENIUSES",
+            "BADMINTON LEGENDS"
+        ];
+
         const championPraiseCommentaries = [
             "മികച്ച പോരാട്ടവീര്യത്തോടെയും അത്യുഗ്രൻ സ്മാഷുകളോടെയും എതിരാളികളെ നിലംപരിശാക്കി വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിലെ അജയ്യരായ ചാമ്പ്യന്മാരായി മാറിയിരിക്കുകയാണ് ഇവർ!",
             "അവിശ്വസനീയമായ പ്രകടനം! കോർട്ടിൽ എതിരാളികൾക്ക് യാതൊരു അവസരവും നൽകാതെ കിരീടം ചൂടിയ തികച്ചും അർഹിച്ച വിജയം!",
@@ -909,7 +955,7 @@
             });
         }
 
-        // HISTORY BASED DANGEROUS / MOST DOMINANT TEAM EVALUATION
+        // HISTORY BASED DANGEROUS / DYNAMIC TITLE EVALUATION
         function getHistoricalDangerousTeams() {
             if (!tournamentHistory || tournamentHistory.length === 0) return [];
             let teamWinStats = {};
@@ -939,6 +985,13 @@
                 }
             }
             return dangerousNames;
+        }
+
+        // Helper function to pick a consistent dynamic title based on team ID or wins
+        function getDynamicBadgeTitle(team) {
+            if (!team) return dynamicTitles[0];
+            let index = (team.id + (team.wins || 0)) % dynamicTitles.length;
+            return dynamicTitles[index];
         }
 
         function formatHoursAndMins(totalMins) {
@@ -2153,7 +2206,7 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // Defeated teams list (4th & below) with single line display and clear name wrapping
+            // Defeated teams list (4th & below)
             let loserTeamsList = rankedListWithPositions.filter(t => t.rank > 3);
             let loserHtmlContent = "";
             if (loserTeamsList.length > 0) {
@@ -2193,16 +2246,19 @@
             });
 
             container.innerHTML = `
-                <!-- MALE BADMINTON WINNING PLAYERS DANCE & SHUTTLE ANIMATION -->
+                <!-- CUSTOM ANIMATED BADMINTON PLAYER MATCH & CHASE STAGE -->
                 <div class="dance-stage-container my-1 relative overflow-hidden">
                     <div class="stadium-spotlight"></div>
                     <div class="court-floor"></div>
-                    <div class="floating-shuttle-cock">🏸</div>
-                    <div class="dancing-player-left">
-                        <span>🙋‍♂️🪶</span>
+                    <div class="court-net"></div>
+                    <div class="shuttle-cock-anim">🪶</div>
+                    <!-- Attacker Player with Racket -->
+                    <div class="player-attacker" title="Attacking Champion">
+                        <span>🏃‍♂️🎾</span>
                     </div>
-                    <div class="dancing-player-right">
-                        <span>🙇‍♂️🏆</span>
+                    <!-- Defender Player running away -->
+                    <div class="player-defender" title="Defeated Player Running Away">
+                        <span>🏃‍♂️💨</span>
                     </div>
                 </div>
 
@@ -2236,7 +2292,7 @@
                     </div>
                 </div>
 
-                <!-- 3rd Place (Centered Vertically & Horizontally) & Defeated Team Highlight -->
+                <!-- 3rd Place & Defeated Team Highlight -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
                     <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl p-2 text-center shadow-2xs flex flex-col justify-center items-center space-y-1">
                         <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
@@ -2282,52 +2338,25 @@
             triggerFireworksEffect();
             playFunnyVoiceAnnouncement(championNamesDisplay, "");
 
-            // ACCURATE SCREENSHOT SAVE AFTER 3 SECONDS
+            // SILENT AUTO SCREENSHOT IN BACKGROUND ONLY (NO DOWNLOAD / NO SAVING FILE)
             setTimeout(() => {
                 const targetCard = document.getElementById("screenshot-target-card");
                 if (targetCard && typeof html2canvas !== 'undefined') {
                     html2canvas(targetCard, { 
                         backgroundColor: '#ffffff', 
-                        scale: 3, 
+                        scale: 2, 
                         useCORS: true, 
                         scrollX: 0, 
                         scrollY: 0,
                         windowWidth: targetCard.scrollWidth,
                         windowHeight: targetCard.scrollHeight
                     }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        const fileName = `WESMA_Tournament_Result_${Date.now()}.png`;
-
-                        // Direct Download Link Trigger
-                        const link = document.createElement('a');
-                        link.download = fileName;
-                        link.href = imgData;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
-                        // Mobile Image Share / Save API if available
-                        if (navigator.share && navigator.canShare) {
-                            fetch(imgData)
-                                .then(res => res.blob())
-                                .then(blob => {
-                                    const file = new File([blob], fileName, { type: 'image/png' });
-                                    if (navigator.canShare({ files: [file] })) {
-                                        navigator.share({
-                                            files: [file],
-                                            title: 'WESMA Tournament Result',
-                                            text: 'WESMA Badminton Club - Tournament Final Result'
-                                        }).catch(() => {});
-                                    }
-                                });
-                        }
-
-                        showToast("📸 റിസൾട്ട് സ്ക്രീൻഷോട്ട് ഗാലറിയിലേക്ക് സേവ് ചെയ്തു!");
+                        // Background screenshot rendering completed without triggering file download
                     }).catch(err => {
-                        console.log("Screenshot error:", err);
+                        console.log("Silent screenshot error:", err);
                     });
                 }
-            }, 3000);
+            }, 1500);
         }
 
         function closeFinishMatchModal() {
@@ -2395,7 +2424,6 @@
                 const isSecond = (rankPos === 2 && team.wins > 0 && !team.isDisabled);
                 const isThird = (rankPos === 3 && team.wins > 0 && !team.isDisabled);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0 && !team.isDisabled);
-                const isDangerousTeam = dangerousTeamNames.includes(team.name.trim().toUpperCase());
                 
                 const playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
                 const lossesCount = team.losses || 0;
@@ -2421,10 +2449,11 @@
                     specialBadgeHtml = `<span class="rank-badge bg-slate-200 text-slate-600 border border-slate-300 shadow-xs"><i class="fa-solid fa-user-slash text-[5px] mr-0.5"></i>ABSENT</span>`;
                 }
 
-                // MOST DOMINANT TEAM BADGE ADDITION
+                // DYNAMICALLY CHANGING BADGES BASED ON WINS & TEAMS (10+ MOTIVATIONAL BADGES)
                 let dangerousBadgeHtml = "";
-                if (isDangerousTeam) {
-                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs" title="All-Time Most Dominant Team from History"><i class="fa-solid fa-fire text-[5px] mr-0.5"></i>MOST DOMINANT</span>`;
+                if (team.wins > 0) {
+                    let titleText = getDynamicBadgeTitle(team);
+                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs" title="Tournament Achievement Title"><i class="fa-solid fa-fire text-[5px] mr-0.5"></i>${titleText}</span>`;
                 }
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
@@ -2448,9 +2477,9 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 relative">
-                            <!-- ABSENT / ACTIVE TOGGLE BUTTON -->
-                            <button onclick="toggleTeamDisable(${team.id})" class="text-[8px] font-black uppercase px-1.5 py-1 rounded border transition-all cursor-pointer ${team.isDisabled ? 'bg-slate-200 text-slate-700 border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-300'}" title="വന്നില്ലെങ്കിൽ ഡിസേബിൾ ചെയ്യാം">
-                                ${team.isDisabled ? 'OFF 🔴' : 'ON 🟢'}
+                            <!-- ULTRA COMPACT ON / OFF BUTTON (GREEN DOT / O WRITING ONLY) -->
+                            <button onclick="toggleTeamDisable(${team.id})" class="text-[9px] font-black uppercase w-5 h-5 rounded-full border transition-all cursor-pointer flex items-center justify-center shrink-0 ${team.isDisabled ? 'bg-slate-200 text-slate-600 border-slate-300' : 'bg-emerald-500 text-white border-emerald-600 shadow-2xs'}" title="വന്നില്ലെങ്കിൽ ഡിസേബിൾ ചെയ്യാം (ON/OFF)">
+                                ${team.isDisabled ? 'O' : 'O'}
                             </button>
 
                             <div class="w-5 h-12 bg-white/90 text-slate-700 rounded-lg flex flex-col items-center justify-center border border-slate-200 relative scale-95 shadow-2xs" title="Total Played & Details">
@@ -3027,7 +3056,7 @@
             const toast = document.getElementById("toast");
             if(!toast) return;
             toast.style.opacity = "0";
-            toast.style.transform = "translate(-50%, -50++) scale(0.9)";
+            toast.style.transform = "translate(-50%, -50%) scale(0.9)";
             toast.style.pointerEvents = "none";
             if (toastTimeout) clearTimeout(toastTimeout);
         }
