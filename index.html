@@ -1129,7 +1129,7 @@
                 let randomChamp = championPraiseCommentaries[Math.floor(Math.random() * championPraiseCommentaries.length)];
                 let randomLoser = loserCriticizeCommentaries[Math.floor(Math.random() * loserCriticizeCommentaries.length)];
                 
-                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChamp} എന്നാൽ ${loserName} ടീം പരാജയപ്പെട്ടു. ${randomLoser}`;
+                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChamp} എന്നാൽ പരാജയപ്പെട്ട ടീമുകൾ ${loserName}.`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
@@ -2182,22 +2182,9 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            let loserCandidates = [...rankedListWithPositions].sort((a, b) => {
-                if ((b.losses || 0) !== (a.losses || 0)) return (b.losses || 0) - (a.losses || 0);
-                return (a.wins || 0) - (b.wins || 0);
-            });
-
-            let loserNames = "None";
-            let loserLossCount = 0;
-
-            if (loserCandidates.length > 0) {
-                let maxLosses = loserCandidates[0].losses || 0;
-                let minWins = loserCandidates[0].wins || 0;
-                let tiedLosers = loserCandidates.filter(t => (t.losses || 0) === maxLosses && (t.wins || 0) === minWins);
-
-                loserNames = tiedLosers.map(t => escapeHtml(t.name)).join(" & ");
-                loserLossCount = maxLosses;
-            }
+            // Updated logic to collect ALL teams ranked 4th or lower as Defeated Teams (തോറ്റ ടീം)
+            let loserTeamsList = rankedListWithPositions.filter(t => t.rank > 3);
+            let loserNames = loserTeamsList.length > 0 ? loserTeamsList.map(t => escapeHtml(t.name)).join(" & ") : "None";
 
             let teamsTableHtml = "";
             rankedListWithPositions.forEach((t) => {
@@ -2279,7 +2266,7 @@
                             <i class="fa-solid fa-crosshairs text-rose-600"></i> തോറ്റ ടീം (DEFEATED TEAM)
                         </div>
                         <div class="text-rose-950 font-black uppercase text-[10px] break-words tracking-tight name-wrapper">${loserNames}</div>
-                        <div class="text-[8px] text-rose-700 font-bold">Losses: ${loserLossCount}</div>
+                        <div class="text-[8px] text-rose-700 font-bold">Other Teams (4th & Below)</div>
                     </div>
                 </div>
 
