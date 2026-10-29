@@ -101,12 +101,6 @@
             border-color: #cbd5e1 !important;
         }
 
-        .team-name-1 { color: #3e2723 !important; } 
-        .team-name-2 { color: #4e342e !important; } 
-        .team-name-3 { color: #263238 !important; } 
-        .team-name-4 { color: #33272a !important; } 
-        .team-name-5 { color: #451a03 !important; } 
-
         .gold-border { border: 1.5px solid rgba(140, 98, 57, 0.25); }
 
         .rank-badge {
@@ -236,7 +230,7 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* NEW UNIQUE BADMINTON DOUBLES SMASH & RALLY STAGE ANIMATION */
+        /* NEW WINNING BADMINTON PLAYERS DANCE & SHUTTLE ANIMATION */
         .dance-stage-container {
             position: relative;
             width: 100%;
@@ -248,69 +242,58 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 10px rgba(140, 98, 57, 0.2);
         }
 
-        .court-lines {
+        .court-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: rgba(140, 98, 57, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dancing-player-left {
             position: absolute;
             bottom: 4px;
-            left: 10%;
-            right: 10%;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.3);
+            left: 28%;
+            display: flex;
+            align-items: flex-end;
+            font-size: 20px;
+            animation: championDanceLeft 1.2s infinite ease-in-out;
+            z-index: 4;
+        }
+        @keyframes championDanceLeft {
+            0%, 100% { transform: translateY(0) rotate(-6deg) scale(1); }
+            50% { transform: translateY(-16px) rotate(6deg) scale(1.15); filter: drop-shadow(0 4px 8px rgba(252,211,77,0.5)); }
         }
 
-        .badminton-net-pro {
+        .dancing-player-right {
             position: absolute;
             bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 3px;
-            height: 48px;
-            background: repeating-linear-gradient(0deg, #f8fafc, #f8fafc 3px, transparent 3px, transparent 6px);
-            z-index: 3;
-            box-shadow: 0 0 8px rgba(255,255,255,0.6);
-        }
-
-        .doubles-team-left {
-            position: absolute;
-            bottom: 6px;
-            left: 12%;
+            right: 28%;
             display: flex;
-            gap: 6px;
             align-items: flex-end;
-            animation: doublesJumpLeft 1.2s infinite ease-in-out;
+            font-size: 20px;
+            animation: championDanceRight 1.2s infinite ease-in-out 0.6s;
+            z-index: 4;
         }
-        @keyframes doublesJumpLeft {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            35% { transform: translateY(-24px) rotate(-10deg) scale(1.1); }
-            70% { transform: translateY(0) rotate(5deg); }
+        @keyframes championDanceRight {
+            0%, 100% { transform: translateY(0) rotate(6deg) scale(1); }
+            50% { transform: translateY(-16px) rotate(-6deg) scale(1.15); filter: drop-shadow(0 4px 8px rgba(252,211,77,0.5)); }
         }
 
-        .doubles-team-right {
-            position: absolute;
-            bottom: 6px;
-            right: 12%;
-            display: flex;
-            gap: 6px;
-            align-items: flex-end;
-            animation: doublesJumpRight 1.2s infinite ease-in-out 0.6s;
-        }
-        @keyframes doublesJumpRight {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            35% { transform: translateY(-24px) rotate(10deg) scale(1.1); }
-            70% { transform: translateY(0) rotate(-5deg); }
-        }
-
-        .pro-shuttle-fly {
+        .floating-shuttle-cock {
             position: absolute;
             top: 12px;
-            left: 25%;
-            font-size: 14px;
-            animation: shuttleTrajectory 1.2s infinite linear;
-            z-index: 6;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            animation: shuttleFloatBounce 1s infinite alternate ease-in-out;
+            z-index: 5;
         }
-        @keyframes shuttleTrajectory {
-            0% { transform: translate(0, 25px) rotate(0deg) scale(1); opacity: 0.8; }
-            50% { transform: translate(110px, -15px) rotate(180deg) scale(1.3); opacity: 1; }
-            100% { transform: translate(220px, 25px) rotate(360deg) scale(1); opacity: 0.8; }
+        @keyframes shuttleFloatBounce {
+            0% { transform: translate(-50%, 0) rotate(0deg) scale(1); }
+            100% { transform: translate(-50%, -10px) rotate(180deg) scale(1.2); }
         }
 
         .stadium-spotlight {
@@ -319,14 +302,14 @@
             left: 30%;
             width: 60px;
             height: 90px;
-            background: radial-gradient(circle, rgba(252, 211, 77, 0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(252, 211, 77, 0.3) 0%, transparent 70%);
             transform: rotate(-15deg);
             pointer-events: none;
             animation: spotlightSweep 3s infinite alternate ease-in-out;
         }
         @keyframes spotlightSweep {
-            0% { transform: translateX(-40px) rotate(-20deg); opacity: 0.4; }
-            100% { transform: translateX(60px) rotate(20deg); opacity: 0.9; }
+            0% { transform: translateX(-30px) rotate(-20deg); opacity: 0.5; }
+            100% { transform: translateX(50px) rotate(20deg); opacity: 0.9; }
         }
 
         #fireworks-container {
@@ -1116,9 +1099,8 @@
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 let randomChamp = championPraiseCommentaries[Math.floor(Math.random() * championPraiseCommentaries.length)];
-                let randomLoser = loserCriticizeCommentaries[Math.floor(Math.random() * loserCriticizeCommentaries.length)];
                 
-                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChamp} എന്നാൽ പരാജയപ്പെട്ട ടീമുകൾ.`;
+                const text = `ഇന്നത്തെ വെസ്മാ ബാഡ്മിന്റൺ ടൂർണമെന്റിലെ ചാമ്പ്യന്മാർ ${champName}! ${randomChamp}`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ml-IN';
                 utterance.rate = 0.95;
@@ -2171,7 +2153,7 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // Updated logic to display each defeated team (4th & below) with their losses in a single line
+            // Defeated teams list (4th & below) with single line display and clear name wrapping
             let loserTeamsList = rankedListWithPositions.filter(t => t.rank > 3);
             let loserHtmlContent = "";
             if (loserTeamsList.length > 0) {
@@ -2179,8 +2161,8 @@
                 loserTeamsList.forEach(lt => {
                     let ltLosses = lt.losses || 0;
                     loserHtmlContent += `
-                        <div class="flex items-center justify-between text-[10px] font-bold bg-white/80 px-2 py-1 rounded border border-rose-200">
-                            <span class="uppercase text-slate-900 truncate pr-2 name-wrapper">${escapeHtml(lt.name)}</span>
+                        <div class="flex items-center justify-between text-[10px] font-bold bg-white/90 px-2 py-1.5 rounded border border-rose-200 gap-2">
+                            <span class="uppercase text-slate-900 break-words name-wrapper flex-1 pr-1">${escapeHtml(lt.name)}</span>
                             <span class="text-rose-700 shrink-0 font-black">${ltLosses} Losses ❌</span>
                         </div>
                     `;
@@ -2211,17 +2193,16 @@
             });
 
             container.innerHTML = `
-                <!-- Unique Badminton Doubles Smash & Rally Stage Animation -->
+                <!-- UNIQUE BADMINTON WINNING PLAYERS DANCE & SHUTTLE ANIMATION -->
                 <div class="dance-stage-container my-1 relative overflow-hidden">
                     <div class="stadium-spotlight"></div>
-                    <div class="court-lines"></div>
-                    <div class="badminton-net-pro"></div>
-                    <div class="pro-shuttle-fly">🏸</div>
-                    <div class="doubles-team-left">
-                        <span class="text-xs filter drop-shadow">👥</span>
+                    <div class="court-floor"></div>
+                    <div class="floating-shuttle-cock">🏸</div>
+                    <div class="dancing-player-left">
+                        <span>🕺🪶</span>
                     </div>
-                    <div class="doubles-team-right">
-                        <span class="text-xs filter drop-shadow">👥</span>
+                    <div class="dancing-player-right">
+                        <span>💃🏆</span>
                     </div>
                 </div>
 
@@ -2255,13 +2236,13 @@
                     </div>
                 </div>
 
-                <!-- 3rd Place & Defeated Team Highlight -->
+                <!-- 3rd Place (Centered Vertically & Horizontally) & Defeated Team Highlight -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
-                    <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl p-2 text-center shadow-2xs space-y-0.5">
+                    <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl p-2 text-center shadow-2xs flex flex-col justify-center items-center space-y-1">
                         <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-award text-[#8c6239]"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
-                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words name-wrapper">${thirdNamesDisplay}</div>
+                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words name-wrapper w-full text-center">${thirdNamesDisplay}</div>
                         <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
@@ -2269,7 +2250,7 @@
                         <div class="font-black text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1 border-b border-rose-200 pb-1">
                             <i class="fa-solid fa-crosshairs text-rose-600"></i> തോറ്റ ടീം (DEFEATED TEAM)
                         </div>
-                        <div class="flex-1 overflow-y-auto py-0.5">
+                        <div class="flex-1 overflow-y-auto py-0.5 max-h-24">
                             ${loserHtmlContent}
                         </div>
                     </div>
