@@ -19,10 +19,17 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fcfbf9; /* Standard Warm Off-White */
-            color: #1c1917; /* Standard Dark Charcoal / Off-Black */
+            background-color: #fcfbf9;
+            color: #2c221e;
             -webkit-tap-highlight-color: transparent;
             font-size: 15px;
+        }
+
+        /* 6 Hours Touch Lock Class */
+        .app-touch-locked {
+            pointer-events: none !important;
+            opacity: 0.4;
+            filter: grayscale(80%);
         }
         
         .wesma-title {
@@ -42,7 +49,7 @@
             font-size: 1.35em;
             display: inline-block;
             transform: translateY(3px);
-            color: #78350f; /* Coffee Brown Standard */
+            color: #4a3525;
             font-weight: 900;
             transform-style: preserve-3d;
             animation: ultraSlowFlipHeaderW 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
@@ -50,13 +57,13 @@
         @keyframes ultraSlowFlipHeaderW {
             0%, 85%, 100% { 
                 transform: translateY(3px) rotateX(0deg) scale(1); 
-                color: #78350f; 
+                color: #4a3525; 
                 text-shadow: none;
             }
             92%, 97% { 
                 transform: translateY(3px) rotateX(360deg) scale(1.35); 
-                color: var(--w-rand-color, #44403c); 
-                text-shadow: 0 0 16px var(--w-rand-color, rgba(68, 64, 60, 0.5));
+                color: var(--w-rand-color, #8c6239); 
+                text-shadow: 0 0 16px var(--w-rand-color, rgba(140, 98, 57, 0.4));
             }
         }
 
@@ -64,36 +71,35 @@
             display: inline-block;
             transform-style: preserve-3d;
             font-weight: 800;
-            color: #1c1917; /* Standard Black/Charcoal */
+            color: #2c221e;
             animation: ultraSlowFlip 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes ultraSlowFlip {
             0%, 85%, 100% { 
                 transform: rotateX(0deg) scale(1); 
-                color: #1c1917; 
+                color: #2c221e; 
                 text-shadow: none; 
             }
             92%, 97% { 
                 transform: rotateX(360deg) scale(1.35); 
-                color: var(--rand-color, #78350f); 
-                text-shadow: 0 0 16px var(--rand-color, rgba(120, 53, 15, 0.5)); 
+                color: var(--rand-color, #8c6239); 
+                text-shadow: 0 0 16px var(--rand-color, rgba(140, 98, 57, 0.4)); 
             }
         }
 
-        /* Standard Coffee Brown & Neutral Trendy Mixed Card Colors */
-        .team-box-1 { border-color: #d6d3d1 !important; background: linear-gradient(135deg, #f5f5f4 0%, #e7e5e4 50%, #fdf4f0 100%) !important; }
-        .team-box-2 { border-color: #d6d3d1 !important; background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 50%, #f5f5f4 100%) !important; }
-        .team-box-3 { border-color: #d6d3d1 !important; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f5f5f4 100%) !important; }
-        .team-box-4 { border-color: #d6d3d1 !important; background: linear-gradient(135deg, #fae8ff 0%, #f3e8ff 50%, #f5f5f4 100%) !important; }
-        .team-box-5 { border-color: #d6d3d1 !important; background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 50%, #f5f5f4 100%) !important; }
+        .team-box-1 { border-color: #d1c7bd !important; background: linear-gradient(135deg, #f7f5f0 0%, #fffdfa 50%, #f3ede2 100%) !important; }
+        .team-box-2 { border-color: #d7ccc8 !important; background: linear-gradient(135deg, #efebe9 0%, #faf8f7 50%, #e7dee3 100%) !important; }
+        .team-box-3 { border-color: #cfd8dc !important; background: linear-gradient(135deg, #eceff1 0%, #f7f9fa 50%, #e0f2fe 100%) !important; }
+        .team-box-4 { border-color: #d7ccc8 !important; background: linear-gradient(135deg, #fbe9e7 0%, #fff5f3 50%, #f5f5f4 100%) !important; }
+        .team-box-5 { border-color: #d4d4d8 !important; background: linear-gradient(135deg, #f4f4f5 0%, #fafafa 50%, #fef3c7 100%) !important; }
 
-        .team-name-1 { color: #1c1917 !important; } 
-        .team-name-2 { color: #44403c !important; } 
-        .team-name-3 { color: #292524 !important; } 
-        .team-name-4 { color: #57534e !important; } 
-        .team-name-5 { color: #78350f !important; } 
+        .team-name-1 { color: #3e2723 !important; } 
+        .team-name-2 { color: #4e342e !important; } 
+        .team-name-3 { color: #263238 !important; } 
+        .team-name-4 { color: #33272a !important; } 
+        .team-name-5 { color: #451a03 !important; } 
 
-        .gold-border { border: 1.5px solid rgba(120, 53, 15, 0.2); }
+        .gold-border { border: 1.5px solid rgba(140, 98, 57, 0.25); }
 
         .rank-badge {
             display: inline-flex !important;
@@ -115,27 +121,26 @@
         }
 
         .winner-card {
-            border: 2px solid #78350f !important;
-            box-shadow: 0 4px 14px rgba(120, 53, 15, 0.15) !important;
+            border: 2px solid #8c6239 !important;
+            box-shadow: 0 4px 14px rgba(140, 98, 57, 0.2) !important;
         }
         .second-card {
-            border: 2px solid #44403c !important;
-            box-shadow: 0 4px 14px rgba(68, 64, 60, 0.15) !important;
+            border: 2px solid #5c4033 !important;
+            box-shadow: 0 4px 14px rgba(92, 64, 51, 0.2) !important;
         }
         .third-card {
-            border: 2px solid #78350f !important;
-            box-shadow: 0 4px 12px rgba(120, 53, 15, 0.1) !important;
+            border: 2px solid #8c6239 !important;
+            box-shadow: 0 4px 12px rgba(140, 98, 57, 0.15) !important;
         }
         .loser-card {
-            border: 2px solid rgba(120, 53, 15, 0.3) !important;
+            border: 2px solid rgba(114, 47, 55, 0.3) !important;
         }
 
         .static-watermark {
-            color: #78350f;
+            color: #4a3525;
             font-weight: 700;
         }
 
-        /* Defeated Selection Highlight Effect (3-Seconds Red Pulse & Glow) */
         @keyframes defeatedSelectionGlow {
             0% {
                 background-color: #ffe4e6 !important;
@@ -167,18 +172,26 @@
             animation: defeatedSelectionGlow 3s ease-in-out forwards !important;
         }
 
+        @keyframes startButtonPop {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0px rgba(140, 98, 57, 0); }
+            50% { transform: scale(1.08); box-shadow: 0 0 18px rgba(140, 98, 57, 0.6); }
+        }
+        .start-pop-btn {
+            animation: startButtonPop 1.8s infinite ease-in-out;
+        }
+
         @keyframes liveDotPulseGreen {
-            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(41, 37, 36, 0.8); }
-            50% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 12px rgba(41, 37, 36, 1); }
+            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(22, 163, 74, 0.8); }
+            50% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 12px rgba(22, 163, 74, 1); }
         }
         @keyframes liveDotPulseRed {
-            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(120, 53, 15, 0.8); }
-            50% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 12px rgba(120, 53, 15, 1); }
+            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(220, 38, 38, 0.8); }
+            50% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 12px rgba(220, 38, 38, 1); }
         }
         .live-dot-green {
             width: 7px;
             height: 7px;
-            background-color: #292524;
+            background-color: #16a34a;
             border-radius: 50%;
             display: inline-block;
             animation: liveDotPulseGreen 1.2s infinite ease-in-out;
@@ -186,37 +199,27 @@
         .live-dot-red {
             width: 7px;
             height: 7px;
-            background-color: #78350f;
+            background-color: #dc2626;
             border-radius: 50%;
             display: inline-block;
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* Special Start Button Pulsing Glow Animation */
-        @keyframes startBtnGlow {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(120, 53, 15, 0.4); }
-            50% { transform: scale(1.06); box-shadow: 0 0 18px rgba(120, 53, 15, 0.8); }
-        }
-        .start-btn-pulse {
-            animation: startBtnGlow 1.5s infinite ease-in-out;
-        }
-
-        /* Enlarged & Upgraded Crazy Dancing & Racket Throwing Stage Animation */
         .dance-stage-container {
             position: relative;
             width: 100%;
-            height: 130px;
-            background: linear-gradient(180deg, #f5f5f4 0%, #e7e5e4 100%);
+            height: 75px;
+            background: linear-gradient(180deg, #f7f5f0 0%, #e7e2d9 100%);
             border-radius: 0.75rem;
             overflow: hidden;
-            border: 1.5px solid rgba(120, 53, 15, 0.3);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05), 0 0 10px rgba(120, 53, 15, 0.1);
+            border: 1px solid rgba(140, 98, 57, 0.3);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05), 0 0 10px rgba(140, 98, 57, 0.1);
         }
 
         .champion-aura {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(120,53,15,0.2) 0%, transparent 75%);
+            background: radial-gradient(circle at center, rgba(140,98,57,0.15) 0%, transparent 75%);
             animation: auraPulse 1.5s infinite ease-in-out;
         }
         @keyframes auraPulse {
@@ -229,85 +232,63 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 3px;
-            height: 75px;
-            background: repeating-linear-gradient(0deg, #78350f, #78350f 4px, transparent 4px, transparent 8px);
+            width: 2px;
+            height: 42px;
+            background: repeating-linear-gradient(0deg, #5c4033, #5c4033 3px, transparent 3px, transparent 6px);
             z-index: 2;
         }
 
-        /* Enlarged & Crazy Dancing Players */
         .mens-player-left {
             position: absolute;
-            bottom: 6px;
-            left: 18%;
-            font-size: 2.8rem;
+            bottom: 4px;
+            left: 15%;
             display: flex;
             align-items: flex-end;
-            transform-origin: bottom center;
-            animation: crazyDanceLeft 1.1s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97);
-            z-index: 3;
+            gap: 2px;
+            animation: crazySmashLeft 0.9s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97);
         }
-        @keyframes crazyDanceLeft {
+        @keyframes crazySmashLeft {
             0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-35px) rotate(-25deg) scale(1.3); }
-            50% { transform: translateY(-10px) rotate(15deg) scale(1.15) scaleX(-1); }
-            75% { transform: translateY(-28px) rotate(-10deg) scale(1.25); }
+            30% { transform: translateY(-22px) rotate(-15deg) scale(1.2); }
+            60% { transform: translateY(0) rotate(5deg) scale(0.95); }
         }
 
         .mens-player-right {
             position: absolute;
-            bottom: 6px;
-            right: 18%;
-            font-size: 2.8rem;
+            bottom: 4px;
+            right: 15%;
             display: flex;
             align-items: flex-end;
-            transform-origin: bottom center;
-            animation: crazyDanceRight 1.1s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.55s;
-            z-index: 3;
+            gap: 2px;
+            animation: crazySmashRight 0.9s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.45s;
         }
-        @keyframes crazyDanceRight {
+        @keyframes crazySmashRight {
             0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-35px) rotate(25deg) scale(1.3); }
-            50% { transform: translateY(-10px) rotate(-15deg) scale(1.15) scaleX(-1); }
-            75% { transform: translateY(-28px) rotate(10deg) scale(1.25); }
+            30% { transform: translateY(-22px) rotate(15deg) scale(1.2); }
+            60% { transform: translateY(0) rotate(-5deg) scale(0.95); }
         }
 
-        /* Flying & Thrown Badminton / Rackets */
-        .thrown-racket-1 {
+        .shuttle-smash-motion {
             position: absolute;
-            top: 20px;
-            left: 10%;
-            font-size: 1.4rem;
-            animation: throwRacketFly1 1.2s infinite ease-in-out;
-            z-index: 4;
+            top: 8px;
+            left: 20%;
+            font-size: 13px;
+            animation: wildShuttle 0.9s infinite ease-in-out alternate;
+            z-index: 5;
         }
-        @keyframes throwRacketFly1 {
-            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0.2; }
-            50% { transform: translate(110px, -25px) rotate(360deg) scale(1.4); opacity: 1; }
-            100% { transform: translate(220px, 15px) rotate(720deg) scale(0.9); opacity: 0.2; }
-        }
-
-        .thrown-racket-2 {
-            position: absolute;
-            top: 15px;
-            right: 10%;
-            font-size: 1.4rem;
-            animation: throwRacketFly2 1.2s infinite ease-in-out 0.6s;
-            z-index: 4;
-        }
-        @keyframes throwRacketFly2 {
-            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0.2; }
-            50% { transform: translate(-110px, -25px) rotate(-360deg) scale(1.4); opacity: 1; }
-            100% { transform: translate(-220px, 15px) rotate(-720deg) scale(0.9); opacity: 0.2; }
+        @keyframes wildShuttle {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            50% { transform: translate(90px, 25px) rotate(220deg) scale(1.4); }
+            100% { transform: translate(180px, -8px) rotate(410deg) scale(1); }
         }
 
         .spotlight-beam-left {
             position: absolute;
             top: -20px;
             left: 10%;
-            width: 50px;
-            height: 120px;
-            background: linear-gradient(180deg, rgba(120, 53, 15, 0.2) 0%, transparent 100%);
+            width: 40px;
+            height: 100px;
+            background: linear-gradient(180deg, rgba(92, 64, 51, 0.2) 0%, transparent 100%);
             transform: rotate(-25deg);
             pointer-events: none;
             animation: beamGlow 1.5s infinite alternate ease-in-out;
@@ -316,9 +297,9 @@
             position: absolute;
             top: -20px;
             right: 10%;
-            width: 50px;
-            height: 120px;
-            background: linear-gradient(180deg, rgba(68, 64, 60, 0.2) 0%, transparent 100%);
+            width: 40px;
+            height: 100px;
+            background: linear-gradient(180deg, rgba(140, 98, 57, 0.2) 0%, transparent 100%);
             transform: rotate(25deg);
             pointer-events: none;
             animation: beamGlow 1.5s infinite alternate ease-in-out 0.75s;
@@ -349,9 +330,9 @@
         }
 
         .record-detail-btn {
-            background: linear-gradient(135deg, rgba(120, 53, 15, 0.1), rgba(68, 64, 60, 0.15));
-            border: 1px solid rgba(120, 53, 15, 0.4);
-            color: #78350f;
+            background: linear-gradient(135deg, rgba(92, 64, 51, 0.1), rgba(140, 98, 57, 0.15));
+            border: 1px solid rgba(140, 98, 57, 0.4);
+            color: #4a3525;
             padding: 2px 5px;
             border-radius: 4px;
             font-size: 8px;
@@ -360,75 +341,73 @@
             align-items: center;
             gap: 2px;
             transition: all 0.15s ease-in-out;
-            box-shadow: 0 0 4px rgba(120, 53, 15, 0.1);
+            box-shadow: 0 0 4px rgba(140, 98, 57, 0.1);
         }
         .record-detail-btn:active {
             transform: scale(0.92);
-            background: rgba(120, 53, 15, 0.2);
+            background: rgba(140, 98, 57, 0.2);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-stone-100 text-stone-900">
+<body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
 
     <!-- Startup Gate Modal -->
-    <div id="startup-gate" class="fixed inset-0 bg-stone-900/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4 text-stone-900">
-            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(120,53,15,0.3)]">
+    <div id="startup-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4 text-slate-900">
+            <div class="w-16 h-16 mx-auto relative drop-shadow-[0_2px_10px_rgba(140,98,57,0.3)]">
                 <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="96" fill="#78350F" />
-                    <circle cx="100" cy="100" r="90" fill="#ffffff" stroke="#78350F" stroke-width="1.5" />
-                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#78350F" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="100" cy="100" r="96" fill="#5c4033" />
+                    <circle cx="100" cy="100" r="90" fill="#ffffff" stroke="#5c4033" stroke-width="1.5" />
+                    <path d="M 56 75 L 74 118 L 100 92 L 126 118 L 144 75" fill="none" stroke="#5c4033" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div>
-                <h2 class="text-sm font-semibold text-amber-900 tracking-wider">WESMA BADMINTON</h2>
-                <p class="text-xs text-stone-500 font-light mt-1 tracking-widest uppercase">WELCOME TO TOURNAMENT</p>
+                <h2 class="text-sm font-semibold text-[#8c6239] tracking-wider">WESMA BADMINTON</h2>
+                <p class="text-xs text-slate-500 font-light mt-1 tracking-widest uppercase">WELCOME TO TOURNAMENT</p>
             </div>
-            <button type="button" onclick="launchApp()" class="w-full bg-gradient-to-r from-amber-900 to-stone-800 hover:from-amber-800 hover:to-stone-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-amber-900/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <button type="button" onclick="launchApp()" class="w-full bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-semibold py-3 rounded-xl shadow-lg shadow-[#8c6239]/20 text-xs tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-play"></i> START TOURNAMENT
             </button>
         </div>
     </div>
     
     <!-- Printable Share Area Container -->
-    <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-white p-2.5 rounded-2xl shadow-md border border-stone-200">
+    <div id="capture-area" class="w-full max-w-xl my-auto space-y-2.5 bg-white p-2.5 rounded-2xl shadow-md border border-[#e6decb]">
         
-        <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-stone-200">
+        <div class="flex items-center justify-between px-2 pt-0.5 pb-1 border-b border-[#e6decb]">
             <div class="flex items-center gap-2">
-                <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5 font-bold">
-                    <i class="fa-solid fa-shuttlecock text-amber-900 text-[9px]"></i> WESMA BADMINTON CLUB
+                <span class="text-[10px] tracking-[0.2em] uppercase static-watermark flex items-center gap-1.5 font-bold text-[#5c4033]">
+                    <i class="fa-solid fa-shuttlecock text-[#8c6239] text-[9px]"></i> WESMA BADMINTON CLUB
                 </span>
-                <div class="flex items-center gap-1.5">
-                    <span id="match-status-badge" class="bg-stone-100 border border-stone-300 text-stone-800 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider">
-                        <span id="match-status-dot" class="live-dot-green"></span> <span id="match-status-text">LIVE</span>
-                    </span>
-                    <!-- NEW START BUTTON BESIDE LIVE OPTION WITH SPECIAL PULSE ANIMATION -->
-                    <button onclick="manualStartMatchTimer()" class="bg-gradient-to-r from-amber-700 to-stone-800 hover:from-amber-800 hover:to-stone-900 text-white font-black text-[9px] px-2.5 py-0.5 rounded-md shadow-sm uppercase tracking-wider flex items-center gap-1 cursor-pointer start-btn-pulse border border-amber-900" title="ടൈമർ & കളി പുതിയതായി സ്റ്റാർട്ട് ചെയ്യുക">
-                        <i class="fa-solid fa-play text-[8px]"></i> START
-                    </button>
-                </div>
+                <span id="match-status-badge" class="bg-emerald-50 border border-emerald-300 text-emerald-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider">
+                    <span id="match-status-dot" class="live-dot-green"></span> <span id="match-status-text">LIVE</span>
+                </span>
+                <!-- START Button (Active even during touch lock) -->
+                <button onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[9px] px-2.5 py-1 rounded-md shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-play text-[8px]"></i> START
+                </button>
             </div>
-            <span id="header-date-badge-small" class="text-[9px] text-stone-500 font-medium tracking-wider"></span>
+            <span id="header-date-badge-small" class="text-[9px] text-slate-500 font-medium tracking-wider"></span>
         </div>
 
         <!-- Header Banner -->
-        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-stone-50 border gold-border rounded-2xl shadow-sm relative overflow-hidden space-y-0">
+        <div id="share-header-banner" class="text-center py-1.5 px-3 bg-[#fcfbf9] border gold-border rounded-2xl shadow-sm relative overflow-hidden space-y-0">
             <div class="py-0.5">
-                <div id="header-title-container" class="wesma-title leading-tight text-stone-900"></div>
+                <div id="header-title-container" class="wesma-title leading-tight text-slate-900"></div>
             </div>
         </div>
 
         <!-- Outer Defeated Bar -->
-        <div class="bg-stone-50 border border-stone-200 rounded-lg px-2 py-1 flex items-center justify-between shadow-xs gap-1.5">
+        <div class="bg-[#fcfbf9] border border-[#d7ccc8] rounded-lg px-2 py-1 flex items-center justify-between shadow-xs gap-1.5">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                <span class="w-3.5 h-3.5 rounded-full bg-rose-100 border border-rose-300 text-rose-700 flex items-center justify-center text-[7px] shrink-0">
+                <span class="w-3.5 h-3.5 rounded-full bg-rose-100 border border-rose-300 text-rose-600 flex items-center justify-center text-[7px] shrink-0">
                     <i class="fa-solid fa-shield-halved"></i>
                 </span>
                 <div class="min-w-0 flex-1">
-                    <div id="main-top-last-defeated-text" class="text-[9px] font-bold text-stone-700 truncate w-full">No matches played yet</div>
+                    <div id="main-top-last-defeated-text" class="text-[9px] font-bold text-slate-700 truncate w-full">No matches played yet</div>
                 </div>
             </div>
-            <button onclick="openLastDefeatedHistoryModal()" class="w-5 h-5 bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-700 rounded flex items-center justify-center text-[9px] shrink-0 cursor-pointer" title="Previous Defeats History">
+            <button onclick="openLastDefeatedHistoryModal()" class="w-5 h-5 bg-[#f5f0eb] hover:bg-[#ebdcd0] border border-[#d7ccc8] text-[#5c4033] rounded flex items-center justify-center text-[9px] shrink-0 cursor-pointer" title="Previous Defeats History">
                 <i class="fa-solid fa-circle-info"></i>
             </button>
         </div>
@@ -437,53 +416,53 @@
         <div id="main-content-area" class="space-y-2.5">
             <div id="teams-list" class="space-y-2.5"></div>
 
-            <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-2 shadow-xs">
-                <div class="flex items-center justify-between px-2 py-1 bg-white rounded-lg border border-stone-200 shadow-2xs">
-                    <span class="text-xs font-medium text-stone-600 flex items-center gap-2">
-                        <i class="fa-solid fa-gamepad text-stone-700"></i> Total Plays :
+            <div class="bg-[#fcfbf9] border border-[#e6decb] rounded-xl p-3 space-y-2 shadow-xs">
+                <div class="flex items-center justify-between px-2 py-1 bg-white rounded-lg border border-[#e6decb] shadow-2xs">
+                    <span class="text-xs font-medium text-slate-600 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-[#8c6239]"></i> Total Plays :
                     </span>
                     <div class="flex items-center gap-1.5">
-                        <div class="flex items-center gap-1 bg-stone-50 px-2.5 py-0.5 rounded-lg shadow-inner border border-stone-200">
-                            <span id="total-play-val" class="text-stone-800 font-bold text-xs min-w-[15px] text-center">
+                        <div class="flex items-center gap-1 bg-[#fcfbf9] px-2.5 py-0.5 rounded-lg shadow-inner border border-[#e6decb]">
+                            <span id="total-play-val" class="text-[#5c4033] font-bold text-xs min-w-[15px] text-center">
                                 0
                             </span>
-                            <span class="text-[9px] text-stone-400 font-bold uppercase">(PER TEAM)</span>
-                            <button onclick="openPerTeamPlaysModal()" class="ml-1 text-stone-700 hover:text-stone-900 text-[11px] cursor-pointer" title="Per Team Details">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase">(PER TEAM)</span>
+                            <button onclick="openPerTeamPlaysModal()" class="ml-1 text-[#5c4033] hover:text-[#3e2723] text-[11px] cursor-pointer" title="Per Team Details">
                                 <i class="fa-solid fa-circle-info"></i>
                             </button>
                         </div>
-                        <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-stone-200">
-                            <span id="total-play-divided-val" class="text-stone-900 font-bold text-xs">
+                        <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-[#d7ccc8]">
+                            <span id="total-play-divided-val" class="text-[#4a3525] font-bold text-xs">
                                 0
                             </span>
-                            <span class="text-[9px] text-stone-400 font-bold uppercase">(TOTAL MATCH)</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase">(TOTAL MATCH)</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="text-xs text-stone-600 bg-white px-3 py-2 rounded-lg flex items-center justify-between border border-stone-200 shadow-2xs">
-                    <span class="flex items-center gap-1.5 font-medium text-stone-700">
-                        <i class="fa-solid fa-stopwatch text-stone-700 text-xs"></i> Current Match Duration:
+                <div class="text-xs text-slate-600 bg-white px-3 py-2 rounded-lg flex items-center justify-between border border-[#e6decb] shadow-2xs">
+                    <span class="flex items-center gap-1.5 font-medium text-slate-700">
+                        <i class="fa-solid fa-stopwatch text-emerald-600 text-xs"></i> Current Match Duration:
                     </span>
-                    <span id="current-match-timer" class="text-stone-800 text-xs font-bold">0h 0m 0s</span>
+                    <span id="current-match-timer" class="text-emerald-600 text-xs font-bold">0h 0m 0s</span>
                 </div>
 
-                <div class="text-xs text-stone-600 bg-white px-3 py-2 rounded-lg flex items-center justify-between border border-stone-200 shadow-2xs">
-                    <span class="flex items-center gap-1.5 font-medium text-stone-700">
-                        <i class="fa-solid fa-clock-rotate-left text-stone-700 text-xs"></i> Session Duration:
+                <div class="text-xs text-slate-600 bg-white px-3 py-2 rounded-lg flex items-center justify-between border border-[#e6decb] shadow-2xs">
+                    <span class="flex items-center gap-1.5 font-medium text-slate-700">
+                        <i class="fa-solid fa-clock-rotate-left text-[#5c4033] text-xs"></i> Session Duration:
                     </span>
-                    <span id="total-duration-timer" class="text-stone-800 text-xs font-bold">0h 0m 0s</span>
+                    <span id="total-duration-timer" class="text-[#5c4033] text-xs font-bold">0h 0m 0s</span>
                 </div>
             </div>
 
             <!-- Main Interface Leaderboard Section -->
-            <div id="main-leaderboard-section" class="bg-stone-50 border gold-border rounded-xl p-3 text-center shadow-xs space-y-2">
+            <div id="main-leaderboard-section" class="bg-[#fcfbf9] border gold-border rounded-xl p-3 text-center shadow-xs space-y-2">
                 <div class="pt-1 text-left space-y-1.5">
-                    <button onclick="toggleH2HInterface()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold text-[11px] py-2 px-2 rounded-lg border border-stone-300 flex items-center justify-between transition-all cursor-pointer">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-stone-700"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് / Most Lost H2H</span>
+                    <button onclick="toggleH2HInterface()" class="w-full bg-[#f5f0eb] hover:bg-[#ebdcd0] text-[#5c4033] font-semibold text-[11px] py-2 px-2 rounded-lg border border-[#d7ccc8] flex items-center justify-between transition-all cursor-pointer">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-[#8c6239]"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് / Most Lost H2H</span>
                         <i id="h2h-toggle-icon" class="fa-solid fa-chevron-down text-xs"></i>
                     </button>
-                    <div id="h2h-stats-container" class="hidden bg-white rounded-xl p-2.5 border border-stone-200 space-y-1.5 text-[11px] shadow-inner">
+                    <div id="h2h-stats-container" class="hidden bg-white rounded-xl p-2.5 border border-[#e6decb] space-y-1.5 text-[11px] shadow-inner">
                         <div id="most-lost-to-target" class="text-rose-600 font-medium space-y-1">⚠️ ഏറ്റവും കൂടുതൽ തോറ്റതിന്റെ വിവരങ്ങൾ കണക്കാക്കുന്നു... / Calculating most lost stats...</div>
                     </div>
                 </div>
@@ -493,71 +472,88 @@
 
     <!-- Match Controls & Compact Summary -->
     <div class="w-full max-w-xl pt-2 space-y-2">
-        <div class="bg-white border border-stone-300 rounded-xl p-2.5 shadow-sm flex items-center justify-between">
+        <div class="bg-white border border-[#d7ccc8] rounded-xl p-2.5 shadow-sm flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <i class="fa-solid fa-chart-pie text-stone-800 text-sm"></i>
+                <i class="fa-solid fa-chart-pie text-[#5c4033] text-sm"></i>
                 <div>
-                    <div class="text-xs font-bold text-stone-900">SUMMARY / സംഗ്രഹം</div>
-                    <div class="text-[9px] text-stone-500 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ / Time, Win & Results</div>
+                    <div class="text-xs font-bold text-slate-800">SUMMARY / സംഗ്രഹം</div>
+                    <div class="text-[9px] text-slate-500 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ / Time, Win & Results</div>
                 </div>
             </div>
-            <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-stone-800 to-amber-900 hover:from-stone-700 hover:to-amber-800 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
+            <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
                 <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
             </button>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-            <div class="flex items-center justify-between bg-white border border-stone-300 rounded-xl px-2.5 py-2 shadow-sm">
-                <span class="text-[10px] text-stone-800 font-bold flex items-center gap-1">
+            <div class="flex items-center justify-between bg-white border border-[#d7ccc8] rounded-xl px-2.5 py-2 shadow-sm">
+                <span class="text-[10px] text-slate-700 font-bold flex items-center gap-1">
                     <span class="live-dot-green"></span> STATUS:
                 </span>
-                <button onclick="openCurrentStatusModal()" class="bg-gradient-to-r from-stone-800 to-amber-900 hover:from-stone-700 hover:to-amber-800 text-white font-extrabold py-1.5 px-2.5 rounded-lg shadow flex items-center gap-1 text-[10px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer">
+                <button onclick="openCurrentStatusModal()" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold py-1.5 px-2.5 rounded-lg shadow flex items-center gap-1 text-[10px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer">
                     <i class="fa-solid fa-share-nodes"></i> SHARE
                 </button>
             </div>
             <div class="flex items-center justify-between bg-white border border-rose-300 rounded-xl px-2 py-2 shadow-sm">
                 <span class="text-[8px] text-rose-700 font-bold flex items-center gap-0.5 uppercase tracking-tighter shrink-0">
-                    <i class="fa-solid fa-flag-checkered text-stone-700 text-[8px]"></i> TOURNAMENT:
+                    <i class="fa-solid fa-flag-checkered text-[#5c4033] text-[8px]"></i> TOURNAMENT:
                 </span>
-                <button onclick="manualFinishMatch()" class="bg-rose-700 hover:bg-rose-600 text-white font-semibold py-1.5 px-2 rounded-lg border border-rose-800 flex items-center gap-1 text-[9px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer shrink-0 shadow-2xs">
+                <button onclick="manualFinishMatch()" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold py-1.5 px-2 rounded-lg border border-rose-700 flex items-center gap-1 text-[9px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer shrink-0 shadow-2xs">
                     END MATCH
                 </button>
             </div>
         </div>
 
-        <div class="bg-white border border-stone-300 rounded-xl px-3 py-2 flex items-center justify-between shadow-sm">
+        <div class="bg-white border border-[#d7ccc8] rounded-xl px-3 py-2 flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-2">
-                <button onclick="openUndoModal()" class="text-[10px] bg-stone-800 hover:bg-stone-700 text-white font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+                <button onclick="openUndoModal()" class="text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                     🔄 UNDO
                 </button>
-                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-stone-700 hover:bg-stone-600 border border-stone-500 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
+                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
                     <i class="fa-solid fa-user-plus text-[10px]"></i>
                 </button>
-                <span id="history-summary-text" class="text-[10px] text-stone-500 font-medium italic truncate max-w-[100px] sm:max-w-[150px]">
+                <span id="history-summary-text" class="text-[10px] text-slate-500 font-medium italic truncate max-w-[100px] sm:max-w-[150px]">
                     സെഷൻ റെക്കോർഡുകൾ / Session Records
                 </span>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="openHistoryModal()" class="text-[10px] bg-stone-800 hover:bg-stone-700 text-white font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
+                <button onclick="openHistoryModal()" class="text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-folder-open"></i> HISTORY
                 </button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 gap-2">
-            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-2.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-stone-700 cursor-pointer">
-                <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i> ടെക്സ്റ്റ് ഷെയർ / Text Share
+            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-[#3d2817] hover:bg-[#2c1d10] text-white font-medium py-2.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-[#5c4033] cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-emerald-300 text-sm"></i> ടെക്സ്റ്റ് ഷെയർ / Text Share
             </button>
         </div>
     </div>
 
+    <!-- Start Match Confirmation Popup Modal (Active during touch lock) -->
+    <div id="start-match-confirm-modal" style="pointer-events: auto !important;" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-4 z-[70] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-6 text-center space-y-4 text-slate-800">
+            <div class="w-12 h-12 mx-auto bg-[#f5f0eb] text-[#5c4033] rounded-2xl flex items-center justify-center border border-[#d7ccc8] text-lg shadow-sm">
+                <i class="fa-solid fa-play"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-black text-[#5c4033] uppercase tracking-wider">ടൈമർ സ്റ്റാർട്ട് / പുതിയ കളി</h3>
+                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭించాలా? / Start fresh game & unlock touch?</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="closeStartMatchConfirmModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2.5 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button onclick="executeStartFreshMatch()" class="w-full bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold py-2.5 rounded-xl text-xs shadow-md cursor-pointer">ആരംഭിക്കുക / Start</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Last Defeated History Modal -->
-    <div id="last-defeated-history-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
-        <div class="bg-white border gold-border w-full max-w-xl rounded-2xl shadow-2xl p-4 space-y-3 relative max-h-[85vh] flex flex-col text-stone-800">
-            <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+    <div id="last-defeated-history-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
+        <div class="bg-white border gold-border w-full max-w-xl rounded-2xl shadow-2xl p-4 space-y-3 relative max-h-[85vh] flex flex-col text-slate-800">
+            <button onclick="closeLastDefeatedHistoryModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider text-center border-b border-stone-200 pb-2">
+            <h3 class="text-xs font-bold text-[#5c4033] uppercase tracking-wider text-center border-b border-[#e6decb] pb-2">
                 🛡️ LAST DEFEATED HISTORY (FULL LIST)
             </h3>
             <div id="last-defeated-history-content" class="space-y-2 overflow-y-auto pr-1 text-[10px] flex-1"></div>
@@ -565,12 +561,12 @@
     </div>
 
     <!-- Per Team Plays Detail Modal -->
-    <div id="per-team-plays-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
-        <div class="bg-white border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 space-y-3 relative text-stone-800">
-            <button onclick="closePerTeamPlaysModal()" class="absolute right-3 top-3 w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+    <div id="per-team-plays-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-[60] hidden">
+        <div class="bg-white border gold-border w-full max-w-sm rounded-2xl shadow-2xl p-4 space-y-3 relative text-slate-800">
+            <button onclick="closePerTeamPlaysModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider text-center border-b border-stone-200 pb-2">
+            <h3 class="text-xs font-bold text-[#5c4033] uppercase tracking-wider text-center border-b border-[#e6decb] pb-2">
                 🎮 PER TEAM PLAYS BREAKDOWN
             </h3>
             <div id="per-team-plays-content" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
@@ -578,25 +574,25 @@
     </div>
 
     <!-- RECORDS Modal -->
-    <div id="time-summary-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-stone-800">
-            <div class="p-2.5 bg-gradient-to-r from-stone-100 via-white to-amber-50 border-b border-stone-300 flex items-center justify-between">
-                <h3 class="text-xs font-extrabold text-stone-900 flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-chart-pie text-amber-900 animate-pulse"></i> RECORDS & MATCH STATS
+    <div id="time-summary-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
+            <div class="p-2.5 bg-gradient-to-r from-[#fcfbf9] via-white to-[#f5f0eb] border-b border-[#d7ccc8] flex items-center justify-between">
+                <h3 class="text-xs font-extrabold text-[#5c4033] flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-chart-pie text-[#8c6239] animate-pulse"></i> RECORDS & MATCH STATS
                 </h3>
-                <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeTimeSummaryModal()" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-time-summary-content" class="p-2 space-y-1.5 overflow-y-auto flex-1"></div>
-            <div class="p-2 bg-stone-50 border-t border-stone-200 text-right">
-                <button onclick="closeTimeSummaryModal()" class="bg-stone-200 hover:bg-stone-300 text-stone-700 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
+            <div class="p-2 bg-[#fcfbf9] border-t border-[#e6decb] text-right">
+                <button onclick="closeTimeSummaryModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
             </div>
         </div>
     </div>
 
     <!-- Team Detailed Info Popup -->
-    <div id="team-info-detail-modal" class="fixed inset-0 bg-stone-900/85 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[60] hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-4 space-y-2.5 relative text-stone-800">
-            <button onclick="closeTeamInfoDetailModal()" class="absolute right-3 top-3 w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+    <div id="team-info-detail-modal" class="fixed inset-0 bg-[#1e1715]/85 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[60] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-4 space-y-2.5 relative text-slate-800">
+            <button onclick="closeTeamInfoDetailModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="team-info-detail-content" class="space-y-2 text-[11px] max-h-[75vh] overflow-y-auto pr-1"></div>
@@ -604,39 +600,39 @@
     </div>
 
     <!-- Defeated Team Selection Modal -->
-    <div id="defeated-team-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-lg rounded-3xl shadow-2xl p-6 text-center space-y-4 max-h-[90vh] flex flex-col text-stone-800">
+    <div id="defeated-team-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-lg rounded-3xl shadow-2xl p-6 text-center space-y-4 max-h-[90vh] flex flex-col text-slate-800">
             <div>
-                <div id="winning-team-indicator" class="mb-3 p-3 bg-stone-50 border border-stone-300 rounded-2xl text-stone-900 font-bold text-sm uppercase tracking-wide flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <div id="winning-team-indicator" class="mb-3 p-3 bg-[#f5f0eb] border border-[#d7ccc8] rounded-2xl text-[#5c4033] font-bold text-sm uppercase tracking-wide flex flex-col items-center justify-center gap-1 shadow-2xs">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-crown text-amber-600 text-base"></i> <span id="winning-team-name-span">WINNER TEAM</span>
                     </div>
-                    <div id="winning-team-last-defeated-sub" class="text-[10px] text-stone-500 font-normal italic"></div>
+                    <div id="winning-team-last-defeated-sub" class="text-[10px] text-slate-500 font-normal italic"></div>
                 </div>
-                <h3 class="text-sm sm:text-base font-extrabold text-stone-900 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക / Select Defeated Team</h3>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-800 uppercase tracking-wide">തോറ്റ ടീം സെലക്ട് ചെയ്യുക / Select Defeated Team</h3>
             </div>
             <div id="defeated-team-options" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
-            <div class="pt-3 border-t border-stone-200">
-                <button onclick="closeDefeatedTeamModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-3 rounded-2xl text-xs uppercase cursor-pointer border border-stone-300 transition-all active:scale-95">റദ്ദാക്കുക / Cancel</button>
+            <div class="pt-3 border-t border-[#e6decb]">
+                <button onclick="closeDefeatedTeamModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl text-xs uppercase cursor-pointer border border-slate-300 transition-all active:scale-95">റദ്ദാക്കുക / Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- Current Status Share Modal Window -->
-    <div id="current-status-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-stone-800">
-            <div class="p-3.5 bg-gradient-to-r from-stone-100 via-white to-amber-50 border-b border-stone-300 flex items-center justify-between relative px-4">
+    <div id="current-status-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-slate-800">
+            <div class="p-3.5 bg-gradient-to-r from-[#fcfbf9] via-white to-[#f5f0eb] border-b border-[#d7ccc8] flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
-                    <div class="text-sm font-black text-stone-900 tracking-widest uppercase flex items-center gap-1.5">
-                        <i class="fa-solid fa-shuttlecock text-amber-900 text-xs"></i> WESMA LIVE HUB
+                    <div class="text-sm font-black text-[#5c4033] tracking-widest uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-shuttlecock text-[#8c6239] text-xs"></i> WESMA LIVE HUB
                     </div>
-                    <div class="text-[9px] text-stone-500 font-medium tracking-wider">BADMINTON TOURNAMENT SHARING</div>
+                    <div class="text-[9px] text-slate-500 font-medium tracking-wider">BADMINTON TOURNAMENT SHARING</div>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="flex flex-col text-right">
-                        <div id="current-status-date" class="text-[10px] text-amber-900 font-bold tracking-wider"></div>
+                        <div id="current-status-date" class="text-[10px] text-[#5c4033] font-bold tracking-wider"></div>
                     </div>
-                    <button onclick="closeCurrentStatusModal()" class="w-6 h-6 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+                    <button onclick="closeCurrentStatusModal()" class="w-6 h-6 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -646,48 +642,48 @@
     </div>
 
     <!-- End Match Password Verification Modal -->
-    <div id="end-match-password-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[70] hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-stone-800">
-            <div class="w-10 h-10 mx-auto bg-rose-50 text-rose-700 rounded-full flex items-center justify-center border border-rose-200 text-sm">
+    <div id="end-match-password-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[70] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-slate-800">
+            <div class="w-10 h-10 mx-auto bg-rose-50 text-rose-600 rounded-full flex items-center justify-center border border-rose-200 text-sm">
                 <i class="fa-solid fa-lock"></i>
             </div>
-            <h3 class="text-sm font-semibold text-stone-800">എൻഡ് മാച്ച് പാസ്‌വേർഡ് / End Match Password</h3>
-            <p class="text-xs text-stone-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകുക / Enter Admin PIN (1234)</p>
+            <h3 class="text-sm font-semibold text-slate-800">എൻഡ് മാച്ച് പാസ്‌വേർഡ് / End Match Password</h3>
+            <p class="text-xs text-slate-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകുക / Enter Admin PIN (1234)</p>
             <div class="space-y-2 pt-1">
-                <input type="password" id="end-match-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs text-center text-stone-800 focus:outline-none focus:border-amber-900">
+                <input type="password" id="end-match-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-[#5c4033]">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeEndMatchPasswordModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
-                <button onclick="verifyEndMatchPassword()" class="w-full bg-rose-700 hover:bg-rose-600 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">ഉറപ്പിക്കുക / Confirm</button>
+                <button onclick="closeEndMatchPasswordModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button onclick="verifyEndMatchPassword()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">ഉറപ്പിക്കുക / Confirm</button>
             </div>
         </div>
     </div>
 
     <!-- End Match Modal Window -->
-    <div id="finish-match-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-stone-800">
+    <div id="finish-match-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-center relative text-slate-800">
             <div id="fireworks-container"></div>
             
-            <div class="p-3 bg-stone-100 border-b border-stone-300 flex items-center justify-between relative px-4">
+            <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between relative px-4">
                 <div class="flex flex-col text-left">
-                    <div class="text-sm font-black text-stone-900 tracking-widest uppercase">WESMA</div>
-                    <div class="text-[9px] text-stone-500 font-medium tracking-wider">BADMINTON CLUB</div>
-                    <div class="text-[9px] text-amber-900 font-bold tracking-widest mt-0.5">SINCE 2026</div>
+                    <div class="text-sm font-black text-[#5c4033] tracking-widest uppercase">WESMA</div>
+                    <div class="text-[9px] text-slate-500 font-medium tracking-wider">BADMINTON CLUB</div>
+                    <div class="text-[9px] text-[#8c6239] font-bold tracking-widest mt-0.5">SINCE 2026</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div id="modal-header-date" class="text-[10px] text-amber-900 font-bold tracking-wider"></div>
+                    <div id="modal-header-date" class="text-[10px] text-[#5c4033] font-bold tracking-wider"></div>
                     <div class="relative inline-block">
-                        <button onclick="toggleEndModalResetDropdown()" class="w-6 h-6 bg-stone-200 hover:bg-stone-300 text-stone-900 rounded-full flex items-center justify-center text-[10px] cursor-pointer" title="Reset Options">
+                        <button onclick="toggleEndModalResetDropdown()" class="w-6 h-6 bg-slate-200 hover:bg-slate-300 text-[#5c4033] rounded-full flex items-center justify-center text-[10px] cursor-pointer" title="Reset Options">
                             <i class="fa-solid fa-circle-info"></i>
                         </button>
-                        <div id="end-modal-reset-dropdown" class="hidden absolute right-0 mt-1 w-44 bg-white border border-stone-300 rounded-xl shadow-2xl p-2 z-50 text-left">
+                        <div id="end-modal-reset-dropdown" class="hidden absolute right-0 mt-1 w-44 bg-white border border-[#d7ccc8] rounded-xl shadow-2xl p-2 z-50 text-left">
                             <button onclick="resetScores()" class="w-full text-left bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-1.5 px-2 rounded-lg border border-rose-200 text-[10px] flex items-center gap-1.5 cursor-pointer">
-                                <i class="fa-solid fa-rotate-right text-rose-700"></i> ടൂർണമെന്റ് റീസെറ്റ് / Reset
+                                <i class="fa-solid fa-rotate-right text-rose-600"></i> ടൂർണമെന്റ് റീസെറ്റ് / Reset
                             </button>
                         </div>
                     </div>
                 </div>
-                <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+                <button onclick="closeFinishMatchModal()" class="absolute right-2 top-2 w-6 h-6 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -696,23 +692,23 @@
     </div>
 
     <!-- Custom Name Editing Popup Modal -->
-    <div id="custom-name-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-stone-800">
-            <div class="w-10 h-10 mx-auto bg-stone-100 text-stone-800 rounded-full flex items-center justify-center border border-stone-300 text-sm">
+    <div id="custom-name-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-slate-800">
+            <div class="w-10 h-10 mx-auto bg-[#f5f0eb] text-[#5c4033] rounded-full flex items-center justify-center border border-[#d7ccc8] text-sm">
                 <i class="fa-solid fa-pen-to-square"></i>
             </div>
-            <h3 class="text-sm font-semibold text-stone-800">ടീം പേര് മാറ്റുക / Edit Name</h3>
-            <p class="text-xs text-stone-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് മാറ്റുക / Enter Admin PIN (1234)</p>
+            <h3 class="text-sm font-semibold text-slate-800">ടീം പേര് മാറ്റുക / Edit Name</h3>
+            <p class="text-xs text-slate-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പേര് മാറ്റുക / Enter Admin PIN (1234)</p>
             <div class="space-y-2 pt-1">
-                <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs text-center text-stone-800 focus:outline-none focus:border-amber-900">
-                <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര് / New Name" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs text-center text-stone-800 focus:outline-none focus:border-amber-900 uppercase">
+                <input type="password" id="edit-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-[#5c4033]">
+                <input type="text" id="edit-team-name-input" placeholder="പുതിയ ടീം പേര് / New Name" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-[#5c4033] uppercase">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeCustomNameModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
-                <button onclick="submitCustomTeamName()" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">സേവ് ചെയ്യുക / Save</button>
+                <button onclick="closeCustomNameModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button onclick="submitCustomTeamName()" class="w-full bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">സേവ് ചെയ്യുക / Save</button>
             </div>
-            <div class="pt-2 border-t border-stone-200 flex justify-center">
-                <button onclick="deleteTeamFromModal()" class="text-[9px] text-rose-700 hover:text-rose-800 underline tracking-wide py-1 px-2 transition-all cursor-pointer flex items-center gap-1 opacity-80 hover:opacity-100 font-medium">
+            <div class="pt-2 border-t border-[#e6decb] flex justify-center">
+                <button onclick="deleteTeamFromModal()" class="text-[9px] text-rose-600 hover:text-rose-700 underline tracking-wide py-1 px-2 transition-all cursor-pointer flex items-center gap-1 opacity-80 hover:opacity-100 font-medium">
                     <i class="fa-solid fa-trash-can text-[8px]"></i> ടീമിനെ ഡിലീറ്റ് ചെയ്യുക / Delete Team
                 </button>
             </div>
@@ -720,102 +716,102 @@
     </div>
 
     <!-- Add New Team Modal -->
-    <div id="add-team-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-stone-800">
-            <div class="w-10 h-10 mx-auto bg-stone-100 text-stone-800 rounded-full flex items-center justify-center border border-stone-300 text-sm">
+    <div id="add-team-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-slate-800">
+            <div class="w-10 h-10 mx-auto bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center border border-emerald-200 text-sm">
                 <i class="fa-solid fa-user-plus"></i>
             </div>
-            <h3 class="text-sm font-semibold text-stone-800">പുതിയ ടീമിനെ ചേർക്കുക / Add Team</h3>
-            <p class="text-xs text-stone-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ ടീമിന്റെ പേര് നൽകുക / Enter Admin PIN (1234)</p>
+            <h3 class="text-sm font-semibold text-slate-800">പുതിയ ടീമിനെ ചേർക്കുക / Add Team</h3>
+            <p class="text-xs text-slate-500 font-light">അഡ്മിൻ പിൻ (1234) നൽകി പുതിയ ടീമിന്റെ പേര് നൽകുക / Enter Admin PIN (1234)</p>
             <div class="space-y-2 pt-1">
-                <input type="password" id="add-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs text-center text-stone-800 focus:outline-none focus:border-amber-900">
-                <input type="text" id="new-team-name-input" placeholder="ടീം പേര് / Team Name" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs text-center text-stone-800 focus:outline-none focus:border-amber-900 uppercase">
+                <input type="password" id="add-admin-pin" placeholder="Admin PIN (1234)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-emerald-500">
+                <input type="text" id="new-team-name-input" placeholder="ടീം പേര് / Team Name" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-emerald-500 uppercase">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeAddTeamModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
-                <button onclick="submitNewTeam()" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">ചേർക്കുക / Add</button>
+                <button onclick="closeAddTeamModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button onclick="submitNewTeam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">ചേർക്കുക / Add</button>
             </div>
         </div>
     </div>
 
     <!-- WhatsApp Choice Modal -->
-    <div id="whatsapp-choice-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white border gold-border w-full max-w-xs rounded-2xl shadow-2xl p-5 text-center space-y-3 text-stone-800">
-            <h3 class="text-sm font-semibold text-stone-800">വാട്സാപ്പ് തിരഞ്ഞെടുക്കുക / Select WhatsApp</h3>
-            <p class="text-xs text-stone-500 font-light">ഏത് ആപ്പിലേക്കാണ് അയക്കേണ്ടത്? / Choose app</p>
+    <div id="whatsapp-choice-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white border gold-border w-full max-w-xs rounded-2xl shadow-2xl p-5 text-center space-y-3 text-slate-800">
+            <h3 class="text-sm font-semibold text-slate-800">വാട്സാപ്പ് തിരഞ്ഞെടുക്കുക / Select WhatsApp</h3>
+            <p class="text-xs text-slate-500 font-light">ഏത് ആപ്പിലേക്കാണ് അയക്കേണ്ടത്? / Choose app</p>
             <div class="space-y-2 pt-2">
-                <button onclick="proceedWhatsAppShare('normal')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
+                <button onclick="proceedWhatsAppShare('normal')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
                     <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp (റഗുലർ / Regular)
                 </button>
-                <button onclick="proceedWhatsAppShare('business')" class="w-full bg-teal-800 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
+                <button onclick="proceedWhatsAppShare('business')" class="w-full bg-teal-700 hover:bg-teal-600 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
                     <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Business
                 </button>
-                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button onclick="closeWhatsAppChoiceModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- Undo Management Modal -->
-    <div id="undo-management-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl p-6 text-center space-y-5 relative overflow-hidden text-stone-800">
-            <div class="w-16 h-16 mx-auto bg-stone-100 text-stone-800 rounded-2xl flex items-center justify-center border border-stone-300 text-2xl shadow-sm">
+    <div id="undo-management-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-md rounded-3xl shadow-2xl p-6 text-center space-y-5 relative overflow-hidden text-slate-800">
+            <div class="w-16 h-16 mx-auto bg-[#f5f0eb] text-[#5c4033] rounded-2xl flex items-center justify-center border border-[#d7ccc8] text-2xl shadow-sm">
                 <i class="fa-solid fa-rotate-left"></i>
             </div>
             <div>
-                <h3 class="text-lg font-black text-stone-900 tracking-wider uppercase">ACTION REVERSAL CENTER</h3>
-                <p class="text-[11px] text-stone-500 uppercase tracking-widest mt-1">Undo & Score Control</p>
+                <h3 class="text-lg font-black text-[#5c4033] tracking-wider uppercase">ACTION REVERSAL CENTER</h3>
+                <p class="text-[11px] text-slate-500 uppercase tracking-widest mt-1">Undo & Score Control</p>
             </div>
-            <div class="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-left space-y-2 shadow-inner">
-                <div class="text-[11px] font-bold text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <i class="fa-solid fa-clock-rotate-left text-amber-900"></i> LAST ACTION RECORDED
+            <div class="bg-[#fcfbf9] border border-[#e6decb] rounded-2xl p-4 text-left space-y-2 shadow-inner">
+                <div class="text-[11px] font-bold text-[#5c4033] uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-clock-rotate-left text-[#8c6239]"></i> LAST ACTION RECORDED
                 </div>
-                <div id="undo-details-text" class="text-xs text-stone-700 font-medium leading-relaxed min-h-[50px] flex items-center">
+                <div id="undo-details-text" class="text-xs text-slate-700 font-medium leading-relaxed min-h-[50px] flex items-center">
                     No recorded actions available to undo.
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="closeUndoModal()" class="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl text-xs uppercase border border-stone-300 transition-all cursor-pointer">CANCEL</button>
-                <button id="confirm-undo-btn" onclick="executeUndoAction()" class="bg-stone-900 hover:bg-stone-800 text-white font-black py-3 rounded-xl text-xs uppercase shadow-md transition-all disabled:opacity-40 cursor-pointer">REVERT ACTION</button>
+                <button onclick="closeUndoModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-xs uppercase border border-slate-300 transition-all cursor-pointer">CANCEL</button>
+                <button id="confirm-undo-btn" onclick="executeUndoAction()" class="bg-[#5c4033] hover:bg-[#4e342e] text-white font-black py-3 rounded-xl text-xs uppercase shadow-md transition-all disabled:opacity-40 cursor-pointer">REVERT ACTION</button>
             </div>
         </div>
     </div>
 
     <!-- History Popup Modal -->
-    <div id="history-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
-        <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-stone-800">
-            <div class="p-3 bg-stone-100 border-b border-stone-300 flex items-center justify-between">
-                <h3 class="text-xs font-semibold text-stone-900 flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-amber-900"></i> TOURNAMENT LOGS (1 HOUR+)
+    <div id="history-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
+            <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="text-xs font-semibold text-[#5c4033] flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT LOGS (1 HOUR+)
                 </h3>
-                <button onclick="closeHistoryModal()" class="w-7 h-7 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-history-content" class="p-3 space-y-2.5 overflow-y-auto flex-1"></div>
-            <div class="p-2.5 bg-stone-50 border-t border-stone-200 text-right">
-                <button onclick="closeHistoryModal()" class="bg-stone-200 hover:bg-stone-300 text-stone-700 font-medium py-2 px-4 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
+            <div class="p-2.5 bg-[#fcfbf9] border-t border-[#e6decb] text-right">
+                <button onclick="closeHistoryModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
             </div>
         </div>
     </div>
 
     <!-- History Record Details Popup Modal -->
-    <div id="history-record-detail-modal" class="fixed inset-0 bg-stone-900/85 backdrop-blur-md flex items-center justify-center p-3 z-[70] hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-stone-800">
-            <div class="p-2.5 bg-gradient-to-r from-stone-100 via-white to-amber-50 border-b border-stone-300 flex items-center justify-between">
-                <h3 class="text-xs font-extrabold text-stone-900 flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-chart-pie text-amber-900 animate-pulse"></i> RECORDS & MATCH STATS
+    <div id="history-record-detail-modal" class="fixed inset-0 bg-[#1e1715]/85 backdrop-blur-md flex items-center justify-center p-3 z-[70] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
+            <div class="p-2.5 bg-gradient-to-r from-[#fcfbf9] via-white to-[#f5f0eb] border-b border-[#d7ccc8] flex items-center justify-between">
+                <h3 class="text-xs font-extrabold text-[#5c4033] flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-chart-pie text-[#8c6239] animate-pulse"></i> RECORDS & MATCH STATS
                 </h3>
-                <button onclick="closeHistoryRecordDetailModal()" class="w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeHistoryRecordDetailModal()" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="history-record-detail-content" class="p-2 space-y-1.5 overflow-y-auto flex-1"></div>
-            <div class="p-2 bg-stone-50 border-t border-stone-200 text-right">
-                <button onclick="closeHistoryRecordDetailModal()" class="bg-stone-200 hover:bg-stone-300 text-stone-700 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
+            <div class="p-2 bg-[#fcfbf9] border-t border-[#e6decb] text-right">
+                <button onclick="closeHistoryRecordDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
             </div>
         </div>
     </div>
 
     <!-- History Team Detailed Info Popup -->
-    <div id="history-team-info-detail-modal" class="fixed inset-0 bg-stone-900/85 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[80] hidden">
-        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-4 space-y-2.5 relative text-stone-800">
-            <button onclick="closeHistoryTeamInfoDetailModal()" class="absolute right-3 top-3 w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
+    <div id="history-team-info-detail-modal" class="fixed inset-0 bg-[#1e1715]/85 backdrop-blur-md flex flex-col items-center justify-center p-4 z-[80] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-sm rounded-3xl shadow-2xl p-4 space-y-2.5 relative text-slate-800">
+            <button onclick="closeHistoryTeamInfoDetailModal()" class="absolute right-3 top-3 w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="history-team-info-detail-content" class="space-y-2 text-[11px] max-h-[75vh] overflow-y-auto pr-1"></div>
@@ -823,7 +819,7 @@
     </div>
 
     <!-- Prominent Center Pop-up Toast Notification -->
-    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/95 text-stone-900 border-2 border-stone-800 font-bold px-5 py-3 rounded-2xl text-xs shadow-xl opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/95 text-[#2c221e] border-2 border-[#8c6239] font-bold px-5 py-3 rounded-2xl text-xs shadow-xl opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു! / Score updated!</div>
     </div>
 
@@ -831,11 +827,11 @@
         const ADMIN_PIN = "1234";
         
         const defaultTeams = [
-            { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-stone-800", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
-            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-stone-700", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
-            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-900", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
-            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-stone-600", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
-            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-amber-800", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] }
+            { id: 1, name: "SHAFEER & FAISAL", wins: 0, losses: 0, played: 0, badgeBg: "bg-[#5c4033]", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
+            { id: 2, name: "MUSTHAFA & JUNAID", wins: 0, losses: 0, played: 0, badgeBg: "bg-[#6d4c41]", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
+            { id: 3, name: "ASHRAF & ANWAR", wins: 0, losses: 0, played: 0, badgeBg: "bg-[#37474f]", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
+            { id: 4, name: "ANEESH & ANAS", wins: 0, losses: 0, played: 0, badgeBg: "bg-[#722f37]", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] },
+            { id: 5, name: "FAHAD & MUJEEB", wins: 0, losses: 0, played: 0, badgeBg: "bg-[#8c6239]", lastMatchTime: 0, lastClickTime: 0, clickOrder: 0, matchInterval: 0, totalTimeSpentMinutes: 0, defeatedDetails: [], matchHistoryLog: [] }
         ];
 
         let teams = JSON.parse(JSON.stringify(defaultTeams));
@@ -855,9 +851,10 @@
         let autoWinTimeout = null;
         let lastActionSnapshot = null;
         let lastActionDescription = "";
+        let lastActivityTimestamp = Date.now();
 
-        const flipPopColorsList = ["#1c1917", "#44403c", "#78350f", "#292524", "#57534e", "#18181b", "#3f3f46"];
-        const badgeColorsList = ["bg-stone-800", "bg-stone-700", "bg-amber-900", "bg-stone-600", "bg-amber-800", "bg-zinc-800", "bg-neutral-800"];
+        const flipPopColorsList = ["#5c4033", "#8c6239", "#4a3525", "#722f37", "#37474f", "#6d4c41", "#2c221e"];
+        const badgeColorsList = ["bg-[#5c4033]", "bg-[#6d4c41]", "bg-[#37474f]", "bg-[#722f37]", "bg-[#8c6239]", "bg-[#4e342e]", "bg-[#263238]"];
 
         const championPraiseCommentaries = [
             "മികച്ച പോരാട്ടവീര്യത്തോടെയും അത്യുഗ്രൻ സ്മാഷുകളോടെയും എതിരാളികളെ നിലംപരിശാക്കി വെസ്മാ ബാഡ്മിന്റൺ കോർട്ടിലെ അജയ്യരായ ചാമ്പ്യന്മാരായി മാറിയിരിക്കുകയാണ് ഇവർ!",
@@ -883,7 +880,7 @@
 
         function loadLocalBackup() {
             try {
-                const localData = localStorage.getItem('wesma_local_backup_v133');
+                const localData = localStorage.getItem('wesma_local_backup_v134');
                 if (localData) {
                     const parsed = JSON.parse(localData);
                     if (parsed && parsed.teams) {
@@ -893,17 +890,13 @@
                         tournamentHistory = parsed.tournamentHistory || [];
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
+                        lastActivityTimestamp = parsed.lastActivityTimestamp || Date.now();
 
                         const oneHourMs = 60 * 60 * 1000;
                         tournamentHistory = tournamentHistory.filter(h => {
                             let duration = h.durationMinutes ? (h.durationMinutes * 60 * 1000) : oneHourMs;
                             return duration >= oneHourMs;
                         });
-
-                        if (tournamentStartTimestamp && !isMatchEnded) {
-                            const gate = document.getElementById("startup-gate");
-                            if(gate) gate.classList.add("hidden");
-                        }
                     }
                 }
             } catch(e) {
@@ -922,7 +915,7 @@
                         databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
                     });
                 }
-                dbRef = firebase.database().ref('wesma_badminton_scores_v133');
+                dbRef = firebase.database().ref('wesma_badminton_scores_v134');
                 isFirebaseConnected = true;
             }
         } catch (e) {
@@ -967,21 +960,42 @@
                 lastActionTimestamp = Date.now();
                 globalClickSequence = 0;
             }
+            lastActivityTimestamp = Date.now();
             saveData();
             render();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
         }
 
-        // NEW START BUTTON FUNCTION TO RESET AND START TIMER FRESH
-        function manualStartMatchTimer() {
-            triggerHapticFeedback([50, 50, 50]);
+        function openStartMatchConfirmModal() {
+            triggerHapticFeedback([30]);
+            const modal = document.getElementById("start-match-confirm-modal");
+            if (modal) modal.classList.remove("hidden");
+        }
+
+        function closeStartMatchConfirmModal() {
+            const modal = document.getElementById("start-match-confirm-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        function executeStartFreshMatch() {
+            closeStartMatchConfirmModal();
+            triggerHapticFeedback([60, 40, 60]);
+
             tournamentStartTimestamp = Date.now();
             lastActionTimestamp = Date.now();
+            lastActivityTimestamp = Date.now();
             isMatchEnded = false;
+            
+            // Remove touch lock instantly
+            const masterBody = document.getElementById("master-body-container");
+            if (masterBody) masterBody.classList.remove("app-touch-locked");
+
             saveData();
             updateMatchStatusBadge();
-            showToast("⏱️ പുതിയ ടൈമറും കളിയും സ്റ്റാർട്ട് ചെയ്തു!");
+            updateMainTopLastDefeatedBar();
+            render();
+            showToast("⏱️ പുതിയ കളി / ടൈമർ സ്റ്റാർട്ട് ചെയ്തു!");
         }
 
         function playBestSound() {
@@ -1032,7 +1046,7 @@
             if (!container) return;
             container.innerHTML = "";
 
-            const colors = ['#78350f', '#44403c', '#1c1917', '#292524', '#57534e', '#d97706', '#0f172a'];
+            const colors = ['#5c4033', '#8c6239', '#16a34a', '#722f37', '#37474f', '#6d4c41', '#2c221e'];
             
             for (let i = 0; i < 9; i++) {
                 setTimeout(() => {
@@ -1081,6 +1095,8 @@
                 globalClickSequence = 0;
             }
 
+            checkSixHoursTouchLock();
+
             if (dbRef) {
                 dbRef.on('value', (snapshot) => {
                     const data = snapshot.val();
@@ -1091,6 +1107,7 @@
                         tournamentHistory = data.tournamentHistory || [];
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
+                        lastActivityTimestamp = data.lastActivityTimestamp || lastActivityTimestamp;
 
                         const oneHourMs = 60 * 60 * 1000;
                         tournamentHistory = tournamentHistory.filter(h => {
@@ -1104,6 +1121,7 @@
                     updateHistorySummaryText();
                     updateMatchStatusBadge();
                     updateMainTopLastDefeatedBar();
+                    checkSixHoursTouchLock();
                 }, (error) => {
                     console.error("Firebase read error:", error);
                     render();
@@ -1114,6 +1132,20 @@
             startCooldownTickers();
             updateMatchStatusBadge();
             updateHistorySummaryText();
+        }
+
+        // 6 Hours Check Function
+        function checkSixHoursTouchLock() {
+            const sixHoursMs = 6 * 60 * 60 * 1000;
+            const now = Date.now();
+            const masterBody = document.getElementById("master-body-container");
+            if (!masterBody) return;
+
+            if (lastActivityTimestamp && (now - lastActivityTimestamp > sixHoursMs)) {
+                masterBody.classList.add("app-touch-locked");
+            } else {
+                masterBody.classList.remove("app-touch-locked");
+            }
         }
 
         function updateMatchStatusBadge() {
@@ -1127,7 +1159,7 @@
                 dot.className = "live-dot-red";
                 text.textContent = "MATCH STOPPED";
             } else {
-                badge.className = "bg-stone-100 border border-stone-300 text-stone-800 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider";
+                badge.className = "bg-emerald-50 border border-emerald-300 text-emerald-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider";
                 dot.className = "live-dot-green";
                 text.textContent = "LIVE";
             }
@@ -1154,7 +1186,7 @@
 
             if (allDefeats.length > 0) {
                 let lastEvent = allDefeats[0];
-                barEl.innerHTML = `<span class="text-stone-950 font-bold">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-700 font-bold">${escapeHtml(lastEvent.loser)}</span>`;
+                barEl.innerHTML = `<span class="text-slate-950 font-bold">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-600 font-bold">${escapeHtml(lastEvent.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
             }
@@ -1183,19 +1215,19 @@
             allDefeats.sort((a, b) => b.seq - a.seq);
 
             if (allDefeats.length === 0) {
-                content.innerHTML = `<div class="text-stone-500 italic text-center py-6">No matches played yet.</div>`;
+                content.innerHTML = `<div class="text-slate-500 italic text-center py-6">No matches played yet.</div>`;
             } else {
                 let html = "";
                 allDefeats.forEach((item, index) => {
                     html += `
-                        <div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] gap-2">
+                        <div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] gap-2">
                             <div class="min-w-0 flex-1 break-words leading-tight">
-                                <span class="text-stone-800 font-bold">#${allDefeats.length - index}</span> 
-                                <span class="text-stone-900 font-bold uppercase">${escapeHtml(item.winner)}</span>
-                                <span class="text-stone-600"> Defeated </span>
-                                <span class="text-rose-700 font-bold uppercase">${escapeHtml(item.loser)}</span>
+                                <span class="text-[#5c4033] font-bold">#${allDefeats.length - index}</span> 
+                                <span class="text-emerald-700 font-bold uppercase">${escapeHtml(item.winner)}</span>
+                                <span class="text-slate-600"> Defeated </span>
+                                <span class="text-rose-600 font-bold uppercase">${escapeHtml(item.loser)}</span>
                             </div>
-                            <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200 shrink-0">${item.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${item.durationMinutes}m</span>
                         </div>
                     `;
                 });
@@ -1246,15 +1278,16 @@
                     return duration >= oneHourMs;
                 });
 
-                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded };
-                localStorage.setItem('wesma_local_backup_v133', JSON.stringify(payload));
+                const payload = { teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded, lastActivityTimestamp };
+                localStorage.setItem('wesma_local_backup_v134', JSON.stringify(payload));
             } catch(e) {}
         }
 
         function saveData() {
+            lastActivityTimestamp = Date.now();
             saveLocalBackup();
             if (dbRef) {
-                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded }).catch((error) => {
+                dbRef.set({ teams, tournamentStartTimestamp, lastActionTimestamp, tournamentHistory, globalClickSequence, isMatchEnded, lastActivityTimestamp }).catch((error) => {
                     console.error("Firebase write error:", error);
                 });
             }
@@ -1298,9 +1331,9 @@
             const summaryEl = document.getElementById("history-summary-text");
             if (!summaryEl) return;
             if (tournamentHistory.length > 0) {
-                summaryEl.textContent = `ആകെ ${tournamentHistory.length} സെഷനുകൾ / ${tournamentHistory.length} Sessions`;
+                summaryEl.textContent = `ആകെ ${tournamentHistory.length} സെഷൻ റെക്കോർഡുകൾ`;
             } else {
-                summaryEl.textContent = `സെഷൻ റെക്കോർഡുകൾ / Session Records`;
+                summaryEl.textContent = `സെഷൻ റെക്കോർഡുകൾ`;
             }
         }
 
@@ -1315,12 +1348,12 @@
                 let played = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                 let colorClass = `team-name-${((idx % 5) + 1)}`;
                 html += `
-                    <div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 flex justify-between items-center text-xs text-stone-800">
+                    <div class="bg-[#fcfbf9] p-2.5 rounded-xl border border-[#e6decb] flex justify-between items-center text-xs text-slate-800">
                         <span class="font-bold ${colorClass}">${escapeHtml(t.name)}</span>
                         <div class="flex items-center gap-2">
-                            <span class="text-stone-800 font-extrabold bg-stone-100 px-2 py-0.5 rounded border border-stone-300">${played} Plays</span>
-                            <span class="text-[10px] text-stone-900 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
-                            <span class="text-[10px] text-rose-700 font-semibold flex items-center gap-1">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
+                            <span class="text-[#5c4033] font-extrabold bg-white px-2 py-0.5 rounded border border-[#e6decb]">${played} Plays</span>
+                            <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
+                            <span class="text-[10px] text-rose-600 font-semibold flex items-center gap-1">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
                         </div>
                     </div>
                 `;
@@ -1355,45 +1388,45 @@
                 let colorClass = `team-name-${(((t.id - 1) % 5) + 1)}`;
                 
                 html += `
-                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-white border border-stone-300 shadow-2xs">
-                        <div class="flex items-center justify-between text-[11px] font-bold text-stone-900">
+                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-white border border-[#d7ccc8] shadow-2xs">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
-                                <span class="text-stone-700 font-black">#${idx + 1}</span>
+                                <span class="text-[#5c4033] font-black">#${idx + 1}</span>
                                 <span class="uppercase tracking-wider truncate ${colorClass}">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-stone-900 font-bold bg-stone-100 px-2 py-0.5 rounded border border-stone-300 text-[9px] shrink-0">
+                            <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
                             </span>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 text-[9px]">
-                            <div class="bg-stone-50 border border-stone-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-[#fcfbf9] border border-emerald-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-stone-800 font-extrabold uppercase text-[8px]">WIN</span>
+                                    <span class="text-emerald-700 font-extrabold uppercase text-[8px]">WIN</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-stone-900 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
+                                <span class="text-emerald-800 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-stone-50 border border-rose-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-[#fcfbf9] border border-rose-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-rose-700 font-extrabold uppercase text-[8px]">LOSS</span>
+                                    <span class="text-rose-600 font-extrabold uppercase text-[8px]">LOSS</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-rose-800 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[9px]"></i></span>
+                                <span class="text-rose-700 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-stone-50 border border-stone-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-[#fcfbf9] border border-[#d7ccc8] rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-stone-700 font-extrabold uppercase text-[8px]">MATCH</span>
+                                    <span class="text-[#5c4033] font-extrabold uppercase text-[8px]">MATCH</span>
                                     <button onclick="showTeamInfoDetail(${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-stone-900 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${playedCount} <i class="fa-solid fa-chart-line text-[9px]"></i></span>
+                                <span class="text-[#5c4033] text-xs font-black mt-0.5 flex items-center justify-center gap-1">${playedCount} <i class="fa-solid fa-chart-line text-[9px]"></i></span>
                             </div>
                         </div>
                     </div>
@@ -1419,29 +1452,29 @@
             if (!modal || !content) return;
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-stone-200 pb-2">${escapeHtml(team.name)}</div>`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2">${escapeHtml(team.name)}</div>`;
             let playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
 
             if (type === 'wins') {
-                html += `<div class="text-stone-900 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> ജയിച്ച കളികൾ / Wins: (${team.wins})</div>`;
+                html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> ജയിച്ച കളികൾ / Wins: (${team.wins})</div>`;
                 if (!team.matchHistoryLog || team.matchHistoryLog.filter(m => m.result === 'WIN').length === 0) {
-                    html += `<div class="text-stone-500 italic">ആരെയും തോൽപ്പിച്ചിട്ടില്ല / No wins.</div>`;
+                    html += `<div class="text-slate-500 italic">ആരെയും തോൽപ്പിച്ചിട്ടില്ല / No wins.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
-                        html += `<div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] text-stone-800">
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
                             <div>
-                                <span class="text-stone-700 font-bold">Play #${idx + 1}:</span> 
-                                <span class="text-stone-600">തോൽപ്പിച്ചത് / Defeated: <b class="text-stone-900">${escapeHtml(m.opponent)}</b></span>
+                                <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-600">തോൽപ്പിച്ചത് / Defeated: <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'losses') {
-                html += `<div class="text-rose-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ കളികൾ / Losses: (${team.losses || 0})</div>`;
+                html += `<div class="text-rose-600 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> തോറ്റ കളികൾ / Losses: (${team.losses || 0})</div>`;
                 
                 let lossMatches = [];
                 teams.forEach(otherTeam => {
@@ -1458,42 +1491,42 @@
                 });
 
                 if (lossMatches.length === 0) {
-                    html += `<div class="text-stone-500 italic">ആരോടും തോറ്റിട്ടില്ല / No losses.</div>`;
+                    html += `<div class="text-slate-500 italic">ആരോടും തോറ്റിട്ടില്ല / No losses.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
-                        html += `<div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] text-stone-800">
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
                             <div>
-                                <span class="text-rose-700 font-bold">Play #${idx + 1}:</span> 
-                                <span class="text-stone-600">തോറ്റത് / Lost to: <b class="text-stone-900">${escapeHtml(m.winner)}</b></span>
+                                <span class="text-rose-600 font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-600">തോറ്റത് / Lost to: <b class="text-slate-900">${escapeHtml(m.winner)}</b></span>
                             </div>
-                            <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                html += `<div class="text-stone-800 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${playedCount})</div>`;
+                html += `<div class="text-[#5c4033] font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> ആകെ കളിച്ച കളികൾ / Total Matches: (${playedCount})</div>`;
                 
                 html += `<div class="grid grid-cols-2 gap-1 my-1">
-                    <div class="bg-stone-100 border border-stone-300 px-1 py-1 rounded text-center"><span class="text-[8px] text-stone-700 uppercase font-bold">Win:</span> <span class="text-[11px] font-black text-stone-900">${team.wins} 🏆</span></div>
-                    <div class="bg-rose-50 border border-rose-300 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-700 uppercase font-bold">Loss:</span> <span class="text-[11px] font-black text-rose-800">${team.losses || 0} ❌</span></div>
+                    <div class="bg-emerald-50 border border-emerald-300 px-1 py-1 rounded text-center"><span class="text-[8px] text-emerald-700 uppercase font-bold">Win:</span> <span class="text-[11px] font-black text-emerald-800">${team.wins} 🏆</span></div>
+                    <div class="bg-rose-50 border border-rose-300 px-1 py-1 rounded text-center"><span class="text-[8px] text-rose-600 uppercase font-bold">Loss:</span> <span class="text-[11px] font-black text-rose-700">${team.losses || 0} ❌</span></div>
                 </div>`;
 
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
-                    html += `<div class="text-stone-500 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches.</div>`;
+                    html += `<div class="text-slate-500 italic">കളികൾ കളിച്ചിട്ടില്ല / No matches.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
-                        let resColor = m.result === 'WIN' ? 'text-stone-900' : 'text-rose-700';
-                        html += `<div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] text-stone-800">
+                        let resColor = m.result === 'WIN' ? 'text-emerald-700' : 'text-rose-600';
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
                             <div>
-                                <span class="text-stone-700 font-bold">Play #${idx + 1}:</span> 
-                                <span class="text-stone-600">vs <b class="text-stone-900">${escapeHtml(m.opponent)}</b></span>
+                                <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-600">vs <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="${resColor} font-extrabold uppercase">${m.result}</span>
-                                <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200">${m.durationMinutes}m</span>
+                                <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                             </div>
                         </div>`;
                     });
@@ -1523,7 +1556,7 @@
             });
 
             if (!tournamentHistory || tournamentHistory.length === 0) {
-                container.innerHTML = `<div class="text-stone-400 font-light text-center py-6 text-xs">1 മണിക്കൂറിൽ കൂടുതലുള്ള സെഷൻ റെക്കോർഡുകൾ ഒന്നുമില്ല. / No sessions over 1 hour.</div>`;
+                container.innerHTML = `<div class="text-slate-400 font-light text-center py-6 text-xs">1 മണിക്കൂറിൽ കൂടുതലുള്ള സെഷൻ റെക്കോർഡുകൾ ഒന്നുമില്ല. / No sessions over 1 hour.</div>`;
             } else {
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
@@ -1534,32 +1567,32 @@
                     if (!winnersNames) winnersNames = "No Wins";
 
                     const card = document.createElement("div");
-                    card.className = "bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-2 shadow-2xs relative text-stone-800";
+                    card.className = "bg-[#fcfbf9] border border-[#e6decb] rounded-xl p-3 space-y-2 shadow-2xs relative text-slate-800";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
                         let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                         teamsListHtml += `
-                            <div class="flex justify-between items-center text-[11px] font-medium text-stone-700 py-1 border-b border-stone-200">
+                            <div class="flex justify-between items-center text-[11px] font-medium text-slate-700 py-1 border-b border-[#e6decb]">
                                 <span>${i + 1}. ${escapeHtml(t.name)}</span>
                                 <div class="flex gap-2">
-                                    <span class="text-stone-700 font-semibold">${playedCount} P</span>
-                                    <span class="text-stone-900 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
-                                    <span class="text-rose-700 font-semibold">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
+                                    <span class="text-[#5c4033] font-semibold">${playedCount} P</span>
+                                    <span class="text-emerald-700 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
+                                    <span class="text-rose-600 font-semibold">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
                                 </div>
                             </div>
                         `;
                     });
                     card.innerHTML = `
-                        <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+                        <div class="flex items-center justify-between border-b border-[#e6decb] pb-2">
                             <div>
-                                <div class="text-xs font-bold text-stone-900">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
-                                <div class="text-[10px] font-medium text-stone-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
+                                <div class="text-xs font-bold text-[#5c4033]">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
+                                <div class="text-[10px] font-medium text-slate-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <button onclick="deleteSingleHistory(${idx})" class="w-6 h-6 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center border border-rose-200 text-[10px] cursor-pointer" title="ഡിലീറ്റ് / Delete">
+                                <button onclick="deleteSingleHistory(${idx})" class="w-6 h-6 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center border border-rose-200 text-[10px] cursor-pointer" title="ഡിലീറ്റ് / Delete">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
-                                <button onclick="openHistoryRecordDetailModal(${idx})" class="w-7 h-7 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg flex items-center justify-center border border-stone-300 text-xs cursor-pointer shadow-2xs" title="റെക്കോർഡ് / View Records">
+                                <button onclick="openHistoryRecordDetailModal(${idx})" class="w-7 h-7 bg-[#f5f0eb] hover:bg-[#ebdcd0] text-[#5c4033] rounded-lg flex items-center justify-center border border-[#d7ccc8] text-xs cursor-pointer shadow-2xs" title="റെക്കോർഡ് / View Records">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
                             </div>
@@ -1616,45 +1649,45 @@
                 let colorClass = `team-name-${(((t.id - 1) % 5) + 1)}`;
                 
                 html += `
-                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-white border border-stone-300 shadow-2xs">
-                        <div class="flex items-center justify-between text-[11px] font-bold text-stone-900">
+                    <div class="unique-summary-card ${animClass} rounded-xl p-2.5 space-y-1.5 bg-white border border-[#d7ccc8] shadow-2xs">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
-                                <span class="text-stone-700 font-black">#${idx + 1}</span>
+                                <span class="text-[#5c4033] font-black">#${idx + 1}</span>
                                 <span class="uppercase tracking-wider truncate ${colorClass}">${escapeHtml(t.name)}</span>
                             </span>
-                            <span class="text-stone-900 font-bold bg-stone-100 px-2 py-0.5 rounded border border-stone-300 text-[9px] shrink-0">
+                            <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
                             </span>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5 text-[9px]">
-                            <div class="bg-stone-50 border border-stone-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-[#fcfbf9] border border-emerald-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-stone-800 font-extrabold uppercase text-[8px]">WIN</span>
+                                    <span class="text-emerald-700 font-extrabold uppercase text-[8px]">WIN</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'wins')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-stone-900 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
+                                <span class="text-emerald-800 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-stone-50 border border-rose-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-[#fcfbf9] border border-rose-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-rose-700 font-extrabold uppercase text-[8px]">LOSS</span>
+                                    <span class="text-rose-600 font-extrabold uppercase text-[8px]">LOSS</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'losses')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-rose-800 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[9px]"></i></span>
+                                <span class="text-rose-700 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${t.losses || 0} <i class="fa-solid fa-circle-exclamation text-[9px]"></i></span>
                             </div>
 
-                            <div class="bg-stone-50 border border-stone-300 rounded-lg p-1.5 text-center flex flex-col justify-between">
+                            <div class="bg-[#fcfbf9] border border-[#d7ccc8] rounded-lg p-1.5 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-stone-700 font-extrabold uppercase text-[8px]">MATCH</span>
+                                    <span class="text-[#5c4033] font-extrabold uppercase text-[8px]">MATCH</span>
                                     <button onclick="showHistoryTeamInfoDetail(${historyIndex}, ${t.id}, 'played')" class="record-detail-btn cursor-pointer" title="വിശദവിവരങ്ങൾ">
                                         <i class="fa-solid fa-list-ul"></i> INFO
                                     </button>
                                 </div>
-                                <span class="text-stone-900 text-xs font-black mt-0.5 flex items-center justify-center gap-1">${playedCount} <i class="fa-solid fa-chart-line text-[9px]"></i></span>
+                                <span class="text-[#5c4033] text-xs font-black mt-0.5 flex items-center justify-center gap-1">${playedCount} <i class="fa-solid fa-chart-line text-[9px]"></i></span>
                             </div>
                         </div>
                     </div>
@@ -1682,28 +1715,28 @@
             if (!modal || !content) return;
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-stone-200 pb-2">${escapeHtml(team.name)}</div>`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2">${escapeHtml(team.name)}</div>`;
 
             if (type === 'wins') {
-                html += `<div class="text-stone-900 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
+                html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
                 if (!team.matchHistoryLog || team.matchHistoryLog.filter(m => m.result === 'WIN').length === 0) {
-                    html += `<div class="text-stone-500 italic">No wins.</div>`;
+                    html += `<div class="text-slate-500 italic">No wins.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
-                        html += `<div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] text-stone-800">
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
                             <div>
-                                <span class="text-stone-700 font-bold">Play #${idx + 1}:</span> 
-                                <span class="text-stone-600">Defeated: <b class="text-stone-900">${escapeHtml(m.opponent)}</b></span>
+                                <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-600">Defeated: <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'losses') {
-                html += `<div class="text-rose-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Losses: (${team.losses || 0})</div>`;
+                html += `<div class="text-rose-600 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Losses: (${team.losses || 0})</div>`;
                 
                 let lossMatches = [];
                 item.teams.forEach(otherTeam => {
@@ -1720,38 +1753,38 @@
                 });
 
                 if (lossMatches.length === 0) {
-                    html += `<div class="text-stone-500 italic">No losses.</div>`;
+                    html += `<div class="text-slate-500 italic">No losses.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
-                        html += `<div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] text-stone-800">
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
                             <div>
-                                <span class="text-rose-700 font-bold">Play #${idx + 1}:</span> 
-                                <span class="text-stone-600">Lost to: <b class="text-stone-900">${escapeHtml(m.winner)}</b></span>
+                                <span class="text-rose-600 font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-600">Lost to: <b class="text-slate-900">${escapeHtml(m.winner)}</b></span>
                             </div>
-                            <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
                 }
             } else if (type === 'played') {
                 let playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
-                html += `<div class="text-stone-800 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> Total Matches: (${playedCount})</div>`;
+                html += `<div class="text-[#5c4033] font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> Total Matches: (${playedCount})</div>`;
                 
                 if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
-                    html += `<div class="text-stone-500 italic">No matches.</div>`;
+                    html += `<div class="text-slate-500 italic">No matches.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
-                        let resColor = m.result === 'WIN' ? 'text-stone-900' : 'text-rose-700';
-                        html += `<div class="bg-stone-50 p-2 rounded-lg border border-stone-200 flex justify-between items-center text-[10px] text-stone-800">
+                        let resColor = m.result === 'WIN' ? 'text-emerald-700' : 'text-rose-600';
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
                             <div>
-                                <span class="text-stone-700 font-bold">Play #${idx + 1}:</span> 
-                                <span class="text-stone-600">vs <b class="text-stone-900">${escapeHtml(m.opponent)}</b></span>
+                                <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
+                                <span class="text-slate-600">vs <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="${resColor} font-extrabold uppercase">${m.result}</span>
-                                <span class="text-stone-700 text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-stone-200">${m.durationMinutes}m</span>
+                                <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                             </div>
                         </div>`;
                     });
@@ -1774,6 +1807,8 @@
                 const currentTimerEl = document.getElementById("current-match-timer");
                 const totalDurationEl = document.getElementById("total-duration-timer");
                 
+                checkSixHoursTouchLock();
+
                 if (isMatchEnded || !tournamentStartTimestamp) {
                     if (isMatchEnded && lastActionTimestamp && tournamentStartTimestamp) {
                         const elapsedTotal = lastActionTimestamp - tournamentStartTimestamp;
@@ -1878,50 +1913,50 @@
             }
 
             container.innerHTML = `
-                <div class="bg-gradient-to-br from-stone-50 via-white to-amber-50/40 p-4 rounded-2xl border-2 border-stone-300 shadow-md space-y-4 text-center relative overflow-hidden">
-                    <div class="text-[11px] text-stone-900 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5 border-b border-stone-200 pb-2">
+                <div class="bg-gradient-to-br from-[#fcfbf9] via-white to-[#f5f0eb] p-4 rounded-2xl border-2 border-[#d7ccc8] shadow-md space-y-4 text-center relative overflow-hidden">
+                    <div class="text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1.5 border-b border-[#d7ccc8] pb-2">
                         <span class="live-dot-green"></span> തത്സമയ മത്സര വിവരങ്ങൾ / Live Match Stats
                     </div>
 
                     <div class="space-y-3 pt-0.5 text-left">
-                        <div class="bg-white border-2 border-stone-300 rounded-xl p-3 shadow-2xs flex items-center justify-between">
+                        <div class="bg-white border-2 border-emerald-300 rounded-xl p-3 shadow-2xs flex items-center justify-between">
                             <div class="min-w-0 flex-1 pr-2">
-                                <div class="text-[9px] text-stone-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                                    <i class="fa-solid fa-crown text-amber-600"></i> ഒന്നാം സ്ഥാനം / 1st Place
+                                <div class="text-[9px] text-emerald-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fa-solid fa-crown text-amber-500"></i> ഒന്നാം സ്ഥാനം / 1st Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-stone-900 uppercase mt-1 truncate">${topScorerName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 truncate">${topScorerName}</div>
                             </div>
-                            <div class="bg-stone-50 border border-stone-300 rounded-lg px-3 py-1.5 text-center shrink-0">
-                                <span class="text-[8px] text-stone-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
-                                <span class="text-sm font-black text-stone-900">${topScorerWins} 🏆</span>
+                            <div class="bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-1.5 text-center shrink-0">
+                                <span class="text-[8px] text-emerald-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
+                                <span class="text-sm font-black text-emerald-800">${topScorerWins} 🏆</span>
                             </div>
                         </div>
 
-                        <div class="bg-white border-2 border-stone-300 rounded-xl p-3 shadow-2xs flex items-center justify-between">
+                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-3 shadow-2xs flex items-center justify-between">
                             <div class="min-w-0 flex-1 pr-2">
-                                <div class="text-[9px] text-stone-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                                    <i class="fa-solid fa-medal text-stone-600"></i> രണ്ടാം സ്ഥാനം / 2nd Place
+                                <div class="text-[9px] text-[#5c4033] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fa-solid fa-medal text-[#8c6239]"></i> രണ്ടാം സ്ഥാനം / 2nd Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-stone-900 uppercase mt-1 truncate">${secondPlaceName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 truncate">${secondPlaceName}</div>
                             </div>
-                            <div class="bg-stone-50 border border-stone-300 rounded-lg px-3 py-1.5 text-center shrink-0">
-                                <span class="text-[8px] text-stone-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
-                                <span class="text-sm font-black text-stone-900">${secondPlaceWins} 🏆</span>
+                            <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-3 py-1.5 text-center shrink-0">
+                                <span class="text-[8px] text-[#5c4033] uppercase block font-bold">Wins / ജയങ്ങൾ</span>
+                                <span class="text-sm font-black text-[#5c4033]">${secondPlaceWins} 🏆</span>
                             </div>
                         </div>
 
-                        <div class="bg-white border-2 border-stone-200 rounded-xl p-4 shadow-md space-y-3">
-                            <div class="text-[11px] text-stone-900 font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-2">
-                                <i class="fa-solid fa-bolt text-stone-700 text-sm"></i> മത്സര വിശേഷങ്ങൾ / Highlights
+                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-4 shadow-md space-y-3">
+                            <div class="text-[11px] text-[#5c4033] font-black uppercase tracking-wider flex items-center gap-1.5 border-b border-[#d7ccc8] pb-2">
+                                <i class="fa-solid fa-bolt text-[#8c6239] text-sm"></i> മത്സര വിശേഷങ്ങൾ / Highlights
                             </div>
-                            <div class="text-[11px] text-stone-700 font-medium leading-relaxed space-y-2">
-                                <div>• Total Match: <b class="text-stone-900">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
-                                <div class="bg-stone-50 border border-rose-200 rounded-lg p-2 mt-1">
-                                    <div class="text-[9px] text-rose-700 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
-                                    <div class="text-xs font-black text-stone-900 uppercase mt-0.5">${mostDefeatedName}</div>
+                            <div class="text-[11px] text-slate-700 font-medium leading-relaxed space-y-2">
+                                <div>• Total Match: <b class="text-[#5c4033]">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
+                                <div class="bg-[#fcfbf9] border border-rose-200 rounded-lg p-2 mt-1">
+                                    <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
+                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${mostDefeatedName}</div>
                                     <div class="text-[10px] text-rose-700 font-bold mt-0.5">തോൽവികൾ / Losses: ${mostDefeatedCount} ❌</div>
                                 </div>
-                                <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-stone-800 font-semibold">${h2hText}</span></div>
+                                <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-slate-800 font-semibold">${h2hText}</span></div>
                             </div>
                         </div>
                     </div>
@@ -2056,66 +2091,65 @@
                 let isSecondRow = secondPlaceTeams.some(st => st.id === t.id);
                 let isThirdRow = thirdPlaceTeams.some(tt => tt.id === t.id);
                 
-                let rowBg = isWinnerRow ? 'bg-amber-50 font-bold' : (isSecondRow ? 'bg-stone-100 font-bold' : (isThirdRow ? 'bg-amber-50/50 font-bold' : ''));
-                let rowTextColor = isWinnerRow ? 'text-amber-900' : (isSecondRow ? 'text-stone-900' : (isThirdRow ? 'text-amber-800' : 'text-stone-700'));
+                let rowBg = isWinnerRow ? 'bg-[#f5f0eb] font-bold' : (isSecondRow ? 'bg-[#fcfbf9] font-bold' : (isThirdRow ? 'bg-[#f5f0eb]/50 font-bold' : ''));
+                let rowTextColor = isWinnerRow ? 'text-[#5c4033]' : (isSecondRow ? 'text-[#8c6239]' : (isThirdRow ? 'text-[#4a3525]' : 'text-slate-700'));
                 
                 teamsTableHtml += `
-                    <tr class="border-b border-stone-200 text-center text-stone-800 ${rowBg}">
-                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor}">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-stone-700"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-amber-700"></i>' : ''))}</td>
+                    <tr class="border-b border-[#e6decb] text-center text-slate-800 ${rowBg}">
+                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor}">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
                         <td class="py-1 px-1">${played}</td>
-                        <td class="py-1 px-1 font-bold text-stone-900">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
-                        <td class="py-1 px-1 font-bold text-rose-700">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
+                        <td class="py-1 px-1 font-bold text-emerald-600">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
+                        <td class="py-1 px-1 font-bold text-rose-600">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
                     </tr>
                 `;
             });
 
             container.innerHTML = `
-                <!-- Upgraded Large & Crazy Dancing Stage Animation with Racket Throwing -->
+                <!-- Compact Animation Stage -->
                 <div class="dance-stage-container my-1 relative overflow-hidden">
                     <div class="champion-aura"></div>
                     <div class="spotlight-beam-left"></div>
                     <div class="spotlight-beam-right"></div>
                     <div class="badminton-net"></div>
-                    <div class="thrown-racket-1">🏸</div>
-                    <div class="thrown-racket-2">🏸</div>
-                    <div class="mens-player-left">🕺</div>
-                    <div class="mens-player-right">💃</div>
+                    <div class="shuttle-smash-motion">🏸</div>
+                    <div class="mens-player-left"><span class="text-xs">🤸‍♂️</span></div>
+                    <div class="mens-player-right"><span class="text-xs">🤸‍♂️</span></div>
                 </div>
 
                 <!-- Prominent Champions Box -->
-                <div class="bg-gradient-to-r from-amber-700/10 via-amber-700/20 to-amber-700/10 border-2 border-amber-800 rounded-2xl p-4 shadow-md text-center space-y-2 relative">
-                    <div class="text-[11px] text-amber-900 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-crown text-amber-700 text-base"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-700 text-base"></i>
+                <div class="bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-4 shadow-md text-center space-y-2 relative">
+                    <div class="text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-crown text-amber-600 text-base"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-base"></i>
                     </div>
-                    <div class="text-lg sm:text-xl font-black text-stone-900 uppercase tracking-wide leading-snug break-words px-1">
+                    <div class="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1">
                         ✨ ${championNamesDisplay} ✨
                     </div>
-                    <div class="text-[11px] text-stone-900 font-bold bg-white px-3 py-1 rounded-full inline-block border border-stone-300 shadow-2xs">
+                    <div class="text-[11px] text-emerald-700 font-bold bg-white px-3 py-1 rounded-full inline-block border border-emerald-300 shadow-2xs">
                         🏆 Wins: ${firstWins}
                     </div>
                 </div>
 
                 <!-- Balanced 2nd Place Section -->
-                <div class="bg-gradient-to-r from-stone-100 via-white to-stone-100 border border-stone-300 rounded-xl p-2.5 shadow-2xs text-center space-y-1 relative">
-                    <div class="text-[9px] text-stone-700 uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-medal text-stone-600 text-xs"></i> 2nd PLACE / രണ്ടാം സ്ഥാനം
+                <div class="bg-gradient-to-r from-[#fcfbf9] via-white to-[#fcfbf9] border border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs text-center space-y-1 relative">
+                    <div class="text-[9px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-medal text-[#8c6239] text-xs"></i> 2nd PLACE / രണ്ടാം സ്ഥാനം
                     </div>
-                    <div class="text-xs sm:text-sm font-black text-stone-900 uppercase tracking-wide leading-snug break-words px-1">
+                    <div class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide leading-snug break-words px-1">
                         🌟 ${secondNamesDisplay} 🌟
                     </div>
-                    <div class="text-[9px] text-stone-800 font-bold bg-white px-2.5 py-0.5 rounded-full inline-block border border-stone-300">
+                    <div class="text-[9px] text-[#5c4033] font-bold bg-white px-2.5 py-0.5 rounded-full inline-block border border-[#d7ccc8]">
                         🥈 Wins: ${secondWins}
                     </div>
                 </div>
 
                 <!-- 3rd Place & Defeated Team Highlight -->
                 <div class="grid grid-cols-2 gap-1.5 text-xs">
-                    <div class="bg-amber-50/60 border border-amber-300 rounded-xl p-2 text-center shadow-2xs space-y-0.5">
-                        <div class="font-bold text-amber-900 uppercase text-[8px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-award text-amber-700"></i> 3rd Place / മൂന്നാം സ്ഥാനം
+                    <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl p-2 text-center shadow-2xs space-y-0.5">
+                        <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-award text-[#8c6239]"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
-                        <div class="text-stone-900 font-bold uppercase text-[10px] break-words">${thirdNamesDisplay}</div>
-                        <div class="text-[8px] text-amber-900 font-bold">Wins: ${thirdWins}</div>
+                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words">${thirdNamesDisplay}</div>
+                        <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
                     <!-- Defeated Team Highlight -->
@@ -2133,13 +2167,13 @@
 
                 <!-- Full Summary Table -->
                 <div class="space-y-1 text-left pt-1">
-                    <div class="text-[10px] font-bold text-stone-900 uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-list-check text-stone-700"></i> ഫൈനൽ സ്കോർ ഷീറ്റ്:
+                    <div class="text-[10px] font-bold text-[#5c4033] uppercase flex items-center gap-1">
+                        <i class="fa-solid fa-list-check text-[#8c6239]"></i> ഫൈനൽ സ്കോർ ഷീറ്റ്:
                     </div>
-                    <div class="overflow-x-auto bg-white rounded-xl border border-stone-200 p-1 shadow-2xs">
+                    <div class="overflow-x-auto bg-white rounded-xl border border-[#e6decb] p-1 shadow-2xs">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-stone-200 text-[8px] text-stone-500 uppercase text-center font-bold">
+                                <tr class="border-b border-[#e6decb] text-[8px] text-slate-500 uppercase text-center font-bold">
                                     <th class="py-0.5 px-1 text-left">ടീം / Team</th>
                                     <th class="py-0.5 px-1">Play</th>
                                     <th class="py-0.5 px-1">Win</th>
@@ -2238,18 +2272,18 @@
                 
                 if (isWinner) {
                     extraCardClass = "winner-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-amber-800 text-white shadow-xs"><i class="fa-solid fa-crown text-[5px] mr-0.5"></i>1st</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-[#8c6239] text-white shadow-xs"><i class="fa-solid fa-crown text-[5px] mr-0.5"></i>1st</span>`;
                 } else if (isSecond) {
                     extraCardClass = "second-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-stone-700 text-white shadow-xs"><i class="fa-solid fa-medal text-[5px] mr-0.5"></i>2nd</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-[#5c4033] text-white shadow-xs"><i class="fa-solid fa-medal text-[5px] mr-0.5"></i>2nd</span>`;
                 } else if (isThird) {
                     extraCardClass = "third-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-amber-900 text-amber-100 shadow-xs"><i class="fa-solid fa-award text-[5px] mr-0.5"></i>3rd</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-[#4a3525] text-amber-100 shadow-xs"><i class="fa-solid fa-award text-[5px] mr-0.5"></i>3rd</span>`;
                 } else if (isFastest) {
-                    specialBadgeHtml = `<span class="rank-badge bg-stone-800 text-white shadow-xs"><i class="fa-solid fa-bolt text-[5px] mr-0.5"></i>Fast</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-[#6d4c41] text-white shadow-xs"><i class="fa-solid fa-bolt text-[5px] mr-0.5"></i>Fast</span>`;
                 } else {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-rose-100 text-rose-800 border border-rose-300 shadow-xs"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>Last</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-rose-100 text-rose-700 border border-rose-300 shadow-xs"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>Last</span>`;
                 }
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
@@ -2263,43 +2297,43 @@
                             ${specialBadgeHtml}
                             <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-1 min-w-0" title="Click to edit or delete">
                                 <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name, team.id - 1)}</span>
-                                <i class="fa-solid fa-pen text-[9px] text-stone-400 shrink-0 ml-1"></i>
+                                <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
-                            <div class="w-5 h-12 bg-white/90 text-stone-700 rounded-lg flex flex-col items-center justify-center border border-stone-200 relative scale-95 shadow-2xs" title="Total Played & Details">
-                                <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-stone-800 text-white rounded-full flex items-center justify-center text-[6px] font-bold shadow-2xs cursor-pointer">
+                            <div class="w-5 h-12 bg-white/90 text-slate-700 rounded-lg flex flex-col items-center justify-center border border-slate-200 relative scale-95 shadow-2xs" title="Total Played & Details">
+                                <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-[#5c4033] text-white rounded-full flex items-center justify-center text-[6px] font-bold shadow-2xs cursor-pointer">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
-                                <span class="text-[6px] text-stone-500 font-medium leading-none">Play</span>
-                                <span class="text-[10px] text-stone-900 font-bold">${playedCount}</span>
+                                <span class="text-[6px] text-slate-500 font-medium leading-none">Play</span>
+                                <span class="text-[10px] text-[#5c4033] font-bold">${playedCount}</span>
                             </div>
                             
                             <button type="button" onclick="handleScoreChange(${team.id}, -1)" class="w-7 h-12 bg-rose-50 text-rose-700 rounded-lg flex items-center justify-center border border-rose-200 active:scale-95 transition-all cursor-pointer shadow-2xs" title="Minus (-1)">
                                 <i class="fa-solid fa-minus text-[10px]"></i>
                             </button>
                             
-                            <div class="flex flex-col items-center justify-center rounded-lg px-3 py-1 win-loss-highlight-box min-w-[54px] border border-stone-200 bg-white">
-                                <span class="text-xs text-stone-900 font-black flex items-center gap-1">${team.wins} <i class="fa-solid fa-trophy text-[9px] text-amber-600"></i></span>
-                                <span class="text-[10px] text-rose-700 font-bold flex items-center gap-1">${lossesCount} <i class="fa-solid fa-shield text-[8px] text-rose-600"></i></span>
+                            <div class="flex flex-col items-center justify-center rounded-lg px-3 py-1 win-loss-highlight-box min-w-[54px] border border-[#d7ccc8]">
+                                <span class="text-xs text-[#5c4033] font-black flex items-center gap-1">${team.wins} <i class="fa-solid fa-trophy text-[9px] text-amber-600"></i></span>
+                                <span class="text-[10px] text-rose-700 font-bold flex items-center gap-1">${lossesCount} <i class="fa-solid fa-shield text-[8px] text-rose-500"></i></span>
                             </div>
                             
                             <div class="relative">
-                                <button type="button" id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-12 h-12 bg-stone-900 hover:bg-stone-800 text-white rounded-lg flex items-center justify-center border border-stone-700 shadow-md active:scale-95 transition-all cursor-pointer" title="Win +1">
+                                <button type="button" id="plus-btn-${team.id}" onclick="handleScoreChange(${team.id}, 1)" class="w-12 h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center justify-center border border-emerald-400 shadow-md active:scale-95 transition-all cursor-pointer" title="Win +1">
                                     <i class="fa-solid fa-plus text-base font-bold"></i>
                                 </button>
-                                <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-lg flex items-center justify-center border border-stone-700 ${inCooldown ? '' : 'hidden'} z-10 shadow-inner">
+                                <div id="cool-overlay-${team.id}" class="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-lg flex items-center justify-center border border-emerald-400 ${inCooldown ? '' : 'hidden'} z-10 shadow-inner">
                                     <div class="flex flex-col items-center justify-center">
                                         <span class="text-[10px] leaf-anim">🍃</span>
-                                        <span id="cool-countdown-${team.id}" class="text-[9px] text-stone-800 font-bold">60s</span>
+                                        <span id="cool-countdown-${team.id}" class="text-[9px] text-emerald-700 font-bold">60s</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between text-[10px] text-stone-500 font-medium pt-1.5 border-t border-stone-200/60 px-1">
+                    <div class="flex items-center justify-between text-[10px] text-slate-500 font-medium pt-1.5 border-t border-[#e6decb] px-1">
                         <span class="italic">Match Rotation Status</span>
-                        <span class="text-stone-800 font-bold">Order: #${team.clickOrder || 0} | Interval: ${team.matchInterval || 0}m</span>
+                        <span class="text-[#5c4033] font-bold">Order: #${team.clickOrder || 0} | Interval: ${team.matchInterval || 0}m</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -2410,13 +2444,13 @@
 
                     const btn = document.createElement("button");
                     btn.type = "button";
-                    btn.className = "w-full bg-stone-50 hover:bg-stone-100 text-stone-900 font-extrabold py-3.5 px-4 rounded-2xl border border-stone-200 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 shadow-2xs";
+                    btn.className = "w-full bg-[#fcfbf9] hover:bg-[#f5f0eb] text-slate-900 font-extrabold py-3.5 px-4 rounded-2xl border border-[#d7ccc8] text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 shadow-2xs";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none">
-                            <span class="uppercase tracking-wider font-extrabold text-stone-900 text-xs sm:text-sm">${escapeHtml(t.name)}</span>
+                            <span class="uppercase tracking-wider font-extrabold text-[#5c4033] text-xs sm:text-sm">${escapeHtml(t.name)}</span>
                             <span class="text-[10px] text-rose-700 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 uppercase">Select Defeated</span>
                         </div>
-                        <div class="text-[10px] text-stone-500 font-medium italic pointer-events-none">${lastDefeatedText}</div>
+                        <div class="text-[10px] text-slate-500 font-medium italic pointer-events-none">${lastDefeatedText}</div>
                     `;
                     
                     let isSelectionProcessed = false;
@@ -2526,10 +2560,10 @@
             if (!modal || !detailsEl || !confirmBtn) return;
 
             if (lastActionSnapshot && lastActionDescription) {
-                detailsEl.innerHTML = `<span class="text-stone-900 font-semibold">${lastActionDescription}</span>`;
+                detailsEl.innerHTML = `<span class="text-slate-900 font-semibold">${lastActionDescription}</span>`;
                 confirmBtn.disabled = false;
             } else {
-                detailsEl.innerHTML = `<span class="text-stone-400 font-light">No recorded actions available to undo.</span>`;
+                detailsEl.innerHTML = `<span class="text-slate-400 font-light">No recorded actions available to undo.</span>`;
                 confirmBtn.disabled = true;
             }
             modal.classList.remove("hidden");
@@ -2745,11 +2779,11 @@
 
                 topLossPairs.forEach(pair => {
                     lossPointsHtml += `
-                        <div class="flex items-start gap-1.5 bg-stone-50 p-1.5 rounded-lg border border-stone-200 text-stone-800">
-                            <span class="text-rose-700 font-bold">•</span>
+                        <div class="flex items-start gap-1.5 bg-[#fcfbf9] p-1.5 rounded-lg border border-[#e6decb] text-slate-800">
+                            <span class="text-rose-600 font-bold">•</span>
                             <div>
-                                <b class="text-stone-900 uppercase">${escapeHtml(pair.loser)}</b> ടീം, <b class="text-stone-900 uppercase">${escapeHtml(pair.winner)}</b> ടീമിനെതിരെ 
-                                <span class="text-rose-700 font-extrabold">${pair.count} പ്രാവശ്യം</span> തോറ്റു / Lost ${pair.count} times.
+                                <b class="text-slate-900 uppercase">${escapeHtml(pair.loser)}</b> ടീം, <b class="text-[#5c4033] uppercase">${escapeHtml(pair.winner)}</b> ടീമിനെതിരെ 
+                                <span class="text-rose-600 font-extrabold">${pair.count} പ്രാവശ്യം</span> തോറ്റു / Lost ${pair.count} times.
                             </div>
                         </div>
                     `;
@@ -2757,7 +2791,7 @@
             }
 
             if (mostLostToEl) {
-                mostLostToEl.innerHTML = lossPairs.length > 0 ? lossPointsHtml : `<div class="text-stone-400 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല / No stats available.</div>`;
+                mostLostToEl.innerHTML = lossPairs.length > 0 ? lossPointsHtml : `<div class="text-slate-400 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല / No stats available.</div>`;
             }
         }
 
@@ -2796,9 +2830,13 @@
             teams = JSON.parse(JSON.stringify(defaultTeams));
             tournamentStartTimestamp = Date.now();
             lastActionTimestamp = Date.now();
+            lastActivityTimestamp = Date.now();
             globalClickSequence = 0;
             isMatchEnded = false;
             
+            const masterBody = document.getElementById("master-body-container");
+            if (masterBody) masterBody.classList.remove("app-touch-locked");
+
             saveData();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
