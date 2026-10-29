@@ -349,6 +349,14 @@
             transform: scale(0.92);
             background: rgba(140, 98, 57, 0.2);
         }
+
+        /* Improved Text Wrapping Classes for International Names (Fixes text cutoff) */
+        .name-wrapper {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1.25;
+        }
     </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -408,7 +416,7 @@
                     <i class="fa-solid fa-shield-halved"></i>
                 </span>
                 <div class="min-w-0 flex-1">
-                    <div id="main-top-last-defeated-text" class="text-[9px] font-bold text-slate-700 truncate w-full">No matches played yet</div>
+                    <div id="main-top-last-defeated-text" class="text-[9px] font-bold text-slate-700 name-wrapper w-full">No matches played yet</div>
                 </div>
             </div>
             <button onclick="openLastDefeatedHistoryModal()" class="w-5 h-5 bg-[#f5f0eb] hover:bg-[#ebdcd0] border border-[#d7ccc8] text-[#5c4033] rounded flex items-center justify-center text-[9px] shrink-0 cursor-pointer" title="Previous Defeats History">
@@ -874,6 +882,26 @@
             "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം!"
         ];
 
+        // INTERNATIONAL STANDARD TIE-BREAKER SORTING FUNCTION
+        function getInternationalSortedTeams(teamsArray) {
+            return [...teamsArray].sort((a, b) => {
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                let aLosses = a.losses || 0;
+                let bLosses = b.losses || 0;
+                if (aLosses !== bLosses) return aLosses - bLosses;
+                
+                let h2hWinA = 0;
+                let h2hWinB = 0;
+                if (a.defeatedDetails) h2hWinA = a.defeatedDetails.filter(d => d.name === b.name).length;
+                if (b.defeatedDetails) h2hWinB = b.defeatedDetails.filter(d => d.name === a.name).length;
+                if (h2hWinA !== h2hWinB) return h2hWinB - h2hWinA;
+
+                let aPlayed = Math.max(a.played || 0, 1);
+                let bPlayed = Math.max(b.played || 0, 1);
+                return (b.wins / bPlayed) - (a.wins / aPlayed);
+            });
+        }
+
         function formatHoursAndMins(totalMins) {
             if (!totalMins || totalMins <= 0) return "0h 0m";
             const h = Math.floor(totalMins / 60);
@@ -1220,7 +1248,7 @@
                 allDefeats.forEach((item, index) => {
                     html += `
                         <div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] gap-2">
-                            <div class="min-w-0 flex-1 break-words leading-tight">
+                            <div class="min-w-0 flex-1 break-words leading-tight name-wrapper">
                                 <span class="text-[#5c4033] font-bold">#${allDefeats.length - index}</span> 
                                 <span class="text-emerald-700 font-bold uppercase">${escapeHtml(item.winner)}</span>
                                 <span class="text-slate-600"> Defeated </span>
@@ -1347,8 +1375,8 @@
                 let colorClass = `team-name-${((idx % 5) + 1)}`;
                 html += `
                     <div class="bg-[#fcfbf9] p-2.5 rounded-xl border border-[#e6decb] flex justify-between items-center text-xs text-slate-800">
-                        <span class="font-bold ${colorClass}">${escapeHtml(t.name)}</span>
-                        <div class="flex items-center gap-2">
+                        <span class="font-bold ${colorClass} name-wrapper pr-1">${escapeHtml(t.name)}</span>
+                        <div class="flex items-center gap-2 shrink-0">
                             <span class="text-[#5c4033] font-extrabold bg-white px-2 py-0.5 rounded border border-[#e6decb]">${played} Plays</span>
                             <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
                             <span class="text-[10px] text-rose-600 font-semibold flex items-center gap-1">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
@@ -1372,10 +1400,7 @@
             const container = document.getElementById("modal-time-summary-content");
             if (!modal || !container) return;
 
-            let sortedTeamsForSummary = [...teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
-            });
+            let sortedTeamsForSummary = getInternationalSortedTeams(teams);
 
             let html = "";
             sortedTeamsForSummary.forEach((t, idx) => {
@@ -1390,7 +1415,7 @@
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-[#5c4033] font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider truncate ${colorClass}">${escapeHtml(t.name)}</span>
+                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}</span>
                             </span>
                             <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -1450,7 +1475,7 @@
             if (!modal || !content) return;
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2">${escapeHtml(team.name)}</div>`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}</div>`;
             let playedCount = Math.max(team.played || 0, (team.wins + (team.losses || 0)));
 
             if (type === 'wins') {
@@ -1461,12 +1486,12 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
-                            <div>
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-600">തോൽപ്പിച്ചത് / Defeated: <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1493,12 +1518,12 @@
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
-                            <div>
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <span class="text-rose-600 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-600">തോറ്റത് / Lost to: <b class="text-slate-900">${escapeHtml(m.winner)}</b></span>
                             </div>
-                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1517,12 +1542,12 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-700' : 'text-rose-600';
-                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
-                            <div>
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-600">vs <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 shrink-0">
                                 <span class="${resColor} font-extrabold uppercase">${m.result}</span>
                                 <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
                             </div>
@@ -1558,7 +1583,7 @@
             } else {
                 container.innerHTML = "";
                 tournamentHistory.forEach((item, idx) => {
-                    let sortedTeams = [...item.teams].sort((a, b) => b.wins - a.wins);
+                    let sortedTeams = getInternationalSortedTeams(item.teams);
                     let maxWins = sortedTeams[0].wins;
                     let winnerTeams = sortedTeams.filter(t => t.wins === maxWins && maxWins > 0);
                     let winnersNames = winnerTeams.map(w => escapeHtml(w.name)).join(" • ");
@@ -1570,9 +1595,9 @@
                     sortedTeams.forEach((t, i) => {
                         let playedCount = Math.max(t.played || 0, (t.wins + (t.losses || 0)));
                         teamsListHtml += `
-                            <div class="flex justify-between items-center text-[11px] font-medium text-slate-700 py-1 border-b border-[#e6decb]">
-                                <span>${i + 1}. ${escapeHtml(t.name)}</span>
-                                <div class="flex gap-2">
+                            <div class="flex justify-between items-center text-[11px] font-medium text-slate-700 py-1 border-b border-[#e6decb] gap-2">
+                                <span class="name-wrapper flex-1">${i + 1}. ${escapeHtml(t.name)}</span>
+                                <div class="flex gap-2 shrink-0">
                                     <span class="text-[#5c4033] font-semibold">${playedCount} P</span>
                                     <span class="text-emerald-700 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
                                     <span class="text-rose-600 font-semibold">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></span>
@@ -1581,12 +1606,12 @@
                         `;
                     });
                     card.innerHTML = `
-                        <div class="flex items-center justify-between border-b border-[#e6decb] pb-2">
-                            <div>
+                        <div class="flex items-center justify-between border-b border-[#e6decb] pb-2 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <div class="text-xs font-bold text-[#5c4033]">Session #${tournamentHistory.length - idx} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
                                 <div class="text-[10px] font-medium text-slate-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
                             </div>
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 shrink-0">
                                 <button onclick="deleteSingleHistory(${idx})" class="w-6 h-6 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center border border-rose-200 text-[10px] cursor-pointer" title="ഡിലീറ്റ് / Delete">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
@@ -1633,10 +1658,7 @@
             const container = document.getElementById("history-record-detail-content");
             if (!modal || !container) return;
 
-            let sortedTeamsForSummary = [...item.teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
-            });
+            let sortedTeamsForSummary = getInternationalSortedTeams(item.teams);
 
             let html = "";
             sortedTeamsForSummary.forEach((t, idx) => {
@@ -1651,7 +1673,7 @@
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-[#5c4033] font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider truncate ${colorClass}">${escapeHtml(t.name)}</span>
+                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}</span>
                             </span>
                             <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -1713,7 +1735,7 @@
             if (!modal || !content) return;
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2">${escapeHtml(team.name)}</div>`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}</div>`;
 
             if (type === 'wins') {
                 html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
@@ -1723,12 +1745,12 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     let winMatches = team.matchHistoryLog.filter(m => m.result === 'WIN');
                     winMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
-                            <div>
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-600">Defeated: <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1755,12 +1777,12 @@
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
-                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
-                            <div>
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <span class="text-rose-600 font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-600">Lost to: <b class="text-slate-900">${escapeHtml(m.winner)}</b></span>
                             </div>
-                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${m.durationMinutes}m</span>
                         </div>`;
                     });
                     html += `</div>`;
@@ -1775,14 +1797,14 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     team.matchHistoryLog.forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-700' : 'text-rose-600';
-                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800">
-                            <div>
+                        html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
+                            <div class="name-wrapper flex-1">
                                 <span class="text-[#5c4033] font-bold">Play #${idx + 1}:</span> 
                                 <span class="text-slate-600">vs <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 shrink-0">
                                 <span class="${resColor} font-extrabold uppercase">${m.result}</span>
-                                <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb]">${m.durationMinutes}m</span>
+                                <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${m.durationMinutes}m</span>
                             </div>
                         </div>`;
                     });
@@ -1851,7 +1873,8 @@
             let totalPlaysCount = calculateTotalPlays();
             let totalMatchesCount = totalPlaysCount / 2;
 
-            let teamsWithWins = teams.filter(t => (t.wins || 0) > 0).sort((a, b) => b.wins - a.wins || (a.losses || 0) - (b.losses || 0));
+            let sortedTeams = getInternationalSortedTeams(teams);
+            let teamsWithWins = sortedTeams.filter(t => (t.wins || 0) > 0);
 
             let topScorerName = "ഇതുവരെ കളികളില്ല / No Matches";
             let topScorerWins = 0;
@@ -1915,12 +1938,12 @@
                     </div>
 
                     <div class="space-y-3 pt-0.5 text-left">
-                        <div class="bg-white border-2 border-emerald-300 rounded-xl p-3 shadow-2xs flex items-center justify-between">
+                        <div class="bg-white border-2 border-emerald-300 rounded-xl p-3 shadow-2xs flex items-center justify-between gap-2">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-emerald-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-crown text-amber-500"></i> ഒന്നാം സ്ഥാനം / 1st Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 truncate">${topScorerName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 name-wrapper">${topScorerName}</div>
                             </div>
                             <div class="bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-emerald-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
@@ -1928,12 +1951,12 @@
                             </div>
                         </div>
 
-                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-3 shadow-2xs flex items-center justify-between">
+                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-3 shadow-2xs flex items-center justify-between gap-2">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-[#5c4033] font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-medal text-[#8c6239]"></i> രണ്ടാം സ്ഥാനം / 2nd Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 truncate">${secondPlaceName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 name-wrapper">${secondPlaceName}</div>
                             </div>
                             <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-[#5c4033] uppercase block font-bold">Wins / ജയങ്ങൾ</span>
@@ -1949,7 +1972,7 @@
                                 <div>• Total Match: <b class="text-[#5c4033]">${Number.isInteger(totalMatchesCount) ? totalMatchesCount : totalMatchesCount.toFixed(1)} Matches</b> (${totalPlaysCount} Plays)</div>
                                 <div class="bg-[#fcfbf9] border border-rose-200 rounded-lg p-2 mt-1">
                                     <div class="text-[9px] text-rose-600 font-extrabold uppercase">ഏറ്റവും കൂടുതൽ തോറ്റ ടീം / Most Defeated Team:</div>
-                                    <div class="text-xs font-black text-slate-900 uppercase mt-0.5">${mostDefeatedName}</div>
+                                    <div class="text-xs font-black text-slate-900 uppercase mt-1 name-wrapper">${mostDefeatedName}</div>
                                     <div class="text-[10px] text-rose-700 font-bold mt-0.5">തോൽവികൾ / Losses: ${mostDefeatedCount} ❌</div>
                                 </div>
                                 <div>• നേർക്കുനേർ / Head-to-Head: <span class="text-slate-800 font-semibold">${h2hText}</span></div>
@@ -2016,16 +2039,14 @@
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
 
-            let sortedTeams = [...teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
-            });
+            let sortedTeams = getInternationalSortedTeams(teams);
             
             let rankedListWithPositions = [];
             let currentRank = 1;
             sortedTeams.forEach((t, i) => {
                 if (i > 0) {
-                    if (t.wins !== sortedTeams[i - 1].wins || (t.losses || 0) !== (sortedTeams[i - 1].losses || 0)) {
+                    let prev = sortedTeams[i - 1];
+                    if (t.wins !== prev.wins || (t.losses || 0) !== (prev.losses || 0)) {
                         currentRank = i + 1;
                     }
                 }
@@ -2092,7 +2113,7 @@
                 
                 teamsTableHtml += `
                     <tr class="border-b border-[#e6decb] text-center text-slate-800 ${rowBg}">
-                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor}">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor} name-wrapper">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-600">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-600">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -2117,7 +2138,7 @@
                     <div class="text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-crown text-amber-600 text-base"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-base"></i>
                     </div>
-                    <div class="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1">
+                    <div class="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
                         ✨ ${championNamesDisplay} ✨
                     </div>
                     <div class="text-[11px] text-emerald-700 font-bold bg-white px-3 py-1 rounded-full inline-block border border-emerald-300 shadow-2xs">
@@ -2130,7 +2151,7 @@
                     <div class="text-[9px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-medal text-[#8c6239] text-xs"></i> 2nd PLACE / രണ്ടാം സ്ഥാനം
                     </div>
-                    <div class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide leading-snug break-words px-1">
+                    <div class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
                         🌟 ${secondNamesDisplay} 🌟
                     </div>
                     <div class="text-[9px] text-[#5c4033] font-bold bg-white px-2.5 py-0.5 rounded-full inline-block border border-[#d7ccc8]">
@@ -2144,7 +2165,7 @@
                         <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-award text-[#8c6239]"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
-                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words">${thirdNamesDisplay}</div>
+                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words name-wrapper">${thirdNamesDisplay}</div>
                         <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
@@ -2156,7 +2177,7 @@
                         <div class="font-black text-rose-700 uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-crosshairs text-rose-600"></i> തോറ്റ ടീം (DEFEATED TEAM)
                         </div>
-                        <div class="text-rose-950 font-black uppercase text-[10px] break-words tracking-tight">${loserNames}</div>
+                        <div class="text-rose-950 font-black uppercase text-[10px] break-words tracking-tight name-wrapper">${loserNames}</div>
                         <div class="text-[8px] text-rose-700 font-bold">Losses: ${loserLossCount}</div>
                     </div>
                 </div>
@@ -2187,7 +2208,6 @@
             triggerFireworksEffect();
             playFunnyVoiceAnnouncement(championNamesDisplay, loserNames);
 
-            // Auto Screenshot after 3 seconds of opening End Match modal (Captures only the match interface card without phone date/time)
             setTimeout(() => {
                 const targetCard = document.getElementById("screenshot-target-card");
                 if (targetCard && typeof html2canvas !== 'undefined') {
@@ -2237,10 +2257,7 @@
             if(!container) return;
             container.innerHTML = "";
             
-            let sortedTeams = [...teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
-            });
+            let sortedTeams = getInternationalSortedTeams(teams);
 
             let teamsWithTime = teams.filter(t => t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
@@ -2249,16 +2266,12 @@
                 fastestTeamId = teamsWithTime[0].id;
             }
 
-            let rankedTeams = [...teams].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return (a.losses || 0) - (b.losses || 0);
-            });
-
             let currentPos = 1;
             let teamRanksMap = {};
-            rankedTeams.forEach((t, i) => {
+            sortedTeams.forEach((t, i) => {
                 if (i > 0) {
-                    if (t.wins !== rankedTeams[i - 1].wins || (t.losses || 0) !== (rankedTeams[i - 1].losses || 0)) {
+                    let prev = sortedTeams[i - 1];
+                    if (t.wins !== prev.wins || (t.losses || 0) !== (prev.losses || 0)) {
                         currentPos = i + 1;
                     }
                 }
@@ -2295,7 +2308,7 @@
                     specialBadgeHtml = `<span class="rank-badge bg-[#6d4c41] text-white shadow-xs"><i class="fa-solid fa-bolt text-[5px] mr-0.5"></i>Fast</span>`;
                 } else {
                     extraCardClass = "loser-card";
-                    specialBadgeHtml = `<span class="rank-badge bg-rose-100 text-rose-700 border border-rose-300 shadow-xs"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>Last</span>`;
+                    specialBadgeHtml = `<span class="rank-badge bg-rose-100 text-rose-700 border border-rose-300 shadow-xs"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>${rankPos}th</span>`;
                 }
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
@@ -2308,7 +2321,7 @@
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
                             ${specialBadgeHtml}
                             <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-1 min-w-0" title="Click to edit or delete">
-                                <span class="leading-snug break-words pr-1 min-w-0">${formatSingleLetterAnimatedName(team.name, team.id - 1)}</span>
+                                <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}</span>
                                 <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
                             </div>
                         </div>
@@ -2458,9 +2471,9 @@
                     btn.type = "button";
                     btn.className = "w-full bg-[#fcfbf9] hover:bg-[#f5f0eb] text-slate-900 font-extrabold py-3.5 px-4 rounded-2xl border border-[#d7ccc8] text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 shadow-2xs";
                     btn.innerHTML = `
-                        <div class="flex items-center justify-between w-full pointer-events-none">
-                            <span class="uppercase tracking-wider font-extrabold text-[#5c4033] text-xs sm:text-sm">${escapeHtml(t.name)}</span>
-                            <span class="text-[10px] text-rose-700 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 uppercase">Select Defeated</span>
+                        <div class="flex items-center justify-between w-full pointer-events-none gap-2">
+                            <span class="uppercase tracking-wider font-extrabold text-[#5c4033] text-xs sm:text-sm name-wrapper flex-1">${escapeHtml(t.name)}</span>
+                            <span class="text-[10px] text-rose-700 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 uppercase shrink-0">Select Defeated</span>
                         </div>
                         <div class="text-[10px] text-slate-500 font-medium italic pointer-events-none">${lastDefeatedText}</div>
                     `;
@@ -2793,7 +2806,7 @@
                     lossPointsHtml += `
                         <div class="flex items-start gap-1.5 bg-[#fcfbf9] p-1.5 rounded-lg border border-[#e6decb] text-slate-800">
                             <span class="text-rose-600 font-bold">•</span>
-                            <div>
+                            <div class="name-wrapper flex-1">
                                 <b class="text-slate-900 uppercase">${escapeHtml(pair.loser)}</b> ടീം, <b class="text-[#5c4033] uppercase">${escapeHtml(pair.winner)}</b> ടീമിനെതിരെ 
                                 <span class="text-rose-600 font-extrabold">${pair.count} പ്രാവശ്യം</span> തോറ്റു / Lost ${pair.count} times.
                             </div>
@@ -2821,7 +2834,7 @@
 
         function proceedWhatsAppShare(type) {
             closeWhatsAppChoiceModal();
-            let sorted = [...teams].sort((a, b) => b.wins - a.wins);
+            let sorted = getInternationalSortedTeams(teams);
             let text = "🏸 *WESMA BADMINTON CLUB - LIVE SCORES* 🏸\n\n";
             
             sorted.forEach((t, i) => {
