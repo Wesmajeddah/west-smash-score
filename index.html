@@ -122,19 +122,26 @@
         }
 
         .dangerous-badge {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+            background: linear-gradient(135deg, #b45309 0%, #78350f 100%) !important;
             color: #ffffff !important;
-            font-size: 7px !important;
-            font-weight: 900 !important;
-            padding: 1px 4px !important;
-            border-radius: 4px !important;
-            box-shadow: 0 0 6px rgba(220, 38, 38, 0.4) !important;
-            border: 1px solid #fca5a5 !important;
+            font-size: 6px !important;
+            font-weight: 800 !important;
+            padding: 1px 3px !important;
+            border-radius: 3px !important;
+            height: 12px !important;
+            line-height: 1 !important;
+            box-shadow: 0 0 4px rgba(180, 83, 9, 0.3) !important;
+            border: 1px solid #fde68a !important;
             animation: pulseDangerous 1.5s infinite ease-in-out;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-bottom: 2px !important;
+            width: fit-content !important;
         }
         @keyframes pulseDangerous {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.85; }
+            50% { transform: scale(1.03); opacity: 0.9; }
         }
 
         .winner-card {
@@ -571,7 +578,7 @@
             </div>
             <div>
                 <h3 class="text-sm font-black text-[#5c4033] uppercase tracking-wider">ടൈമർ സ്റ്റാർട്ട് / പുതിയ കളി</h3>
-                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭിച്ചാലോ? / Start fresh game & unlock touch?</p>
+                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് Лоക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭിച്ചാലോ? / Start fresh game & unlock touch?</p>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeStartMatchConfirmModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2.5 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -959,7 +966,7 @@
             if (!totalMins || totalMins <= 0) return "0h 0m";
             const h = Math.floor(totalMins / 60);
             const m = totalMins % 60;
-            if (h > 0) return `${h}h ${m}m`;
+            if (h > 0) return `${h}h ${m}`;
             return `${m}m`;
         }
 
@@ -2419,10 +2426,10 @@
                     specialBadgeHtml = `<span class="rank-badge bg-rose-100 text-rose-700 border border-rose-300 shadow-xs"><i class="fa-solid fa-shield text-[5px] mr-0.5"></i>${rankPos}th</span>`;
                 }
 
-                // DANGEROUS / STRONG TEAM BADGE ADDITION FROM HISTORY
+                // MOST DOMINANT TEAM BADGE ADDITION (PLACED ABOVE NAME & SMALLER SIZE)
                 let dangerousBadgeHtml = "";
                 if (isDangerousTeam) {
-                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs shrink-0" title="All-Time Most Dominant Team from History"><i class="fa-solid fa-fire text-[6px] mr-0.5"></i>DANGEROUS</span>`;
+                    dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs" title="All-Time Most Dominant Team from History"><i class="fa-solid fa-fire text-[5px] mr-0.5"></i>MOST DOMINANT</span>`;
                 }
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
@@ -2433,11 +2440,15 @@
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 flex-1 min-w-0">
                             <span class="w-1.5 h-11 rounded-md ${team.badgeBg} shrink-0"></span>
-                            ${specialBadgeHtml}
-                            ${dangerousBadgeHtml}
-                            <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-1 min-w-0" title="Click to edit or delete">
-                                <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}</span>
-                                <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
+                            <div class="flex flex-col min-w-0 flex-1 justify-center">
+                                ${dangerousBadgeHtml}
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    ${specialBadgeHtml}
+                                    <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-0.5 min-w-0" title="Click to edit or delete">
+                                        <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}</span>
+                                        <i class="fa-solid fa-pen text-[9px] text-slate-400 shrink-0 ml-1"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 relative">
