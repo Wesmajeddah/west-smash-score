@@ -27,10 +27,28 @@
             font-size: 15px;
         }
 
-        .app-touch-locked {
+        /* Lock the complete interface before each device joins the shared session.
+           The overlay also covers History / Status / Share controls outside capture-area. */
+        .app-touch-locked::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            background: rgba(30, 23, 21, 0.34);
+            -webkit-backdrop-filter: blur(5px) grayscale(65%);
+            backdrop-filter: blur(5px) grayscale(65%);
+            pointer-events: auto;
+        }
+        .app-touch-locked #capture-area {
             pointer-events: none !important;
-            opacity: 0.4;
-            filter: grayscale(80%);
+        }
+        .app-touch-locked #main-start-button {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            filter: none !important;
+            position: relative;
+            z-index: 60;
+            cursor: pointer !important;
         }
         
         .wesma-title {
@@ -247,19 +265,22 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
-        /* Elegant synchronized two-player shuttlecock dance */
+        /* Elegant badminton victory animation — same 88px stage size */
         .dance-stage-container{position:relative;width:100%;height:88px;background:radial-gradient(ellipse at 50% 0%,#fff8e8 0%,#f4e8d5 48%,#e9d7bd 100%);border:1px solid rgba(140,98,57,.45);border-radius:.85rem;overflow:hidden;box-shadow:inset 0 0 18px rgba(92,64,51,.10),0 3px 10px rgba(92,64,51,.10)}
         .dance-stage-container:before{content:"";position:absolute;left:8%;right:8%;bottom:12px;height:1px;background:linear-gradient(90deg,transparent,rgba(140,98,57,.45),transparent)}
         .dance-floor-glow{position:absolute;left:25%;right:25%;bottom:5px;height:12px;background:radial-gradient(ellipse,rgba(140,98,57,.22),transparent 70%)}
-        .dance-man{position:absolute;bottom:13px;z-index:3;font-size:35px;line-height:1;filter:drop-shadow(0 3px 2px rgba(44,34,30,.18));transform-origin:50% 90%}
-        .dance-man-left{left:25%;animation:wesmaDanceLeft 1.55s ease-in-out infinite}
-        .dance-man-right{right:25%;animation:wesmaDanceRight 1.55s ease-in-out infinite;animation-delay:.28s}
-        .dance-shuttlecock{position:absolute;left:50%;top:14px;z-index:4;font-size:19px;transform:translateX(-50%);animation:wesmaShuttleDance 1.55s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(92,64,51,.18))}
+        .victory-trophy{position:absolute;left:50%;bottom:13px;z-index:4;transform:translateX(-50%);font-size:39px;line-height:1;color:#a8793e;filter:drop-shadow(0 3px 3px rgba(92,64,51,.24));animation:wesmaTrophyGlow 1.8s ease-in-out infinite}
+        .victory-racket{position:absolute;bottom:17px;width:19px;height:32px;border:2px solid rgba(140,98,57,.85);border-radius:50%;z-index:2;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+        .victory-racket:after{content:"";position:absolute;width:3px;height:23px;left:6px;top:24px;border-radius:3px;background:#8c6239;transform:rotate(12deg)}
+        .victory-racket.left{left:28%;transform:rotate(-32deg);animation:wesmaRacketLeft 2.1s ease-in-out infinite}
+        .victory-racket.right{right:28%;transform:rotate(32deg) scaleX(-1);animation:wesmaRacketRight 2.1s ease-in-out infinite}
+        .dance-shuttlecock{position:absolute;left:50%;top:8px;z-index:5;font-size:17px;transform:translateX(-50%);animation:wesmaShuttleDance 1.8s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(92,64,51,.18));color:#8c6239}
         .dance-sparkle{position:absolute;color:#a8793e;font-size:10px;opacity:.65;animation:wesmaSparkle 2s ease-in-out infinite}
         .dance-sparkle.one{left:13%;top:18px}.dance-sparkle.two{right:13%;top:23px;animation-delay:.7s}
-        @keyframes wesmaDanceLeft{0%,100%{transform:translateY(0) rotate(-8deg) scale(1)}25%{transform:translateY(-10px) rotate(13deg) scale(1.04)}50%{transform:translateY(-2px) rotate(-14deg) scale(1)}75%{transform:translateY(-8px) rotate(8deg) scale(1.03)}}
-        @keyframes wesmaDanceRight{0%,100%{transform:translateY(-2px) rotate(8deg) scaleX(-1)}25%{transform:translateY(-8px) rotate(-13deg) scaleX(-1) scale(1.04)}50%{transform:translateY(0) rotate(14deg) scaleX(-1)}75%{transform:translateY(-10px) rotate(-8deg) scaleX(-1) scale(1.03)}}
-        @keyframes wesmaShuttleDance{0%,100%{top:14px;transform:translateX(-50%) rotate(-18deg) scale(.92)}50%{top:4px;transform:translateX(-50%) rotate(22deg) scale(1.12)}}
+        @keyframes wesmaTrophyGlow{0%,100%{transform:translateX(-50%) translateY(0) scale(1);filter:drop-shadow(0 2px 3px rgba(92,64,51,.2))}50%{transform:translateX(-50%) translateY(-4px) scale(1.08);filter:drop-shadow(0 0 9px rgba(212,175,55,.8))}}
+        @keyframes wesmaRacketLeft{0%,100%{transform:rotate(-32deg) translateY(0)}50%{transform:rotate(-24deg) translateY(-4px)}}
+        @keyframes wesmaRacketRight{0%,100%{transform:rotate(32deg) scaleX(-1) translateY(0)}50%{transform:rotate(24deg) scaleX(-1) translateY(-4px)}}
+        @keyframes wesmaShuttleDance{0%,100%{top:12px;transform:translateX(-50%) rotate(-22deg) scale(.9)}50%{top:1px;transform:translateX(-50%) rotate(24deg) scale(1.1)}}
         @keyframes wesmaSparkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:.9;transform:scale(1.25)}}
 
         #fireworks-container {
@@ -352,7 +373,7 @@
                     <span id="match-status-dot" class="live-dot-green"></span> <span id="match-status-text">LIVE</span>
                 </span>
                 <div class="relative inline-flex flex-col items-start gap-0.5">
-                    <button onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer"><i class="fa-solid fa-play text-[7px]"></i> START</button>
+                    <button id="main-start-button" onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#d4af37] to-[#a8793e] hover:from-[#c49b2e] hover:to-[#8c6239] text-[#2c221e] font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-[#8c6239]"><i class="fa-solid fa-play text-[7px]"></i> START</button>
                 </div>
             </div>
             <div id="header-date-badge-small" class="relative bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] rounded-md tracking-wider shadow-2xs">
@@ -440,18 +461,14 @@
                 </div>
             </div>
 
-            <!-- Main Interface Leaderboard Section -->
-            <div id="main-leaderboard-section" class="bg-[#fcfbf9] border gold-border rounded-xl p-3 text-center shadow-xs space-y-2">
-                <div class="pt-1 text-left space-y-1.5">
-                    <button onclick="toggleH2HInterface()" class="w-full bg-[#f5f0eb] hover:bg-[#ebdcd0] text-[#5c4033] font-semibold text-[11px] py-2 px-2 rounded-lg border border-[#d7ccc8] flex items-center justify-between transition-all cursor-pointer">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-[#8c6239]"></i> ഏറ്റവും കൂടുതൽ തോറ്റത് ആര് ആരോടാണ് / Most Lost H2H</span>
-                        <i id="h2h-toggle-icon" class="fa-solid fa-chevron-down text-xs"></i>
-                    </button>
-                    <div id="h2h-stats-container" class="hidden bg-white rounded-xl p-2.5 border border-[#e6decb] space-y-1.5 text-[11px] shadow-inner">
-                        <div id="most-lost-to-target" class="text-rose-600 font-medium space-y-1">⚠️ ഏറ്റവും കൂടുതൽ തോറ്റതിന്റെ വിവരങ്ങൾ കണക്കാക്കുന്നു... / Calculating most lost stats...</div>
-                    </div>
-                </div>
-            </div>
+            <!-- Compact champion shortcut only; opens the Instagram-style winner poster -->
+            <button id="official-combined-section" type="button" onclick="openChampionStatusModal()" class="relative w-full overflow-hidden rounded-lg border border-[#9b633d] px-3 py-2 shadow-lg text-left active:scale-[0.99] transition" style="background:radial-gradient(circle at 82% 18%,rgba(153,35,28,.52),transparent 42%),linear-gradient(125deg,#080608 0%,#21090d 58%,#3a1013 100%);">
+                <span class="absolute -right-5 -top-7 w-24 h-24 rounded-full border-[10px] border-red-900/20 pointer-events-none"></span>
+                <span class="relative flex items-center justify-between gap-2">
+                    <span class="flex items-center gap-2 min-w-0"><i class="fa-solid fa-crown text-[#e5b85c] text-sm"></i><span class="text-[10px] font-black tracking-[0.2em] text-white">CHAMPION</span></span>
+                    <span class="text-[8px] font-extrabold tracking-widest text-amber-200">TAP TO VIEW <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                </span>
+            </button>
         </div>
     </div>
 
@@ -505,12 +522,15 @@
                 <button onclick="openHistoryModal()" class="text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-2.5 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-folder-open"></i> HISTORY
                 </button>
+                <button onclick="openMatchCorrectionModal()" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-2.5 py-1 rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-pen-to-square"></i> CORRECT
+                </button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 gap-2">
-            <button onclick="openWhatsAppChoiceModal('text')" class="w-full bg-[#3d2817] hover:bg-[#2c1d10] text-white font-medium py-2.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1 text-xs transition-all active:scale-95 border border-[#5c4033] cursor-pointer">
-                <i class="fa-brands fa-whatsapp text-emerald-300 text-sm"></i> ടെക്സ്റ്റ് ഷെയർ / Text Share
+            <button onclick="openUnifiedReportModal()" class="w-full bg-gradient-to-r from-[#8c6239] to-[#5c4033] hover:from-[#78522f] hover:to-[#4e342e] text-white font-extrabold py-2.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-[#c6a15b] cursor-pointer">
+                <i class="fa-solid fa-images text-amber-200"></i> OFFICIAL COMBINED REPORT • IMAGE SHARE
             </button>
         </div>
     </div>
@@ -522,8 +542,8 @@
                 <i class="fa-solid fa-play"></i>
             </div>
             <div>
-                <h3 class="text-sm font-black text-[#5c4033] uppercase tracking-wider">ടൈമർ സ്റ്റാർട്ട് / പുതിയ കളി</h3>
-                <p class="text-xs text-slate-500 font-light mt-1">ടച്ച് ലോക്ക് റിലീസ് ചെയ്ത് പുതിയ കളി ആരംഭിച്ചാലോ? / Start fresh game & unlock touch?</p>
+                <h3 class="text-sm font-black text-[#5c4033] uppercase tracking-wider">ടൈമർ സ്റ്റാർട്ട് / പുതിയ സെഷൻ</h3>
+                <p class="text-xs text-slate-500 font-light mt-1">ആദ്യ ഫോണിൽ Start ചെയ്താൽ എല്ലാ ഫോണുകളിലും LIVE മാച്ച് കാണിക്കും. മറ്റൊരു ഫോണിൽ Match ഇതിനകം ആരംഭിച്ചിട്ടുണ്ടെങ്കിൽ വീണ്ടും Start ചെയ്യാൻ കഴിയില്ല. Notification മാത്രം കാണിക്കും.</p>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeStartMatchConfirmModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2.5 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
@@ -667,6 +687,65 @@
         </div>
     </div>
 
+    <!-- Combined Main Interface + Current Status + End Match shareable report -->
+    <div id="unified-report-modal" class="fixed inset-0 bg-[#1e1715]/90 backdrop-blur-md flex items-center justify-center p-3 z-[95] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] text-slate-800">
+            <div class="p-3 bg-[#f5f0eb] border-b border-[#d7ccc8] flex items-center justify-between">
+                <div><div class="text-xs font-black text-[#5c4033]">WESMA OFFICIAL MATCH REPORT</div><div class="text-[9px] text-slate-500">Main Scoreboard • Winner • Team Statistics</div></div>
+                <button onclick="closeUnifiedReportModal()" class="w-7 h-7 bg-white rounded-lg text-slate-600 border border-[#d7ccc8]"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-3 overflow-y-auto flex-1 space-y-3">
+                <div id="unified-report-capture" class="bg-white border-2 border-[#c6a15b] rounded-xl p-4 space-y-3 text-slate-800">
+                    <div id="unified-report-content"></div>
+                </div>
+                <img id="unified-report-preview" class="hidden w-full rounded-xl border border-[#d7ccc8]" alt="WESMA Official Match Report Preview">
+                <div id="unified-report-status" class="text-center text-[10px] text-slate-500">റിപ്പോർട്ട് തയ്യാറാക്കുന്നു...</div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 p-3 border-t border-[#e6decb] bg-[#fcfbf9]">
+                <button onclick="generateUnifiedReportImage()" class="bg-[#5c4033] text-white rounded-lg py-2 text-[10px] font-bold">PREVIEW</button>
+                <button onclick="downloadUnifiedReportImage()" class="bg-[#8c6239] text-white rounded-lg py-2 text-[10px] font-bold">DOWNLOAD</button>
+                <button onclick="shareUnifiedReportImage()" class="bg-emerald-700 text-white rounded-lg py-2 text-[10px] font-bold">SHARE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instagram Story-style WESMA Winner Status -->
+    <div id="champion-status-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 z-[110] hidden">
+        <div class="w-full max-w-[390px] max-h-[96vh] flex flex-col gap-2">
+            <div id="champion-status-capture" class="relative mx-auto w-full overflow-hidden text-white shadow-2xl" style="aspect-ratio:9/16;background:radial-gradient(circle at 78% 38%,rgba(190,48,34,.58),transparent 38%),radial-gradient(circle at 20% 78%,rgba(90,10,20,.55),transparent 45%),linear-gradient(145deg,#050304 0%,#180609 48%,#350d12 100%);">
+                <div class="absolute inset-0 opacity-40 pointer-events-none" style="background:repeating-linear-gradient(125deg,transparent 0 34px,rgba(255,70,50,.10) 35px 39px,transparent 40px 72px);"></div>
+                <div class="relative h-full flex flex-col justify-between p-[7%] text-center">
+                    <div class="pt-2">
+                        <div class="text-[clamp(9px,2.7vw,13px)] font-black tracking-[.32em] text-amber-200">WESMA BADMINTON CLUB</div>
+                        <div class="mt-7 text-[clamp(27px,8vw,42px)] leading-none font-black italic tracking-tight">MATCH RESULT</div>
+                        <div id="champion-status-date" class="mt-3 text-[clamp(9px,2.6vw,12px)] tracking-wide text-white/75"></div>
+                    </div>
+                    <div class="py-2">
+                        <div class="text-[10px] tracking-[.35em] font-bold text-amber-300">CHAMPIONS</div>
+                        <div id="champion-status-wins" class="mt-1 text-[clamp(76px,23vw,116px)] leading-none font-light" style="font-family:Georgia,serif;">0</div>
+                        <div class="text-[11px] tracking-[.28em] text-amber-100">MATCH WINS</div>
+                        <div class="mx-auto my-5 h-px w-16 bg-white/60"></div>
+                        <div id="champion-status-team" class="text-[clamp(19px,5.5vw,28px)] leading-tight font-black uppercase break-words"></div>
+                        <div class="mt-3 text-[10px] tracking-[.25em] text-white/70">WINNING TEAM</div>
+                        <div id="champion-status-players" class="mt-5 text-[clamp(12px,3.5vw,16px)] font-semibold text-white/90 leading-relaxed"></div>
+                    </div>
+                    <div class="pb-2">
+                        <div class="mx-auto mb-4 h-px w-3/4 bg-white/25"></div>
+                        <div class="text-[11px] tracking-[.25em] font-black text-amber-200">WESMA</div>
+                        <div class="mt-1 text-[9px] tracking-[.2em] text-white/65">BADMINTON CLUB • SINCE 2026</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="generateChampionStatusImage()" class="rounded-lg bg-white text-slate-900 py-2 text-[10px] font-black">PREVIEW</button>
+                <button onclick="downloadChampionStatusImage()" class="rounded-lg bg-amber-500 text-black py-2 text-[10px] font-black">SAVE</button>
+                <button onclick="shareChampionStatusImage()" class="rounded-lg bg-emerald-700 text-white py-2 text-[10px] font-black">SHARE</button>
+                <button onclick="closeChampionStatusModal()" class="rounded-lg bg-slate-700 text-white py-2 text-[10px] font-black">CLOSE</button>
+            </div>
+            <div id="champion-status-message" class="text-center text-[10px] text-white/70"></div>
+        </div>
+    </div>
+
     <!-- Custom Name Editing Popup Modal with ON/OFF Status Toggle Built-in -->
     <div id="custom-name-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-white border gold-border w-full max-w-xs rounded-3xl shadow-2xl p-5 text-center space-y-3 text-slate-800">
@@ -767,7 +846,7 @@
         <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
             <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
                 <h3 class="text-xs font-semibold text-[#5c4033] flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT LOGS (1 HOUR+)
+                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT HISTORY
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -790,6 +869,30 @@
             <div id="history-record-detail-content" class="p-2 space-y-1.5 overflow-y-auto flex-1"></div>
             <div class="p-2 bg-[#fcfbf9] border-t border-[#e6decb] text-right">
                 <button onclick="closeHistoryRecordDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer">അടയ്ക്കുക / Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Result Correction Modal -->
+    <div id="match-correction-modal" class="fixed inset-0 bg-[#1e1715]/85 backdrop-blur-md flex items-center justify-center p-3 z-[90] hidden">
+        <div class="bg-white border-2 gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] text-slate-800">
+            <div class="p-3 bg-gradient-to-r from-[#fcfbf9] via-white to-[#f5f0eb] border-b border-[#d7ccc8] flex items-center justify-between">
+                <div>
+                    <h3 class="text-xs font-extrabold text-[#5c4033] flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-[#8c6239]"></i> MATCH REVIEW & CORRECTION</h3>
+                    <p class="text-[9px] text-slate-500 mt-1">മാച്ച് പരിശോധിക്കുക • പിശകുണ്ടെങ്കിൽ മാത്രം തിരുത്തുക</p>
+                </div>
+                <button onclick="closeMatchCorrectionModal()" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-3 border-b border-[#e6decb] space-y-2">
+                <label for="match-correction-scope" class="block text-[10px] font-bold text-[#5c4033]">ഏത് റെക്കോർഡാണ് തിരുത്തേണ്ടത്?</label>
+                <select id="match-correction-scope" onchange="renderMatchCorrectionList()" class="w-full bg-white border border-[#d7ccc8] rounded-lg px-3 py-2 text-xs text-slate-800">
+                    <option value="current">നിലവിലെ ടൂർണമെന്റ് / LIVE</option>
+                </select>
+                <p class="text-[9px] text-slate-500">മാച്ച് നമ്പർ ക്രമത്തിൽ പരിശോധിക്കുക. സംശയമുള്ള മാച്ച് തുറന്ന് വിശദാംശങ്ങൾ ഉറപ്പാക്കിയ ശേഷം മാത്രം correction ചെയ്യുക.</p>
+            </div>
+            <div id="match-correction-list" class="p-3 space-y-2 overflow-y-auto flex-1"></div>
+            <div class="p-2.5 bg-[#fcfbf9] border-t border-[#e6decb] flex justify-end">
+                <button onclick="closeMatchCorrectionModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-xl text-xs cursor-pointer">CLOSE</button>
             </div>
         </div>
     </div>
@@ -826,7 +929,14 @@
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let isMatchEnded = false;
-        let isTournamentLocked = false;
+        // A brand-new / reset session waits for an explicit START action.
+        let isTournamentLocked = true;
+        // Each newly opened device stays blurred until its user taps START/RUNNING.
+        // This is local-only; the shared tournament state remains in Firebase.
+        let isLocalStartGateVisible = true;
+        let autoResetInterval = null;
+        let autoResetInProgress = false;
+        const AUTO_RESET_IDLE_MS = 6 * 60 * 60 * 1000;
         let timerInterval = null;
         let cooldownInterval = null;
         let isFirebaseConnected = false;
@@ -845,7 +955,10 @@
         let historyWriteQueue = Promise.resolve();
         let firebaseWriteQueue = Promise.resolve();
         let firebaseWritePending = 0;
+        let matchCorrectionTarget = null;
         let firebaseLastWriteError = null;
+        let startGuardActive = false;
+        let finishProcessing = false;
 
         const flipPopColorsList = ["#5c4033", "#8c6239", "#4a3525", "#722f37", "#37474f", "#6d4c41", "#2c221e"];
         const badgeColorsList = ["bg-[#5c4033]", "bg-[#6d4c41]", "bg-[#37474f]", "bg-[#722f37]", "bg-[#8c6239]", "bg-[#4e342e]", "bg-[#263238]"];
@@ -898,18 +1011,35 @@
             });
         }
 
-        function getDynamicBadgeTitle(team) {
-            if (!team || !Array.isArray(tournamentHistory) || tournamentHistory.length < 3) return "";
-            const recent = tournamentHistory.slice(0,4);
+        function getDynamicBadgeTitle(team, sessionTeams = teams, historyRows = tournamentHistory) {
+            // Historical eligibility + current-session maximum wins. The same rule can
+            // also be evaluated against a selected saved History session.
+            if (!team || !Array.isArray(historyRows) || historyRows.length < 3) return "";
+            const pool = Array.isArray(sessionTeams) ? sessionTeams : [];
+            const currentTeam = pool.find(t => String(t.id) === String(team.id));
+            if (!currentTeam || currentTeam.isDisabled || (Number(currentTeam.wins) || 0) <= 0) return "";
+            const activeTeams = pool.filter(t => !t.isDisabled);
+            const currentMaxWins = activeTeams.reduce((max, t) => Math.max(max, Number(t.wins) || 0), 0);
+            if ((Number(currentTeam.wins) || 0) !== currentMaxWins) return "";
+
+            const recent = historyRows.slice(0,4);
             const aggregateFor = candidateId => {
-                const rows = recent.map(r => (r.teams || []).find(t => t.id === candidateId)).filter(Boolean);
+                const rows = recent.map(r => (r.teams || []).find(t => String(t.id) === String(candidateId))).filter(Boolean);
                 const totals = rows.reduce((a,t) => ({wins:a.wins+(Number(t.wins)||0),played:a.played+Math.max(Number(t.played)||0,(Number(t.wins)||0)+(Number(t.losses)||0))}),{wins:0,played:0});
-                return {id:candidateId,records:rows.length,wins:totals.wins,rate:totals.played?totals.wins/totals.played:0};
+                return {id:String(candidateId),records:rows.length,wins:totals.wins,rate:totals.played?totals.wins/totals.played:0};
             };
-            const ordered = teams.map(t => aggregateFor(t.id)).filter(x => x.records >= 3).sort((a,b) => b.rate-a.rate || b.wins-a.wins);
-            const rank = ordered.findIndex(x => x.id === team.id);
+            const ordered = activeTeams.map(t => aggregateFor(t.id)).filter(x => x.records >= 3).sort((a,b) => b.rate-a.rate || b.wins-a.wins);
+            const rank = ordered.findIndex(x => x.id === String(team.id));
             if (rank < 0 || rank > 1) return "";
             return dynamicTitles[(rank + Math.floor(ordered[rank].rate * 10)) % dynamicTitles.length];
+        }
+
+        function getHistoryBadgeTitle(team, historyIndex) {
+            const record = tournamentHistory[Number(historyIndex)];
+            if (!record || !Array.isArray(record.teams)) return "";
+            // History is stored newest first; only older sessions (following this row)
+            // are used to assess the historical title for this session.
+            return getDynamicBadgeTitle(team, record.teams, tournamentHistory.slice(Number(historyIndex) + 1, Number(historyIndex) + 5));
         }
 
         function formatHoursAndMins(totalMins) {
@@ -991,29 +1121,30 @@
         function launchApp() {
             initAudioContext();
             triggerHapticFeedback([40, 60, 40]);
-            
+
+            // Opening the app must not silently start, unlock, or reset a tournament.
+            // The actual shared tournament start happens only after the main START flow.
             const gate = document.getElementById("startup-gate");
             if (gate) {
                 gate.style.display = "none";
                 gate.classList.add("hidden");
             }
-            
-            isMatchEnded = false;
-            isTournamentLocked = false;
-            if (!tournamentStartTimestamp) {
-                tournamentStartTimestamp = Date.now();
-                lastActionTimestamp = Date.now();
-                globalClickSequence = 0;
-            }
-            saveData();
             render();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
             applyTouchLockState();
+            updateStartButtonState();
         }
 
         function openStartMatchConfirmModal() {
             triggerHapticFeedback([30]);
+            if (tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded) {
+                // This device is already looking at an active shared session. Rejoin it
+                // locally instead of blocking the user or attempting to start/reset it.
+                adoptSharedRunningSession(tournamentStartTimestamp);
+                showToast("ℹ️ മറ്റൊരു ഫോണിൽ ഇതിനകം START ചെയ്തിട്ടുണ്ട്. ഈ ഫോണിൽ LIVE മാച്ച് കാണിക്കുന്നു; ടൈമറും സ്കോറുകളും റീസെറ്റ് ചെയ്തിട്ടില്ല.");
+                return;
+            }
             const modal = document.getElementById("start-match-confirm-modal");
             if (modal) modal.classList.remove("hidden");
         }
@@ -1023,24 +1154,109 @@
             if (modal) modal.classList.add("hidden");
         }
 
-        function executeStartFreshMatch() {
-            closeStartMatchConfirmModal();
-            triggerHapticFeedback([60, 40, 60]);
-
-            tournamentStartTimestamp = Date.now();
-            lastActionTimestamp = Date.now();
+        function adoptSharedRunningSession(startedAt) {
+            const safeStart = Number(startedAt) || Number(tournamentStartTimestamp) || 0;
+            if (!safeStart) {
+                showToast("⚠️ നിലവിലുള്ള ടൂർണമെന്റിന്റെ Start സമയം ലഭിച്ചില്ല. Firebase sync പരിശോധിക്കുക.");
+                return false;
+            }
+            // Joining an already-running session is a local UI/timer action only.
+            // Do NOT saveData() here: that could overwrite newer scores from another phone.
+            tournamentStartTimestamp = safeStart;
             isMatchEnded = false;
             isTournamentLocked = false;
+            isLocalStartGateVisible = false;
+            startGuardActive = true;
+            if (!lastActionTimestamp) lastActionTimestamp = safeStart;
+            updateMatchStatusBadge();
+            updateMainTopLastDefeatedBar();
+            render();
+            applyTouchLockState();
+            updateStartButtonState();
+            startLiveTimer();
+            return true;
+        }
+
+        function applySuccessfulStart(startedAt) {
+            const safeStart = Number(startedAt) || Date.now();
+            tournamentStartTimestamp = safeStart;
+            lastActionTimestamp = safeStart;
+            isMatchEnded = false;
+            isTournamentLocked = false;
+            isLocalStartGateVisible = false;
+            startGuardActive = true;
+            finishProcessing = false;
+            if (dbRef) dbRef.child("lastActionTimestamp").set(safeStart).catch(error => console.error("Start timer anchor save failed:", error));
             lastActionSnapshot = null;
             lastActionDescription = "";
             undoHistoryStack = [];
-            
             saveData();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
             render();
             applyTouchLockState();
-            showToast("⏱️ പുതിയ കളി / ടൈമർ സ്റ്റാർട്ട് ചെയ്തു!");
+            updateStartButtonState();
+            startLiveTimer();
+            showToast("⏱️ ടൂർണമെന്റ് ആരംഭിച്ചു! മറ്റു ഫോണുകളിൽ വീണ്ടും Start അമർത്തിയാലും ടൈമർ റീസെറ്റ് ആകില്ല.");
+        }
+
+        function executeStartFreshMatch() {
+            closeStartMatchConfirmModal();
+            triggerHapticFeedback([60, 40, 60]);
+
+            // Use one transaction on the shared tournament root so the guard and
+            // reset/locked state are evaluated atomically. A stale active guard left
+            // by an older session must NOT block a fresh start after Reset.
+            // Simultaneous starts are still safe: the first transaction unlocks the
+            // session; the next device sees that same session as running and is rejected.
+            if (dbRef) {
+                dbRef.transaction(current => {
+                    if (!current || !Array.isArray(current.teams)) return;
+                    const guard = current.sessionStartGuard || {};
+                    const sharedMatchRunning = current.isTournamentLocked !== true &&
+                        current.isMatchEnded !== true &&
+                        (guard.active === true || !!current.tournamentStartTimestamp);
+                    if (sharedMatchRunning) return;
+
+                    const startedAt = Date.now();
+                    return {
+                        ...current,
+                        tournamentStartTimestamp: startedAt,
+                        lastActionTimestamp: startedAt,
+                        isMatchEnded: false,
+                        isTournamentLocked: false,
+                        sessionStartGuard: {
+                            active: true,
+                            startedAt,
+                            sessionId: String(startedAt),
+                            token: `start-${startedAt}`
+                        }
+                    };
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        console.error("Start transaction failed:", error);
+                        showToast("⚠️ Start സ്ഥിരീകരിക്കാൻ കഴിഞ്ഞില്ല. ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിക്കുക.");
+                        return;
+                    }
+                    if (!committed) {
+                        // A genuinely active shared session already exists.
+                        // Do not reset or change this device's timer/state.
+                        showToast("⚠️ Match Already Started / Game Already In Progress");
+                        return;
+                    }
+                    const value = snapshot && snapshot.val();
+                    const guard = value && value.sessionStartGuard;
+                    applySuccessfulStart(guard && guard.startedAt || (value && value.tournamentStartTimestamp));
+                }, false);
+                return;
+            }
+
+            if (tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded) {
+                showToast("ടൂർണമെന്റ് ഇതിനകം ആരംഭിച്ചിട്ടുണ്ട്. ടൈമർ റീസെറ്റ് ചെയ്തിട്ടില്ല.");
+                updateStartButtonState();
+                return;
+            }
+            applySuccessfulStart(Date.now());
         }
 
         function playBestSound() {
@@ -1136,11 +1352,9 @@
                 gate.style.display = "none";
                 gate.classList.add("hidden");
             }
-            if (!tournamentStartTimestamp) {
-                tournamentStartTimestamp = Date.now();
-                lastActionTimestamp = Date.now();
-                globalClickSequence = 0;
-            }
+            // Do not generate a start timestamp during page initialization.
+            // A generated timestamp made the app think the tournament was already
+            // running, so the START confirmation could never open on a fresh session.
 
             applyTouchLockState();
 
@@ -1158,7 +1372,9 @@
                         });
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
-                        tournamentHistory = data.tournamentHistory || [];
+                        const firebaseHistory = dedupeHistoryRecords(data.tournamentHistory || []);
+                        const localHistory = Array.isArray(tournamentHistory) ? tournamentHistory : [];
+                        tournamentHistory = mergeHistoryRecords(firebaseHistory, localHistory);
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
                         isTournamentLocked = data.isTournamentLocked || false;
@@ -1166,11 +1382,24 @@
                         lastActionDescription = data.lastActionDescription || "";
                         undoHistoryStack = Array.isArray(data.undoHistoryStack) ? data.undoHistoryStack : (lastActionSnapshot ? [lastActionSnapshot] : []);
                         sessionHistorySavedId = data.sessionHistorySavedId || null;
-
+                        if (data.sessionStartGuard && typeof data.sessionStartGuard === "object") {
+                            startGuardActive = !!data.sessionStartGuard.active;
+                            if (Number(data.sessionStartGuard.startedAt) > 0) {
+                                tournamentStartTimestamp = Number(data.sessionStartGuard.startedAt);
+                            }
+                        } else if (dbRef) {
+                            const legacyActive = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
+                            dbRef.child("sessionStartGuard").transaction(current => current || { active: legacyActive, startedAt: tournamentStartTimestamp || null }, () => {}, false);
+                            startGuardActive = legacyActive;
+                        }
+                        if (JSON.stringify(tournamentHistory) !== JSON.stringify(firebaseHistory)) {
+                            persistMergedHistory();
+                        }
                         saveLocalBackup();
                     }
                     render();
                     updateHistorySummaryText();
+                    updateStartButtonState();
                     updateMatchStatusBadge();
                     updateMainTopLastDefeatedBar();
                     applyTouchLockState();
@@ -1184,13 +1413,17 @@
             startCooldownTickers();
             updateMatchStatusBadge();
             updateHistorySummaryText();
+            updateStartButtonState();
+            if (autoResetInterval) clearInterval(autoResetInterval);
+            autoResetInterval = setInterval(checkAutoResetAfterInactivity, 60 * 1000);
+            setTimeout(checkAutoResetAfterInactivity, 2500);
         }
 
         function applyTouchLockState() {
             const masterBody = document.getElementById("master-body-container");
             if (!masterBody) return;
 
-            if (isTournamentLocked) {
+            if (isTournamentLocked || isLocalStartGateVisible) {
                 masterBody.classList.add("app-touch-locked");
             } else {
                 masterBody.classList.remove("app-touch-locked");
@@ -1337,6 +1570,149 @@
             return teams.reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
         }
 
+        function historyDateKey(record) {
+            if (!record) return "";
+            if (record.dateKey) return String(record.dateKey);
+            const stamp = Number(record.startTimestamp || record.sessionId || record.id || 0);
+            if (stamp > 0) {
+                const d = new Date(stamp);
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            }
+            const raw = String(record.date || "");
+            const parsed = new Date(raw);
+            if (!Number.isNaN(parsed.getTime())) return `${parsed.getFullYear()}-${String(parsed.getMonth()+1).padStart(2,'0')}-${String(parsed.getDate()).padStart(2,'0')}`;
+            return raw.split(",")[0].trim();
+        }
+
+        function historyRecordFingerprint(record) {
+            const teamSnapshot = JSON.stringify(record && record.teams ? record.teams : []);
+            return `${historyDateKey(record)}|${Number(record && record.totalPlays || 0)}|${teamSnapshot}`;
+        }
+
+        // Keep the first saved copy of each session; never discard unique history entries.
+        function dedupeHistoryRecords(records) {
+            const source = Array.isArray(records) ? records : (records && typeof records === "object" ? Object.values(records) : []);
+            const valid = source.filter(record => record && Array.isArray(record.teams));
+            valid.sort((a, b) => historyRecordTimestamp(b) - historyRecordTimestamp(a));
+            const seenSessions = new Set();
+            const kept = [];
+            valid.forEach(record => {
+                const sid = String(record.sessionId || record.startTimestamp || record.id || "");
+                const key = sid ? `session:${sid}` : `legacy:${historyRecordFingerprint(record)}`;
+                if (seenSessions.has(key)) return;
+                seenSessions.add(key);
+                kept.push(record);
+            });
+            return kept.sort((a, b) => historyRecordTimestamp(b) - historyRecordTimestamp(a));
+        }
+
+        function mergeHistoryRecords(preferredRecords, additionalRecords) {
+            const first = Array.isArray(preferredRecords) ? preferredRecords : (preferredRecords && typeof preferredRecords === "object" ? Object.values(preferredRecords) : []);
+            const second = Array.isArray(additionalRecords) ? additionalRecords : (additionalRecords && typeof additionalRecords === "object" ? Object.values(additionalRecords) : []);
+            return dedupeHistoryRecords([...first, ...second]);
+        }
+
+        function getDailyTotalMatches(record) {
+            const key = historyDateKey(record);
+            if (!key) return Math.floor((Number(record && record.totalPlays || 0) + 0.5) / 2);
+            const sameDay = dedupeHistoryRecords(tournamentHistory || []).filter(item => historyDateKey(item) === key);
+            const totalTeamPlays = sameDay.reduce((sum, item) => sum + (Number(item.totalPlays) || 0), 0);
+            return Math.floor((totalTeamPlays + 0.5) / 2);
+        }
+
+        function updateOfficialCombinedSection() {
+            // Compact CHAMPION shortcut; winner data is populated when the poster is opened.
+        }
+
+
+        let championStatusCanvas = null;
+        let championStatusBusy = false;
+
+        function openChampionStatusModal() {
+            const active = teams.filter(t => !t.isDisabled);
+            const ranked = [...active].sort((a,b) => (Number(b.wins)||0)-(Number(a.wins)||0) || (Number(a.losses)||0)-(Number(b.losses)||0) || String(a.name).localeCompare(String(b.name)));
+            const topWins = ranked.length ? Number(ranked[0].wins)||0 : 0;
+            const winners = topWins > 0 ? ranked.filter(t => (Number(t.wins)||0) === topWins) : [];
+            const team = winners[0] || null;
+            const dateEl = document.getElementById('champion-status-date');
+            const winsEl = document.getElementById('champion-status-wins');
+            const teamEl = document.getElementById('champion-status-team');
+            const playersEl = document.getElementById('champion-status-players');
+            if (dateEl) dateEl.textContent = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+            if (winsEl) winsEl.textContent = String(topWins);
+            if (teamEl) teamEl.textContent = team ? team.name : 'AWAITING FIRST WIN';
+            if (playersEl) {
+                const names = team ? String(team.name || '').split(/\s*&\s*|\s+AND\s+/i).filter(Boolean) : [];
+                playersEl.innerHTML = team ? names.map(name => `<div>${escapeHtml(name)}</div>`).join('') : 'Winner details will appear after the first win';
+            }
+            championStatusCanvas = null;
+            const msg = document.getElementById('champion-status-message');
+            if (msg) msg.textContent = 'PREVIEW അമർത്തി Instagram Status image തയ്യാറാക്കാം.';
+            const modal = document.getElementById('champion-status-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeChampionStatusModal() {
+            const modal = document.getElementById('champion-status-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function generateChampionStatusImage() {
+            if (championStatusBusy) return;
+            const target = document.getElementById('champion-status-capture');
+            const msg = document.getElementById('champion-status-message');
+            if (!target || typeof html2canvas === 'undefined') { if (msg) msg.textContent = 'Image generator unavailable.'; return; }
+            championStatusBusy = true;
+            if (msg) msg.textContent = 'HD Instagram Status തയ്യാറാക്കുന്നു...';
+            try {
+                championStatusCanvas = await html2canvas(target,{backgroundColor:'#080608',scale:3,useCORS:true,scrollX:0,scrollY:0});
+                if (msg) msg.textContent = 'Image ready. SAVE അല്ലെങ്കിൽ SHARE അമർത്തുക.';
+            } catch (e) {
+                console.error('Champion status image failed:',e);
+                if (msg) msg.textContent = 'Image സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.';
+            } finally { championStatusBusy = false; }
+        }
+
+        function downloadChampionStatusImage() {
+            if (!championStatusCanvas) { generateChampionStatusImage(); return; }
+            const link = document.createElement('a');
+            link.download = `WESMA-Champion-Status-${Date.now()}.png`;
+            link.href = championStatusCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function shareChampionStatusImage() {
+            if (!championStatusCanvas) await generateChampionStatusImage();
+            if (!championStatusCanvas) return;
+            try {
+                const blob = await new Promise(resolve => championStatusCanvas.toBlob(resolve,'image/png'));
+                if (!blob) throw new Error('Image creation failed');
+                const file = new File([blob],`WESMA-Champion-Status-${Date.now()}.png`,{type:'image/png'});
+                if (navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({files:[file],title:'WESMA Champion',text:'WESMA BADMINTON CLUB - Champions'});
+                else downloadChampionStatusImage();
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
+                console.error('Champion status share failed:',e);
+                downloadChampionStatusImage();
+            }
+        }
+
+        function updateStartButtonState() {
+            updateOfficialCombinedSection();
+            const button = document.getElementById("main-start-button");
+            if (!button) return;
+            const alreadyRunning = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
+            if (alreadyRunning) {
+                button.innerHTML = '<i class="fa-solid fa-check text-[7px]"></i> RUNNING';
+                button.className = "bg-gradient-to-r from-[#f3e5b5] to-[#d4af37] text-[#4a3525] font-extrabold text-[8px] px-2 py-0.5 rounded shadow uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-[#8c6239]";
+                button.title = "Match already in progress. A second Start attempt will be rejected.";
+            } else {
+                button.innerHTML = '<i class="fa-solid fa-play text-[7px]"></i> START';
+                button.className = "bg-gradient-to-r from-[#d4af37] to-[#a8793e] hover:from-[#c49b2e] hover:to-[#8c6239] text-[#2c221e] font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-[#8c6239]";
+                button.title = "Start the tournament timer";
+            }
+        }
+
         function captureUndoSnapshot(description) {
             const snapshot = {
                 teams: JSON.parse(JSON.stringify(teams)),
@@ -1368,9 +1744,21 @@
             } catch(e) { console.warn("Local backup save error:", e); }
         }
 
-        function saveData() {
+        function saveLastActionTimestampMonotonic(timestamp) {
+            const proposed = Number(timestamp) || 0;
+            if (!dbRef || !proposed) return Promise.resolve(false);
+            return new Promise(resolve => {
+                dbRef.child("lastActionTimestamp").transaction(current => Math.max(Number(current) || 0, proposed), (error, committed) => {
+                    if (error) console.error("Timer anchor sync failed:", error);
+                    resolve(!!committed);
+                }, false);
+            });
+        }
+
+        function saveData(extraRootUpdates = {}) {
+            // Any meaningful shared data change restarts the six-hour idle window.
+            lastActionTimestamp = Date.now();
             saveLocalBackup();
-            updateLeaderboard();
             updateMainTopLastDefeatedBar();
             if (!dbRef) return Promise.resolve(false);
 
@@ -1383,7 +1771,8 @@
                 globalClickSequence, isMatchEnded, isTournamentLocked,
                 lastActionSnapshot: lastActionSnapshot ? JSON.parse(JSON.stringify(lastActionSnapshot)) : null,
                 lastActionDescription, undoHistoryStack: JSON.parse(JSON.stringify(undoHistoryStack || [])),
-                sessionHistorySavedId
+                sessionHistorySavedId,
+                ...(extraRootUpdates && typeof extraRootUpdates === "object" ? extraRootUpdates : {})
             };
 
             firebaseWritePending += 1;
@@ -1401,36 +1790,37 @@
             return firebaseWriteQueue;
         }
 
+        function persistMergedHistory() {
+            if (!dbRef) return Promise.resolve(false);
+            const historyRef = dbRef.child("tournamentHistory");
+            return new Promise(resolve => {
+                historyRef.transaction(current => mergeHistoryRecords(current, tournamentHistory), (error, committed, snapshot) => {
+                    if (error) {
+                        console.error("History merge repair failed:", error);
+                        resolve(false);
+                        return;
+                    }
+                    if (committed && snapshot) tournamentHistory = dedupeHistoryRecords(snapshot.val());
+                    saveLocalBackup();
+                    updateHistorySummaryText();
+                    resolve(!!committed);
+                }, false);
+            });
+        }
+
         function saveHistoryRecordTransaction(record) {
             if (!dbRef || !record) return Promise.resolve(false);
             const historyRef = dbRef.child('tournamentHistory');
             historyWriteQueue = historyWriteQueue.catch(() => false).then(() => new Promise((resolve) => {
                 historyRef.transaction((current) => {
-                    const list = Array.isArray(current) ? current : [];
-                    const sameLegacySession = (item) => item &&
-                        String(item.date || '') === String(record.date || '') &&
-                        Number(item.totalPlays || 0) === Number(record.totalPlays || 0) &&
-                        JSON.stringify(item.teams || []) === JSON.stringify(record.teams || []);
-                    const isSameSession = (item) => item && (
-                        String(item.sessionId || '') === String(record.sessionId) ||
-                        String(item.startTimestamp || '') === String(record.startTimestamp) ||
-                        (!item.sessionId && !item.startTimestamp && sameLegacySession(item))
-                    );
-                    const matching = list.filter(isSameSession);
-                    if (matching.length > 0) {
-                        let kept = false;
-                        const deduped = [];
-                        list.forEach(item => {
-                            if (!isSameSession(item)) {
-                                deduped.push(item);
-                            } else if (!kept) {
-                                deduped.push({ ...item, sessionId: record.sessionId, startTimestamp: record.startTimestamp });
-                                kept = true;
-                            }
-                        });
-                        return deduped;
-                    }
-                    return [record, ...list];
+                    const list = dedupeHistoryRecords(Array.isArray(current) ? current : (current && typeof current === "object" ? Object.values(current) : []));
+                    const newKey = String(record.sessionId || record.startTimestamp || record.id || "");
+                    const exists = list.some(item => {
+                        const oldKey = String(item.sessionId || item.startTimestamp || item.id || "");
+                        return (newKey && oldKey === newKey) || (!oldKey && historyRecordFingerprint(item) === historyRecordFingerprint(record));
+                    });
+                    // Block only duplicate sessions; distinct eligible sessions are retained.
+                    return exists ? list : dedupeHistoryRecords([record, ...list]);
                 }, (error, committed, snapshot) => {
                     if (error) {
                         console.error("Firebase history transaction failed:", error);
@@ -1451,48 +1841,33 @@
 
         function savePermanentHistoryToStorage() {
             const sessionId = String(tournamentStartTimestamp || "no-session");
-            // Check both the session marker and the actual history records. This also
-            // protects against a stale session marker after a reload or on another device.
-            const expectedDate = new Date(Number(sessionId) || Date.now()).toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-            });
-            const currentTeamSnapshot = JSON.stringify(teams);
-            const existingSessionRecord = (tournamentHistory || []).find(item => item && (
-                String(item.sessionId || '') === sessionId || String(item.startTimestamp || '') === sessionId ||
-                (!item.sessionId && !item.startTimestamp && String(item.date || '') === expectedDate &&
-                    Number(item.totalPlays || 0) === Number(calculateTotalPlays()) &&
-                    JSON.stringify(item.teams || []) === currentTeamSnapshot)
-            ));
-            if (existingSessionRecord) {
-                existingSessionRecord.sessionId = sessionId;
-                existingSessionRecord.startTimestamp = sessionId;
+            if (!sessionId || sessionId === "no-session") return false;
+            const exists = (tournamentHistory || []).some(item => item &&
+                [item.sessionId, item.startTimestamp, item.id].some(value => String(value || '') === sessionId));
+            if (exists || sessionHistorySavedId === sessionId) {
                 sessionHistorySavedId = sessionId;
-                saveHistoryRecordTransaction(existingSessionRecord);
-                saveLocalBackup();
                 return false;
             }
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
-
-            const sessionDurationMs = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
-            const sessionDurationMins = Math.max(1, Math.round(sessionDurationMs / 60000));
-            const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', {
+            const durationMs = Date.now() - Number(tournamentStartTimestamp);
+            const durationMins = Math.max(0, Math.floor(durationMs / 60000));
+            if (durationMins < 60) {
+                showToast("⏳ 1 മണിക്കൂറിൽ കൂടുതലുള്ള Match മാത്രമേ History-ൽ സേവ് ചെയ്യൂ.");
+                return false;
+            }
+            const dateStr = new Date(Number(tournamentStartTimestamp) || Date.now()).toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
             const record = {
-                id: sessionId,
-                sessionId,
-                startTimestamp: sessionId,
-                date: dateStr,
+                id: sessionId, sessionId, startTimestamp: Number(sessionId), date: dateStr,
+                dateKey: historyDateKey({ startTimestamp: sessionId }),
                 teams: JSON.parse(JSON.stringify(teams)),
-                totalPlays,
-                durationMinutes: sessionDurationMins
+                totalPlays, totalMatches: Math.floor((totalPlays + 0.5) / 2),
+                durationMinutes: durationMins
             };
-
-            tournamentHistory = [record, ...(tournamentHistory || []).filter(item =>
-                !(item && (String(item.sessionId || '') === sessionId || String(item.startTimestamp || '') === sessionId))
-            )];
             sessionHistorySavedId = sessionId;
+            tournamentHistory = dedupeHistoryRecords([record, ...(tournamentHistory || [])]);
             saveLocalBackup();
             updateHistorySummaryText();
             saveHistoryRecordTransaction(record);
@@ -1502,6 +1877,7 @@
         function updateHistorySummaryText() {
             const summaryEl = document.getElementById("history-summary-text");
             if (!summaryEl) return;
+            tournamentHistory = dedupeHistoryRecords(tournamentHistory || []);
             if (tournamentHistory.length > 0) {
                 summaryEl.textContent = `ആകെ ${tournamentHistory.length} സെഷൻ റെക്കോർഡുകൾ`;
             } else {
@@ -1523,7 +1899,7 @@
                 let colorClass = `team-name-${((((Number(t.id) || 1) - 1) % 5) + 1)}`;
                 html += `
                     <div class="bg-[#fcfbf9] p-2.5 rounded-xl border border-[#e6decb] flex justify-between items-center text-xs text-slate-800">
-                        <span class="font-bold ${colorClass} name-wrapper pr-1">${escapeHtml(t.name)}</span>
+                        <span class="font-bold ${colorClass} name-wrapper pr-1">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
                         <div class="flex items-center gap-2 shrink-0">
                             <span class="text-[#5c4033] font-extrabold bg-white px-2 py-0.5 rounded border border-[#e6decb]">${played} Plays</span>
                             <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${t.wins} <i class="fa-solid fa-bolt text-[9px]"></i></span>
@@ -1564,7 +1940,7 @@
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-[#5c4033] font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}</span>
+                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
                             </span>
                             <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -1624,7 +2000,8 @@
             if (!modal || !content) return;
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}</div>`;
+            const liveBadge = getDynamicBadgeTitle(team);
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}${liveBadge ? ` <span class="dangerous-badge">${liveBadge}</span>` : ""}</div>`;
             let playedCount = getTeamPlayedCount(team);
 
             if (type === 'wins') {
@@ -1706,6 +2083,264 @@
             if (modal) modal.classList.add("hidden");
         }
 
+        function openMatchCorrectionModal() {
+            const pin = prompt("MATCH CORRECTION തുറക്കാൻ Admin PIN (1234) നൽകുക / Enter Admin PIN:");
+            if (pin !== ADMIN_PIN) {
+                if (pin !== null) alert("തെറ്റായ Admin PIN! / Incorrect PIN!");
+                return;
+            }
+            const modal = document.getElementById("match-correction-modal");
+            const scope = document.getElementById("match-correction-scope");
+            if (!modal || !scope) return;
+            scope.innerHTML = '<option value="current">നിലവിലെ ടൂർണമെന്റ് / LIVE</option>';
+            (tournamentHistory || []).forEach((record, index) => {
+                const option = document.createElement("option");
+                option.value = `history:${index}`;
+                option.textContent = `HISTORY • ${record.date || `Session #${index + 1}`}`;
+                scope.appendChild(option);
+            });
+            scope.value = "current";
+            renderMatchCorrectionList();
+            modal.classList.remove("hidden");
+        }
+
+        function closeMatchCorrectionModal() {
+            const modal = document.getElementById("match-correction-modal");
+            if (modal) modal.classList.add("hidden");
+            matchCorrectionTarget = null;
+        }
+
+        function getCorrectionTeamsForScope(scopeValue) {
+            if (scopeValue === "current") return teams;
+            const match = String(scopeValue || "").match(/^history:(\d+)$/);
+            if (!match) return [];
+            const record = tournamentHistory[Number(match[1])];
+            return record && Array.isArray(record.teams) ? record.teams : [];
+        }
+
+        function getCorrectionMatches(sourceTeams) {
+            const matches = [];
+            (sourceTeams || []).forEach(winner => {
+                (winner.matchHistoryLog || []).forEach((log, logIndex) => {
+                    if (!log || log.result !== "WIN") return;
+                    const loser = sourceTeams.find(candidate => (log.opponentId != null && String(candidate.id) === String(log.opponentId)) ||
+                        (log.opponentId == null && candidate.name === log.opponent));
+                    if (!loser) return;
+                    if (Number(log.seq) > 0) {
+                        const pairedLoss = (loser.matchHistoryLog || []).find(item => item && Number(item.seq) === Number(log.seq) && item.result === "LOSS" &&
+                            ((item.opponentId != null && String(item.opponentId) === String(winner.id)) || (item.opponentId == null && item.opponent === winner.name)));
+                        if (!pairedLoss) return;
+                        matches.push({ seq: String(Number(log.seq)), label: `MATCH #${Number(log.seq)}`, winnerId: winner.id, loserId: loser.id,
+                            winnerName: winner.name, loserName: loser.name, duration: Number(log.durationMinutes || pairedLoss.durationMinutes || 0),
+                            timestamp: Number(log.timestamp || pairedLoss.timestamp || 0) });
+                    } else {
+                        // Older saved logs may not have a global sequence. Pair the nth
+                        // result between the same two teams using their original log order.
+                        const priorWins = (winner.matchHistoryLog || []).slice(0, logIndex + 1).filter(item => item && !(Number(item.seq) > 0) && item.result === "WIN" &&
+                            ((item.opponentId != null && String(item.opponentId) === String(loser.id)) || (item.opponentId == null && item.opponent === loser.name))).length;
+                        const legacyOrdinal = priorWins - 1;
+                        const matchingLosses = (loser.matchHistoryLog || []).filter(item => item && !(Number(item.seq) > 0) && item.result === "LOSS" &&
+                            ((item.opponentId != null && String(item.opponentId) === String(winner.id)) || (item.opponentId == null && item.opponent === winner.name)));
+                        const pairedLoss = matchingLosses[legacyOrdinal];
+                        if (!pairedLoss) return;
+                        matches.push({ seq: `legacy:${winner.id}:${loser.id}:${legacyOrdinal}`, label: `LEGACY MATCH • ${priorWins}`,
+                            winnerId: winner.id, loserId: loser.id, winnerName: winner.name, loserName: loser.name,
+                            duration: Number(log.durationMinutes || pairedLoss.durationMinutes || 0), timestamp: Number(log.timestamp || pairedLoss.timestamp || 0) });
+                    }
+                });
+            });
+            const unique = new Map();
+            matches.sort((a,b) => {
+                const aSeq = Number(a.seq), bSeq = Number(b.seq);
+                if (aSeq > 0 && bSeq > 0) return aSeq - bSeq;
+                if (aSeq > 0) return -1;
+                if (bSeq > 0) return 1;
+                const aLegacy = Number(String(a.seq).split(":").pop()) || 0;
+                const bLegacy = Number(String(b.seq).split(":").pop()) || 0;
+                return aLegacy - bLegacy;
+            }).forEach(item => { if (!unique.has(item.seq)) unique.set(item.seq, item); });
+            return Array.from(unique.values());
+        }
+
+        function renderMatchCorrectionList() {
+            const scope = document.getElementById("match-correction-scope");
+            const container = document.getElementById("match-correction-list");
+            if (!scope || !container) return;
+            const sourceTeams = getCorrectionTeamsForScope(scope.value);
+            const matches = getCorrectionMatches(sourceTeams);
+            if (!matches.length) {
+                container.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">തിരുത്താവുന്ന paired match records കണ്ടെത്തിയില്ല.<br><span class="text-[10px]">ഈ സെഷനിൽ WIN/LOSS ആയി രേഖപ്പെടുത്തിയ മാച്ചുകൾ ഇവിടെ കാണിക്കും.</span></div>';
+                return;
+            }
+            const allTeamOptions = sourceTeams.map(team =>
+                `<option value="${escapeHtml(String(team.id))}">${escapeHtml(team.name)}</option>`
+            ).join("");
+            container.innerHTML = matches.map((match, index) => {
+                const safeSeq = String(match.seq).replace(/'/g, "\\'");
+                const safeWinner = String(match.winnerId).replace(/'/g, "\\'");
+                const safeLoser = String(match.loserId).replace(/'/g, "\\'");
+                return `<div class="border border-[#e6decb] rounded-xl p-3 bg-[#fcfbf9] space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[10px] font-extrabold text-[#5c4033]">${match.label || `MATCH #${match.seq}`}</span>
+                        <span class="text-[9px] text-slate-500 text-right">${match.timestamp ? new Date(match.timestamp).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : (match.duration ? `${match.duration} min` : "Time not recorded")}</span>
+                    </div>
+                    <div class="text-[11px] font-semibold text-slate-700">${escapeHtml(match.winnerName)} <span class="text-slate-400 font-normal">vs</span> ${escapeHtml(match.loserName)}</div>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[9px] text-slate-500">Recorded: <b class="text-[#5c4033]">${escapeHtml(match.winnerName)} WON</b></span>
+                        <button onclick="toggleMatchCorrectionReview(${index})" class="shrink-0 bg-[#f5f0eb] hover:bg-[#ebdcd0] border border-[#d7ccc8] text-[#5c4033] rounded-lg px-3 py-2 text-[10px] font-extrabold">REVIEW</button>
+                    </div>
+                    <div id="match-correction-review-${index}" class="hidden border-t border-[#e6decb] pt-2 space-y-2">
+                        <p class="text-[9px] text-slate-600">Full Teams List-ൽ നിന്ന് പുതിയ Winner, Loser തിരഞ്ഞെടുക്കാം. തിരഞ്ഞെടുക്കാത്ത ടീമുകളുടെ കണക്കുകൾ മാറ്റില്ല.</p>
+                        <label class="block text-[9px] font-bold text-emerald-700">WINNER</label>
+                        <select id="match-correction-winner-${index}" class="w-full bg-white border border-[#d7ccc8] rounded-lg px-2 py-2 text-[10px] text-slate-800">${allTeamOptions}</select>
+                        <label class="block text-[9px] font-bold text-rose-700">LOSER</label>
+                        <select id="match-correction-loser-${index}" class="w-full bg-white border border-[#d7ccc8] rounded-lg px-2 py-2 text-[10px] text-slate-800">${allTeamOptions}</select>
+                        <button onclick="applyMatchCorrection('${safeSeq}', '${safeWinner}', '${safeLoser}', 'match-correction-winner-${index}', 'match-correction-loser-${index}')" class="w-full bg-[#5c4033] hover:bg-[#4e342e] text-white rounded-lg px-3 py-2 text-[10px] font-bold">CONFIRM CORRECTION</button>
+                    </div>
+                </div>`;
+            }).join("");
+            matches.forEach((match, index) => {
+                const winner = document.getElementById(`match-correction-winner-${index}`);
+                const loser = document.getElementById(`match-correction-loser-${index}`);
+                if (winner) winner.value = String(match.winnerId);
+                if (loser) loser.value = String(match.loserId);
+            });
+        }
+
+        function toggleMatchCorrectionReview(index) {
+            const panel = document.getElementById(`match-correction-review-${index}`);
+            if (panel) panel.classList.toggle("hidden");
+        }
+
+        function applyMatchCorrection(sequence, oldWinnerIdRaw, oldLoserIdRaw, winnerSelectId, loserSelectId) {
+            const scopeEl = document.getElementById("match-correction-scope");
+            const winnerSelect = document.getElementById(winnerSelectId);
+            const loserSelect = document.getElementById(loserSelectId);
+            if (!scopeEl || !winnerSelect || !loserSelect) return;
+
+            const sourceTeams = getCorrectionTeamsForScope(scopeEl.value);
+            const editingTeams = scopeEl.value === "current" ? sourceTeams : JSON.parse(JSON.stringify(sourceTeams));
+            const oldWinner = editingTeams.find(t => String(t.id) === String(oldWinnerIdRaw));
+            const oldLoser = editingTeams.find(t => String(t.id) === String(oldLoserIdRaw));
+            const newWinner = editingTeams.find(t => String(t.id) === String(winnerSelect.value));
+            const newLoser = editingTeams.find(t => String(t.id) === String(loserSelect.value));
+            if (!oldWinner || !oldLoser || !newWinner || !newLoser) {
+                alert("ടീം വിവരങ്ങൾ കണ്ടെത്താനായില്ല. Correction റദ്ദാക്കി.");
+                return;
+            }
+            if (String(newWinner.id) === String(newLoser.id)) {
+                alert("Winner, Loser വ്യത്യസ്ത ടീമുകളായിരിക്കണം.");
+                return;
+            }
+            if (String(newWinner.id) === String(oldWinner.id) && String(newLoser.id) === String(oldLoser.id)) {
+                showToast("മാറ്റമൊന്നും ആവശ്യമില്ല.");
+                return;
+            }
+
+            const legacyMatch = String(sequence).match(/^legacy:([^:]+):([^:]+):(\d+)$/);
+            let oldWinnerLog = null, oldLoserLog = null;
+            if (legacyMatch) {
+                const ordinal = Number(legacyMatch[3]);
+                const matchesOpponent = (m, opponent) => m &&
+                    ((m.opponentId != null && String(m.opponentId) === String(opponent.id)) || (m.opponentId == null && m.opponent === opponent.name));
+                oldWinnerLog = (oldWinner.matchHistoryLog || []).filter(m => m && !(Number(m.seq) > 0) && m.result === "WIN" && matchesOpponent(m, oldLoser))[ordinal] || null;
+                oldLoserLog = (oldLoser.matchHistoryLog || []).filter(m => m && !(Number(m.seq) > 0) && m.result === "LOSS" && matchesOpponent(m, oldWinner))[ordinal] || null;
+            } else {
+                oldWinnerLog = (oldWinner.matchHistoryLog || []).find(m => m && Number(m.seq) === Number(sequence) && m.result === "WIN");
+                oldLoserLog = (oldLoser.matchHistoryLog || []).find(m => m && Number(m.seq) === Number(sequence) && m.result === "LOSS");
+            }
+            if (!oldWinnerLog || !oldLoserLog) {
+                alert("ഈ മാച്ചിന്റെ paired WIN/LOSS റെക്കോർഡ് പൂർണ്ണമല്ല. സുരക്ഷയ്ക്കായി മാറ്റം നടത്തിയിട്ടില്ല.");
+                return;
+            }
+            if (!confirm(`MATCH RESULT മാറ്റണോ?\\nWinner: ${newWinner.name}\\nLoser: ${newLoser.name}\\nമാറ്റം ആവശ്യമായ ടീമുകളുടെ കണക്കുകൾ മാത്രം അപ്ഡേറ്റ് ചെയ്യും.`)) return;
+
+            if (scopeEl.value === "current") {
+                captureUndoSnapshot(`CORRECTED MATCH ${legacyMatch ? "(LEGACY)" : `#${sequence}`}: ${newWinner.name} WON`);
+            }
+
+            const duration = Number(oldWinnerLog.durationMinutes || oldLoserLog.durationMinutes || 0);
+            const timestamp = Number(oldWinnerLog.timestamp || oldLoserLog.timestamp || Date.now());
+            const seq = Number(oldWinnerLog.seq || oldLoserLog.seq || 0);
+            const oldWinnerName = oldWinner.name, oldLoserName = oldLoser.name;
+
+            // Remove the original paired result and update only the original participants.
+            oldWinner.matchHistoryLog = (oldWinner.matchHistoryLog || []).filter(item => item !== oldWinnerLog);
+            oldLoser.matchHistoryLog = (oldLoser.matchHistoryLog || []).filter(item => item !== oldLoserLog);
+            // Remove only the original result counters, then add the corrected result.
+            // This works for swapped teams and for selecting any other team.
+            oldWinner.wins = Math.max(0, (Number(oldWinner.wins) || 0) - 1);
+            oldLoser.losses = Math.max(0, (Number(oldLoser.losses) || 0) - 1);
+            oldWinner.played = Math.max(0, (Number(oldWinner.played) || 0) - 1);
+            oldLoser.played = Math.max(0, (Number(oldLoser.played) || 0) - 1);
+            oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
+            oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
+            newWinner.wins = (Number(newWinner.wins) || 0) + 1;
+            newLoser.losses = (Number(newLoser.losses) || 0) + 1;
+            newWinner.played = (Number(newWinner.played) || 0) + 1;
+            newLoser.played = (Number(newLoser.played) || 0) + 1;
+            newWinner.totalTimeSpentMinutes = (Number(newWinner.totalTimeSpentMinutes) || 0) + duration;
+            newLoser.totalTimeSpentMinutes = (Number(newLoser.totalTimeSpentMinutes) || 0) + duration;
+
+            oldWinner.defeatedDetails = (oldWinner.defeatedDetails || []).filter(d =>
+                seq > 0 ? Number(d.seq) !== seq : !(d && d.name === oldLoserName));
+            oldLoser.defeatedDetails = (oldLoser.defeatedDetails || []).filter(d =>
+                seq > 0 ? Number(d.seq) !== seq : !(d && d.name === oldWinnerName));
+
+            const makeLog = (result, opponent) => ({
+                ...(seq > 0 ? { seq } : {}),
+                result, opponent: opponent.name, opponentId: opponent.id,
+                durationMinutes: duration, timestamp
+            });
+            if (!Array.isArray(newWinner.matchHistoryLog)) newWinner.matchHistoryLog = [];
+            if (!Array.isArray(newLoser.matchHistoryLog)) newLoser.matchHistoryLog = [];
+            newWinner.matchHistoryLog.push(makeLog("WIN", newLoser));
+            newLoser.matchHistoryLog.push(makeLog("LOSS", newWinner));
+            if (!Array.isArray(newWinner.defeatedDetails)) newWinner.defeatedDetails = [];
+            newWinner.defeatedDetails.push({ name: newLoser.name, ...(seq > 0 ? { seq } : {}), durationMinutes: duration });
+
+            if (scopeEl.value === "current") {
+                saveData();
+                render();
+                renderMatchCorrectionList();
+                showToast("മാച്ച് Winner/Loser തിരുത്തി. ബാധിച്ച ടീമുകളുടെ കണക്കുകൾ മാത്രം അപ്ഡേറ്റ് ചെയ്തു.");
+            } else {
+                const historyMatch = String(scopeEl.value).match(/^history:(\d+)$/);
+                const historyIndex = historyMatch ? Number(historyMatch[1]) : -1;
+                const selectedRecord = tournamentHistory[historyIndex];
+                if (!selectedRecord) { alert("History record കണ്ടെത്താനായില്ല."); return; }
+                const selectedKey = String(selectedRecord.sessionId || selectedRecord.startTimestamp || selectedRecord.id || "");
+                const selectedFingerprint = historyRecordFingerprint(selectedRecord);
+                const correctedTeams = editingTeams;
+                const applyRecord = list => {
+                    const normalized = Array.isArray(list) ? list : (list && typeof list === "object" ? Object.values(list) : []);
+                    return normalized.map(record => {
+                        const recordKey = String(record.sessionId || record.startTimestamp || record.id || "");
+                        if (selectedKey ? recordKey === selectedKey : historyRecordFingerprint(record) === selectedFingerprint) {
+                            return { ...record, teams: correctedTeams };
+                        }
+                        return record;
+                    });
+                };
+                if (dbRef) {
+                    dbRef.child("tournamentHistory").transaction(current => applyRecord(current), (error, committed, snapshot) => {
+                        if (error || !committed || !snapshot) {
+                            console.error("Match correction history save failed:", error);
+                            showToast("⚠️ History correction Firebase-ൽ സേവ് ആയില്ല.");
+                            return;
+                        }
+                        tournamentHistory = dedupeHistoryRecords(snapshot.val());
+                        saveLocalBackup(); updateHistorySummaryText(); renderMatchCorrectionList();
+                        showToast("HISTORY മാച്ച് Winner/Loser തിരുത്തി.");
+                    }, false);
+                } else {
+                    tournamentHistory = dedupeHistoryRecords(applyRecord(tournamentHistory));
+                    saveLocalBackup(); updateHistorySummaryText(); renderMatchCorrectionList();
+                    showToast("HISTORY മാച്ച് Winner/Loser തിരുത്തി.");
+                }
+            }
+        }
+
         function openHistoryModal() {
             triggerHapticFeedback([30]);
             const modal = document.getElementById("history-modal");
@@ -1718,6 +2353,15 @@
             } else {
                 container.innerHTML = "";
                 tournamentHistory.map((item, originalIndex) => ({ item, originalIndex }))
+                    .sort((a, b) => {
+                        const getStamp = entry => {
+                            const direct = Number(entry.item && (entry.item.startTimestamp || entry.item.sessionId || entry.item.id)) || 0;
+                            if (direct > 0) return direct;
+                            const parsed = Date.parse(entry.item && entry.item.date || "");
+                            return Number.isFinite(parsed) ? parsed : 0;
+                        };
+                        return getStamp(b) - getStamp(a) || a.originalIndex - b.originalIndex;
+                    })
                     .forEach(({ item, originalIndex: idx }, displayIndex) => {
                     let sortedTeams = getInternationalSortedTeams(item.teams);
                     let maxWins = sortedTeams[0].wins;
@@ -1744,8 +2388,9 @@
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-[#e6decb] pb-2 gap-2">
                             <div class="name-wrapper flex-1">
-                                <div class="text-xs font-bold text-[#5c4033]">Session #${idx + 1} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
+                                <div class="text-xs font-bold text-[#5c4033]">Session #${displayIndex + 1} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
                                 <div class="text-[10px] font-medium text-slate-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
+                                <div class="text-[10px] font-extrabold text-[#8c6239] mt-0.5">ഈ ദിവസം ആകെ: ${getDailyTotalMatches(item)} MATCHES <span class="font-medium text-slate-500">• ഈ സെഷൻ: ${Math.floor(((Number(item.totalPlays) || 0) + 0.5) / 2)}</span></div>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <button onclick="deleteSingleHistory(${idx})" class="w-6 h-6 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center border border-rose-200 text-[10px] cursor-pointer" title="ഡിലീറ്റ് / Delete">
@@ -1777,18 +2422,33 @@
                 return;
             }
             if (window.confirm("ഈ സെഷൻ ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്യണോ? / Delete session history?")) {
-                tournamentHistory.splice(index, 1);
-                saveLocalBackup();
-                saveData();
+                const selected = tournamentHistory[index];
+                const selectedKey = String(selected && (selected.sessionId || selected.startTimestamp || selected.id) || "");
+                const selectedFingerprint = historyRecordFingerprint(selected);
+                const removeSelected = list => dedupeHistoryRecords(list).filter(item => {
+                    const itemKey = String(item.sessionId || item.startTimestamp || item.id || "");
+                    return selectedKey ? itemKey !== selectedKey : historyRecordFingerprint(item) !== selectedFingerprint;
+                });
                 if (dbRef) {
-                    dbRef.child('tournamentHistory').set(tournamentHistory).catch(error => {
-                        console.error("Firebase history delete failed:", error);
-                        showToast("⚠️ History delete Firebase-ൽ സേവ് ആയില്ല.");
-                    });
+                    dbRef.child("tournamentHistory").transaction(current => removeSelected(current), (error, committed, snapshot) => {
+                        if (error || !committed) {
+                            console.error("Firebase history delete failed:", error);
+                            showToast("⚠️ History delete Firebase-ൽ സേവ് ആയില്ല.");
+                            return;
+                        }
+                        tournamentHistory = dedupeHistoryRecords(snapshot && snapshot.val());
+                        saveLocalBackup();
+                        updateHistorySummaryText();
+                        openHistoryModal();
+                        showToast("ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്തു! / History deleted!");
+                    }, false);
+                } else {
+                    tournamentHistory = removeSelected(tournamentHistory);
+                    saveLocalBackup();
+                    updateHistorySummaryText();
+                    openHistoryModal();
+                    showToast("ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്തു! / History deleted!");
                 }
-                updateHistorySummaryText();
-                openHistoryModal();
-                showToast("ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്തു! / History deleted!");
             }
         }
 
@@ -1803,7 +2463,7 @@
 
             let sortedTeamsForSummary = getInternationalSortedTeams(item.teams);
 
-            let html = "";
+            let html = `<div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl px-3 py-2 text-center text-[10px] font-extrabold text-[#5c4033]">${item.date || ""} • THIS SESSION: ${Math.floor(((Number(item.totalPlays) || 0) + 0.5) / 2)} MATCHES • DAY TOTAL: ${getDailyTotalMatches(item)} MATCHES</div>`;
             sortedTeamsForSummary.forEach((t, idx) => {
                 let mins = t.totalTimeSpentMinutes || 0;
                 let formattedTime = formatHoursAndMins(mins);
@@ -1816,7 +2476,7 @@
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-[#5c4033] font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}</span>
+                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}${getHistoryBadgeTitle(t, historyIndex) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, historyIndex)}</span>` : ""}</span>
                             </span>
                             <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -1878,7 +2538,8 @@
             if (!modal || !content) return;
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}</div>`;
+            const historyBadge = getHistoryBadgeTitle(team, historyIndex);
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}${historyBadge ? ` <span class="dangerous-badge">${historyBadge}</span>` : ""}</div>`;
 
             if (type === 'wins') {
                 html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
@@ -2033,12 +2694,12 @@
 
             if (activeTeamsWithWins.length > 0) {
                 let firstTeams = sortedTeams.filter(t => firstPlaceIds.includes(t.id));
-                topScorerName = firstTeams.map(t => escapeHtml(t.name)).join(" & ");
+                topScorerName = firstTeams.map(t => `${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` (${getDynamicBadgeTitle(t)})` : ""}`).join(" & ");
                 topScorerWins = firstTeams.length > 0 ? firstTeams[0].wins : 0;
 
                 let secondTeams = sortedTeams.filter(t => secondPlaceIds.includes(t.id));
                 if (secondTeams.length > 0) {
-                    secondPlaceName = secondTeams.map(t => escapeHtml(t.name)).join(" & ");
+                    secondPlaceName = secondTeams.map(t => `${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` (${getDynamicBadgeTitle(t)})` : ""}`).join(" & ");
                     secondPlaceWins = secondTeams[0].wins;
                 }
             }
@@ -2077,7 +2738,7 @@
                         let losses = t.losses || 0;
                         bottomBoxHtml += `
                             <div class="bg-white border border-rose-200 rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 shadow-2xs">
-                                <span class="font-extrabold text-slate-900 uppercase text-[11px] name-wrapper flex-1 text-left">${escapeHtml(t.name)}</span>
+                                <span class="font-extrabold text-slate-900 uppercase text-[11px] name-wrapper flex-1 text-left">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
                                 <span class="text-rose-700 font-black bg-rose-50 px-2 py-0.5 rounded border border-rose-200 text-[10px] shrink-0">${losses} ❌ Losses</span>
                             </div>
                         `;
@@ -2141,6 +2802,122 @@
             modal.classList.remove("hidden");
         }
 
+        let unifiedReportCanvas = null;
+        let unifiedReportBusy = false;
+
+        function openUnifiedReportModal() {
+            const modal = document.getElementById("unified-report-modal");
+            const content = document.getElementById("unified-report-content");
+            const preview = document.getElementById("unified-report-preview");
+            const status = document.getElementById("unified-report-status");
+            if (!modal || !content) return;
+            const active = getInternationalSortedTeams(teams.filter(t => !t.isDisabled));
+            const totalPlays = calculateTotalPlays();
+            const totalMatches = Math.floor((totalPlays + 0.5) / 2);
+            const totalTimeMinutes = Math.round(active.reduce((sum, team) => sum + (Number(team.totalTimeSpentMinutes) || 0), 0) / 2);
+            const leaderWins = active.length ? Number(active[0].wins) || 0 : 0;
+            const leaders = active.filter(t => (Number(t.wins) || 0) === leaderWins && leaderWins > 0);
+            const dateText = new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            const rows = active.map((t, i) => {
+                const badge = getDynamicBadgeTitle(t);
+                return `<tr class="border-b border-[#e6decb]">
+                    <td class="py-2 pr-1 text-left font-bold">${i+1}. ${escapeHtml(t.name)}${badge ? ` <span class="text-[8px] text-[#8c6239]">• ${escapeHtml(badge)}</span>` : ""}</td>
+                    <td class="py-2 text-center">${getTeamPlayedCount(t)}</td><td class="py-2 text-center font-black text-emerald-700">${Number(t.wins)||0}</td><td class="py-2 text-center font-black text-rose-700">${Number(t.losses)||0}</td>
+                    <td class="py-2 text-right">${formatHoursAndMins(Number(t.totalTimeSpentMinutes)||0)}</td>
+                </tr>`;
+            }).join("");
+            const mainCards = active.map(t => {
+                const badge = getDynamicBadgeTitle(t);
+                return `<div class="flex items-center justify-between gap-2 border border-[#e6decb] rounded-lg px-2.5 py-2 bg-[#fcfbf9]">
+                    <div class="min-w-0"><div class="text-[10px] font-black uppercase">${escapeHtml(t.name)}${badge ? ` <span class="text-[#8c6239]">• ${escapeHtml(badge)}</span>` : ""}</div><div class="text-[8px] text-slate-500">Played ${getTeamPlayedCount(t)} • Time ${formatHoursAndMins(Number(t.totalTimeSpentMinutes)||0)}</div></div>
+                    <div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${Number(t.wins)||0} W</div><div class="text-[9px] font-bold text-rose-700">${Number(t.losses)||0} L</div></div>
+                </div>`;
+            }).join("");
+            const leadersText = leaders.length ? leaders.map(t => escapeHtml(t.name)).join(" & ") : "Awaiting first win";
+            const secondPlace = active[1] || null;
+            const thirdPlace = active[2] || null;
+            const maxLosses = active.reduce((max, t) => Math.max(max, Number(t.losses) || 0), 0);
+            const mostLossTeams = maxLosses > 0
+                ? active.filter(t => (Number(t.losses) || 0) === maxLosses).map(t => escapeHtml(t.name)).join(" & ")
+                : "No losses yet";
+            const podiumRow = (label, team, fallback) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="font-black text-right text-[#5c4033]">${team ? escapeHtml(team.name) : fallback}</span></div>`;
+            content.innerHTML = `
+                <div class="text-center border-b-2 border-[#c6a15b] pb-3">
+                    <div class="text-2xl font-black tracking-[0.22em] text-[#5c4033]">WESMA</div><div class="text-[10px] font-bold tracking-[0.25em] text-[#8c6239]">BADMINTON CLUB</div><div class="text-[8px] font-bold tracking-[0.2em] text-slate-500 mt-1">OFFICIAL MATCH REPORT • SINCE 2026</div><div class="text-[9px] text-slate-500 mt-2">${dateText}</div>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-center">
+                    <div class="rounded-lg bg-[#f5f0eb] p-2"><div class="text-[8px] text-[#8c6239] font-bold">TOTAL MATCHES</div><div class="text-lg font-black text-[#5c4033]">${totalMatches}</div></div>
+                    <div class="rounded-lg bg-[#f5f0eb] p-2"><div class="text-[8px] text-[#8c6239] font-bold">TOTAL TIME</div><div class="text-lg font-black text-[#5c4033]">${formatHoursAndMins(totalTimeMinutes)}</div></div>
+                    <div class="rounded-lg bg-[#f5f0eb] p-2"><div class="text-[8px] text-[#8c6239] font-bold">STATUS</div><div class="text-[10px] font-black text-[#5c4033] mt-1">${isMatchEnded ? "COMPLETED" : (isTournamentLocked ? "NOT STARTED" : "LIVE")}</div></div>
+                </div>
+                <section class="space-y-2"><div class="text-[10px] font-black tracking-wider text-[#5c4033] border-b border-[#d7ccc8] pb-1">01 • MAIN INTERFACE SCOREBOARD</div>${mainCards || '<div class="text-xs text-slate-500">No active teams</div>'}</section>
+                <section class="space-y-2"><div class="text-[10px] font-black tracking-wider text-[#5c4033] border-b border-[#d7ccc8] pb-1">02 • WINNER & TEAM STATISTICS</div>
+                    <div class="text-center rounded-lg bg-[#5c4033] text-white p-2"><div class="text-[8px] tracking-widest">WESMA WINNER</div><div class="text-sm font-black mt-1">${leadersText}</div><div class="text-[9px] text-amber-100">${leaderWins} Wins</div></div>
+                    <div class="grid grid-cols-1 gap-1.5">${podiumRow("2ND PLACE", secondPlace, "Not available")}${podiumRow("3RD PLACE", thirdPlace, "Not available")}<div class="flex items-center justify-between gap-2 rounded-lg border border-rose-200 bg-rose-50 px-2 py-1.5 text-[9px]"><span class="font-bold text-rose-700">MOST LOSSES</span><span class="font-black text-right text-rose-800">${mostLossTeams} • ${maxLosses}</span></div></div>
+                    <table class="w-full text-[9px]"><thead><tr class="text-slate-500 border-b border-[#d7ccc8]"><th class="text-left py-1">TEAM</th><th>PLAY</th><th>WIN</th><th>LOSS</th><th class="text-right">TIME</th></tr></thead><tbody>${rows}</tbody></table>
+                </section>
+                <div class="text-center text-[8px] text-slate-500 border-t border-[#d7ccc8] pt-2">WESMA BADMINTON CLUB • OFFICIAL RECORD</div>`;
+            unifiedReportCanvas = null;
+            if (preview) { preview.src = ""; preview.classList.add("hidden"); }
+            if (status) status.textContent = "Report ready. PREVIEW അമർത്തി image സൃഷ്ടിക്കുക.";
+            modal.classList.remove("hidden");
+        }
+
+        function closeUnifiedReportModal() {
+            const modal = document.getElementById("unified-report-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        async function generateUnifiedReportImage() {
+            if (unifiedReportBusy) return;
+            const target = document.getElementById("unified-report-capture");
+            const preview = document.getElementById("unified-report-preview");
+            const status = document.getElementById("unified-report-status");
+            if (!target || typeof html2canvas === "undefined") { if (status) status.textContent = "Image generator is unavailable."; return; }
+            unifiedReportBusy = true;
+            if (status) status.textContent = "HD report image തയ്യാറാക്കുന്നു...";
+            try {
+                const canvas = await html2canvas(target, { backgroundColor: "#ffffff", scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: target.scrollWidth, windowHeight: target.scrollHeight });
+                unifiedReportCanvas = canvas;
+                if (preview) { preview.src = canvas.toDataURL("image/png"); preview.classList.remove("hidden"); }
+                if (status) status.textContent = "HD image ready. DOWNLOAD അല്ലെങ്കിൽ SHARE അമർത്തുക.";
+            } catch (error) {
+                console.error("Unified report image generation failed:", error);
+                if (status) status.textContent = "Image സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും PREVIEW ശ്രമിക്കുക.";
+            } finally { unifiedReportBusy = false; }
+        }
+
+        function downloadUnifiedReportImage() {
+            if (!unifiedReportCanvas) { generateUnifiedReportImage(); return; }
+            const link = document.createElement("a");
+            link.download = `WESMA-Match-Report-${Date.now()}.png`;
+            link.href = unifiedReportCanvas.toDataURL("image/png");
+            link.click();
+        }
+
+        async function shareUnifiedReportImage() {
+            if (!unifiedReportCanvas) { await generateUnifiedReportImage(); }
+            if (!unifiedReportCanvas) return;
+            const status = document.getElementById("unified-report-status");
+            try {
+                const blob = await new Promise(resolve => unifiedReportCanvas.toBlob(resolve, "image/png"));
+                if (!blob) throw new Error("Could not create image file");
+                const file = new File([blob], `WESMA-Match-Report-${Date.now()}.png`, { type: "image/png" });
+                if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+                    await navigator.share({ files: [file], title: "WESMA Official Match Report", text: "WESMA BADMINTON CLUB - Official Match Report" });
+                    if (status) status.textContent = "Share sheet opened.";
+                } else {
+                    downloadUnifiedReportImage();
+                    if (status) status.textContent = "ഈ ഫോണിൽ direct image share ലഭ്യമല്ല; image download ചെയ്തു. Gallery-ൽ നിന്ന് share ചെയ്യാം.";
+                }
+            } catch (error) {
+                if (error && error.name === "AbortError") return;
+                console.error("Unified report share failed:", error);
+                downloadUnifiedReportImage();
+                if (status) status.textContent = "Share പരാജയപ്പെട്ടു; image download ചെയ്തു. Gallery-ൽ നിന്ന് share ചെയ്യാം.";
+            }
+        }
+
         function closeCurrentStatusModal() {
             const modal = document.getElementById("current-status-modal");
             if (modal) modal.classList.add("hidden");
@@ -2153,6 +2930,10 @@
         }
 
         function manualFinishMatch() {
+            if (finishProcessing || isMatchEnded) {
+                showToast("Match Already Ended / This Match Was Already Processed");
+                return;
+            }
             triggerHapticFeedback([40]);
             const modal = document.getElementById("end-match-password-modal");
             const pinInput = document.getElementById("end-match-admin-pin");
@@ -2166,6 +2947,11 @@
         }
 
         function verifyEndMatchPassword() {
+            if (finishProcessing || isMatchEnded) {
+                closeEndMatchPasswordModal();
+                showToast("Match Already Ended / This Match Was Already Processed");
+                return;
+            }
             const pinInput = document.getElementById("end-match-admin-pin").value;
             if (pinInput !== ADMIN_PIN) {
                 alert("തെറ്റായ Admin PIN! / Incorrect PIN!");
@@ -2176,24 +2962,29 @@
         }
 
         function proceedFinishMatch() {
+            if (finishProcessing || isMatchEnded) {
+                showToast("Match Already Ended / This Match Was Already Processed");
+                return;
+            }
+            if (calculateTotalPlays() === 0) {
+                showToast("⚠️ നിലവിൽ മത്സരങ്ങളൊന്നും നടന്നിട്ടില്ല!");
+                return;
+            }
+            finishProcessing = true;
             triggerHapticFeedback([100, 50, 100]);
 
             const activeSessionId = String(tournamentStartTimestamp || "no-session");
             if (sessionHistorySavedId === activeSessionId || (tournamentHistory || []).some(item =>
                 item && (String(item.sessionId || '') === activeSessionId || String(item.startTimestamp || '') === activeSessionId)
             )) {
-                isMatchEnded = true;
-                updateMatchStatusBadge();
-                saveData();
+                finishProcessing = false;
                 showToast("ഈ സെഷൻ History-യിൽ ഇതിനകം സേവ് ചെയ്തിട്ടുണ്ട്.");
-                // Still allow the existing finish summary to open, but never append again.
-            }
-            if (calculateTotalPlays() === 0) {
-                showToast("⚠️ നിലവിൽ മത്സരങ്ങളൊന്നും നടന്നിട്ടില്ല!");
                 return;
             }
 
             isMatchEnded = true;
+            startGuardActive = false;
+            if (dbRef) dbRef.child("sessionStartGuard").transaction(current => ({ ...(current || {}), active: false, endedAt: Date.now() }), error => { if (error) console.error("Start guard release failed:", error); }, false);
             updateMatchStatusBadge();
             savePermanentHistoryToStorage();
             saveData();
@@ -2245,9 +3036,10 @@
                 }
             }
 
+            // Keep the WESMA Winner heading clean; taglines remain visible in other views.
             let championNamesDisplay = firstPlaceTeams.length > 0 ? firstPlaceTeams.map(t => escapeHtml(t.name)).join(" & ") : "None";
-            let secondNamesDisplay = secondPlaceTeams.length > 0 ? secondPlaceTeams.map(t => escapeHtml(t.name)).join(" & ") : "None";
-            let thirdNamesDisplay = thirdPlaceTeams.length > 0 ? thirdPlaceTeams.map(t => escapeHtml(t.name)).join(" & ") : "None";
+            let secondNamesDisplay = secondPlaceTeams.length > 0 ? secondPlaceTeams.map(t => `${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` (${getDynamicBadgeTitle(t)})` : ""}`).join(" & ") : "None";
+            let thirdNamesDisplay = thirdPlaceTeams.length > 0 ? thirdPlaceTeams.map(t => `${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` (${getDynamicBadgeTitle(t)})` : ""}`).join(" & ") : "None";
 
             let firstWins = firstPlaceTeams.length > 0 ? firstPlaceTeams[0].wins : 0;
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
@@ -2262,7 +3054,7 @@
                     let ltLosses = lt.losses || 0;
                     loserHtmlContent += `
                         <div class="flex items-center justify-between text-[10px] font-bold bg-white/90 px-2 py-1.5 rounded border border-rose-200 gap-2">
-                            <span class="uppercase text-slate-900 break-words name-wrapper flex-1 pr-1">${escapeHtml(lt.name)}</span>
+                            <span class="uppercase text-slate-900 break-words name-wrapper flex-1 pr-1">${escapeHtml(lt.name)}${getDynamicBadgeTitle(lt) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(lt)}</span>` : ""}</span>
                             <span class="text-rose-700 shrink-0 font-black">${ltLosses} Losses ❌</span>
                         </div>
                     `;
@@ -2284,7 +3076,7 @@
                 
                 teamsTableHtml += `
                     <tr class="border-b border-[#e6decb] text-center text-slate-800 ${rowBg}">
-                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor} name-wrapper">${t.rank}. ${escapeHtml(t.name)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor} name-wrapper">${t.rank}. ${escapeHtml(t.name)} ${getDynamicBadgeTitle(t) ? `<span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-600">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-600">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -2293,10 +3085,12 @@
             });
 
             container.innerHTML = `
-                <!-- Elegant synchronized dance by two male players with a shuttlecock -->
-                <div class="dance-stage-container my-1" role="img" aria-label="Two men performing synchronized dance steps with a shuttlecock">
+                <!-- Elegant badminton victory moment: trophy, crossed rackets and shuttlecock -->
+                <div class="dance-stage-container my-1" role="img" aria-label="Elegant badminton victory celebration with trophy, rackets and shuttlecock">
                     <div class="dance-floor-glow"></div><span class="dance-sparkle one">✦</span><span class="dance-sparkle two">✧</span>
-                    <div class="dance-man dance-man-left" aria-hidden="true">🕺</div><div class="dance-shuttlecock" aria-hidden="true"><i class="fa-solid fa-shuttlecock"></i></div><div class="dance-man dance-man-right" aria-hidden="true">🕺</div>
+                    <span class="victory-racket left" aria-hidden="true"></span><span class="victory-racket right" aria-hidden="true"></span>
+                    <div class="victory-trophy" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
+                    <div class="dance-shuttlecock" aria-hidden="true"><i class="fa-solid fa-shuttlecock"></i></div>
                 </div>
 
                 <!-- Prominent Champions Box -->
@@ -2492,11 +3286,8 @@
                 }
 
                 // DYNAMICALLY AWARD TITLE BADGE ONLY TO TOP POINT-GAINING WINNER TEAM
+                // The performance title is rendered beside the team name below, not as a detached label.
                 let dangerousBadgeHtml = "";
-                if (team.wins > 0 && team.wins === maxWinsOverall && !team.isDisabled) {
-                    let titleText = getDynamicBadgeTitle(team);
-                    if (titleText) dangerousBadgeHtml = `<span class="dangerous-badge shadow-xs" title="Top Performer (based on recent histories)"><i class="fa-solid fa-fire text-[5px] mr-0.5"></i>${titleText}</span>`;
-                }
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
                 const disabledCardClass = team.isDisabled ? 'team-disabled-card' : '';
@@ -2513,7 +3304,7 @@
                                     ${specialBadgeHtml}
                                     <!-- Dynamic Name Display with integrated Edit Pen Icon -->
                                     <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-0.5 min-w-0" title="Click to edit name, status or delete">
-                                        <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}</span>
+                                        <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}${getDynamicBadgeTitle(team) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(team)}</span>` : ""}</span>
                                         <i class="fa-solid fa-pen text-[10px] text-[#8c6239] shrink-0 ml-1 hover:scale-125 transition-all"></i>
                                     </div>
                                 </div>
@@ -2568,7 +3359,7 @@
                 const dividedVal = (totalPlays / 2);
                 totalPlayDividedEl.textContent = Number.isInteger(dividedVal) ? dividedVal : dividedVal.toFixed(1);
             }
-            updateLeaderboard();
+            updateStartButtonState();
         }
 
         function handleScoreChange(id, delta) {
@@ -2680,7 +3471,7 @@
                     btn.className = "w-full bg-[#fcfbf9] hover:bg-[#f5f0eb] text-slate-900 font-extrabold py-3.5 px-4 rounded-2xl border border-[#d7ccc8] text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 shadow-2xs";
                     btn.innerHTML = `
                         <div class="flex items-center justify-between w-full pointer-events-none gap-2">
-                            <span class="uppercase tracking-wider font-extrabold text-[#5c4033] text-xs sm:text-sm name-wrapper flex-1">${escapeHtml(t.name)}</span>
+                            <span class="uppercase tracking-wider font-extrabold text-[#5c4033] text-xs sm:text-sm name-wrapper flex-1">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
                             <span class="text-[10px] text-rose-700 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 uppercase shrink-0">Select Defeated</span>
                         </div>
                         <div class="text-[10px] text-slate-500 font-medium italic pointer-events-none">${lastDefeatedText}</div>
@@ -2748,6 +3539,7 @@
             team.defeatedDetails.push({
                 name: defeatedTeam.name,
                 seq: globalClickSequence,
+                timestamp: now,
                 durationMinutes: intervalMinutes
             });
 
@@ -2756,6 +3548,7 @@
                 opponent: defeatedTeam.name,
                 opponentId: defeatedTeam.id,
                 seq: globalClickSequence,
+                timestamp: now,
                 result: 'WIN',
                 durationMinutes: intervalMinutes
             });
@@ -2765,6 +3558,7 @@
                 opponent: team.name,
                 opponentId: team.id,
                 seq: globalClickSequence,
+                timestamp: now,
                 result: 'LOSS',
                 durationMinutes: intervalMinutes
             });
@@ -2774,6 +3568,7 @@
             
             if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
             lastActionTimestamp = now;
+            saveLastActionTimestampMonotonic(now);
             
             team.wins += 1;
             team.played = (team.played || 0) + 1;
@@ -3038,60 +3833,6 @@
             showToast("പുതിയ ടീമിനെ ചേർത്തു! / Team added!");
         }
 
-        function toggleH2HInterface() {
-            const container = document.getElementById("h2h-stats-container");
-            const icon = document.getElementById("h2h-toggle-icon");
-            if(!container || !icon) return;
-            if(container.classList.contains("hidden")) {
-                container.classList.remove("hidden");
-                icon.classList.remove("fa-chevron-down");
-                icon.classList.add("fa-chevron-up");
-            } else {
-                container.classList.add("hidden");
-                icon.classList.remove("fa-chevron-up");
-                icon.classList.add("fa-chevron-down");
-            }
-        }
-
-        function updateLeaderboard() {
-            const mostLostToEl = document.getElementById("most-lost-to-target");
-            let lossPairs = [];
-            teams.filter(t => !t.isDisabled).forEach(t => {
-                if (t.defeatedDetails) {
-                    t.defeatedDetails.forEach(item => {
-                        let existing = lossPairs.find(p => p.loser === item.name && p.winner === t.name);
-                        if (existing) {
-                            existing.count += 1;
-                        } else {
-                            lossPairs.push({ loser: item.name, winner: t.name, count: 1 });
-                        }
-                    });
-                }
-            });
-
-            let lossPointsHtml = "";
-            if (lossPairs.length > 0) {
-                lossPairs.sort((a, b) => b.count - a.count);
-                let maxLossCount = lossPairs[0].count;
-                let topLossPairs = lossPairs.filter(p => p.count === maxLossCount);
-
-                topLossPairs.forEach(pair => {
-                    lossPointsHtml += `
-                        <div class="flex items-start gap-1.5 bg-[#fcfbf9] p-1.5 rounded-lg border border-[#e6decb] text-slate-800">
-                            <span class="text-rose-600 font-bold">•</span>
-                            <div class="name-wrapper flex-1">
-                                <b class="text-slate-900 uppercase">${escapeHtml(pair.loser)}</b> ടീം, <b class="text-[#5c4033] uppercase">${escapeHtml(pair.winner)}</b> ടീമിനെതിരെ 
-                                <span class="text-rose-600 font-extrabold">${pair.count} പ്രാവശ്യം</span> തോറ്റു / Lost ${pair.count} times.
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            if (mostLostToEl) {
-                mostLostToEl.innerHTML = lossPairs.length > 0 ? lossPointsHtml : `<div class="text-slate-400 italic">തോറ്റതിന്റെ വിവരങ്ങൾ ലഭ്യമല്ല / No stats available.</div>`;
-            }
-        }
 
         function openWhatsAppChoiceModal(mode) {
             triggerHapticFeedback([30]);
@@ -3113,11 +3854,13 @@
             
             sorted.forEach((t, i) => {
                 let played = getTeamPlayedCount(t);
-                text += `${i + 1}. *${t.name}* \n   🏆 Wins: ${t.wins} | ❌ Losses: ${t.losses || 0} | 🎮 Plays: ${played}\n\n`;
+                const tagline = getDynamicBadgeTitle(t);
+                text += `${i + 1}. *${t.name}*${tagline ? ` — ${tagline}` : ""} \n   🏆 Wins: ${t.wins} | ❌ Losses: ${t.losses || 0} | 🎮 Plays: ${played}\n\n`;
             });
 
             const totalPlays = calculateTotalPlays();
-            text += `🏆 *Champions:* ${sorted[0].wins > 0 ? sorted[0].name : 'Pending'}\n`;
+            const championTagline = sorted.length ? getDynamicBadgeTitle(sorted[0]) : "";
+            text += `🏆 *Champions:* ${sorted[0] && sorted[0].wins > 0 ? sorted[0].name + (championTagline ? ` — ${championTagline}` : "") : 'Pending'}\n`;
             text += `⚡ *Total Matches:* ${totalPlays / 2} Matches (${totalPlays} Per Team Plays)\n`;
             text += `📅 *Date:* ${new Date().toLocaleDateString('en-GB')}`;
 
@@ -3125,42 +3868,150 @@
             window.open(url, '_blank');
         }
 
-        function resetTournamentStateForNewSession() {
-            // Reset match statistics but preserve each team's most recently saved name.
+        async function resetTournamentStateForNewSession() {
+            // Reset only the active session. Saved tournamentHistory is intentionally kept.
             const preservedNames = { ...teamNameOverrides };
             teams = JSON.parse(JSON.stringify(defaultTeams));
+            teamNameOverrides = {};
             teams.forEach(team => {
                 const savedName = preservedNames[String(team.id)];
                 if (savedName) team.name = savedName;
                 teamNameOverrides[String(team.id)] = team.name;
             });
-            tournamentStartTimestamp = Date.now();
-            lastActionTimestamp = Date.now();
+            const resetAt = Date.now();
+            tournamentStartTimestamp = resetAt;
+            lastActionTimestamp = resetAt;
             globalClickSequence = 0;
             isMatchEnded = false;
             isTournamentLocked = true;
+            isLocalStartGateVisible = true;
             lastActionSnapshot = null;
             lastActionDescription = "";
             undoHistoryStack = [];
             sessionHistorySavedId = null;
-            
-            saveData();
+            startGuardActive = false;
+            finishProcessing = false;
+
+            // Paint the cleared state immediately, then wait for the shared Firebase write.
+            saveLocalBackup();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
             render();
             applyTouchLockState();
-            showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! സ്റ്റാർട്ട് അമർത്തുക / Reset! Press Start");
+            updateStartButtonState();
+
+            const resetGuard = { active: false, startedAt: resetAt, resetAt, sessionId: String(resetAt) };
+            const firebaseSaved = dbRef ? await saveData({ sessionStartGuard: resetGuard }) : true;
+            if (dbRef && !firebaseSaved) {
+                showToast("⚠️ Reset ഈ ഫോണിൽ നടന്നു; Firebase sync പരാജയപ്പെട്ടു. കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.");
+                return false;
+            }
+            showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! പഴയ History സുരക്ഷിതമാണ്. START അമർത്തുക.");
+            return true;
         }
 
-        function resetScores() {
+        function applyAutoResetSnapshot(data) {
+            if (!data || !Array.isArray(data.teams)) return;
+            teams = data.teams;
+            teamNameOverrides = data.teamNameOverrides && typeof data.teamNameOverrides === "object"
+                ? data.teamNameOverrides
+                : Object.fromEntries(data.teams.map(team => [String(team.id), team.name]));
+            tournamentHistory = dedupeHistoryRecords(data.tournamentHistory || []);
+            tournamentStartTimestamp = data.tournamentStartTimestamp || null;
+            lastActionTimestamp = data.lastActionTimestamp || null;
+            globalClickSequence = Number(data.globalClickSequence) || 0;
+            isMatchEnded = !!data.isMatchEnded;
+            isTournamentLocked = data.isTournamentLocked !== false;
+            isLocalStartGateVisible = true;
+            lastActionSnapshot = null;
+            lastActionDescription = "";
+            undoHistoryStack = [];
+            sessionHistorySavedId = data.sessionHistorySavedId || null;
+            startGuardActive = false;
+            saveLocalBackup();
+            render();
+            updateHistorySummaryText();
+            updateMatchStatusBadge();
+            updateMainTopLastDefeatedBar();
+            updateStartButtonState();
+            applyTouchLockState();
+        }
+
+        function checkAutoResetAfterInactivity() {
+            if (!dbRef || autoResetInProgress) return;
+            autoResetInProgress = true;
+            const now = Date.now();
+            dbRef.transaction(current => {
+                if (!current || !Array.isArray(current.teams) || current.isTournamentLocked === true) return;
+                const lastActivity = Number(current.lastActionTimestamp) || Number(current.tournamentStartTimestamp) || 0;
+                if (!lastActivity || now - lastActivity < AUTO_RESET_IDLE_MS) return;
+
+                const oldTeams = current.teams;
+                const sessionStart = Number(current.tournamentStartTimestamp) || lastActivity;
+                const sessionId = String(sessionStart);
+                const totalPlays = oldTeams.reduce((sum, team) => sum + Math.max(0, Number(team.played) || 0, (Number(team.wins) || 0) + (Number(team.losses) || 0)), 0);
+                let savedHistory = dedupeHistoryRecords(current.tournamentHistory || []);
+                const alreadySaved = savedHistory.some(item => String(item.sessionId || item.startTimestamp || item.id || "") === sessionId);
+                if (totalPlays > 0 && !alreadySaved) {
+                    const dateStr = new Date(sessionStart).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                    const record = {
+                        id: sessionId, sessionId, startTimestamp: sessionId, date: dateStr,
+                        dateKey: historyDateKey({ startTimestamp: sessionId }),
+                        teams: JSON.parse(JSON.stringify(oldTeams)), totalPlays,
+                        totalMatches: Math.floor((totalPlays + 0.5) / 2),
+                        durationMinutes: Math.max(1, Math.round((now - sessionStart) / 60000))
+                    };
+                    savedHistory = dedupeHistoryRecords([record, ...savedHistory]);
+                }
+
+                const savedNames = current.teamNameOverrides && typeof current.teamNameOverrides === "object"
+                    ? { ...current.teamNameOverrides }
+                    : Object.fromEntries(oldTeams.map(team => [String(team.id), team.name]));
+                const resetTeams = JSON.parse(JSON.stringify(defaultTeams)).map(team => {
+                    const savedName = savedNames[String(team.id)];
+                    if (savedName) team.name = savedName;
+                    return team;
+                });
+                const resetNames = Object.fromEntries(resetTeams.map(team => [String(team.id), team.name]));
+                return {
+                    ...current,
+                    teams: resetTeams,
+                    teamNameOverrides: resetNames,
+                    tournamentHistory: savedHistory,
+                    tournamentStartTimestamp: now,
+                    lastActionTimestamp: now,
+                    globalClickSequence: 0,
+                    isMatchEnded: false,
+                    isTournamentLocked: true,
+                    lastActionSnapshot: null,
+                    lastActionDescription: "",
+                    undoHistoryStack: [],
+                    sessionHistorySavedId: null,
+                    sessionStartGuard: { active: false, startedAt: now, resetAt: now, sessionId: String(now) }
+                };
+            }, (error, committed, snapshot) => {
+                autoResetInProgress = false;
+                if (error) {
+                    console.error("Six-hour auto-reset check failed:", error);
+                    return;
+                }
+                if (committed && snapshot && snapshot.val()) {
+                    applyAutoResetSnapshot(snapshot.val());
+                    showToast("6 മണിക്കൂർ പ്രവർത്തനമില്ലാത്തതിനാൽ ടൂർണമെന്റ് ഓട്ടോമാറ്റിക്കായി റീസെറ്റ് ചെയ്തു. പഴയ History സുരക്ഷിതമാണ്.");
+                }
+            }, false);
+        }
+
+        async function resetScores() {
+            finishProcessing = false;
             triggerHapticFeedback([40]);
             const inputPin = prompt("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്യുന്നതിന് Admin PIN (1234) നൽകുക / Enter PIN:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("തെറ്റായ PIN! / Incorrect PIN!");
                 return;
             }
-            if (window.confirm("ഈ സെഷനിലെ സ്കോറുകൾ റീസെറ്റ് ചെയ്യണോ? / Reset scores?")) {
-                resetTournamentStateForNewSession();
+            if (window.confirm("നിലവിലെ സെഷന്റെ സ്കോറുകൾ മാത്രം റീസെറ്റ് ചെയ്യണോ? പഴയ History ഡിലീറ്റ് ചെയ്യില്ല.")) {
+                await resetTournamentStateForNewSession();
                 closeFinishMatchModal();
             }
         }
