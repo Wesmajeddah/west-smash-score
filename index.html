@@ -846,7 +846,7 @@
         <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
             <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
                 <h3 class="text-xs font-semibold text-[#5c4033] flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT HISTORY
+                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT LOGS (1 HOUR+)
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -1592,18 +1592,17 @@
         // Keep the first saved copy of each session; never discard unique history entries.
         function dedupeHistoryRecords(records) {
             const source = Array.isArray(records) ? records : (records && typeof records === "object" ? Object.values(records) : []);
-            const valid = source.filter(record => record && Array.isArray(record.teams));
-            valid.sort((a, b) => historyRecordTimestamp(b) - historyRecordTimestamp(a));
-            const seenSessions = new Set();
+            const seen = new Set();
             const kept = [];
-            valid.forEach(record => {
+            source.forEach(record => {
+                if (!record || !Array.isArray(record.teams)) return;
                 const sid = String(record.sessionId || record.startTimestamp || record.id || "");
                 const key = sid ? `session:${sid}` : `legacy:${historyRecordFingerprint(record)}`;
-                if (seenSessions.has(key)) return;
-                seenSessions.add(key);
+                if (seen.has(key)) return;
+                seen.add(key);
                 kept.push(record);
             });
-            return kept.sort((a, b) => historyRecordTimestamp(b) - historyRecordTimestamp(a));
+            return kept;
         }
 
         function mergeHistoryRecords(preferredRecords, additionalRecords) {
@@ -1819,8 +1818,12 @@
                         const oldKey = String(item.sessionId || item.startTimestamp || item.id || "");
                         return (newKey && oldKey === newKey) || (!oldKey && historyRecordFingerprint(item) === historyRecordFingerprint(record));
                     });
-                    // Block only duplicate sessions; distinct eligible sessions are retained.
-                    return exists ? list : dedupeHistoryRecords([record, ...list]);
+                    const newStart = Number(record.startTimestamp || record.sessionId || record.id) || 0;
+                    const latestStart = list.reduce((latest, item) => Math.max(latest,
+                        Number(item && (item.startTimestamp || item.sessionId || item.id)) || Date.parse(item && item.date || "") || 0), 0);
+                    const withinOneHour = latestStart > 0 && newStart - latestStart < 60 * 60 * 1000;
+                    // First saved record wins; a second device cannot bypass the one-hour guard.
+                    return (exists || withinOneHour) ? list : dedupeHistoryRecords([record, ...list]);
                 }, (error, committed, snapshot) => {
                     if (error) {
                         console.error("Firebase history transaction failed:", error);
@@ -1842,30 +1845,47 @@
         function savePermanentHistoryToStorage() {
             const sessionId = String(tournamentStartTimestamp || "no-session");
             if (!sessionId || sessionId === "no-session") return false;
-            const exists = (tournamentHistory || []).some(item => item &&
-                [item.sessionId, item.startTimestamp, item.id].some(value => String(value || '') === sessionId));
-            if (exists || sessionHistorySavedId === sessionId) {
+
+            // Idempotency: the same session may be written only once, even if End Match
+            // is tapped repeatedly or two devices attempt to finish at nearly the same time.
+            const existingSessionRecord = (tournamentHistory || []).find(item => item &&
+                (String(item.sessionId || '') === sessionId || String(item.startTimestamp || '') === sessionId || String(item.id || '') === sessionId));
+            if (existingSessionRecord || sessionHistorySavedId === sessionId) {
                 sessionHistorySavedId = sessionId;
                 return false;
             }
-            const totalPlays = calculateTotalPlays();
-            if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
-            const durationMs = Date.now() - Number(tournamentStartTimestamp);
-            const durationMins = Math.max(0, Math.floor(durationMs / 60000));
-            if (durationMins < 60) {
-                showToast("⏳ 1 മണിക്കൂറിൽ കൂടുതലുള്ള Match മാത്രമേ History-ൽ സേവ് ചെയ്യൂ.");
+
+            const sessionStart = Number(sessionId) || 0;
+            const mostRecentRecordTime = (tournamentHistory || []).reduce((latest, item) => {
+                const stamp = Number(item && (item.startTimestamp || item.sessionId || item.id)) || Date.parse(item && item.date || "") || 0;
+                return Math.max(latest, stamp);
+            }, 0);
+
+            // A distinct session is eligible for a new official History entry only
+            // after at least one hour from the previous saved session's start time.
+            if (mostRecentRecordTime && sessionStart - mostRecentRecordTime < 60 * 60 * 1000) {
+                sessionHistorySavedId = sessionId;
+                saveLocalBackup();
+                showToast("⏳ കഴിഞ്ഞ History Record-ിന് ശേഷം 1 മണിക്കൂർ പൂർത്തിയായിട്ടില്ല. Duplicate Record ഒഴിവാക്കി.");
                 return false;
             }
-            const dateStr = new Date(Number(tournamentStartTimestamp) || Date.now()).toLocaleDateString('en-GB', {
+
+            const totalPlays = calculateTotalPlays();
+            if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
+
+            const sessionDurationMs = tournamentStartTimestamp ? (Date.now() - tournamentStartTimestamp) : 0;
+            const sessionDurationMins = Math.max(1, Math.round(sessionDurationMs / 60000));
+            const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
             const record = {
-                id: sessionId, sessionId, startTimestamp: Number(sessionId), date: dateStr,
+                id: sessionId, sessionId, startTimestamp: sessionId, date: dateStr,
                 dateKey: historyDateKey({ startTimestamp: sessionId }),
                 teams: JSON.parse(JSON.stringify(teams)),
                 totalPlays, totalMatches: Math.floor((totalPlays + 0.5) / 2),
-                durationMinutes: durationMins
+                durationMinutes: sessionDurationMins
             };
+
             sessionHistorySavedId = sessionId;
             tournamentHistory = dedupeHistoryRecords([record, ...(tournamentHistory || [])]);
             saveLocalBackup();
@@ -2366,7 +2386,7 @@
                     let sortedTeams = getInternationalSortedTeams(item.teams);
                     let maxWins = sortedTeams[0].wins;
                     let winnerTeams = sortedTeams.filter(t => t.wins === maxWins && maxWins > 0);
-                    let winnersNames = winnerTeams.map(w => escapeHtml(w.name)).join(" • ");
+                    let winnersNames = winnerTeams.map(w => `${escapeHtml(w.name)}${getHistoryBadgeTitle(w, idx) ? ` (${getHistoryBadgeTitle(w, idx)})` : ""}`).join(" • ");
                     if (!winnersNames) winnersNames = "No Wins";
 
                     const card = document.createElement("div");
@@ -2376,7 +2396,7 @@
                         let playedCount = getTeamPlayedCount(t);
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-[11px] font-medium text-slate-700 py-1 border-b border-[#e6decb] gap-2">
-                                <span class="name-wrapper flex-1">${i + 1}. ${escapeHtml(t.name)}</span>
+                                <span class="name-wrapper flex-1">${i + 1}. ${escapeHtml(t.name)}${getHistoryBadgeTitle(t, idx) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, idx)}</span>` : ""}</span>
                                 <div class="flex gap-2 shrink-0">
                                     <span class="text-[#5c4033] font-semibold">${playedCount} P</span>
                                     <span class="text-emerald-700 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
