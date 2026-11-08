@@ -698,13 +698,10 @@
                 <div id="unified-report-capture" class="bg-white border-2 border-[#c6a15b] rounded-xl p-4 space-y-3 text-slate-800">
                     <div id="unified-report-content"></div>
                 </div>
-                <img id="unified-report-preview" class="hidden w-full rounded-xl border border-[#d7ccc8]" alt="WESMA Official Match Report Preview">
                 <div id="unified-report-status" class="text-center text-[10px] text-slate-500">റിപ്പോർട്ട് തയ്യാറാക്കുന്നു...</div>
             </div>
-            <div class="grid grid-cols-3 gap-2 p-3 border-t border-[#e6decb] bg-[#fcfbf9]">
-                <button onclick="generateUnifiedReportImage()" class="bg-[#5c4033] text-white rounded-lg py-2 text-[10px] font-bold">PREVIEW</button>
-                <button onclick="downloadUnifiedReportImage()" class="bg-[#8c6239] text-white rounded-lg py-2 text-[10px] font-bold">DOWNLOAD</button>
-                <button onclick="shareUnifiedReportImage()" class="bg-emerald-700 text-white rounded-lg py-2 text-[10px] font-bold">SHARE</button>
+            <div class="p-3 border-t border-[#e6decb] bg-[#fcfbf9]">
+                <button onclick="shareUnifiedReportImage()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg py-2.5 text-[10px] font-black tracking-wider">SHARE REPORT</button>
             </div>
         </div>
     </div>
@@ -714,6 +711,16 @@
         <div class="w-full max-w-[390px] max-h-[96vh] flex flex-col gap-2">
             <div id="champion-status-capture" class="relative mx-auto w-full overflow-hidden text-white shadow-2xl" style="aspect-ratio:9/16;background:radial-gradient(circle at 78% 38%,rgba(190,48,34,.58),transparent 38%),radial-gradient(circle at 20% 78%,rgba(90,10,20,.55),transparent 45%),linear-gradient(145deg,#050304 0%,#180609 48%,#350d12 100%);">
                 <div class="absolute inset-0 opacity-40 pointer-events-none" style="background:repeating-linear-gradient(125deg,transparent 0 34px,rgba(255,70,50,.10) 35px 39px,transparent 40px 72px);"></div>
+                <div class="absolute right-0 bottom-[18%] w-[92%] h-[34%] opacity-[0.22] pointer-events-none" aria-hidden="true">
+                    <svg viewBox="0 0 360 190" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="#38bdf8" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="105" cy="48" r="17"/><path d="M100 68 L82 112 L119 132 L143 95 L124 72 Z"/><path d="M91 81 L55 102 L35 82" fill="none"/><path d="M119 78 L151 48 L176 23" fill="none"/><path d="M176 23 L194 8 M176 23 L194 38" fill="none"/><path d="M82 112 L59 160 M119 132 L132 170" fill="none"/>
+                            <circle cx="258" cy="74" r="15"/><path d="M248 92 L228 125 L251 145 L280 121 L271 95 Z"/><path d="M243 101 L216 83 L198 98" fill="none"/><path d="M270 99 L300 115" fill="none"/><path d="M228 125 L213 165 M251 145 L272 173" fill="none"/>
+                            <path d="M194 8 L211 1 L223 12 L211 23 Z" fill="none"/><path d="M205 7 L216 18 M211 1 L211 23" fill="none"/>
+                        </g>
+                        <path d="M20 176 Q180 145 340 176" fill="none" stroke="#38bdf8" stroke-width="2" opacity=".7"/>
+                    </svg>
+                </div>
                 <div class="relative h-full flex flex-col justify-between p-[7%] text-center">
                     <div class="pt-2">
                         <div class="text-[clamp(9px,2.7vw,13px)] font-black tracking-[.32em] text-amber-200">WESMA BADMINTON CLUB</div>
@@ -724,7 +731,8 @@
                         <div class="text-[10px] tracking-[.35em] font-bold text-amber-300">CHAMPIONS</div>
                         <div id="champion-status-wins" class="mt-1 text-[clamp(76px,23vw,116px)] leading-none font-light" style="font-family:Georgia,serif;">0</div>
                         <div class="text-[11px] tracking-[.28em] text-amber-100">MATCH WINS</div>
-                        <div class="mx-auto my-5 h-px w-16 bg-white/60"></div>
+                        <div id="champion-status-stats" class="mx-auto mt-3 max-w-[88%] rounded-xl border border-sky-300/30 bg-sky-950/35 px-3 py-2 text-[9px] leading-relaxed text-sky-100/90"></div>
+                        <div class="mx-auto my-4 h-px w-16 bg-white/60"></div>
                         <div id="champion-status-team" class="text-[clamp(19px,5.5vw,28px)] leading-tight font-black uppercase break-words"></div>
                         <div class="mt-3 text-[10px] tracking-[.25em] text-white/70">WINNING TEAM</div>
                         <div id="champion-status-players" class="mt-5 text-[clamp(12px,3.5vw,16px)] font-semibold text-white/90 leading-relaxed"></div>
@@ -736,9 +744,7 @@
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-4 gap-2">
-                <button onclick="generateChampionStatusImage()" class="rounded-lg bg-white text-slate-900 py-2 text-[10px] font-black">PREVIEW</button>
-                <button onclick="downloadChampionStatusImage()" class="rounded-lg bg-amber-500 text-black py-2 text-[10px] font-black">SAVE</button>
+            <div class="grid grid-cols-2 gap-2">
                 <button onclick="shareChampionStatusImage()" class="rounded-lg bg-emerald-700 text-white py-2 text-[10px] font-black">SHARE</button>
                 <button onclick="closeChampionStatusModal()" class="rounded-lg bg-slate-700 text-white py-2 text-[10px] font-black">CLOSE</button>
             </div>
@@ -926,6 +932,7 @@
         let teams = JSON.parse(JSON.stringify(defaultTeams));
         let teamNameOverrides = Object.fromEntries(defaultTeams.map(team => [String(team.id), team.name]));
         let tournamentHistory = [];
+        let historyDeletedKeys = [];
         let tournamentStartTimestamp = null;
         let lastActionTimestamp = null;
         let isMatchEnded = false;
@@ -990,6 +997,40 @@
             "ശരിയായ തന്ത്രങ്ങളോ കൂട്ടായ്മയോ ഇല്ലാതെ കളം വിടേണ്ടി വന്ന ടീം!",
             "എതിരാളികളുടെ ആധിപത്യത്തിന് മുന്നിൽ അടിയറവ് പറഞ്ഞ നിരാശാജനകമായ പരാജയം!"
         ];
+
+        function standingPositionKey(team) {
+            return `${Number(team && team.wins) || 0}|${Number(team && team.losses) || 0}|${getTeamPlayedCount(team)}`;
+        }
+
+        function sameStandingPosition(a, b) {
+            return !!a && !!b && standingPositionKey(a) === standingPositionKey(b);
+        }
+
+        function getStandingGroups(sourceTeams, winnersOnly = false) {
+            const eligible = getInternationalSortedTeams((sourceTeams || []).filter(t => !t.isDisabled && (!winnersOnly || (Number(t.wins) || 0) > 0)));
+            const groupsByKey = new Map();
+            const groups = [];
+            eligible.forEach(team => {
+                const key = standingPositionKey(team);
+                if (groupsByKey.has(key)) groupsByKey.get(key).teams.push(team);
+                else {
+                    const group = { rank: 0, key, teams: [team] };
+                    groupsByKey.set(key, group);
+                    groups.push(group);
+                }
+            });
+            let nextRank = 1;
+            groups.forEach(group => { group.rank = nextRank; nextRank += group.teams.length; });
+            return groups;
+        }
+
+        function getStandingRankMap(sourceTeams) {
+            return new Map(getStandingGroups(sourceTeams).map(group => [group.key, group.rank]));
+        }
+
+        function getPodiumGroups(sourceTeams) {
+            return getStandingGroups(sourceTeams, true).filter(group => group.rank <= 3);
+        }
 
         // BWF INTERNATIONAL STANDARD TIE-BREAKER SORTING FUNCTION
         function getInternationalSortedTeams(teamsArray) {
@@ -1062,6 +1103,7 @@
                             : Object.fromEntries(parsed.teams.map(team => [String(team.id), team.name]));
                         tournamentStartTimestamp = parsed.tournamentStartTimestamp || null;
                         lastActionTimestamp = parsed.lastActionTimestamp || null;
+                        historyDeletedKeys = Array.isArray(parsed.historyDeletedKeys) ? parsed.historyDeletedKeys : [];
                         tournamentHistory = parsed.tournamentHistory || [];
                         globalClickSequence = parsed.globalClickSequence || 0;
                         isMatchEnded = parsed.isMatchEnded || false;
@@ -1213,9 +1255,11 @@
                 dbRef.transaction(current => {
                     if (!current || !Array.isArray(current.teams)) return;
                     const guard = current.sessionStartGuard || {};
+                    const hasLegacyActiveTimestamp = !current.sessionStartGuard &&
+                        Number(current.tournamentStartTimestamp) > 0;
                     const sharedMatchRunning = current.isTournamentLocked !== true &&
                         current.isMatchEnded !== true &&
-                        (guard.active === true || !!current.tournamentStartTimestamp);
+                        (guard.active === true || hasLegacyActiveTimestamp);
                     if (sharedMatchRunning) return;
 
                     const startedAt = Date.now();
@@ -1372,8 +1416,9 @@
                         });
                         tournamentStartTimestamp = data.tournamentStartTimestamp || null;
                         lastActionTimestamp = data.lastActionTimestamp || null;
+                        historyDeletedKeys = Array.isArray(data.historyDeletedKeys) ? data.historyDeletedKeys : historyDeletedKeys;
                         const firebaseHistory = dedupeHistoryRecords(data.tournamentHistory || []);
-                        const localHistory = Array.isArray(tournamentHistory) ? tournamentHistory : [];
+                        const localHistory = dedupeHistoryRecords(Array.isArray(tournamentHistory) ? tournamentHistory : []);
                         tournamentHistory = mergeHistoryRecords(firebaseHistory, localHistory);
                         globalClickSequence = data.globalClickSequence || 0;
                         isMatchEnded = data.isMatchEnded || false;
@@ -1383,9 +1428,13 @@
                         undoHistoryStack = Array.isArray(data.undoHistoryStack) ? data.undoHistoryStack : (lastActionSnapshot ? [lastActionSnapshot] : []);
                         sessionHistorySavedId = data.sessionHistorySavedId || null;
                         if (data.sessionStartGuard && typeof data.sessionStartGuard === "object") {
-                            startGuardActive = !!data.sessionStartGuard.active;
-                            if (Number(data.sessionStartGuard.startedAt) > 0) {
+                            startGuardActive = data.sessionStartGuard.active === true;
+                            // Only an ACTIVE guard may restore a start timestamp.
+                            // An inactive reset guard must never resurrect an old session.
+                            if (startGuardActive && Number(data.sessionStartGuard.startedAt) > 0) {
                                 tournamentStartTimestamp = Number(data.sessionStartGuard.startedAt);
+                            } else if (data.isTournamentLocked === true || data.isMatchEnded === true) {
+                                tournamentStartTimestamp = null;
                             }
                         } else if (dbRef) {
                             const legacyActive = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
@@ -1589,16 +1638,21 @@
             return `${historyDateKey(record)}|${Number(record && record.totalPlays || 0)}|${teamSnapshot}`;
         }
 
-        // Keep the first saved copy of each session; never discard unique history entries.
+        function historyStableKey(record) {
+            const sid = String(record && (record.sessionId || record.startTimestamp || record.id) || "");
+            return sid ? `session:${sid}` : `legacy:${historyRecordFingerprint(record)}`;
+        }
+
+        // Keep the first saved copy of each session and respect explicit deletions on every device.
         function dedupeHistoryRecords(records) {
             const source = Array.isArray(records) ? records : (records && typeof records === "object" ? Object.values(records) : []);
             const seen = new Set();
+            const deleted = new Set(Array.isArray(historyDeletedKeys) ? historyDeletedKeys : []);
             const kept = [];
             source.forEach(record => {
                 if (!record || !Array.isArray(record.teams)) return;
-                const sid = String(record.sessionId || record.startTimestamp || record.id || "");
-                const key = sid ? `session:${sid}` : `legacy:${historyRecordFingerprint(record)}`;
-                if (seen.has(key)) return;
+                const key = historyStableKey(record);
+                if (deleted.has(key) || seen.has(key)) return;
                 seen.add(key);
                 kept.push(record);
             });
@@ -1628,6 +1682,10 @@
         let championStatusBusy = false;
 
         function openChampionStatusModal() {
+            if (!isMatchEnded) {
+                showToast("Champions interface തുറക്കാൻ ആദ്യം END MATCH അമർത്തി മത്സരം അവസാനിപ്പിക്കുക.");
+                return;
+            }
             const active = teams.filter(t => !t.isDisabled);
             const ranked = [...active].sort((a,b) => (Number(b.wins)||0)-(Number(a.wins)||0) || (Number(a.losses)||0)-(Number(b.losses)||0) || String(a.name).localeCompare(String(b.name)));
             const topWins = ranked.length ? Number(ranked[0].wins)||0 : 0;
@@ -1637,6 +1695,7 @@
             const winsEl = document.getElementById('champion-status-wins');
             const teamEl = document.getElementById('champion-status-team');
             const playersEl = document.getElementById('champion-status-players');
+            const statsEl = document.getElementById('champion-status-stats');
             if (dateEl) dateEl.textContent = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
             if (winsEl) winsEl.textContent = String(topWins);
             if (teamEl) teamEl.textContent = team ? team.name : 'AWAITING FIRST WIN';
@@ -1644,9 +1703,21 @@
                 const names = team ? String(team.name || '').split(/\s*&\s*|\s+AND\s+/i).filter(Boolean) : [];
                 playersEl.innerHTML = team ? names.map(name => `<div>${escapeHtml(name)}</div>`).join('') : 'Winner details will appear after the first win';
             }
+            if (statsEl) {
+                const summarize = values => {
+                    const counts = new Map();
+                    (values || []).filter(Boolean).forEach(name => counts.set(String(name), (counts.get(String(name)) || 0) + 1));
+                    const max = Math.max(0, ...counts.values());
+                    return max ? `${Array.from(counts.entries()).filter(([,count]) => count === max).map(([name]) => escapeHtml(name)).join(' & ')} × ${max}` : '—';
+                };
+                const played = team ? getTeamPlayedCount(team) : 0;
+                const mostDefeated = team ? summarize((team.defeatedDetails || []).map(item => item && item.name)) : '—';
+                const mostDefeatedBy = team ? summarize((team.matchHistoryLog || []).filter(item => item && item.result === 'LOSS').map(item => item.opponent)) : '—';
+                statsEl.innerHTML = `<div class="font-black tracking-wider text-sky-200 mb-1">${played} MATCHES PLAYED</div><div>TOP DEFEATED: <b class="text-white">${mostDefeated}</b></div><div>DEFEATED MOST BY: <b class="text-white">${mostDefeatedBy}</b></div>`;
+            }
             championStatusCanvas = null;
             const msg = document.getElementById('champion-status-message');
-            if (msg) msg.textContent = 'PREVIEW അമർത്തി Instagram Status image തയ്യാറാക്കാം.';
+            if (msg) msg.textContent = 'SHARE അമർത്തി Instagram Status image share ചെയ്യാം.';
             const modal = document.getElementById('champion-status-modal');
             if (modal) modal.classList.remove('hidden');
         }
@@ -1665,7 +1736,7 @@
             if (msg) msg.textContent = 'HD Instagram Status തയ്യാറാക്കുന്നു...';
             try {
                 championStatusCanvas = await html2canvas(target,{backgroundColor:'#080608',scale:3,useCORS:true,scrollX:0,scrollY:0});
-                if (msg) msg.textContent = 'Image ready. SAVE അല്ലെങ്കിൽ SHARE അമർത്തുക.';
+                if (msg) msg.textContent = 'Image ready. SHARE അമർത്തുക.';
             } catch (e) {
                 console.error('Champion status image failed:',e);
                 if (msg) msg.textContent = 'Image സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.';
@@ -1681,6 +1752,7 @@
         }
 
         async function shareChampionStatusImage() {
+            if (!isMatchEnded) { showToast("Champions share ചെയ്യാൻ ആദ്യം END MATCH അമർത്തുക."); return; }
             if (!championStatusCanvas) await generateChampionStatusImage();
             if (!championStatusCanvas) return;
             try {
@@ -1688,11 +1760,15 @@
                 if (!blob) throw new Error('Image creation failed');
                 const file = new File([blob],`WESMA-Champion-Status-${Date.now()}.png`,{type:'image/png'});
                 if (navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({files:[file],title:'WESMA Champion',text:'WESMA BADMINTON CLUB - Champions'});
-                else downloadChampionStatusImage();
+                else {
+                    const msg = document.getElementById('champion-status-message');
+                    if (msg) msg.textContent = 'ഈ ഉപകരണത്തിൽ image share പിന്തുണ ലഭ്യമല്ല.';
+                }
             } catch (e) {
                 if (e && e.name === 'AbortError') return;
                 console.error('Champion status share failed:',e);
-                downloadChampionStatusImage();
+                const msg = document.getElementById('champion-status-message');
+                if (msg) msg.textContent = 'Image share ചെയ്യാൻ കഴിഞ്ഞില്ല. വീണ്ടും SHARE ശ്രമിക്കുക.';
             }
         }
 
@@ -1736,7 +1812,7 @@
             try {
                 const payload = {
                     teams, teamNameOverrides, tournamentStartTimestamp, lastActionTimestamp,
-                    tournamentHistory, globalClickSequence, isMatchEnded, isTournamentLocked,
+                    tournamentHistory, historyDeletedKeys, globalClickSequence, isMatchEnded, isTournamentLocked,
                     lastActionSnapshot, lastActionDescription, undoHistoryStack, sessionHistorySavedId
                 };
                 localStorage.setItem('wesma_local_backup_v135', JSON.stringify(payload));
@@ -2113,12 +2189,16 @@
             const scope = document.getElementById("match-correction-scope");
             if (!modal || !scope) return;
             scope.innerHTML = '<option value="current">നിലവിലെ ടൂർണമെന്റ് / LIVE</option>';
-            (tournamentHistory || []).forEach((record, index) => {
-                const option = document.createElement("option");
-                option.value = `history:${index}`;
-                option.textContent = `HISTORY • ${record.date || `Session #${index + 1}`}`;
-                scope.appendChild(option);
-            });
+            (tournamentHistory || []).map((record, index) => ({ record, index }))
+                .sort((a, b) => {
+                    const stamp = item => Number(item.record && (item.record.startTimestamp || item.record.sessionId || item.record.id)) || Date.parse(item.record && item.record.date || "") || 0;
+                    return stamp(b) - stamp(a) || b.index - a.index;
+                }).forEach(({ record, index }) => {
+                    const option = document.createElement("option");
+                    option.value = `history:${index}`;
+                    option.textContent = `HISTORY • ${record.date || `Session #${index + 1}`}`;
+                    scope.appendChild(option);
+                });
             scope.value = "current";
             renderMatchCorrectionList();
             modal.classList.remove("hidden");
@@ -2171,13 +2251,13 @@
             });
             const unique = new Map();
             matches.sort((a,b) => {
+                const aTime = Number(a.timestamp) || 0, bTime = Number(b.timestamp) || 0;
+                if (aTime !== bTime) return bTime - aTime;
                 const aSeq = Number(a.seq), bSeq = Number(b.seq);
-                if (aSeq > 0 && bSeq > 0) return aSeq - bSeq;
-                if (aSeq > 0) return -1;
-                if (bSeq > 0) return 1;
+                if (aSeq > 0 && bSeq > 0 && aSeq !== bSeq) return bSeq - aSeq;
                 const aLegacy = Number(String(a.seq).split(":").pop()) || 0;
                 const bLegacy = Number(String(b.seq).split(":").pop()) || 0;
-                return aLegacy - bLegacy;
+                return bLegacy - aLegacy;
             }).forEach(item => { if (!unique.has(item.seq)) unique.set(item.seq, item); });
             return Array.from(unique.values());
         }
@@ -2386,7 +2466,7 @@
                     let sortedTeams = getInternationalSortedTeams(item.teams);
                     let maxWins = sortedTeams[0].wins;
                     let winnerTeams = sortedTeams.filter(t => t.wins === maxWins && maxWins > 0);
-                    let winnersNames = winnerTeams.map(w => `${escapeHtml(w.name)}${getHistoryBadgeTitle(w, idx) ? ` (${getHistoryBadgeTitle(w, idx)})` : ""}`).join(" • ");
+                    let winnersNames = winnerTeams.map(w => escapeHtml(w.name)).join(" • ");
                     if (!winnersNames) winnersNames = "No Wins";
 
                     const card = document.createElement("div");
@@ -2408,7 +2488,7 @@
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-[#e6decb] pb-2 gap-2">
                             <div class="name-wrapper flex-1">
-                                <div class="text-xs font-bold text-[#5c4033]">Session #${displayIndex + 1} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
+                                <div class="text-xs font-bold text-[#5c4033]">Session #${tournamentHistory.length - displayIndex} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
                                 <div class="text-[10px] font-medium text-slate-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
                                 <div class="text-[10px] font-extrabold text-[#8c6239] mt-0.5">ഈ ദിവസം ആകെ: ${getDailyTotalMatches(item)} MATCHES <span class="font-medium text-slate-500">• ഈ സെഷൻ: ${Math.floor(((Number(item.totalPlays) || 0) + 0.5) / 2)}</span></div>
                             </div>
@@ -2443,27 +2523,34 @@
             }
             if (window.confirm("ഈ സെഷൻ ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്യണോ? / Delete session history?")) {
                 const selected = tournamentHistory[index];
-                const selectedKey = String(selected && (selected.sessionId || selected.startTimestamp || selected.id) || "");
-                const selectedFingerprint = historyRecordFingerprint(selected);
-                const removeSelected = list => dedupeHistoryRecords(list).filter(item => {
-                    const itemKey = String(item.sessionId || item.startTimestamp || item.id || "");
-                    return selectedKey ? itemKey !== selectedKey : historyRecordFingerprint(item) !== selectedFingerprint;
-                });
+                if (!selected) return;
+                const selectedKey = historyStableKey(selected);
                 if (dbRef) {
-                    dbRef.child("tournamentHistory").transaction(current => removeSelected(current), (error, committed, snapshot) => {
-                        if (error || !committed) {
+                    dbRef.transaction(current => {
+                        if (!current || typeof current !== "object") return current;
+                        const tombstones = new Set(Array.isArray(current.historyDeletedKeys) ? current.historyDeletedKeys : []);
+                        tombstones.add(selectedKey);
+                        const rawHistory = Array.isArray(current.tournamentHistory) ? current.tournamentHistory :
+                            (current.tournamentHistory && typeof current.tournamentHistory === "object" ? Object.values(current.tournamentHistory) : []);
+                        return { ...current, historyDeletedKeys: Array.from(tombstones),
+                            tournamentHistory: rawHistory.filter(item => historyStableKey(item) !== selectedKey) };
+                    }, (error, committed, snapshot) => {
+                        if (error || !committed || !snapshot) {
                             console.error("Firebase history delete failed:", error);
-                            showToast("⚠️ History delete Firebase-ൽ സേവ് ആയില്ല.");
+                            showToast("⚠️ History delete Firebase-ൽ സേവ് ആയില്ല. വീണ്ടും ശ്രമിക്കുക.");
                             return;
                         }
-                        tournamentHistory = dedupeHistoryRecords(snapshot && snapshot.val());
+                        const savedRoot = snapshot.val() || {};
+                        historyDeletedKeys = Array.isArray(savedRoot.historyDeletedKeys) ? savedRoot.historyDeletedKeys : [...historyDeletedKeys, selectedKey];
+                        tournamentHistory = dedupeHistoryRecords(savedRoot.tournamentHistory || []);
                         saveLocalBackup();
                         updateHistorySummaryText();
                         openHistoryModal();
                         showToast("ഹിസ്റ്ററി ഡിലീറ്റ് ചെയ്തു! / History deleted!");
                     }, false);
                 } else {
-                    tournamentHistory = removeSelected(tournamentHistory);
+                    historyDeletedKeys = Array.from(new Set([...(historyDeletedKeys || []), selectedKey]));
+                    tournamentHistory = dedupeHistoryRecords(tournamentHistory.filter(item => historyStableKey(item) !== selectedKey));
                     saveLocalBackup();
                     updateHistorySummaryText();
                     openHistoryModal();
@@ -2690,22 +2777,9 @@
             let activeTeams = teams.filter(t => !t.isDisabled);
             let sortedTeams = getInternationalSortedTeams(activeTeams);
             
-            let activeTeamsWithWins = sortedTeams.filter(t => (t.wins || 0) > 0);
-            let firstPlaceIds = [];
-            let secondPlaceIds = [];
-
-            if (activeTeamsWithWins.length > 0) {
-                let maxWins = activeTeamsWithWins[0].wins;
-                let firstTeams = activeTeamsWithWins.filter(t => t.wins === maxWins);
-                firstPlaceIds = firstTeams.map(t => t.id);
-
-                let remainingSec = activeTeamsWithWins.filter(t => t.wins < maxWins);
-                if (remainingSec.length > 0) {
-                    let secondMaxWins = remainingSec[0].wins;
-                    let secondTeams = remainingSec.filter(t => t.wins === secondMaxWins);
-                    secondPlaceIds = secondTeams.map(t => t.id);
-                }
-            }
+            const statusPodiumGroups = getPodiumGroups(activeTeams);
+            const firstPlaceIds = (statusPodiumGroups.find(group => group.rank === 1) || { teams: [] }).teams.map(t => t.id);
+            const secondPlaceIds = (statusPodiumGroups.find(group => group.rank === 2) || { teams: [] }).teams.map(t => t.id);
 
             let topScorerName = "ഇതുവരെ കളികളില്ല / No Matches";
             let topScorerWins = 0;
@@ -2714,12 +2788,12 @@
 
             if (activeTeamsWithWins.length > 0) {
                 let firstTeams = sortedTeams.filter(t => firstPlaceIds.includes(t.id));
-                topScorerName = firstTeams.map(t => `${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` (${getDynamicBadgeTitle(t)})` : ""}`).join(" & ");
+                topScorerName = firstTeams.map(t => escapeHtml(t.name)).join(" & ");
                 topScorerWins = firstTeams.length > 0 ? firstTeams[0].wins : 0;
 
                 let secondTeams = sortedTeams.filter(t => secondPlaceIds.includes(t.id));
                 if (secondTeams.length > 0) {
-                    secondPlaceName = secondTeams.map(t => `${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` (${getDynamicBadgeTitle(t)})` : ""}`).join(" & ");
+                    secondPlaceName = secondTeams.map(t => escapeHtml(t.name)).join(" & ");
                     secondPlaceWins = secondTeams[0].wins;
                 }
             }
@@ -2826,22 +2900,31 @@
         let unifiedReportBusy = false;
 
         function openUnifiedReportModal() {
+            if (!isMatchEnded) {
+                showToast("Combined Report തുറക്കാൻ ആദ്യം END MATCH അമർത്തി മത്സരം അവസാനിപ്പിക്കുക.");
+                return;
+            }
             const modal = document.getElementById("unified-report-modal");
             const content = document.getElementById("unified-report-content");
-            const preview = document.getElementById("unified-report-preview");
             const status = document.getElementById("unified-report-status");
             if (!modal || !content) return;
             const active = getInternationalSortedTeams(teams.filter(t => !t.isDisabled));
             const totalPlays = calculateTotalPlays();
             const totalMatches = Math.floor((totalPlays + 0.5) / 2);
             const totalTimeMinutes = Math.round(active.reduce((sum, team) => sum + (Number(team.totalTimeSpentMinutes) || 0), 0) / 2);
-            const leaderWins = active.length ? Number(active[0].wins) || 0 : 0;
-            const leaders = active.filter(t => (Number(t.wins) || 0) === leaderWins && leaderWins > 0);
+            const podiumGroups = getPodiumGroups(active);
+            const firstPlaceTeams = (podiumGroups.find(group => group.rank === 1) || { teams: [] }).teams;
+            const secondPlaceTeams = (podiumGroups.find(group => group.rank === 2) || { teams: [] }).teams;
+            const thirdPlaceTeams = (podiumGroups.find(group => group.rank === 3) || { teams: [] }).teams;
+            const leaderWins = firstPlaceTeams.length ? Number(firstPlaceTeams[0].wins) || 0 : 0;
+            const leaders = firstPlaceTeams;
             const dateText = new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
-            const rows = active.map((t, i) => {
+            const combinedRankByStanding = getStandingRankMap(active);
+            const rows = active.map(t => {
                 const badge = getDynamicBadgeTitle(t);
+                const standingKey = standingPositionKey(t);
                 return `<tr class="border-b border-[#e6decb]">
-                    <td class="py-2 pr-1 text-left font-bold">${i+1}. ${escapeHtml(t.name)}${badge ? ` <span class="text-[8px] text-[#8c6239]">• ${escapeHtml(badge)}</span>` : ""}</td>
+                    <td class="py-2 pr-1 text-left font-bold">${combinedRankByStanding.get(standingKey) || 0}. ${escapeHtml(t.name)}${badge ? ` <span class="text-[8px] text-[#8c6239]">• ${escapeHtml(badge)}</span>` : ""}</td>
                     <td class="py-2 text-center">${getTeamPlayedCount(t)}</td><td class="py-2 text-center font-black text-emerald-700">${Number(t.wins)||0}</td><td class="py-2 text-center font-black text-rose-700">${Number(t.losses)||0}</td>
                     <td class="py-2 text-right">${formatHoursAndMins(Number(t.totalTimeSpentMinutes)||0)}</td>
                 </tr>`;
@@ -2854,13 +2937,14 @@
                 </div>`;
             }).join("");
             const leadersText = leaders.length ? leaders.map(t => escapeHtml(t.name)).join(" & ") : "Awaiting first win";
-            const secondPlace = active[1] || null;
-            const thirdPlace = active[2] || null;
             const maxLosses = active.reduce((max, t) => Math.max(max, Number(t.losses) || 0), 0);
             const mostLossTeams = maxLosses > 0
                 ? active.filter(t => (Number(t.losses) || 0) === maxLosses).map(t => escapeHtml(t.name)).join(" & ")
                 : "No losses yet";
-            const podiumRow = (label, team, fallback) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="font-black text-right text-[#5c4033]">${team ? escapeHtml(team.name) : fallback}</span></div>`;
+            const podiumRow = (label, groupedTeams, fallback) => {
+                const names = groupedTeams && groupedTeams.length ? groupedTeams.map(team => escapeHtml(team.name)).join(" & ") : fallback;
+                return `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="font-black text-right text-[#5c4033]">${names}</span></div>`;
+            };
             content.innerHTML = `
                 <div class="text-center border-b-2 border-[#c6a15b] pb-3">
                     <div class="text-2xl font-black tracking-[0.22em] text-[#5c4033]">WESMA</div><div class="text-[10px] font-bold tracking-[0.25em] text-[#8c6239]">BADMINTON CLUB</div><div class="text-[8px] font-bold tracking-[0.2em] text-slate-500 mt-1">OFFICIAL MATCH REPORT • SINCE 2026</div><div class="text-[9px] text-slate-500 mt-2">${dateText}</div>
@@ -2873,13 +2957,12 @@
                 <section class="space-y-2"><div class="text-[10px] font-black tracking-wider text-[#5c4033] border-b border-[#d7ccc8] pb-1">01 • MAIN INTERFACE SCOREBOARD</div>${mainCards || '<div class="text-xs text-slate-500">No active teams</div>'}</section>
                 <section class="space-y-2"><div class="text-[10px] font-black tracking-wider text-[#5c4033] border-b border-[#d7ccc8] pb-1">02 • WINNER & TEAM STATISTICS</div>
                     <div class="text-center rounded-lg bg-[#5c4033] text-white p-2"><div class="text-[8px] tracking-widest">WESMA WINNER</div><div class="text-sm font-black mt-1">${leadersText}</div><div class="text-[9px] text-amber-100">${leaderWins} Wins</div></div>
-                    <div class="grid grid-cols-1 gap-1.5">${podiumRow("2ND PLACE", secondPlace, "Not available")}${podiumRow("3RD PLACE", thirdPlace, "Not available")}<div class="flex items-center justify-between gap-2 rounded-lg border border-rose-200 bg-rose-50 px-2 py-1.5 text-[9px]"><span class="font-bold text-rose-700">MOST LOSSES</span><span class="font-black text-right text-rose-800">${mostLossTeams} • ${maxLosses}</span></div></div>
+                    <div class="grid grid-cols-1 gap-1.5">${podiumRow("2ND PLACE", secondPlaceTeams, "Not available")}${podiumRow("3RD PLACE", thirdPlaceTeams, "Not available")}<div class="flex items-center justify-between gap-2 rounded-lg border border-rose-200 bg-rose-50 px-2 py-1.5 text-[9px]"><span class="font-bold text-rose-700">MOST LOSSES</span><span class="font-black text-right text-rose-800">${mostLossTeams} • ${maxLosses}</span></div></div>
                     <table class="w-full text-[9px]"><thead><tr class="text-slate-500 border-b border-[#d7ccc8]"><th class="text-left py-1">TEAM</th><th>PLAY</th><th>WIN</th><th>LOSS</th><th class="text-right">TIME</th></tr></thead><tbody>${rows}</tbody></table>
                 </section>
                 <div class="text-center text-[8px] text-slate-500 border-t border-[#d7ccc8] pt-2">WESMA BADMINTON CLUB • OFFICIAL RECORD</div>`;
             unifiedReportCanvas = null;
-            if (preview) { preview.src = ""; preview.classList.add("hidden"); }
-            if (status) status.textContent = "Report ready. PREVIEW അമർത്തി image സൃഷ്ടിക്കുക.";
+            if (status) status.textContent = "SHARE അമർത്തുമ്പോൾ report image സ്വയം തയ്യാറാകും.";
             modal.classList.remove("hidden");
         }
 
@@ -2891,7 +2974,6 @@
         async function generateUnifiedReportImage() {
             if (unifiedReportBusy) return;
             const target = document.getElementById("unified-report-capture");
-            const preview = document.getElementById("unified-report-preview");
             const status = document.getElementById("unified-report-status");
             if (!target || typeof html2canvas === "undefined") { if (status) status.textContent = "Image generator is unavailable."; return; }
             unifiedReportBusy = true;
@@ -2899,11 +2981,10 @@
             try {
                 const canvas = await html2canvas(target, { backgroundColor: "#ffffff", scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: target.scrollWidth, windowHeight: target.scrollHeight });
                 unifiedReportCanvas = canvas;
-                if (preview) { preview.src = canvas.toDataURL("image/png"); preview.classList.remove("hidden"); }
-                if (status) status.textContent = "HD image ready. DOWNLOAD അല്ലെങ്കിൽ SHARE അമർത്തുക.";
+                if (status) status.textContent = "HD image ready. SHARE അമർത്തുക.";
             } catch (error) {
                 console.error("Unified report image generation failed:", error);
-                if (status) status.textContent = "Image സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും PREVIEW ശ്രമിക്കുക.";
+                if (status) status.textContent = "Image സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും SHARE ശ്രമിക്കുക.";
             } finally { unifiedReportBusy = false; }
         }
 
@@ -2916,6 +2997,7 @@
         }
 
         async function shareUnifiedReportImage() {
+            if (!isMatchEnded) { showToast("End Match കഴിഞ്ഞാൽ മാത്രമേ report share ചെയ്യാൻ കഴിയൂ."); return; }
             if (!unifiedReportCanvas) { await generateUnifiedReportImage(); }
             if (!unifiedReportCanvas) return;
             const status = document.getElementById("unified-report-status");
@@ -2927,14 +3009,12 @@
                     await navigator.share({ files: [file], title: "WESMA Official Match Report", text: "WESMA BADMINTON CLUB - Official Match Report" });
                     if (status) status.textContent = "Share sheet opened.";
                 } else {
-                    downloadUnifiedReportImage();
-                    if (status) status.textContent = "ഈ ഫോണിൽ direct image share ലഭ്യമല്ല; image download ചെയ്തു. Gallery-ൽ നിന്ന് share ചെയ്യാം.";
+                    if (status) status.textContent = "ഈ ഉപകരണത്തിൽ image share പിന്തുണ ലഭ്യമല്ല.";
                 }
             } catch (error) {
                 if (error && error.name === "AbortError") return;
                 console.error("Unified report share failed:", error);
-                downloadUnifiedReportImage();
-                if (status) status.textContent = "Share പരാജയപ്പെട്ടു; image download ചെയ്തു. Gallery-ൽ നിന്ന് share ചെയ്യാം.";
+                if (status) status.textContent = "Image share ചെയ്യാൻ കഴിഞ്ഞില്ല. വീണ്ടും SHARE ശ്രമിക്കുക.";
             }
         }
 
@@ -3022,39 +3102,15 @@
             let sortedTeams = getInternationalSortedTeams(activeTeams);
             
             let rankedListWithPositions = [];
-            let currentRank = 1;
-            sortedTeams.forEach((t, i) => {
-                if (i > 0) {
-                    let prev = sortedTeams[i - 1];
-                    if (t.wins !== prev.wins || (t.losses || 0) !== (prev.losses || 0)) {
-                        currentRank = i + 1;
-                    }
-                }
-                rankedListWithPositions.push({ ...t, rank: currentRank });
+            const rankByStanding = getStandingRankMap(activeTeams);
+            sortedTeams.forEach(t => {
+                rankedListWithPositions.push({ ...t, rank: rankByStanding.get(standingPositionKey(t)) || 0 });
             });
 
-            let activeTeamsWithWins = rankedListWithPositions.filter(t => (t.wins || 0) > 0);
-
-            let firstPlaceTeams = [];
-            let secondPlaceTeams = [];
-            let thirdPlaceTeams = [];
-
-            if (activeTeamsWithWins.length > 0) {
-                let maxWins = activeTeamsWithWins[0].wins;
-                firstPlaceTeams = activeTeamsWithWins.filter(t => t.wins === maxWins);
-
-                let remainingSec = activeTeamsWithWins.filter(t => t.wins < maxWins);
-                if (remainingSec.length > 0) {
-                    let secondMaxWins = remainingSec[0].wins;
-                    secondPlaceTeams = remainingSec.filter(t => t.wins === secondMaxWins);
-
-                    let remainingThird = remainingSec.filter(t => t.wins < secondMaxWins);
-                    if (remainingThird.length > 0) {
-                        let thirdMaxWins = remainingThird[0].wins;
-                        thirdPlaceTeams = remainingThird.filter(t => t.wins === thirdMaxWins);
-                    }
-                }
-            }
+            const podiumGroups = getPodiumGroups(activeTeams);
+            let firstPlaceTeams = (podiumGroups.find(group => group.rank === 1) || { teams: [] }).teams;
+            let secondPlaceTeams = (podiumGroups.find(group => group.rank === 2) || { teams: [] }).teams;
+            let thirdPlaceTeams = (podiumGroups.find(group => group.rank === 3) || { teams: [] }).teams;
 
             // Keep the WESMA Winner heading clean; taglines remain visible in other views.
             let championNamesDisplay = firstPlaceTeams.length > 0 ? firstPlaceTeams.map(t => escapeHtml(t.name)).join(" & ") : "None";
@@ -3065,8 +3121,10 @@
             let secondWins = secondPlaceTeams.length > 0 ? secondPlaceTeams[0].wins : 0;
             let thirdWins = thirdPlaceTeams.length > 0 ? thirdPlaceTeams[0].wins : 0;
 
-            // Defeated teams list (4th & below)
-            let loserTeamsList = rankedListWithPositions.filter(t => t.rank > 3);
+            // Every team outside the positive-win podium stays in the defeated-teams list,
+            // even when fewer than three podium places are available.
+            const podiumTeamIds = new Set([...firstPlaceTeams, ...secondPlaceTeams, ...thirdPlaceTeams].map(t => String(t.id)));
+            let loserTeamsList = rankedListWithPositions.filter(t => !podiumTeamIds.has(String(t.id)));
             let loserHtmlContent = "";
             if (loserTeamsList.length > 0) {
                 loserHtmlContent = `<div class="space-y-1 text-left">`;
@@ -3263,7 +3321,7 @@
             sortedTeams.forEach((t, i) => {
                 if (i > 0) {
                     let prev = sortedTeams[i - 1];
-                    if (t.wins !== prev.wins || (t.losses || 0) !== (prev.losses || 0)) {
+                    if (!sameStandingPosition(t, prev)) {
                         currentPos = i + 1;
                     }
                 }
@@ -3899,7 +3957,9 @@
                 teamNameOverrides[String(team.id)] = team.name;
             });
             const resetAt = Date.now();
-            tournamentStartTimestamp = resetAt;
+            // A reset must clear the active-session timestamp. Keeping resetAt here
+            // makes other devices mistake the reset state for a running match.
+            tournamentStartTimestamp = null;
             lastActionTimestamp = resetAt;
             globalClickSequence = 0;
             isMatchEnded = false;
@@ -3920,7 +3980,7 @@
             applyTouchLockState();
             updateStartButtonState();
 
-            const resetGuard = { active: false, startedAt: resetAt, resetAt, sessionId: String(resetAt) };
+            const resetGuard = { active: false, startedAt: null, resetAt, sessionId: String(resetAt) };
             const firebaseSaved = dbRef ? await saveData({ sessionStartGuard: resetGuard }) : true;
             if (dbRef && !firebaseSaved) {
                 showToast("⚠️ Reset ഈ ഫോണിൽ നടന്നു; Firebase sync പരാജയപ്പെട്ടു. കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.");
