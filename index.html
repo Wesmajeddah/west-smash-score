@@ -18,6 +18,7 @@
     <!-- html2canvas for Auto Screenshot -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
+    <!-- WESMA SAFETY BUILD: FIREBASE READ-ONLY / MANUAL ACTIONS ONLY -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -1692,38 +1693,20 @@
                             } else if (data.isTournamentLocked === true || data.isMatchEnded === true) {
                                 tournamentStartTimestamp = null;
                             }
-                        } else if (dbRef) {
-                            const legacyActive = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
-                            dbRef.child("sessionStartGuard").transaction(current => current || { active: legacyActive, startedAt: tournamentStartTimestamp || null }, () => {}, false);
-                            startGuardActive = legacyActive;
+                        } else {
+                            // Strict read-only mode: never create/repair sessionStartGuard
+                            // merely because a Firebase snapshot was received.
+                            startGuardActive = false;
                         }
                         // Firebase VALUE events are READ-ONLY.
                         // A remote snapshot must never write, repair, or overwrite data merely
                         // because a page opened or another device changed something.
                         refreshScheduledStartUI();
                         // No automatic state-changing scheduler call here.
-                    } else if (!data || !Array.isArray(data.teams) || data.teams.length === 0) {
-                        // First-device bootstrap: if the shared database has no team list yet,
-                        // seed it once from the existing local team set. A Firebase transaction
-                        // prevents two phones opening together from overwriting each other's seed.
-                        const localSeedTeams = wesmaDeepClone(teams);
-                        dbRef.child("teams").transaction(current => {
-                            if (Array.isArray(current) && current.length > 0) return;
-                            return localSeedTeams;
-                        }, (seedError, committed, seedSnapshot) => {
-                            if (seedError) {
-                                console.error("Firebase initial team sync failed:", seedError);
-                                showToast("⚠️ Live Sync failed: Firebase read/write permission പരിശോധിക്കുക.");
-                                return;
-                            }
-                            const seededTeams = seedSnapshot && seedSnapshot.val();
-                            if (committed && Array.isArray(seededTeams)) {
-                                teams = wesmaDeepClone(seededTeams);
-                                teamSyncBase = wesmaDeepClone(seededTeams);
-                                saveLocalBackup();
-                                render();
-                            }
-                        }, false);
+                    } else {
+                        // Strict read-only mode: an empty Firebase snapshot must not
+                        // trigger an automatic seed/write from local data.
+                        // Explicit user actions are the only place allowed to write.
                     }
                     render();
                     updateHistorySummaryText();
@@ -5296,61 +5279,9 @@
         }
 
         function runOfflineScheduledMatchStart(due) {
-            // Offline fallback: archive the previous local session, then start a fresh
-            // local session at the scheduled time without waiting for Firebase.
-            const oldTeams = JSON.parse(JSON.stringify(teams || []));
-            const oldStart = Number(tournamentStartTimestamp) || due;
-            const plays = oldTeams.reduce((n, t) =>
-                n + Math.max(0, Number(t.played) || 0, (Number(t.wins) || 0) + (Number(t.losses) || 0)), 0);
-            const sid = String(oldStart);
-            const already = (tournamentHistory || []).some(r =>
-                String(r.sessionId || r.startTimestamp || r.id || "") === sid);
-
-            if (plays > 0 && !already) {
-                const date = new Date(oldStart).toLocaleString("en-GB", {
-                    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
-                });
-                const rec = {
-                    id: sid, sessionId: sid, startTimestamp: sid, date,
-                    dateKey: historyDateKey({ startTimestamp: sid }),
-                    teams: oldTeams, totalPlays: plays,
-                    totalMatches: Math.floor((plays + 0.5) / 2),
-                    durationMinutes: Math.max(0, Math.floor((due - oldStart) / 60000)),
-                    durationMs: Math.max(0, due - oldStart)
-                };
-                tournamentHistory = dedupeHistoryRecords([rec, ...(tournamentHistory || [])]);
-            }
-
-            const names = { ...(teamNameOverrides || {}) };
-            teams = JSON.parse(JSON.stringify(defaultTeams)).map(team => ({
-                ...team, name: names[String(team.id)] || team.name
-            }));
-            teamNameOverrides = Object.fromEntries(teams.map(team => [String(team.id), team.name]));
-            tournamentStartTimestamp = due;
-            lastActionTimestamp = due;
-            globalClickSequence = 0;
-            isMatchEnded = false;
-            isTournamentLocked = false;
-            isLocalStartGateVisible = false;
-            lastActionSnapshot = null;
-            lastActionDescription = "";
-            undoHistoryStack = [];
-            redoHistoryStack = [];
-            sessionHistorySavedId = null;
-            scheduledMatchStartAt = null;
-            startGuardActive = true;
-            lastEndedChampionSnapshot = null;
-
-            saveLocalBackup();
-            render();
-            updateHistorySummaryText();
-            updateMatchStatusBadge();
-            updateMainTopLastDefeatedBar();
-            updateStartButtonState();
-            applyTouchLockState();
-            startLiveTimer();
-            refreshScheduledStartUI();
-            showToast("⏰ Scheduled time reached. Previous session saved locally; new match started.");
+            // Disabled in strict manual-only mode. Kept as a compatibility stub so
+            // older references cannot mutate teams/history automatically.
+            return;
         }
 
         function checkScheduledMatchStart() {
