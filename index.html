@@ -1621,12 +1621,15 @@
                     }
                     if (data && data.teams && Array.isArray(data.teams) && data.teams.length > 0) {
                         const incomingTeams = wesmaDeepClone(data.teams);
-                        const mergedTeams = teamSyncBase
-                            ? mergeChangedTeamSnapshot(incomingTeams, teamSyncBase, teams)
-                            : incomingTeams;
-                        const hadPendingLocalTeamChanges = JSON.stringify(mergedTeams) !== JSON.stringify(incomingTeams);
-                        teamSyncBase = incomingTeams;
-                        teams = mergedTeams;
+                        // Firebase is the authoritative live snapshot. Do not re-merge
+                        // the previous local snapshot inside the value listener: doing so
+                        // reapplies the same additive win/loss/played delta on every
+                        // Firebase echo and creates an unbounded score-increment loop.
+                        // Local edits are captured by saveData() and merged transactionally
+                        // before their write; remote snapshots must therefore be applied
+                        // as-is here.
+                        teamSyncBase = wesmaDeepClone(incomingTeams);
+                        teams = incomingTeams;
 
                         const incomingNameOverrides = data.teamNameOverrides && typeof data.teamNameOverrides === 'object'
                             ? wesmaDeepClone(data.teamNameOverrides)
@@ -1673,7 +1676,6 @@
                             persistMergedHistory();
                         }
                         saveLocalBackup();
-                        if (hadPendingLocalTeamChanges) saveData();
                         refreshScheduledStartUI();
                         checkScheduledMatchStart();
                     } else if (!data || !Array.isArray(data.teams) || data.teams.length === 0) {
