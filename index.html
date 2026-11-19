@@ -15,6 +15,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <!-- html2canvas for Auto Screenshot -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -1265,7 +1266,14 @@
             if (typeof firebase !== 'undefined') {
                 if (!firebase.apps.length) {
                     firebase.initializeApp({
-                        databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
+                        apiKey: "AIzaSyAQhe2noBtY5cpaMgMTPXRn5BCnMm_RM18",
+                        authDomain: "west-smash.firebaseapp.com",
+                        databaseURL: "https://west-smash-default-rtdb.firebaseio.com",
+                        projectId: "west-smash",
+                        storageBucket: "west-smash.firebasestorage.app",
+                        messagingSenderId: "129493554627",
+                        appId: "1:129493554627:web:7f53ac649760f3b46e1976",
+                        measurementId: "G-QK2BQKR08T"
                     });
                 }
                 dbRef = firebase.database().ref('wesma_badminton_scores_v135');
@@ -1275,10 +1283,25 @@
             console.error("Firebase init error:", e);
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initData();
+        document.addEventListener("DOMContentLoaded", async () => {
             document.body.addEventListener('click', initAudioContext, { once: true });
             document.body.addEventListener('touchstart', initAudioContext, { once: true });
+
+            // Authenticate each device anonymously before attaching any shared database listeners.
+            // Firebase persists the anonymous session on that device for subsequent visits.
+            try {
+                if (typeof firebase === 'undefined' || !firebase.auth) {
+                    throw new Error('Firebase Authentication SDK unavailable');
+                }
+                await firebase.auth().signInAnonymously();
+                initData();
+            } catch (authError) {
+                console.error("Firebase anonymous authentication failed:", authError);
+                const code = authError && authError.code ? authError.code : (authError && authError.message ? authError.message : "unknown");
+                showToast("⚠️ Firebase sign-in failed: " + code + ". Authentication settings പരിശോധിക്കുക.");
+                // Keep the app usable locally; shared Live Sync remains unavailable until sign-in succeeds.
+                initData();
+            }
         });
 
         function initAudioContext() {
