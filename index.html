@@ -636,7 +636,7 @@
                 <button onclick="openUndoModal()" class="text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                     🔄 UNDO
                 </button>
-                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
+                <button type="button" onclick="openAddTeamModal(event)" class="w-7 h-7 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
                     <i class="fa-solid fa-user-plus text-[10px]"></i>
                 </button>
                 <span id="history-summary-text" class="text-[10px] text-slate-500 font-medium italic truncate max-w-[100px] sm:max-w-[150px]">
@@ -894,8 +894,8 @@
                 <input type="text" id="new-team-name-input" placeholder="ടീം പേര് / Team Name" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-center text-slate-800 focus:outline-none focus:border-emerald-500 uppercase">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="closeAddTeamModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
-                <button onclick="submitNewTeam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">ചേർക്കുക / Add</button>
+                <button type="button" onclick="closeAddTeamModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-light py-2 rounded-xl text-xs cursor-pointer">റദ്ദാക്കുക / Cancel</button>
+                <button type="button" onclick="submitNewTeam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs shadow-2xs cursor-pointer">ചേർക്കുക / Add</button>
             </div>
         </div>
     </div>
@@ -4985,7 +4985,10 @@
             }
         }
 
-        function openAddTeamModal() {
+        function openAddTeamModal(event) {
+            // The Add Team modal must open only from a real user click.
+            // This prevents accidental/programmatic click events from opening it.
+            if (event && event.isTrusted === false) return;
             if (historyPreviewLiveState) { showToast("History Special View വായനയ്ക്കു മാത്രമാണ്."); return; }
             triggerHapticFeedback([30]);
             const modal = document.getElementById("add-team-modal");
@@ -5266,7 +5269,9 @@
         }
 
         function checkScheduledMatchStart() {
-            if (!scheduledMatchStartAt || Date.now() < Number(scheduledMatchStartAt) || scheduledStartCheckInProgress) return;
+            // Never auto-start/reset unless a schedule was explicitly saved with SET TIME.
+            if (!Number.isFinite(Number(scheduledMatchStartAt)) || Number(scheduledMatchStartAt) <= 0) return;
+            if (Date.now() < Number(scheduledMatchStartAt) || scheduledStartCheckInProgress) return;
 
             // A local timer must still fire when Firebase is unavailable/offline.
             if (!dbRef || navigator.onLine === false || !isFirebaseConnected) {
