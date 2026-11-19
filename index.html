@@ -2054,7 +2054,7 @@
             const copperLogo = window.wesmaCopperLogoImage;
             if (!copperLogo.complete) await new Promise(resolve => { copperLogo.onload=resolve; copperLogo.onerror=resolve; });
             if (copperLogo.naturalWidth) {
-                ctx.save(); ctx.globalAlpha=0.045;
+                ctx.save(); ctx.globalAlpha=0.012;
                 const logoW=Math.min(canvas.width*0.43,620), logoH=logoW*(copperLogo.naturalHeight/copperLogo.naturalWidth);
                 ctx.drawImage(copperLogo,canvas.width-logoW-34,canvas.height-logoH-105,logoW,logoH);
                 ctx.restore();
@@ -2326,6 +2326,19 @@
             const baseById = new Map(base.map(team => [String(team.id), team]));
             const additiveFields = new Set(['wins', 'losses', 'played', 'totalTimeSpentMinutes']);
             const mergeArrayFields = new Set(['defeatedDetails', 'matchHistoryLog']);
+
+            // A team removed locally after the last confirmed snapshot is a real
+            // deletion. Remove it from the remote list instead of silently restoring it.
+            const localIds = new Set(local.map(team => String(team.id)));
+            base.forEach(baseTeam => {
+                const id = String(baseTeam.id);
+                if (!localIds.has(id)) remoteById.delete(id);
+            });
+            const filteredRemote = remote.filter(team => localIds.has(String(team.id)) || !baseById.has(String(team.id)));
+            remote.length = 0;
+            filteredRemote.forEach(team => remote.push(team));
+            remoteById.clear();
+            remote.forEach(team => remoteById.set(String(team.id), team));
 
             local.forEach(localTeam => {
                 const id = String(localTeam.id);
@@ -4902,23 +4915,8 @@
                     }
                 });
 
-                tournamentHistory.forEach(session => {
-                    if (session.teams) {
-                        session.teams.forEach(st => {
-                            if (st.name === oldName) st.name = nameInput;
-                            if (st.defeatedDetails) {
-                                st.defeatedDetails.forEach(sd => {
-                                    if (sd.name === oldName) sd.name = nameInput;
-                                });
-                            }
-                            if (st.matchHistoryLog) {
-                                st.matchHistoryLog.forEach(sm => {
-                                    if (sm.opponent === oldName) sm.opponent = nameInput;
-                                });
-                            }
-                        });
-                    }
-                });
+                // Past tournamentHistory entries are immutable snapshots.
+                // Renaming a live team must never rewrite historical team names.
 
                 saveData();
                 render();
@@ -4944,7 +4942,42 @@
 
             if (window.confirm(`"${team.name}" എന്ന ടീമിനെ നീക്കം ചെയ്യണോ? / Delete team?`)) {
                 triggerHapticFeedback([60]);
-                teams = teams.filter(t => t.id !== editingTeamId);
+                const deletedTeamId = String(editingTeamId);
+                const deletedTeamName = String(team.name || '');
+                teams = teams.filter(t => String(t.id) !== deletedTeamId);
+                delete teamNameOverrides[deletedTeamId];
+
+                // Remove the deleted team's own row and references to it from all
+                // remaining live team logs. Do not leave orphaned score totals behind.
+                teams.forEach(otherTeam => {
+                    otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item => String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
+                    otherTeam.matchHistoryLog = (otherTeam.matchHistoryLog || []).filter(item => String(item.opponentId || item.teamId || '') !== deletedTeamId && String(item.opponent || '') !== deletedTeamName);
+                });
+
+                const stripDeletedTeam = snapshot => {
+                    if (!snapshot || typeof snapshot !== 'object') return;
+                    if (Array.isArray(snapshot.teams)) {
+                        snapshot.teams = snapshot.teams.filter(item => String(item.id) !== deletedTeamId);
+                        snapshot.teams.forEach(otherTeam => {
+                            otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item => String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
+                            otherTeam.matchHistoryLog = (otherTeam.matchHistoryLog || []).filter(item => String(item.opponentId || item.teamId || '') !== deletedTeamId && String(item.opponent || '') !== deletedTeamName);
+                        });
+                    }
+                    if (snapshot.lastEndedChampionSnapshot) stripDeletedTeam(snapshot.lastEndedChampionSnapshot);
+                    if (Array.isArray(snapshot.undoHistoryStack)) snapshot.undoHistoryStack.forEach(stripDeletedTeam);
+                    if (Array.isArray(snapshot.redoHistoryStack)) snapshot.redoHistoryStack.forEach(stripDeletedTeam);
+                };
+                tournamentHistory = (tournamentHistory || []).map(record => {
+                    const copy = wesmaDeepClone(record);
+                    stripDeletedTeam(copy);
+                    return copy;
+                });
+                if (lastEndedChampionSnapshot) stripDeletedTeam(lastEndedChampionSnapshot);
+                (undoHistoryStack || []).forEach(stripDeletedTeam);
+                (redoHistoryStack || []).forEach(stripDeletedTeam);
+                if (lastActionSnapshot) stripDeletedTeam(lastActionSnapshot);
+                saveLocalBackup();
+                persistMergedHistory();
                 saveData();
                 render();
                 closeCustomNameModal();
