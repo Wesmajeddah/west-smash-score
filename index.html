@@ -387,6 +387,55 @@
         }
 
 
+        /* Compact information dialogs without hiding content; existing inner scroll areas remain active. */
+        #start-match-confirm-modal > div,
+        #last-defeated-history-modal > div,
+        #per-team-plays-modal > div,
+        #time-summary-modal > div,
+        #team-info-detail-modal > div,
+        #defeated-team-modal > div,
+        #current-status-modal > div,
+        #end-match-password-modal > div,
+        #finish-match-modal > div,
+        #unified-report-modal > div,
+        #custom-name-modal > div,
+        #add-team-modal > div,
+        #whatsapp-choice-modal > div,
+        #undo-management-modal > div,
+        #history-modal > div,
+        #history-record-detail-modal > div,
+        #history-special-view-modal > div,
+        #match-correction-modal > div,
+        #history-team-info-detail-modal > div {
+            max-height: 88vh !important;
+        }
+        #start-match-confirm-modal > div,
+        #last-defeated-history-modal > div,
+        #per-team-plays-modal > div,
+        #team-info-detail-modal > div,
+        #defeated-team-modal > div,
+        #end-match-password-modal > div,
+        #custom-name-modal > div,
+        #add-team-modal > div,
+        #whatsapp-choice-modal > div,
+        #undo-management-modal > div,
+        #history-team-info-detail-modal > div {
+            padding: .8rem !important;
+            gap: .55rem !important;
+        }
+        #current-status-modal > div > #current-status-modal-content,
+        #finish-match-modal > #screenshot-target-card > #finish-match-modal-content {
+            padding: .65rem !important;
+            gap: .55rem !important;
+        }
+        #history-modal > div > #modal-history-content,
+        #history-record-detail-modal > div > #history-record-detail-content,
+        #history-special-view-modal > div > #history-special-view-content,
+        #match-correction-modal > div > #match-correction-list,
+        #unified-report-modal > div > div:nth-child(2) {
+            min-height: 0;
+        }
+
         /* End Match summary: refreshed colored shell only; all report content/data stays intact. */
         #finish-match-modal { background: rgba(5,12,24,.88) !important; }
         #screenshot-target-card {
@@ -1034,6 +1083,10 @@
         let lastEndedChampionSnapshot = null;
         let historyWriteQueue = Promise.resolve();
         let firebaseWriteQueue = Promise.resolve();
+        // Last Firebase-confirmed team snapshots let concurrent phones merge only
+        // the fields changed locally instead of replacing the complete team array.
+        let teamSyncBase = null;
+        let teamNameSyncBase = null;
         let firebaseWritePending = 0;
         let matchCorrectionTarget = null;
         let firebaseLastWriteError = null;
@@ -1534,10 +1587,21 @@
                         return;
                     }
                     if (data && data.teams && Array.isArray(data.teams) && data.teams.length > 0) {
-                        teams = data.teams;
-                        teamNameOverrides = data.teamNameOverrides && typeof data.teamNameOverrides === 'object'
-                            ? data.teamNameOverrides
+                        const incomingTeams = wesmaDeepClone(data.teams);
+                        const mergedTeams = teamSyncBase
+                            ? mergeChangedTeamSnapshot(incomingTeams, teamSyncBase, teams)
+                            : incomingTeams;
+                        const hadPendingLocalTeamChanges = JSON.stringify(mergedTeams) !== JSON.stringify(incomingTeams);
+                        teamSyncBase = incomingTeams;
+                        teams = mergedTeams;
+
+                        const incomingNameOverrides = data.teamNameOverrides && typeof data.teamNameOverrides === 'object'
+                            ? wesmaDeepClone(data.teamNameOverrides)
                             : Object.fromEntries(data.teams.map(team => [String(team.id), team.name]));
+                        teamNameOverrides = teamNameSyncBase
+                            ? mergeChangedObjectSnapshot(incomingNameOverrides, teamNameSyncBase, teamNameOverrides)
+                            : incomingNameOverrides;
+                        teamNameSyncBase = incomingNameOverrides;
                         teams.forEach(team => {
                             const savedName = teamNameOverrides[String(team.id)];
                             if (savedName) team.name = savedName;
@@ -1576,6 +1640,7 @@
                             persistMergedHistory();
                         }
                         saveLocalBackup();
+                        if (hadPendingLocalTeamChanges) saveData();
                         refreshScheduledStartUI();
                         checkScheduledMatchStart();
                     }
@@ -1890,6 +1955,29 @@
             ctx.restore();
         }
 
+        function drawChampionTableIcon(ctx, kind, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            if (kind === 'play') {
+                ctx.fillStyle = '#8fd7ff';
+                ctx.beginPath(); ctx.moveTo(-5,-7); ctx.lineTo(7,0); ctx.lineTo(-5,7); ctx.closePath(); ctx.fill();
+            } else if (kind === 'win') {
+                ctx.strokeStyle = '#f2c96d';
+                ctx.fillStyle = 'rgba(242,201,109,.18)';
+                ctx.beginPath(); ctx.moveTo(-5,-7); ctx.lineTo(5,-7); ctx.lineTo(4,1); ctx.quadraticCurveTo(0,7,-4,1); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(-5,-5); ctx.lineTo(-9,-5); ctx.lineTo(-8,0); ctx.lineTo(-4,2); ctx.moveTo(5,-5); ctx.lineTo(9,-5); ctx.lineTo(8,0); ctx.lineTo(4,2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0,5); ctx.lineTo(0,9); ctx.moveTo(-4,9); ctx.lineTo(4,9); ctx.stroke();
+            } else {
+                ctx.strokeStyle = '#ff9299';
+                ctx.beginPath(); ctx.arc(0,0,7,0,Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(-3,-3); ctx.lineTo(3,3); ctx.moveTo(3,-3); ctx.lineTo(-3,3); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
         // Champions must follow the live scoreboard standings, not the last clicked winner.
         // This keeps the poster's main champion name and statistics synchronized with the
         // same ranking logic used by the live scoreboard.
@@ -1942,7 +2030,7 @@
             const copperLogo = window.wesmaCopperLogoImage;
             if (!copperLogo.complete) await new Promise(resolve => { copperLogo.onload=resolve; copperLogo.onerror=resolve; });
             if (copperLogo.naturalWidth) {
-                ctx.save(); ctx.globalAlpha=0.10;
+                ctx.save(); ctx.globalAlpha=0.045;
                 const logoW=Math.min(canvas.width*0.43,620), logoH=logoW*(copperLogo.naturalHeight/copperLogo.naturalWidth);
                 ctx.drawImage(copperLogo,canvas.width-logoW-34,canvas.height-logoH-105,logoW,logoH);
                 ctx.restore();
@@ -1981,7 +2069,7 @@
             [[0,-31],[31,0],[0,31],[-31,0]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,2.2,0,Math.PI*2);ctx.fill();});
             ctx.restore();
             // Keep both statistic groups on one exact center axis, with clear non-overlapping vertical spacing.
-            wesmaChampionStatText(ctx,String(wins),229,395,300,205,'number');
+            wesmaChampionStatText(ctx,String(wins),229,395,300,215,'number');
             wesmaChampionStatText(ctx,'WIN',229,500,225,32,'label');
             ctx.save();
             const statDivider = ctx.createLinearGradient(118,530,340,530);
@@ -1990,7 +2078,7 @@
             statDivider.addColorStop(1,'rgba(212,175,55,0)');
             ctx.strokeStyle=statDivider; ctx.lineWidth=2;
             ctx.beginPath(); ctx.moveTo(118,530); ctx.lineTo(340,530); ctx.stroke(); ctx.restore();
-            wesmaChampionStatText(ctx,String(played),229,585,230,90,'count');
+            wesmaChampionStatText(ctx,String(played),229,585,230,108,'count');
             wesmaChampionStatText(ctx,'MATCHES',229,650,205,25,'count');
 
             // Winner name: slightly larger and distinctly heavier for the first-place champion.
@@ -2039,19 +2127,26 @@
             ctx.strokeStyle='rgba(220,190,130,.42)'; ctx.lineWidth=1;
             ctx.beginPath(); ctx.moveTo(92,802); ctx.lineTo(1050,802); ctx.stroke();
             ctx.restore();
-            const ys=[842,895,948,1001,1054];
-            (ranked||[]).slice(0,5).forEach((team,i)=>{
+            const standingsTeams = ranked || [];
+            const rowAreaTop = 814, rowAreaHeight = 278;
+            const rowGap = standingsTeams.length ? rowAreaHeight / standingsTeams.length : 53;
+            standingsTeams.forEach((team,i)=>{
                 const rank=rankMap.get(standingPositionKey(team)) || i+1;
-                const y=ys[i];
+                const y=rowAreaTop + rowGap*(i+.5);
                 if(i>0){
                     ctx.save(); ctx.strokeStyle='rgba(220,220,220,.16)'; ctx.lineWidth=1;
-                    ctx.beginPath(); ctx.moveTo(92,y-31); ctx.lineTo(1050,y-31); ctx.stroke(); ctx.restore();
+                    ctx.beginPath(); ctx.moveTo(92,y-rowGap*.48); ctx.lineTo(1050,y-rowGap*.48); ctx.stroke(); ctx.restore();
                 }
-                wesmaPosterText(ctx,String(rank)+'.',130,y,78,34,{color:rank===1?'gold':'silver'});
-                wesmaPosterText(ctx,String(team.name||'').toUpperCase(),390,y,390, i===0 ? 35 : 30,{color:rank===2?'#9bdcff':(rank===1?'gold':'#e6e8ed'),font:'Georgia, Times New Roman, serif'});
-                wesmaPosterText(ctx,String(getTeamPlayedCount(team)),710,y,80,34,{color:'silver'});
-                wesmaPosterText(ctx,String(Number(team.wins)||0),835,y,78, i===0 ? 38 : 32,{color:'gold',font:'Georgia, Times New Roman, serif'});
-                wesmaPosterText(ctx,String(Number(team.losses)||0),980,y,65,32,{color:'#ff8b91'});
+                const rowFont=Math.max(13,Math.min(i===0?35:30,rowGap*.58));
+                const valueFont=Math.max(12,Math.min(i===0?34:30,rowGap*.56));
+                wesmaPosterText(ctx,String(rank)+'.',130,y,78,Math.max(13,Math.min(34,rowGap*.62)),{color:rank===1?'gold':'silver'});
+                wesmaPosterText(ctx,String(team.name||'').toUpperCase(),390,y,390,rowFont,{color:rank===2?'#9bdcff':(rank===1?'gold':'#e6e8ed'),font:'Georgia, Times New Roman, serif'});
+                drawChampionTableIcon(ctx,'play',690,y);
+                wesmaPosterText(ctx,String(getTeamPlayedCount(team)),724,y,62,valueFont,{color:'silver'});
+                drawChampionTableIcon(ctx,'win',814,y);
+                wesmaPosterText(ctx,String(Number(team.wins)||0),849,y,62,valueFont,{color:'gold',font:'Georgia, Times New Roman, serif'});
+                drawChampionTableIcon(ctx,'loss',958,y);
+                wesmaPosterText(ctx,String(Number(team.losses)||0),993,y,54,valueFont,{color:'#ff8b91'});
             });
 
             // Keep the footer compact: date plus the actual session start/end time range.
@@ -2195,6 +2290,92 @@
             });
         }
 
+        function wesmaDeepClone(value) {
+            return value == null ? value : JSON.parse(JSON.stringify(value));
+        }
+
+        function mergeChangedTeamSnapshot(remoteTeams, baseTeams, localTeams) {
+            const remote = Array.isArray(remoteTeams) ? wesmaDeepClone(remoteTeams) : [];
+            const base = Array.isArray(baseTeams) ? baseTeams : [];
+            const local = Array.isArray(localTeams) ? localTeams : [];
+            const remoteById = new Map(remote.map(team => [String(team.id), team]));
+            const baseById = new Map(base.map(team => [String(team.id), team]));
+            const additiveFields = new Set(['wins', 'losses', 'played', 'totalTimeSpentMinutes']);
+            const mergeArrayFields = new Set(['defeatedDetails', 'matchHistoryLog']);
+
+            local.forEach(localTeam => {
+                const id = String(localTeam.id);
+                const baseTeam = baseById.get(id);
+                const remoteTeam = remoteById.get(id);
+
+                if (!baseTeam) {
+                    // A team created on this device is appended without replacing
+                    // teams created on another connected device.
+                    if (!remoteTeam) {
+                        const added = wesmaDeepClone(localTeam);
+                        remote.push(added);
+                        remoteById.set(id, added);
+                    }
+                    return;
+                }
+
+                if (!remoteTeam) {
+                    const restored = wesmaDeepClone(localTeam);
+                    remote.push(restored);
+                    remoteById.set(id, restored);
+                    return;
+                }
+
+                Object.keys(localTeam).forEach(key => {
+                    const localValue = localTeam[key];
+                    const baseValue = baseTeam[key];
+                    if (JSON.stringify(localValue) === JSON.stringify(baseValue)) return;
+
+                    if (additiveFields.has(key)) {
+                        const delta = (Number(localValue) || 0) - (Number(baseValue) || 0);
+                        remoteTeam[key] = (Number(remoteTeam[key]) || 0) + delta;
+                    } else if (mergeArrayFields.has(key) && Array.isArray(localValue)) {
+                        const combined = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
+                        const seen = new Set(combined.map(item => JSON.stringify(item)));
+                        localValue.forEach(item => {
+                            const signature = JSON.stringify(item);
+                            if (!seen.has(signature)) { combined.push(wesmaDeepClone(item)); seen.add(signature); }
+                        });
+                        remoteTeam[key] = combined;
+                    } else {
+                        remoteTeam[key] = wesmaDeepClone(localValue);
+                    }
+                });
+            });
+            return remote;
+        }
+
+        function mergeChangedObjectSnapshot(remoteObject, baseObject, localObject) {
+            const remote = remoteObject && typeof remoteObject === 'object' ? { ...remoteObject } : {};
+            const base = baseObject && typeof baseObject === 'object' ? baseObject : {};
+            const local = localObject && typeof localObject === 'object' ? localObject : {};
+            const keys = new Set([...Object.keys(base), ...Object.keys(local)]);
+            keys.forEach(key => {
+                if (JSON.stringify(local[key]) === JSON.stringify(base[key])) return;
+                if (Object.prototype.hasOwnProperty.call(local, key)) remote[key] = local[key];
+                else delete remote[key];
+            });
+            return remote;
+        }
+
+        function runFirebaseTransaction(ref, updater) {
+            return new Promise(resolve => {
+                ref.transaction(updater, (error, committed, snapshot) => {
+                    if (error) {
+                        console.error("Firebase transaction failed:", error);
+                        resolve({ committed: false, value: null });
+                        return;
+                    }
+                    resolve({ committed: !!committed, value: snapshot ? snapshot.val() : null });
+                }, false);
+            });
+        }
+
         function saveData(extraRootUpdates = {}) {
             if (historyPreviewLiveState) return Promise.resolve(false);
             // Any meaningful shared data change restarts the six-hour idle window.
@@ -2206,8 +2387,6 @@
             // History is deliberately excluded here: it is written with a Firebase
             // transaction below so simultaneous End Match actions cannot append duplicates.
             const payload = {
-                teams: JSON.parse(JSON.stringify(teams)),
-                teamNameOverrides: { ...teamNameOverrides },
                 tournamentStartTimestamp, lastActionTimestamp,
                 globalClickSequence, isMatchEnded, isTournamentLocked,
                 lastActionSnapshot: lastActionSnapshot ? JSON.parse(JSON.stringify(lastActionSnapshot)) : null,
@@ -2218,10 +2397,32 @@
                 ...(extraRootUpdates && typeof extraRootUpdates === "object" ? extraRootUpdates : {})
             };
 
+            const localTeamsForWrite = wesmaDeepClone(teams);
+            const baseTeamsForWrite = wesmaDeepClone(teamSyncBase);
+            const localNamesForWrite = { ...teamNameOverrides };
+            const baseNamesForWrite = wesmaDeepClone(teamNameSyncBase);
+
             firebaseWritePending += 1;
             firebaseWriteQueue = firebaseWriteQueue
                 .catch(() => false)
-                .then(() => dbRef.update(payload))
+                .then(async () => {
+                    const teamResult = await runFirebaseTransaction(dbRef.child("teams"), current =>
+                        mergeChangedTeamSnapshot(current, baseTeamsForWrite, localTeamsForWrite));
+                    if (teamResult.committed && Array.isArray(teamResult.value)) {
+                        teamSyncBase = wesmaDeepClone(teamResult.value);
+                        if (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)) {
+                            lastEndedChampionSnapshot.teams = wesmaDeepClone(teamResult.value);
+                            payload.lastEndedChampionSnapshot = wesmaDeepClone(lastEndedChampionSnapshot);
+                        }
+                    }
+
+                    const namesResult = await runFirebaseTransaction(dbRef.child("teamNameOverrides"), current =>
+                        mergeChangedObjectSnapshot(current, baseNamesForWrite, localNamesForWrite));
+                    if (namesResult.committed && namesResult.value && typeof namesResult.value === "object") {
+                        teamNameSyncBase = wesmaDeepClone(namesResult.value);
+                    }
+                    return dbRef.update(payload);
+                })
                 .then(() => { firebaseLastWriteError = null; return true; })
                 .catch((error) => {
                     firebaseLastWriteError = error;
@@ -4755,7 +4956,7 @@
                 return;
             }
 
-            const newId = teams.length > 0 ? Math.max(...teams.map(t => t.id)) + 1 : 1;
+            const newId = Math.max(Date.now(), ...teams.map(t => (Number(t.id) || 0) + 1));
             const randomBadgeBg = badgeColorsList[Math.floor(Math.random() * badgeColorsList.length)];
 
             teams.push({
@@ -4775,8 +4976,15 @@
                 matchHistoryLog: []
             });
 
+            // The new team's opening WIN / LOSS / PLAY values mirror the Main Interface.
+            // If a match has ended, extend its Champions snapshot without changing
+            // any existing team's saved result or statistics.
+            if (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)) {
+                lastEndedChampionSnapshot.teams = wesmaDeepClone(teams);
+            }
             saveData();
             render();
+            refreshChampionStatusLive();
             closeAddTeamModal();
             showToast("പുതിയ ടീമിനെ ചേർത്തു! / Team added!");
         }
