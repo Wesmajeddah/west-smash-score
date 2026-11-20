@@ -15,6 +15,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <!-- html2canvas for Auto Screenshot -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -455,6 +456,25 @@
     </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
+
+    <!-- WESMA shared Firebase account login; credentials are never stored in source -->
+    <div id="wesma-login-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex items-center justify-center p-4" style="z-index:10000">
+        <form id="wesma-login-form" class="bg-white border border-[#d4af37] w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900" onsubmit="event.preventDefault(); wesmaLogin();">
+            <div class="text-center">
+                <div class="text-xl font-black tracking-widest text-[#5c4033]">WESMA</div>
+                <div class="text-xs text-slate-500 mt-1">BADMINTON CLUB · MEMBER LOGIN</div>
+            </div>
+            <label class="block text-xs font-semibold text-[#5c4033]">Login ID / Email
+                <input id="wesma-login-email" type="email" autocomplete="username" required class="mt-1 w-full border border-[#d7ccc8] rounded-xl px-3 py-3 text-sm" placeholder="Shared account email">
+            </label>
+            <label class="block text-xs font-semibold text-[#5c4033]">Password
+                <input id="wesma-login-password" type="password" autocomplete="current-password" required class="mt-1 w-full border border-[#d7ccc8] rounded-xl px-3 py-3 text-sm" placeholder="Password">
+            </label>
+            <button id="wesma-login-button" type="submit" class="w-full bg-gradient-to-r from-[#5c4033] to-[#8c6239] text-white font-bold py-3 rounded-xl text-sm">LOGIN</button>
+            <p id="wesma-login-error" class="text-xs text-red-700 text-center" role="alert"></p>
+            <p class="text-[10px] text-slate-500 text-center">Use the club's Firebase Email/Password account. Do not share credentials outside the club.</p>
+        </form>
+    </div>
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
@@ -1261,24 +1281,66 @@
         renderHeaderTitle();
         render();
 
+        const WESMA_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAQhe2noBtY5cpaMgMTPXRn5BCnMm_RM18",
+            authDomain: "west-smash.firebaseapp.com",
+            databaseURL: "https://west-smash-default-rtdb.firebaseio.com",
+            projectId: "west-smash",
+            storageBucket: "west-smash.firebasestorage.app",
+            messagingSenderId: "129493554627",
+            appId: "1:129493554627:web:7f53ac649760f3b46e1976",
+            measurementId: "G-QK2BQKR08T"
+        };
+        let wesmaAuth = null;
+        let wesmaAppStarted = false;
+
         try {
             if (typeof firebase !== 'undefined') {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp({
-                        databaseURL: "https://west-smash-default-rtdb.firebaseio.com"
-                    });
-                }
+                if (!firebase.apps.length) firebase.initializeApp(WESMA_FIREBASE_CONFIG);
+                wesmaAuth = firebase.auth();
                 dbRef = firebase.database().ref('wesma_badminton_scores_v135');
                 isFirebaseConnected = false;
             }
         } catch (e) {
             console.error("Firebase init error:", e);
+            const errorBox = document.getElementById("wesma-login-error");
+            if (errorBox) errorBox.textContent = "Firebase initialization failed. Check the project configuration.";
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        function startWesmaAfterLogin() {
+            if (wesmaAppStarted) return;
+            wesmaAppStarted = true;
+            const loginGate = document.getElementById("wesma-login-gate");
+            if (loginGate) loginGate.style.display = "none";
             initData();
             document.body.addEventListener('click', initAudioContext, { once: true });
             document.body.addEventListener('touchstart', initAudioContext, { once: true });
+        }
+
+        async function wesmaLogin() {
+            const email = (document.getElementById("wesma-login-email")?.value || "").trim();
+            const password = document.getElementById("wesma-login-password")?.value || "";
+            const errorBox = document.getElementById("wesma-login-error");
+            const button = document.getElementById("wesma-login-button");
+            if (!wesmaAuth) { if (errorBox) errorBox.textContent = "Firebase Authentication is unavailable."; return; }
+            if (button) { button.disabled = true; button.textContent = "PLEASE WAIT…"; }
+            if (errorBox) errorBox.textContent = "";
+            try {
+                await wesmaAuth.signInWithEmailAndPassword(email, password);
+                startWesmaAfterLogin();
+            } catch (error) {
+                console.error("WESMA login failed:", error);
+                if (errorBox) errorBox.textContent = error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found" ? "Login ID or password is incorrect." : (error.message || "Login failed. Please try again.");
+            } finally {
+                if (button) { button.disabled = false; button.textContent = "LOGIN"; }
+            }
+        }
+        window.wesmaLogin = wesmaLogin;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (wesmaAuth) {
+                wesmaAuth.onAuthStateChanged(user => { if (user) startWesmaAfterLogin(); });
+            }
         });
 
         function initAudioContext() {
@@ -1587,10 +1649,8 @@
                         return;
                     }
                     if (data && data.teams && Array.isArray(data.teams) && data.teams.length > 0) {
-                        // Firebase value events are authoritative snapshots, not user actions.
-                        // Never replay local additive deltas from this listener: doing so and
-                        // calling saveData() creates a feedback loop (wins/losses/plays drift).
-                        // Local edits are persisted only by the explicit saveData() action path.
+                        // Remote Firebase snapshots are authoritative state, never local actions.
+                        // Re-merging and saving a listener event caused additive score drift.
                         const incomingTeams = wesmaDeepClone(data.teams);
                         teamSyncBase = wesmaDeepClone(incomingTeams);
                         teams = incomingTeams;
@@ -2434,14 +2494,15 @@
             };
 
             const localTeamsForWrite = wesmaDeepClone(teams);
-            const baseTeamsForWrite = wesmaDeepClone(teamSyncBase);
             const localNamesForWrite = { ...teamNameOverrides };
-            const baseNamesForWrite = wesmaDeepClone(teamNameSyncBase);
 
             firebaseWritePending += 1;
             firebaseWriteQueue = firebaseWriteQueue
                 .catch(() => false)
                 .then(async () => {
+                    // Use the latest server-confirmed base at execution time for queued saves.
+                    const baseTeamsForWrite = wesmaDeepClone(teamSyncBase);
+                    const baseNamesForWrite = wesmaDeepClone(teamNameSyncBase);
                     const teamResult = await runFirebaseTransaction(dbRef.child("teams"), current =>
                         mergeChangedTeamSnapshot(current, baseTeamsForWrite, localTeamsForWrite));
                     if (!teamResult.committed || !Array.isArray(teamResult.value)) {
