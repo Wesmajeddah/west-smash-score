@@ -356,6 +356,13 @@
         }
 
 
+        /* Keep the existing date menu visible in the compact main header. */
+        #capture-area > div:first-child { display:flex; align-items:center; gap:6px; min-width:0; }
+        #capture-area > div:first-child > div:first-child { flex:1 1 auto; min-width:0; }
+        #header-date-badge-small { display:flex !important; flex:0 0 auto !important; min-width:max-content; position:relative; z-index:100; }
+        #header-date-badge-small > button { display:flex !important; white-space:nowrap; min-height:30px; }
+        #end-modal-reset-dropdown { z-index:200 !important; max-width:min(84vw, 320px); max-height:75vh; overflow-y:auto; }
+
         /* Correct / match-review controls stay inside their existing boxes on mobile. */
         #match-correction-modal label { overflow-wrap:anywhere; line-height:1.35; }
         #match-correction-modal select, #match-correction-modal button { min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; box-sizing:border-box; }
@@ -468,7 +475,6 @@
         <div id="wesma-admin-requests" class="mt-4"></div>
       </div>
     </div>
-    <button id="wesma-admin-open" type="button" onclick="document.getElementById('wesma-device-status').style.display='flex'" class="fixed right-3 top-3 rounded-full bg-[#5c4033] px-3 py-2 text-xs font-bold text-white shadow-lg" style="z-index:99998;display:none">DEVICE ADMIN</button>
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
@@ -519,6 +525,7 @@
                         </div>
                     </div>
                     <div class="text-[9px] text-slate-500 mb-2">Tournament options</div>
+                    <button id="wesma-admin-open" type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); document.getElementById('wesma-device-status').style.display='flex'; attachWesmaAdminRequests();" class="w-full text-left bg-[#5c4033] hover:bg-[#4e342e] text-white font-bold py-2.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1.5 cursor-pointer" style="display:none"><i class="fa-solid fa-shield-halved"></i> DEVICE ADMIN</button>
                     <button type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); resetScores()" class="w-full text-left bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2.5 px-2.5 rounded-lg border border-rose-200 text-[10px] flex items-center gap-1.5 cursor-pointer"><i class="fa-solid fa-rotate-right text-rose-600"></i> ടൂർണമെന്റ് റീസെറ്റ് / Reset</button>
                     <div class="mt-2 pt-2 border-t border-[#e6decb] space-y-1.5">
                         <div class="text-[9px] font-black tracking-wider text-[#5c4033]"><i class="fa-regular fa-clock mr-1"></i> SCHEDULE AUTO RESET & START</div>
@@ -2973,7 +2980,58 @@
             const match = String(scopeValue || "").match(/^history:(\d+)$/);
             if (!match) return [];
             const record = tournamentHistory[Number(match[1])];
-            return record && Array.isArray(record.teams) ? record.teams : [];
+            if (!record || !Array.isArray(record.teams)) return [];
+
+            // History snapshots can contain cumulative team totals from older dates.
+            // Build an isolated, editable copy containing only matches from this session.
+            const sessionStart = Number(record.startTimestamp || record.sessionId || record.id) || 0;
+            const sessionDuration = Number(record.durationMs) || (Number(record.durationMinutes) || 0) * 60000;
+            const nextSessionStart = sessionStart ? (tournamentHistory || [])
+                .map(item => Number(item && (item.startTimestamp || item.sessionId || item.id)) || 0)
+                .filter(stamp => stamp > sessionStart)
+                .sort((a, b) => a - b)[0] || 0 : 0;
+            const sessionEnd = sessionStart
+                ? (sessionDuration ? sessionStart + sessionDuration : (nextSessionStart ? nextSessionStart - 1 : Date.now()))
+                : 0;
+            const dateStart = (() => {
+                if (sessionStart) return 0;
+                const parsed = Date.parse(record.date || "");
+                if (!Number.isFinite(parsed)) return 0;
+                const d = new Date(parsed); d.setHours(0,0,0,0); return d.getTime();
+            })();
+            const dateEnd = dateStart ? dateStart + 86400000 : 0;
+
+            return JSON.parse(JSON.stringify(record.teams)).map(team => {
+                const originalLogs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+                const sessionLogs = originalLogs.filter(log => {
+                    if (!log) return false;
+                    const stamp = Number(log.timestamp) || 0;
+                    if (stamp) {
+                        if (sessionStart) return stamp >= sessionStart && (!sessionEnd || stamp <= sessionEnd);
+                        if (dateStart) return stamp >= dateStart && stamp < dateEnd;
+                        return false;
+                    }
+                    // Untimestamped legacy entries cannot safely be assigned to a date
+                    // when the snapshot contains multiple sessions; exclude them.
+                    return !sessionStart && !dateStart && originalLogs.length > 0;
+                });
+                team.matchHistoryLog = sessionLogs;
+                team.wins = sessionLogs.filter(log => log.result === "WIN").length;
+                team.losses = sessionLogs.filter(log => log.result === "LOSS").length;
+                team.played = team.wins + team.losses;
+                team.totalTimeSpentMinutes = sessionLogs.reduce((sum, log) => sum + (Number(log.durationMinutes) || 0), 0);
+                const winSeqs = new Set(sessionLogs.filter(log => log.result === "WIN" && Number(log.seq) > 0).map(log => Number(log.seq)));
+                team.defeatedDetails = (Array.isArray(team.defeatedDetails) ? team.defeatedDetails : []).filter(detail => {
+                    if (!detail) return false;
+                    const stamp = Number(detail.timestamp) || 0;
+                    if (stamp) {
+                        if (sessionStart) return stamp >= sessionStart && (!sessionEnd || stamp <= sessionEnd);
+                        if (dateStart) return stamp >= dateStart && stamp < dateEnd;
+                    }
+                    return Number(detail.seq) > 0 && winSeqs.has(Number(detail.seq));
+                });
+                return team;
+            });
         }
 
         function getCorrectionMatches(sourceTeams) {
