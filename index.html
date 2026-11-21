@@ -457,13 +457,18 @@
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
 
-    <!-- WESMA device authorization status; no email/password login screen -->
-    <div id="wesma-device-status" class="fixed bottom-2 left-2 right-2 mx-auto max-w-md bg-white/95 border border-[#d4af37] rounded-xl shadow-lg p-3 text-xs text-slate-800" style="z-index:9999;display:none">
-        <div class="font-black text-[#5c4033]">WESMA DEVICE ACCESS</div>
-        <div id="wesma-device-message" class="mt-1">Connecting securely…</div>
-        <div class="mt-1 break-all"><span class="font-bold">Device ID:</span> <code id="wesma-device-uid">Waiting for Firebase…</code></div>
-        <button type="button" onclick="copyWesmaDeviceId()" class="mt-2 px-3 py-1 rounded-lg bg-[#5c4033] text-white font-bold">COPY DEVICE ID</button>
+    <!-- WESMA login-free device approval gate -->
+    <div id="wesma-device-status" class="fixed inset-0 bg-slate-950/80 flex items-center justify-center p-4" style="z-index:99999;display:none">
+      <div class="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl text-slate-800">
+        <div class="text-lg font-black text-[#5c4033]">WESMA DEVICE ACCESS</div>
+        <div id="wesma-device-message" class="mt-2 text-sm">Connecting securely…</div>
+        <div class="mt-3 rounded-lg bg-slate-100 p-3 text-xs break-all"><b>Device ID:</b><br><code id="wesma-device-uid">Waiting for Firebase…</code></div>
+        <button type="button" onclick="copyWesmaDeviceId()" class="mt-2 rounded-lg bg-[#5c4033] px-4 py-2 text-sm font-bold text-white">COPY DEVICE ID</button>
+        <div class="mt-3 flex justify-end"><button type="button" onclick="document.getElementById('wesma-device-status').style.display='none'" class="rounded bg-slate-200 px-3 py-2 text-xs font-bold">CLOSE</button></div>
+        <div id="wesma-admin-requests" class="mt-4"></div>
+      </div>
     </div>
+    <button id="wesma-admin-open" type="button" onclick="document.getElementById('wesma-device-status').style.display='flex'" class="fixed right-3 top-3 rounded-full bg-[#5c4033] px-3 py-2 text-xs font-bold text-white shadow-lg" style="z-index:99998;display:none">DEVICE ADMIN</button>
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
@@ -1280,78 +1285,155 @@
             appId: "1:129493554627:web:7f53ac649760f3b46e1976",
             measurementId: "G-QK2BQKR08T"
         };
+        const WESMA_ADMIN_UID = "JbxyfAryiVVEa6MolR5nwDAMevZ2";
         let wesmaAuth = null;
         let wesmaAppStarted = false;
+        let wesmaAccessRoot = null;
+        let wesmaApprovalListenerAttached = false;
 
         try {
             if (typeof firebase !== 'undefined') {
                 if (!firebase.apps.length) firebase.initializeApp(WESMA_FIREBASE_CONFIG);
                 wesmaAuth = firebase.auth();
+                wesmaAccessRoot = firebase.database().ref('wesma_access');
                 dbRef = firebase.database().ref('wesma_badminton_scores_v135');
                 isFirebaseConnected = false;
             }
         } catch (e) {
             console.error("Firebase init error:", e);
-            const errorBox = document.getElementById("wesma-login-error");
-            if (errorBox) errorBox.textContent = "Firebase initialization failed. Check the project configuration.";
         }
 
         function showWesmaDeviceStatus(message, uid) {
             const panel = document.getElementById("wesma-device-status");
             const msg = document.getElementById("wesma-device-message");
             const id = document.getElementById("wesma-device-uid");
-            if (panel) panel.style.display = "block";
+            if (panel) panel.style.display = "flex";
             if (msg) msg.textContent = message;
             if (id && uid) id.textContent = uid;
         }
-
+        function hideWesmaDeviceStatus() {
+            const panel = document.getElementById("wesma-device-status");
+            if (panel) panel.style.display = "none";
+        }
         async function copyWesmaDeviceId() {
             const uid = wesmaAuth && wesmaAuth.currentUser && wesmaAuth.currentUser.uid;
             if (!uid) return;
-            try {
-                await navigator.clipboard.writeText(uid);
-                showWesmaDeviceStatus("Device ID copied. Add this UID to the Firebase authorized-device rules.", uid);
-            } catch (e) {
-                showWesmaDeviceStatus("Select and copy the Device ID shown below.", uid);
+            try { await navigator.clipboard.writeText(uid); }
+            catch (e) {
+                const range = document.createRange();
+                const node = document.getElementById("wesma-device-uid");
+                if (node) { range.selectNodeContents(node); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
             }
+            const msg = document.getElementById("wesma-device-message");
+            if (msg) msg.textContent = "Device ID copied. Waiting for administrator approval.";
         }
         window.copyWesmaDeviceId = copyWesmaDeviceId;
 
-        function startWesmaAfterLogin() {
+        function escapeWesmaHtml(value) {
+            return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+        }
+        function attachWesmaAdminRequests() {
+            if (wesmaApprovalListenerAttached || !wesmaAccessRoot) return;
+            wesmaApprovalListenerAttached = true;
+            wesmaAccessRoot.child("requests").on("value", snap => {
+                const box = document.getElementById("wesma-admin-requests");
+                if (!box || !wesmaAuth.currentUser || wesmaAuth.currentUser.uid !== WESMA_ADMIN_UID) return;
+                const requests = snap.val() || {};
+                const rows = Object.entries(requests).filter(([uid, data]) => data && data.status !== "approved" && data.status !== "rejected");
+                box.innerHTML = '<div class="border-t pt-3"><div class="font-bold text-sm mb-2">DEVICE APPROVAL REQUESTS (' + rows.length + ')</div>' +
+                  (rows.length ? rows.map(([uid, data]) => '<div class="mb-2 rounded-lg border p-3"><div class="break-all text-xs font-mono">' + escapeWesmaHtml(uid) + '</div><div class="mt-1 text-xs text-slate-500">' + escapeWesmaHtml(data.label || "New device") + '</div><div class="mt-2 flex gap-2"><button data-wesma-approve="' + escapeWesmaHtml(uid) + '" class="rounded bg-green-700 px-3 py-2 text-xs font-bold text-white">APPROVE</button><button data-wesma-reject="' + escapeWesmaHtml(uid) + '" class="rounded bg-red-700 px-3 py-2 text-xs font-bold text-white">REJECT</button></div></div>').join("") : '<div class="text-xs text-slate-500">No pending requests.</div>') +
+                  '<div class="mt-3 border-t pt-3"><div class="font-bold text-sm mb-2">APPROVED DEVICES</div><div id="wesma-approved-list" class="text-xs text-slate-600">Loading…</div></div></div>';
+                box.querySelectorAll("[data-wesma-approve]").forEach(btn => btn.addEventListener("click", async () => {
+                    const uid = btn.getAttribute("data-wesma-approve");
+                    try {
+                        await wesmaAccessRoot.child("approved").child(uid).set(true);
+                        await wesmaAccessRoot.child("requests").child(uid).update({status:"approved", reviewedAt: firebase.database.ServerValue.TIMESTAMP});
+                    } catch (e) { alert("Approval failed: " + (e.message || e)); }
+                }));
+                box.querySelectorAll("[data-wesma-reject]").forEach(btn => btn.addEventListener("click", async () => {
+                    const uid = btn.getAttribute("data-wesma-reject");
+                    try { await wesmaAccessRoot.child("requests").child(uid).update({status:"rejected", reviewedAt: firebase.database.ServerValue.TIMESTAMP}); }
+                    catch (e) { alert("Reject failed: " + (e.message || e)); }
+                }));
+                wesmaAccessRoot.child("approved").once("value").then(approvedSnap => {
+                    const list = document.getElementById("wesma-approved-list");
+                    if (!list) return;
+                    const approved = Object.entries(approvedSnap.val() || {}).filter(([,v]) => v === true);
+                    list.innerHTML = approved.length ? approved.map(([uid]) => '<div class="flex items-center justify-between gap-2 border-b py-2"><code class="break-all">' + escapeWesmaHtml(uid) + '</code><button data-wesma-revoke="' + escapeWesmaHtml(uid) + '" class="shrink-0 rounded bg-red-700 px-2 py-1 text-white">REVOKE</button></div>').join("") : "No approved devices.";
+                    list.querySelectorAll("[data-wesma-revoke]").forEach(btn => btn.addEventListener("click", async () => {
+                        const uid = btn.getAttribute("data-wesma-revoke");
+                        if (!confirm("Revoke access for this device?")) return;
+                        try { await wesmaAccessRoot.child("approved").child(uid).remove(); }
+                        catch (e) { alert("Revoke failed: " + (e.message || e)); }
+                    }));
+                }).catch(e => console.error("Approved device list error:", e));
+            });
+        }
+
+        function startWesmaAfterApproval() {
             if (wesmaAppStarted) return;
             wesmaAppStarted = true;
-            const uid = wesmaAuth && wesmaAuth.currentUser ? wesmaAuth.currentUser.uid : "";
-            showWesmaDeviceStatus("Firebase identity created. This device must be added to the Firebase authorized-device list before cloud data can sync.", uid);
+            hideWesmaDeviceStatus();
             initData();
             document.body.addEventListener('click', initAudioContext, { once: true });
             document.body.addEventListener('touchstart', initAudioContext, { once: true });
         }
 
-        // Silent per-device Firebase Anonymous Auth. Database rules must whitelist
-        // each approved UID; anonymous sign-in alone does NOT grant database access.
+        async function checkWesmaDeviceApproval(user) {
+            const uid = user.uid;
+            if (uid === WESMA_ADMIN_UID) {
+                const adminButton = document.getElementById("wesma-admin-open");
+                if (adminButton) adminButton.style.display = "block";
+                showWesmaDeviceStatus("Administrator access granted. Use DEVICE ADMIN to approve or revoke devices.", uid);
+                attachWesmaAdminRequests();
+                startWesmaAfterApproval();
+                return;
+            }
+            try {
+                const approvalSnap = await wesmaAccessRoot.child("approved").child(uid).once("value");
+                if (approvalSnap.val() === true) {
+                    startWesmaAfterApproval();
+                    return;
+                }
+                const requestRef = wesmaAccessRoot.child("requests").child(uid);
+                const requestSnap = await requestRef.once("value");
+                if (!requestSnap.exists() || requestSnap.val().status === "rejected") {
+                    await requestRef.set({status:"pending", label:(navigator.userAgent || "Web device").slice(0,180), requestedAt:firebase.database.ServerValue.TIMESTAMP});
+                }
+                const status = requestSnap.exists() && requestSnap.val().status === "rejected" ? "Your previous request was rejected. Contact the administrator." : "Access request sent. This device will open automatically after administrator approval.";
+                showWesmaDeviceStatus(status, uid);
+                wesmaAccessRoot.child("approved").child(uid).on("value", approvedState => {
+                    if (approvedState.val() === true) location.reload();
+                });
+                if (requestSnap.exists() && requestSnap.val().status === "rejected") {
+                    const msg = document.getElementById("wesma-device-message");
+                    if (msg) msg.textContent = status;
+                }
+            } catch (error) {
+                console.error("WESMA approval check failed:", error);
+                showWesmaDeviceStatus("Could not check approval. Verify Firebase Rules and internet connection.", uid);
+            }
+        }
+
         let wesmaAnonymousSignInStarted = false;
         async function startWesmaDeviceAuth() {
             if (!wesmaAuth) {
                 showWesmaDeviceStatus("Firebase SDK/configuration unavailable. Check internet and Firebase settings.");
                 return;
             }
-            if (wesmaAuth.currentUser) {
-                startWesmaAfterLogin();
-                return;
-            }
+            if (wesmaAuth.currentUser) { checkWesmaDeviceApproval(wesmaAuth.currentUser); return; }
             if (wesmaAnonymousSignInStarted) return;
             wesmaAnonymousSignInStarted = true;
-            showWesmaDeviceStatus("Creating this device's secure Firebase identity…");
+            showWesmaDeviceStatus("Creating secure device identity…");
             try {
                 await wesmaAuth.signInAnonymously();
-                if (wesmaAuth.currentUser) startWesmaAfterLogin();
+                if (wesmaAuth.currentUser) await checkWesmaDeviceApproval(wesmaAuth.currentUser);
             } catch (error) {
-                console.error("WESMA anonymous device authentication failed:", error);
+                console.error("WESMA anonymous authentication failed:", error);
                 const messages = {
-                    "auth/operation-not-allowed": "Firebase Console → Authentication → Sign-in method → Anonymous must be enabled.",
-                    "auth/unauthorized-domain": "Add wesmajeddah.github.io under Firebase Authentication → Settings → Authorized domains.",
-                    "auth/network-request-failed": "Firebase authentication network request failed. Check network/DNS/browser restrictions.",
-                    "auth/too-many-requests": "Too many attempts. Wait and try again."
+                    "auth/operation-not-allowed": "Enable Anonymous Sign-in in Firebase Authentication.",
+                    "auth/unauthorized-domain": "Add wesmajeddah.github.io to Firebase Authorized domains.",
+                    "auth/network-request-failed": "Authentication network request failed. Check internet connection."
                 };
                 showWesmaDeviceStatus(messages[String(error && error.code || "").toLowerCase()] || ("Device authentication failed: " + (error.code || error.message || "unknown error")));
                 wesmaAnonymousSignInStarted = false;
@@ -1360,7 +1442,7 @@
 
         if (wesmaAuth) {
             wesmaAuth.onAuthStateChanged(user => {
-                if (user) startWesmaAfterLogin();
+                if (user) checkWesmaDeviceApproval(user);
                 else startWesmaDeviceAuth();
             }, error => {
                 console.error("WESMA auth state observer error:", error);
