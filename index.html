@@ -56,13 +56,6 @@
         body.history-preview-mode #history-special-view-modal,
         body.history-preview-mode #history-special-view-modal * { pointer-events:auto !important; }
         
-        /* Responsive header: keep the date badge visible on narrow phones. */
-        #capture-area > .flex.items-center.justify-between { min-width:0; flex-wrap:nowrap !important; gap:6px; }
-        #header-date-badge-small { display:flex !important; flex:0 0 auto !important; min-width:max-content; position:relative; z-index:100; visibility:visible !important; }
-        #header-date-badge-small > button { display:flex !important; min-width:max-content; white-space:nowrap !important; min-height:30px; }
-        #header-date-text { display:inline-flex !important; white-space:nowrap !important; visibility:visible !important; }
-        #end-modal-reset-dropdown { z-index:200 !important; max-width:min(84vw, 320px); max-height:75vh; overflow-y:auto; }
-
         .wesma-title {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
@@ -363,6 +356,68 @@
         }
 
 
+        /* Keep the date control visible on narrow phones without squeezing it off-screen. */
+        #capture-area > div:first-child {
+            display:grid !important;
+            grid-template-columns:minmax(0,1fr) max-content;
+            align-items:center;
+            column-gap:6px;
+            width:100%;
+            min-width:0;
+            overflow:visible !important;
+        }
+        #capture-area > div:first-child > div:first-child {
+            display:flex !important;
+            flex:1 1 auto;
+            flex-wrap:wrap !important;
+            align-items:center;
+            gap:4px !important;
+            min-width:0;
+        }
+        #header-date-badge-small {
+            display:flex !important;
+            flex:0 0 auto !important;
+            width:max-content !important;
+            min-width:max-content !important;
+            max-width:none !important;
+            position:relative;
+            z-index:100;
+            justify-self:end;
+            visibility:visible !important;
+            opacity:1 !important;
+        }
+        #header-date-badge-small > button {
+            display:flex !important;
+            flex:0 0 auto !important;
+            width:max-content !important;
+            min-width:max-content !important;
+            white-space:nowrap !important;
+            min-height:34px;
+            padding:6px 9px;
+            font-size:10px !important;
+            line-height:1.2;
+            color:#5c4033 !important;
+            background:#f5f0eb !important;
+            visibility:visible !important;
+            opacity:1 !important;
+        }
+        #header-date-text {
+            display:inline-flex !important;
+            align-items:center;
+            flex:0 0 auto !important;
+            width:max-content !important;
+            min-width:max-content !important;
+            white-space:nowrap !important;
+            color:#5c4033 !important;
+            visibility:visible !important;
+            opacity:1 !important;
+        }
+        #end-modal-reset-dropdown { z-index:200 !important; max-width:min(84vw, 320px); max-height:75vh; overflow-y:auto; }
+        @media (max-width:360px) {
+            #header-date-badge-small > button { padding:5px 6px; font-size:9px !important; }
+            #capture-area > div:first-child > div:first-child { column-gap:3px !important; }
+        }
+
         /* Correct / match-review controls stay inside their existing boxes on mobile. */
         #match-correction-modal label { overflow-wrap:anywhere; line-height:1.35; }
         #match-correction-modal select, #match-correction-modal button { min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; box-sizing:border-box; }
@@ -525,7 +580,7 @@
                         </div>
                     </div>
                     <div class="text-[9px] text-slate-500 mb-2">Tournament options</div>
-                    <button id="wesma-admin-open" type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); document.getElementById('wesma-device-status').style.display='flex'" class="w-full text-left bg-[#f5f0eb] hover:bg-[#ebdcd0] text-[#5c4033] font-bold py-2.5 px-2.5 rounded-lg border border-[#d7ccc8] text-[10px] flex items-center gap-1.5 cursor-pointer mb-2" style="display:none"><i class="fa-solid fa-mobile-screen-button"></i> DEVICE ADMIN</button>
+                    <button id="wesma-admin-open" type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); document.getElementById('wesma-device-status').style.display='flex'; attachWesmaAdminRequests();" class="w-full text-left bg-[#5c4033] hover:bg-[#4e342e] text-white font-bold py-2.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1.5 cursor-pointer" style="display:none"><i class="fa-solid fa-shield-halved"></i> DEVICE ADMIN</button>
                     <button type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); resetScores()" class="w-full text-left bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2.5 px-2.5 rounded-lg border border-rose-200 text-[10px] flex items-center gap-1.5 cursor-pointer"><i class="fa-solid fa-rotate-right text-rose-600"></i> ടൂർണമെന്റ് റീസെറ്റ് / Reset</button>
                     <div class="mt-2 pt-2 border-t border-[#e6decb] space-y-1.5">
                         <div class="text-[9px] font-black tracking-wider text-[#5c4033]"><i class="fa-regular fa-clock mr-1"></i> SCHEDULE AUTO RESET & START</div>
@@ -1390,7 +1445,7 @@
             const uid = user.uid;
             if (uid === WESMA_ADMIN_UID) {
                 const adminButton = document.getElementById("wesma-admin-open");
-                if (adminButton) adminButton.style.display = "flex";
+                if (adminButton) adminButton.style.display = "block";
                 showWesmaDeviceStatus("Administrator access granted. Use DEVICE ADMIN to approve or revoke devices.", uid);
                 attachWesmaAdminRequests();
                 startWesmaAfterApproval();
@@ -1727,16 +1782,29 @@
             }
         }
 
-        function refreshHeaderDateLabels() {
+        function refreshVisibleDateLabels() {
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const dateText = document.getElementById("header-date-text");
-            if (dateText) dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
+            if (dateText) {
+                dateText.replaceChildren();
+                const icon = document.createElement("i");
+                icon.className = "fa-regular fa-calendar-days text-[9px] mr-1";
+                icon.setAttribute("aria-hidden", "true");
+                dateText.append(icon, document.createTextNode(todayStr));
+                dateText.setAttribute("aria-label", "Date: " + todayStr);
+            }
             const dateMenuDate = document.getElementById("date-menu-current-date");
             if (dateMenuDate) dateMenuDate.textContent = todayStr;
         }
 
+        // Populate the date immediately and again after browser page restoration.
+        refreshVisibleDateLabels();
+        document.addEventListener("DOMContentLoaded", refreshVisibleDateLabels, { once:true });
+        window.addEventListener("pageshow", refreshVisibleDateLabels);
+        window.addEventListener("focus", refreshVisibleDateLabels);
+
         function initData() {
-            refreshHeaderDateLabels();
+            refreshVisibleDateLabels();
 
             renderHeaderTitle();
             render();
@@ -1931,26 +1999,28 @@
             return sortLatestFirst(team.defeatedDetails)[0];
         }
 
-        function getCurrentSessionLatestDefeatEvent() {
-            const sessionStart = Number(tournamentStartTimestamp) || 0;
+        function getCurrentSessionLastDefeated() {
+            // Last Defeated is a LIVE-session indicator, not an archive of every
+            // previous match. Ignore entries saved before the current session began.
+            const sessionStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
+            if (!sessionStart) return null;
             const events = [];
             (Array.isArray(teams) ? teams : []).forEach(winner => {
-                (Array.isArray(winner && winner.matchHistoryLog) ? winner.matchHistoryLog : []).forEach(log => {
-                    if (!log || log.result !== "WIN") return;
-                    const loser = teams.find(candidate => candidate && (
-                        (log.opponentId != null && String(candidate.id) === String(log.opponentId)) ||
-                        (log.opponentId == null && candidate.name === log.opponent)
-                    ));
+                if (!winner || winner.isDisabled || !Array.isArray(winner.defeatedDetails)) return;
+                winner.defeatedDetails.forEach(defeat => {
+                    if (!defeat || !defeat.name) return;
+                    const timestamp = normalizeHistoryTimestamp(defeat.timestamp);
+                    if (!timestamp || timestamp < sessionStart) return;
+                    const loser = teams.find(team => team && team.name === defeat.name);
                     if (!loser) return;
-                    const seq = Number(log.seq) || 0;
-                    const paired = (loser.matchHistoryLog || []).some(item => item && item.result === "LOSS" &&
-                        (seq > 0 ? Number(item.seq) === seq :
-                            ((item.opponentId != null && String(item.opponentId) === String(winner.id)) || item.opponent === winner.name)));
-                    if (!paired) return;
-                    const timestamp = Number(log.timestamp) || 0;
-                    // A new live session must not inherit old/undated legacy defeat rows.
-                    if (sessionStart && (!timestamp || timestamp < sessionStart)) return;
-                    events.push({ winner: winner.name, loser: loser.name, seq, timestamp, durationMinutes: Math.max(0, Number(log.durationMinutes) || 0) });
+                    const seq = Number(defeat.seq) || 0;
+                    const hasWin = (winner.matchHistoryLog || []).some(log => log && log.result === "WIN" &&
+                        (seq ? Number(log.seq) === seq : log.opponent === loser.name));
+                    const hasLoss = (loser.matchHistoryLog || []).some(log => log && log.result === "LOSS" &&
+                        (seq ? Number(log.seq) === seq : log.opponent === winner.name));
+                    if (!hasWin || !hasLoss) return;
+                    events.push({ winner: winner.name, loser: defeat.name, seq, timestamp,
+                        durationMinutes: Number(defeat.durationMinutes) || 0 });
                 });
             });
             events.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
@@ -1960,11 +2030,11 @@
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
-            const latest = getCurrentSessionLatestDefeatEvent();
+            const latest = getCurrentSessionLastDefeated();
             if (latest) {
                 barEl.innerHTML = `<span class="text-slate-950 font-bold">${escapeHtml(latest.winner)}</span> Last Defeated <span class="text-rose-600 font-bold">${escapeHtml(latest.loser)}</span>`;
             } else {
-                barEl.textContent = "No matches played yet";
+                barEl.textContent = "No matches played in this live session yet";
             }
         }
 
@@ -1973,11 +2043,19 @@
             const modal = document.getElementById("last-defeated-history-modal");
             const content = document.getElementById("last-defeated-history-content");
             if (!modal || !content) return;
-            const latest = getCurrentSessionLatestDefeatEvent();
+            const latest = getCurrentSessionLastDefeated();
             if (!latest) {
                 content.innerHTML = `<div class="text-slate-500 italic text-center py-6">No completed match in the current live session yet.</div>`;
             } else {
-                content.innerHTML = `<div class="bg-[#fcfbf9] p-3 rounded-lg border border-[#e6decb] flex justify-between items-center text-[11px] gap-2"><div class="min-w-0 flex-1 break-words leading-tight name-wrapper"><span class="text-emerald-700 font-bold uppercase">${escapeHtml(latest.winner)}</span><span class="text-slate-600"> Defeated </span><span class="text-rose-600 font-bold uppercase">${escapeHtml(latest.loser)}</span></div><span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${latest.durationMinutes}m</span></div>`;
+                content.innerHTML = `
+                    <div class="bg-[#fcfbf9] p-3 rounded-lg border border-[#e6decb] flex justify-between items-center text-[11px] gap-2">
+                        <div class="min-w-0 flex-1 break-words leading-tight name-wrapper">
+                            <span class="text-emerald-700 font-bold uppercase">${escapeHtml(latest.winner)}</span>
+                            <span class="text-slate-600"> Defeated </span>
+                            <span class="text-rose-600 font-bold uppercase">${escapeHtml(latest.loser)}</span>
+                        </div>
+                        <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${latest.durationMinutes}m</span>
+                    </div>`;
             }
             modal.classList.remove("hidden");
         }
@@ -2004,18 +2082,51 @@
             return teams.reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
         }
 
+        function normalizeHistoryTimestamp(value) {
+            if (value == null || value === "") return 0;
+            if (typeof value === "number" || /^\d+(?:\.\d+)?$/.test(String(value).trim())) {
+                const numeric = Number(value);
+                if (!Number.isFinite(numeric) || numeric <= 0) return 0;
+                return numeric < 100000000000 ? numeric * 1000 : numeric;
+            }
+            const parsed = Date.parse(String(value));
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
         function historyDateKey(record) {
             if (!record) return "";
-            if (record.dateKey) return String(record.dateKey);
-            const stamp = Number(record.startTimestamp || record.sessionId || record.id || 0);
-            if (stamp > 0) {
+            const explicitKey = String(record.dateKey || "").trim();
+            const isoMatch = explicitKey.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+            if (isoMatch) return `${isoMatch[1]}-${String(isoMatch[2]).padStart(2,'0')}-${String(isoMatch[3]).padStart(2,'0')}`;
+            const stamp = normalizeHistoryTimestamp(record.startTimestamp || record.sessionId || record.id);
+            if (stamp) {
                 const d = new Date(stamp);
                 return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             }
-            const raw = String(record.date || "");
+            const raw = String(record.date || explicitKey || "").trim();
             const parsed = new Date(raw);
             if (!Number.isNaN(parsed.getTime())) return `${parsed.getFullYear()}-${String(parsed.getMonth()+1).padStart(2,'0')}-${String(parsed.getDate()).padStart(2,'0')}`;
+            const dmy = raw.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+            if (dmy) return `${dmy[3]}-${String(dmy[2]).padStart(2,'0')}-${String(dmy[1]).padStart(2,'0')}`;
             return raw.split(",")[0].trim();
+        }
+
+        function getHistoryRecordWindow(record) {
+            const start = normalizeHistoryTimestamp(record && (record.startTimestamp || record.sessionId || record.id));
+            const durationMs = Math.max(0, Number(record && record.durationMs) || (Number(record && record.durationMinutes) || 0) * 60000);
+            if (start && durationMs > 0) return { start, end: start + durationMs + 1, mode:"session" };
+            const dateKey = historyDateKey(record);
+            const parts = dateKey.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (parts) {
+                const dayStart = new Date(Number(parts[1]), Number(parts[2])-1, Number(parts[3])).getTime();
+                return { start:dayStart, end:new Date(Number(parts[1]), Number(parts[2])-1, Number(parts[3])+1).getTime(), mode:"date" };
+            }
+            return { start:0, end:0, mode:"unknown" };
+        }
+
+        function isTimestampInHistoryWindow(value, windowRange) {
+            const stamp = normalizeHistoryTimestamp(value);
+            return !!(stamp && windowRange && windowRange.start && stamp >= windowRange.start && stamp < windowRange.end);
         }
 
         function historyRecordFingerprint(record) {
@@ -2700,8 +2811,8 @@
 
             const sessionDurationMs = tournamentStartTimestamp ? Math.max(0, Date.now() - Number(tournamentStartTimestamp)) : 0;
             if (sessionDurationMs < 60 * 60 * 1000) {
-                // Do not set sessionHistorySavedId here: that would permanently block
-                // a later eligible save if this function is retried after the hour mark.
+                // Do not mark this session as saved yet: if the same session later
+                // reaches one hour, End Match must still be able to archive it.
                 saveLocalBackup();
                 showToast("⏳ ഒരു മണിക്കൂർ പൂർത്തിയായ സെഷനുകൾ മാത്രമേ History-യിൽ സേവ് ചെയ്യൂ.");
                 return false;
@@ -2951,7 +3062,7 @@
             scope.innerHTML = '<option value="current">നിലവിലെ ടൂർണമെന്റ് / LIVE</option>';
             (tournamentHistory || []).map((record, index) => ({ record, index }))
                 .sort((a, b) => {
-                    const stamp = item => Number(item.record && (item.record.startTimestamp || item.record.sessionId || item.record.id)) || Date.parse(item.record && item.record.date || "") || 0;
+                    const stamp = item => normalizeHistoryTimestamp(item.record && (item.record.startTimestamp || item.record.sessionId || item.record.id)) || Date.parse(historyDateKey(item.record)) || 0;
                     return stamp(b) - stamp(a) || b.index - a.index;
                 }).forEach(({ record, index }) => {
                     const option = document.createElement("option");
@@ -2970,43 +3081,74 @@
             matchCorrectionTarget = null;
         }
 
-        // Reconcile derived team counters after a single match is removed/corrected.
-        // This only touches the teams involved in that match; unrelated teams are never changed.
-        function reconcileTeamAfterMatchEdit(team) {
-            if (!team) return;
-            const logs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
-            const valid = logs.filter(log => log && (log.result === "WIN" || log.result === "LOSS"));
-            team.wins = valid.filter(log => log.result === "WIN").length;
-            team.losses = valid.filter(log => log.result === "LOSS").length;
-            team.played = team.wins + team.losses;
-            // A log is one participant's copy of a match, so summing its durations
-            // does not double-count within an individual team's statistics.
-            if (valid.every(log => Number.isFinite(Number(log.durationMinutes)))) {
-                team.totalTimeSpentMinutes = valid.reduce((sum, log) => sum + Math.max(0, Number(log.durationMinutes) || 0), 0);
-            }
-            const latest = valid.slice().sort((a, b) =>
-                (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0) ||
-                (Number(b.seq) || 0) - (Number(a.seq) || 0)
-            )[0];
-            if (latest) {
-                team.lastMatchTime = Math.max(0, Number(latest.durationMinutes) || 0);
-                team.matchInterval = team.lastMatchTime;
-                team.lastClickTime = Number(latest.timestamp) || team.lastClickTime || 0;
-                team.clickOrder = Number(latest.seq) || team.clickOrder || 0;
-            } else {
-                team.lastMatchTime = 0;
-                team.matchInterval = 0;
-                team.lastClickTime = 0;
-                team.clickOrder = 0;
-            }
-        }
-
         function getCorrectionTeamsForScope(scopeValue) {
             if (scopeValue === "current") return teams;
             const match = String(scopeValue || "").match(/^history:(\d+)$/);
             if (!match) return [];
             const record = tournamentHistory[Number(match[1])];
-            return record && Array.isArray(record.teams) ? record.teams : [];
+            if (!record || !Array.isArray(record.teams)) return [];
+
+            // A History option represents one saved session. Use its exact start/end
+            // when available, rather than accidentally mixing neighbouring dates.
+            const windowRange = getHistoryRecordWindow(record);
+            const clonedTeams = JSON.parse(JSON.stringify(record.teams));
+            const allLogs = clonedTeams.flatMap(team => Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : []);
+            const hasAnyUsableTimestamp = allLogs.some(log => normalizeHistoryTimestamp(log && log.timestamp) > 0);
+
+            return clonedTeams.map(team => {
+                const originalLogs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+                team.matchHistoryLog = originalLogs.filter(log => {
+                    const stamp = normalizeHistoryTimestamp(log && log.timestamp);
+                    if (stamp) return isTimestampInHistoryWindow(stamp, windowRange);
+                    // Old records with no timestamps at all are kept as a legacy
+                    // snapshot; mixed timestamped records cannot safely date unknown rows.
+                    return !hasAnyUsableTimestamp && windowRange.mode !== "unknown";
+                });
+                team.wins = team.matchHistoryLog.filter(log => log && log.result === "WIN").length;
+                team.losses = team.matchHistoryLog.filter(log => log && log.result === "LOSS").length;
+                team.played = team.wins + team.losses;
+                team.totalTimeSpentMinutes = team.matchHistoryLog.reduce((sum, log) => sum + (Number(log && log.durationMinutes) || 0), 0);
+                const validSeqs = new Set(team.matchHistoryLog.filter(log => log && Number(log.seq) > 0).map(log => Number(log.seq)));
+                team.defeatedDetails = (Array.isArray(team.defeatedDetails) ? team.defeatedDetails : []).filter(detail => {
+                    const stamp = normalizeHistoryTimestamp(detail && detail.timestamp);
+                    if (stamp) return isTimestampInHistoryWindow(stamp, windowRange);
+                    return !hasAnyUsableTimestamp && (Number(detail && detail.seq) > 0 ? validSeqs.has(Number(detail.seq)) : true);
+                });
+                return team;
+            });
+        }
+
+        function mergeCorrectedDateIntoHistoryTeams(record, correctedDateTeams) {
+            const windowRange = getHistoryRecordWindow(record);
+            const sourceTeams = JSON.parse(JSON.stringify(record.teams || []));
+            const correctedTeams = Array.isArray(correctedDateTeams) ? correctedDateTeams : [];
+            const allLogs = sourceTeams.flatMap(team => Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : []);
+            const hasAnyUsableTimestamp = allLogs.some(log => normalizeHistoryTimestamp(log && log.timestamp) > 0);
+            return sourceTeams.map(originalTeam => {
+                const correctedTeam = correctedTeams.find(team => String(team.id) === String(originalTeam.id));
+                if (!correctedTeam) return originalTeam;
+                const allOriginalLogs = Array.isArray(originalTeam.matchHistoryLog) ? originalTeam.matchHistoryLog : [];
+                const otherSessionLogs = allOriginalLogs.filter(log => {
+                    const stamp = normalizeHistoryTimestamp(log && log.timestamp);
+                    if (stamp) return !isTimestampInHistoryWindow(stamp, windowRange);
+                    return hasAnyUsableTimestamp || windowRange.mode === "unknown";
+                });
+                const selectedSessionLogs = Array.isArray(correctedTeam.matchHistoryLog) ? correctedTeam.matchHistoryLog : [];
+                originalTeam.matchHistoryLog = [...otherSessionLogs, ...selectedSessionLogs].sort((a,b) => normalizeHistoryTimestamp(a && a.timestamp) - normalizeHistoryTimestamp(b && b.timestamp));
+                originalTeam.wins = originalTeam.matchHistoryLog.filter(log => log && log.result === "WIN").length;
+                originalTeam.losses = originalTeam.matchHistoryLog.filter(log => log && log.result === "LOSS").length;
+                originalTeam.played = originalTeam.wins + originalTeam.losses;
+                originalTeam.totalTimeSpentMinutes = originalTeam.matchHistoryLog.reduce((sum, log) => sum + (Number(log && log.durationMinutes) || 0), 0);
+                const originalDetails = Array.isArray(originalTeam.defeatedDetails) ? originalTeam.defeatedDetails : [];
+                const otherSessionDetails = originalDetails.filter(detail => {
+                    const stamp = normalizeHistoryTimestamp(detail && detail.timestamp);
+                    if (stamp) return !isTimestampInHistoryWindow(stamp, windowRange);
+                    return hasAnyUsableTimestamp || windowRange.mode === "unknown";
+                });
+                const correctedDetails = Array.isArray(correctedTeam.defeatedDetails) ? correctedTeam.defeatedDetails : [];
+                originalTeam.defeatedDetails = [...otherSessionDetails, ...correctedDetails];
+                return originalTeam;
+            });
         }
 
         function getCorrectionMatches(sourceTeams) {
@@ -3023,7 +3165,7 @@
                         if (!pairedLoss) return;
                         matches.push({ seq: String(Number(log.seq)), label: `MATCH #${Number(log.seq)}`, winnerId: winner.id, loserId: loser.id,
                             winnerName: winner.name, loserName: loser.name, duration: Number(log.durationMinutes || pairedLoss.durationMinutes || 0),
-                            timestamp: Number(log.timestamp || pairedLoss.timestamp || 0) });
+                            timestamp: normalizeHistoryTimestamp(log.timestamp || pairedLoss.timestamp || 0) });
                     } else {
                         // Older saved logs may not have a global sequence. Pair the nth
                         // result between the same two teams using their original log order.
@@ -3036,7 +3178,7 @@
                         if (!pairedLoss) return;
                         matches.push({ seq: `legacy:${winner.id}:${loser.id}:${legacyOrdinal}`, label: `LEGACY MATCH • ${priorWins}`,
                             winnerId: winner.id, loserId: loser.id, winnerName: winner.name, loserName: loser.name,
-                            duration: Number(log.durationMinutes || pairedLoss.durationMinutes || 0), timestamp: Number(log.timestamp || pairedLoss.timestamp || 0) });
+                            duration: Number(log.durationMinutes || pairedLoss.durationMinutes || 0), timestamp: normalizeHistoryTimestamp(log.timestamp || pairedLoss.timestamp || 0) });
                     }
                 });
             });
@@ -3130,11 +3272,14 @@
             const duration = Number(winLog.durationMinutes || lossLog.durationMinutes || 0);
             if (!confirm(`MATCH ${legacy ? "(LEGACY)" : "#" + sequence} സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?\n${winner.name} vs ${loser.name}\nഈ മാച്ചിന്റെ WIN, LOSS, PLAYED, TIME കണക്കുകൾ മാത്രം കുറയ്ക്കും.`)) return;
             if (isCurrent) captureUndoSnapshot(`DELETED MATCH ${sequence}`);
-            winner.totalTimeSpentMinutes = Math.max(0, (Number(winner.totalTimeSpentMinutes) || 0) - duration);
-            loser.totalTimeSpentMinutes = Math.max(0, (Number(loser.totalTimeSpentMinutes) || 0) - duration);
             winner.matchHistoryLog = (winner.matchHistoryLog || []).filter(log => log !== winLog);
             loser.matchHistoryLog = (loser.matchHistoryLog || []).filter(log => log !== lossLog);
-            // Derived totals are recalculated from the remaining valid match logs below.
+            winner.wins = Math.max(0,(Number(winner.wins)||0)-1);
+            loser.losses = Math.max(0,(Number(loser.losses)||0)-1);
+            winner.played = Math.max(0,(Number(winner.played)||0)-1);
+            loser.played = Math.max(0,(Number(loser.played)||0)-1);
+            winner.totalTimeSpentMinutes = Math.max(0,(Number(winner.totalTimeSpentMinutes)||0)-duration);
+            loser.totalTimeSpentMinutes = Math.max(0,(Number(loser.totalTimeSpentMinutes)||0)-duration);
             const seq = Number(winLog.seq || lossLog.seq || 0);
             const removeDefeat = (team, opponentName) => {
                 if (!Array.isArray(team.defeatedDetails)) return;
@@ -3143,8 +3288,6 @@
             };
             removeDefeat(winner,loser.name);
             removeDefeat(loser,winner.name);
-            reconcileTeamAfterMatchEdit(winner);
-            reconcileTeamAfterMatchEdit(loser);
             if (isCurrent) {
                 saveData(); render(); renderMatchCorrectionList();
                 showToast("മാച്ച് ഡിലീറ്റ് ചെയ്തു. ബന്ധപ്പെട്ട ടീമുകളുടെ കണക്കുകൾ മാത്രം പുതുക്കി.");
@@ -3155,9 +3298,10 @@
                 if (!record) { alert("History record കണ്ടെത്താനായില്ല."); return; }
                 const key = String(record.sessionId || record.startTimestamp || record.id || "");
                 const fingerprint = historyRecordFingerprint(record);
+                const correctedFullTeams = mergeCorrectedDateIntoHistoryTeams(record, editingTeams);
                 const updateRecords = list => (Array.isArray(list) ? list : Object.values(list || {})).map(item => {
                     const itemKey = String(item.sessionId || item.startTimestamp || item.id || "");
-                    return (key ? itemKey === key : historyRecordFingerprint(item) === fingerprint) ? {...item, teams:editingTeams} : item;
+                    return (key ? itemKey === key : historyRecordFingerprint(item) === fingerprint) ? {...item, teams:correctedFullTeams} : item;
                 });
                 if (dbRef) {
                     dbRef.child("tournamentHistory").transaction(current => updateRecords(current), (error, committed, snapshot) => {
@@ -3234,8 +3378,6 @@
             if (scopeEl.value === "current") captureUndoSnapshot(actionLabel);
 
             if (markAsNotPlayed) {
-                oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
-                oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
                 // Keep both log entries in their original sequence, but mark them VOID.
                 // This preserves the match timeline while removing only this result from stats.
                 oldWinnerLog.result = "VOID";
@@ -3245,6 +3387,12 @@
                 oldLoserLog.voided = true;
                 oldLoserLog.voidReason = "NOT_PLAYED";
 
+                oldWinner.wins = Math.max(0, (Number(oldWinner.wins) || 0) - 1);
+                oldLoser.losses = Math.max(0, (Number(oldLoser.losses) || 0) - 1);
+                oldWinner.played = Math.max(0, (Number(oldWinner.played) || 0) - 1);
+                oldLoser.played = Math.max(0, (Number(oldLoser.played) || 0) - 1);
+                oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
+                oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
 
                 // Remove exactly one matching defeated-detail entry, not every past meeting.
                 const removeOneDefeat = (team, opponentName) => {
@@ -3256,11 +3404,15 @@
                 removeOneDefeat(oldWinner, oldLoserName);
                 removeOneDefeat(oldLoser, oldWinnerName);
             } else {
-                oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
-                oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
                 // Remove the original paired result and update only the original participants.
                 oldWinner.matchHistoryLog = (oldWinner.matchHistoryLog || []).filter(item => item !== oldWinnerLog);
                 oldLoser.matchHistoryLog = (oldLoser.matchHistoryLog || []).filter(item => item !== oldLoserLog);
+                oldWinner.wins = Math.max(0, (Number(oldWinner.wins) || 0) - 1);
+                oldLoser.losses = Math.max(0, (Number(oldLoser.losses) || 0) - 1);
+                oldWinner.played = Math.max(0, (Number(oldWinner.played) || 0) - 1);
+                oldLoser.played = Math.max(0, (Number(oldLoser.played) || 0) - 1);
+                oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
+                oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
                 oldWinner.defeatedDetails = (oldWinner.defeatedDetails || []).filter(d =>
                     seq > 0 ? Number(d.seq) !== seq : !(d && d.name === oldLoserName));
                 oldLoser.defeatedDetails = (oldLoser.defeatedDetails || []).filter(d =>
@@ -3282,12 +3434,8 @@
                 newWinner.totalTimeSpentMinutes = (Number(newWinner.totalTimeSpentMinutes) || 0) + duration;
                 newLoser.totalTimeSpentMinutes = (Number(newLoser.totalTimeSpentMinutes) || 0) + duration;
                 if (!Array.isArray(newWinner.defeatedDetails)) newWinner.defeatedDetails = [];
-                newWinner.defeatedDetails.push({ name: newLoser.name, ...(seq > 0 ? { seq } : {}), timestamp, durationMinutes: duration });
+                newWinner.defeatedDetails.push({ name: newLoser.name, ...(seq > 0 ? { seq } : {}), durationMinutes: duration });
             }
-
-            [oldWinner, oldLoser, newWinner, newLoser].filter(Boolean)
-                .filter((team, index, list) => list.indexOf(team) === index)
-                .forEach(reconcileTeamAfterMatchEdit);
 
             if (scopeEl.value === "current") {
                 saveData();
@@ -3303,7 +3451,7 @@
                 if (!selectedRecord) { alert("History record കണ്ടെത്താനായില്ല."); return; }
                 const selectedKey = String(selectedRecord.sessionId || selectedRecord.startTimestamp || selectedRecord.id || "");
                 const selectedFingerprint = historyRecordFingerprint(selectedRecord);
-                const correctedTeams = editingTeams;
+                const correctedTeams = mergeCorrectedDateIntoHistoryTeams(selectedRecord, editingTeams);
                 const applyRecord = list => {
                     const normalized = Array.isArray(list) ? list : (list && typeof list === "object" ? Object.values(list) : []);
                     return normalized.map(record => {
@@ -4752,23 +4900,20 @@
                     }
 
                     captureUndoSnapshot(`${team.name} team win score reduced by -1.`);
-                    const removedDuration = Math.max(0, Number(removedLog.durationMinutes) || Number(opponent.matchHistoryLog[pairedLossIndex].durationMinutes) || 0);
-                    team.totalTimeSpentMinutes = Math.max(0, (Number(team.totalTimeSpentMinutes) || 0) - removedDuration);
-                    opponent.totalTimeSpentMinutes = Math.max(0, (Number(opponent.totalTimeSpentMinutes) || 0) - removedDuration);
+                    team.wins = Math.max(0, (Number(team.wins) || 0) - 1);
+                    team.played = Math.max(0, (Number(team.played) || 0) - 1);
                     team.matchHistoryLog = (team.matchHistoryLog || []).filter(m => m !== removedLog);
                     team.defeatedDetails = (team.defeatedDetails || []).filter(d =>
-                        removedSeq > 0 ? Number(d.seq) !== removedSeq : !(d && d.name === removedLog.opponent && !d.seq)
+                        removedSeq > 0 ? Number(d.seq) !== removedSeq : !(d.name === removedLog.opponent && !d.seq)
                     );
+                    opponent.losses = Math.max(0, (Number(opponent.losses) || 0) - 1);
+                    opponent.played = Math.max(0, (Number(opponent.played) || 0) - 1);
                     opponent.matchHistoryLog.splice(pairedLossIndex, 1);
-                    // Remove only this match's paired result and reconcile only its two participants.
-                    reconcileTeamAfterMatchEdit(team);
-                    reconcileTeamAfterMatchEdit(opponent);
                     // Keep the global sequence monotonic; removed history entries must not reuse old IDs.
 
                     saveData();
                     render();
-                    renderMatchCorrectionList();
-                    showToast(`⚠️ ${team.name} സ്കോർ കുറച്ചു. ബന്ധപ്പെട്ട match record-ും കണക്കുകളും മാത്രം നീക്കി.`);
+                    showToast(`⚠️ ${team.name} സ്കോർ കുറച്ചു!`);
                 } else {
                     showToast("⚠️ സ്കോർ ഇതിലും കുറവില്ല!");
                 }
@@ -5407,8 +5552,7 @@
             const already = (tournamentHistory || []).some(r =>
                 String(r.sessionId || r.startTimestamp || r.id || "") === sid);
 
-            const previousSessionDurationMs = Math.max(0, due - oldStart);
-            if (plays > 0 && !already && previousSessionDurationMs >= 60 * 60 * 1000) {
+            if (plays > 0 && !already && (due - oldStart) >= 60 * 60 * 1000) {
                 const date = new Date(oldStart).toLocaleString("en-GB", {
                     day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
                 });
@@ -5417,8 +5561,8 @@
                     dateKey: historyDateKey({ startTimestamp: sid }),
                     teams: oldTeams, totalPlays: plays,
                     totalMatches: Math.floor((plays + 0.5) / 2),
-                    durationMinutes: Math.floor(previousSessionDurationMs / 60000),
-                    durationMs: previousSessionDurationMs
+                    durationMinutes: Math.max(0, Math.floor((due - oldStart) / 60000)),
+                    durationMs: Math.max(0, due - oldStart)
                 };
                 tournamentHistory = dedupeHistoryRecords([rec, ...(tournamentHistory || [])]);
             }
@@ -5477,10 +5621,9 @@
                 let history = dedupeHistoryRecords(current.tournamentHistory || []);
                 const sid = String(oldStart);
                 const already = history.some(r=>String(r.sessionId||r.startTimestamp||r.id||"")===sid);
-                const previousSessionDurationMs = Math.max(0, due - oldStart);
-                if (plays > 0 && !already && previousSessionDurationMs >= 60 * 60 * 1000) {
+                if (plays > 0 && !already && (due - oldStart) >= 60 * 60 * 1000) {
                     const date = new Date(oldStart).toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
-                    const rec = {id:sid,sessionId:sid,startTimestamp:sid,date,dateKey:historyDateKey({startTimestamp:sid}),teams:JSON.parse(JSON.stringify(oldTeams)),totalPlays:plays,totalMatches:Math.floor((plays+0.5)/2),durationMinutes:Math.floor(previousSessionDurationMs/60000),durationMs:previousSessionDurationMs};
+                    const rec = {id:sid,sessionId:sid,startTimestamp:sid,date,dateKey:historyDateKey({startTimestamp:sid}),teams:JSON.parse(JSON.stringify(oldTeams)),totalPlays:plays,totalMatches:Math.floor((plays+0.5)/2),durationMinutes:Math.max(0,Math.floor((due-oldStart)/60000)),durationMs:Math.max(0,due-oldStart)};
                     history = dedupeHistoryRecords([rec,...history]);
                 }
                 const names = current.teamNameOverrides || Object.fromEntries(oldTeams.map(t=>[String(t.id),t.name]));
