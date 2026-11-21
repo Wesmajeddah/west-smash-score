@@ -468,7 +468,7 @@
         <div id="wesma-admin-requests" class="mt-4"></div>
       </div>
     </div>
-    <button id="wesma-admin-open" type="button" onclick="document.getElementById('wesma-device-status').style.display='flex'" class="fixed right-3 top-3 rounded-full bg-[#5c4033] px-3 py-2 text-xs font-bold text-white shadow-lg" style="z-index:99998;display:none">DEVICE ADMIN</button>
+
 
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
@@ -505,11 +505,12 @@
                     <button id="main-start-button" onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#d4af37] to-[#a8793e] hover:from-[#c49b2e] hover:to-[#8c6239] text-[#2c221e] font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-[#8c6239]"><i class="fa-solid fa-play text-[7px]"></i> START</button>
                 </div>
             </div>
-            <div id="header-date-badge-small" class="relative bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] rounded-md tracking-wider shadow-2xs">
-                <button type="button" onclick="toggleEndModalResetDropdown(event)" class="w-full h-full px-2 py-1 flex items-center justify-center gap-1.5 cursor-pointer" title="Open date menu">
-                    <span id="header-date-text"><i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> --</span>
+            <div id="header-date-badge-small" class="relative bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] rounded-md tracking-wider shadow-2xs flex items-center gap-1 px-1.5 py-1 min-w-0">
+                <button type="button" onclick="toggleEndModalResetDropdown(event)" class="px-1 flex items-center justify-center gap-1.5 cursor-pointer min-w-0" title="Open date menu">
+                    <span id="header-date-text" class="whitespace-nowrap"><i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> --</span>
                     <i class="fa-solid fa-chevron-down text-[7px]"></i>
                 </button>
+                <button id="wesma-admin-open" type="button" onclick="event.stopPropagation(); document.getElementById('wesma-device-status').style.display='flex'" class="rounded bg-[#5c4033] px-1.5 py-1 text-[8px] font-black text-white whitespace-nowrap" style="display:none">DEVICE ADMIN</button>
                 <div id="end-modal-reset-dropdown" class="hidden absolute right-0 top-full mt-1 w-52 bg-white border border-[#d7ccc8] rounded-xl shadow-2xl p-2.5 z-[90] text-left">
                     <div class="flex items-center gap-2 pb-2 mb-2 border-b border-[#e6decb]">
                         <span class="w-7 h-7 rounded-lg bg-[#f5f0eb] text-[#8c6239] flex items-center justify-center"><i class="fa-regular fa-calendar-days"></i></span>
@@ -1724,7 +1725,15 @@
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const dateText = document.getElementById("header-date-text");
-            if(dateText) dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
+            if (dateText) {
+                dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
+                dateText.style.display = "inline";
+                dateText.style.visibility = "visible";
+            }
+            if (dateBadgeSmall) {
+                dateBadgeSmall.style.display = "flex";
+                dateBadgeSmall.style.visibility = "visible";
+            }
             const dateMenuDate = document.getElementById("date-menu-current-date");
             if (dateMenuDate) dateMenuDate.textContent = todayStr;
 
@@ -1921,27 +1930,55 @@
             return sortLatestFirst(team.defeatedDetails)[0];
         }
 
+        function getCurrentSessionDefeatEvents() {
+            const events = [];
+            (Array.isArray(teams) ? teams : []).forEach(winner => {
+                (Array.isArray(winner.matchHistoryLog) ? winner.matchHistoryLog : []).forEach(log => {
+                    if (!log || log.result !== "WIN") return;
+                    const loser = teams.find(team =>
+                        String(team.id) === String(log.opponentId) ||
+                        (!log.opponentId && String(team.name) === String(log.opponent))
+                    );
+                    events.push({
+                        winner: winner.name,
+                        loser: log.opponent || (loser && loser.name) || "Unknown team",
+                        seq: Number(log.seq) || 0,
+                        timestamp: Number(log.timestamp) || 0,
+                        durationMinutes: Number(log.durationMinutes) || 1
+                    });
+                });
+            });
+
+            // Compatibility fallback for older saved data that has defeatedDetails
+            // but predates matchHistoryLog. Do not mix this with modern logs, as
+            // doing so duplicates each defeat and can surface stale entries.
+            if (events.length === 0) {
+                (Array.isArray(teams) ? teams : []).forEach(winner => {
+                    (Array.isArray(winner.defeatedDetails) ? winner.defeatedDetails : []).forEach(item => {
+                        if (!item) return;
+                        events.push({
+                            winner: winner.name,
+                            loser: item.name || "Unknown team",
+                            seq: Number(item.seq) || 0,
+                            timestamp: Number(item.timestamp) || 0,
+                            durationMinutes: Number(item.durationMinutes) || 1
+                        });
+                    });
+                });
+            }
+
+            return events.sort((a, b) =>
+                (Number(b.seq) || 0) - (Number(a.seq) || 0) ||
+                (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)
+            );
+        }
+
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
-
-            let allDefeats = [];
-            teams.forEach(t => {
-                if (!t.isDisabled && t.defeatedDetails && t.defeatedDetails.length > 0) {
-                    t.defeatedDetails.forEach(d => {
-                        allDefeats.push({
-                            winner: t.name,
-                            loser: d.name,
-                            seq: d.seq || 0
-                        });
-                    });
-                }
-            });
-
-            allDefeats.sort((a, b) => (Number(b.seq)||0) - (Number(a.seq)||0));
-
+            const allDefeats = getCurrentSessionDefeatEvents();
             if (allDefeats.length > 0) {
-                let lastEvent = allDefeats[0];
+                const lastEvent = allDefeats[0];
                 barEl.innerHTML = `<span class="text-slate-950 font-bold">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-600 font-bold">${escapeHtml(lastEvent.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
@@ -1954,40 +1991,21 @@
             const content = document.getElementById("last-defeated-history-content");
             if (!modal || !content) return;
 
-            let allDefeats = [];
-            teams.forEach(t => {
-                if (t.defeatedDetails && t.defeatedDetails.length > 0) {
-                    t.defeatedDetails.forEach(d => {
-                        allDefeats.push({
-                            winner: t.name,
-                            loser: d.name,
-                            seq: d.seq || 0,
-                            durationMinutes: d.durationMinutes || 1
-                        });
-                    });
-                }
-            });
-
-            allDefeats = sortLatestFirst(allDefeats);
-
+            const allDefeats = getCurrentSessionDefeatEvents();
             if (allDefeats.length === 0) {
                 content.innerHTML = `<div class="text-slate-500 italic text-center py-6">No matches played yet.</div>`;
             } else {
-                let html = "";
-                allDefeats.forEach((item, index) => {
-                    html += `
-                        <div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] gap-2">
-                            <div class="min-w-0 flex-1 break-words leading-tight name-wrapper">
-                                <span class="text-[#5c4033] font-bold">#${allDefeats.length - index}</span> 
-                                <span class="text-emerald-700 font-bold uppercase">${escapeHtml(item.winner)}</span>
-                                <span class="text-slate-600"> Defeated </span>
-                                <span class="text-rose-600 font-bold uppercase">${escapeHtml(item.loser)}</span>
-                            </div>
-                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${item.durationMinutes}m</span>
+                content.innerHTML = allDefeats.map((item, index) => `
+                    <div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] gap-2">
+                        <div class="min-w-0 flex-1 break-words leading-tight name-wrapper">
+                            <span class="text-[#5c4033] font-bold">#${allDefeats.length - index}</span>
+                            <span class="text-emerald-700 font-bold uppercase">${escapeHtml(item.winner)}</span>
+                            <span class="text-slate-600"> Defeated </span>
+                            <span class="text-rose-600 font-bold uppercase">${escapeHtml(item.loser)}</span>
                         </div>
-                    `;
-                });
-                content.innerHTML = html;
+                        <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${item.durationMinutes}m</span>
+                    </div>
+                `).join("");
             }
             modal.classList.remove("hidden");
         }
@@ -2540,13 +2558,21 @@
                         const delta = (Number(localValue) || 0) - (Number(baseValue) || 0);
                         remoteTeam[key] = (Number(remoteTeam[key]) || 0) + delta;
                     } else if (mergeArrayFields.has(key) && Array.isArray(localValue)) {
-                        const combined = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
-                        const seen = new Set(combined.map(item => JSON.stringify(item)));
-                        localValue.forEach(item => {
-                            const signature = JSON.stringify(item);
-                            if (!seen.has(signature)) { combined.push(wesmaDeepClone(item)); seen.add(signature); }
-                        });
-                        remoteTeam[key] = combined;
+                        const baseArray = Array.isArray(baseValue) ? baseValue : [];
+                        // A shorter array means this device intentionally removed records
+                        // or reset the active session. Preserve that deletion on Firebase;
+                        // otherwise old defeated/history entries reappear after reset.
+                        if (localValue.length < baseArray.length) {
+                            remoteTeam[key] = wesmaDeepClone(localValue);
+                        } else {
+                            const combined = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
+                            const seen = new Set(combined.map(item => JSON.stringify(item)));
+                            localValue.forEach(item => {
+                                const signature = JSON.stringify(item);
+                                if (!seen.has(signature)) { combined.push(wesmaDeepClone(item)); seen.add(signature); }
+                            });
+                            remoteTeam[key] = combined;
+                        }
                     } else {
                         remoteTeam[key] = wesmaDeepClone(localValue);
                     }
