@@ -1844,6 +1844,8 @@
                         // Remote Firebase snapshots are authoritative state, never local actions.
                         // Re-merging and saving a listener event caused additive score drift.
                         const incomingTeams = wesmaDeepClone(data.teams);
+                        const loadedSessionEpoch = String((data.sessionStartGuard && data.sessionStartGuard.sessionId) || "");
+                        if (loadedSessionEpoch) incomingTeams.forEach(team => { if (team && !team.sessionId) team.sessionId = loadedSessionEpoch; });
                         teamSyncBase = wesmaDeepClone(incomingTeams);
                         teams = incomingTeams;
 
@@ -2653,9 +2655,18 @@
                 const remoteTeam = remoteById.get(id);
 
                 if (!baseTeam) {
-                    // A team created on this device is appended without replacing
-                    // teams created on another connected device.
-                    if (!remoteTeam) {
+                    // A reset creates a new session epoch. It must replace stale
+                    // remote team data even when this device had no prior sync base.
+                    if (localTeam.sessionId && (!remoteTeam || String(remoteTeam.sessionId || '') !== String(localTeam.sessionId))) {
+                        const fresh = wesmaDeepClone(localTeam);
+                        if (remoteTeam) {
+                            const at = remote.indexOf(remoteTeam);
+                            if (at >= 0) remote[at] = fresh;
+                        } else {
+                            remote.push(fresh);
+                        }
+                        remoteById.set(id, fresh);
+                    } else if (!remoteTeam) {
                         const added = wesmaDeepClone(localTeam);
                         remote.push(added);
                         remoteById.set(id, added);
@@ -2669,6 +2680,21 @@
                     remoteById.set(id, restored);
                     return;
                 }
+
+                const baseEpoch = String(baseTeam.sessionId || '');
+                const localEpoch = String(localTeam.sessionId || '');
+                const remoteEpoch = String(remoteTeam.sessionId || '');
+                // If this device has a newer reset epoch, replace the old session
+                // wholesale. If Firebase already has a newer epoch, ignore writes
+                // from a stale phone so old scores cannot resurrect after reset.
+                if (localEpoch !== baseEpoch) {
+                    const fresh = wesmaDeepClone(localTeam);
+                    const at = remote.indexOf(remoteTeam);
+                    if (at >= 0) remote[at] = fresh;
+                    remoteById.set(id, fresh);
+                    return;
+                }
+                if (remoteEpoch !== baseEpoch) return;
 
                 Object.keys(localTeam).forEach(key => {
                     const localValue = localTeam[key];
@@ -2808,9 +2834,21 @@
                     if (namesResult.value && typeof namesResult.value === "object") {
                         teamNameSyncBase = wesmaDeepClone(namesResult.value);
                     }
-                    return dbRef.update(payload);
+                    // Atomically fence stale devices at the root as well: a phone
+                    // from the previous session must not overwrite the new session's
+                    // timestamps, sequence counter, lock state or undo stack.
+                    const localSessionEpoch = String((localTeamsForWrite[0] && localTeamsForWrite[0].sessionId) || "");
+                    const rootResult = await runFirebaseTransaction(dbRef, current => {
+                        const root = current && typeof current === "object" ? current : {};
+                        const remoteGuard = root.sessionStartGuard && typeof root.sessionStartGuard === "object" ? root.sessionStartGuard : {};
+                        const remoteEpoch = String(remoteGuard.sessionId || (root.teams && root.teams[0] && root.teams[0].sessionId) || "");
+                        if (remoteEpoch && remoteEpoch !== localSessionEpoch) return;
+                        return { ...root, ...payload };
+                    });
+                    if (!rootResult.committed) throw new Error("STALE_SESSION_WRITE_BLOCKED");
+                    return true;
                 })
-                .then(() => { firebaseLastWriteError = null; return true; })
+                .then((result) => { if (result === false) return false; firebaseLastWriteError = null; return true; })
                 .catch((error) => {
                     firebaseLastWriteError = error;
                     console.error("Firebase write error (local backup retained):", error);
@@ -5548,6 +5586,22 @@
                 teamNameOverrides[String(team.id)] = team.name;
             });
             const resetAt = Date.now();
+            const newSessionId = String(resetAt);
+            // Tag every fresh team with a session epoch. This prevents stale phones
+            // from merging old-session counters back after a reset.
+            teams.forEach(team => {
+                team.sessionId = newSessionId;
+                team.wins = 0;
+                team.losses = 0;
+                team.played = 0;
+                team.totalTimeSpentMinutes = 0;
+                team.defeatedDetails = [];
+                team.matchHistoryLog = [];
+                team.lastMatchTime = 0;
+                team.lastClickTime = 0;
+                team.clickOrder = 0;
+                team.matchInterval = 0;
+            });
             // A reset must clear the active-session timestamp. Keeping resetAt here
             // makes other devices mistake the reset state for a running match.
             tournamentStartTimestamp = null;
@@ -5572,10 +5626,42 @@
             applyTouchLockState();
             updateStartButtonState();
 
-            const resetGuard = { active: false, startedAt: null, resetAt, sessionId: String(resetAt) };
-            const firebaseSaved = dbRef ? await saveData({ sessionStartGuard: resetGuard }) : true;
+            const resetGuard = { active: false, startedAt: null, resetAt, sessionId: newSessionId };
+            let firebaseSaved = true;
+            if (dbRef) {
+                try {
+                    // Finish earlier queued writes first, then atomically publish the
+                    // fresh teams and reset metadata while preserving saved History.
+                    await firebaseWriteQueue.catch(() => false);
+                    const resetResult = await runFirebaseTransaction(dbRef, current => ({
+                        ...(current && typeof current === "object" ? current : {}),
+                        teams: wesmaDeepClone(teams),
+                        teamNameOverrides: { ...teamNameOverrides },
+                        tournamentStartTimestamp: null,
+                        lastActionTimestamp: resetAt,
+                        globalClickSequence: 0,
+                        isMatchEnded: false,
+                        isTournamentLocked: true,
+                        lastActionSnapshot: null,
+                        lastActionDescription: "",
+                        undoHistoryStack: [],
+                        redoHistoryStack: [],
+                        sessionHistorySavedId: null,
+                        scheduledMatchStartAt: null,
+                        sessionStartGuard: resetGuard
+                    }));
+                    firebaseSaved = !!resetResult.committed;
+                    if (firebaseSaved && Array.isArray(resetResult.value && resetResult.value.teams)) {
+                        teamSyncBase = wesmaDeepClone(resetResult.value.teams);
+                        teamNameSyncBase = wesmaDeepClone(resetResult.value.teamNameOverrides || teamNameOverrides);
+                    }
+                } catch (resetError) {
+                    console.error("Atomic new-session reset failed:", resetError);
+                    firebaseSaved = false;
+                }
+            }
             if (dbRef && !firebaseSaved) {
-                showToast("⚠️ Reset ഈ ഫോണിൽ നടന്നു; Firebase sync പരാജയപ്പെട്ടു. കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.");
+                showToast("⚠️ Reset ഈ ഫോണിൽ മാത്രം നടന്നു; Firebase sync സ്ഥിരീകരിച്ചിട്ടില്ല. കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.");
                 return false;
             }
             showToast("ടൂർണമെന്റ് റീസെറ്റ് ചെയ്തു! പഴയ History സുരക്ഷിതമാണ്. START അമർത്തുക.");
@@ -5744,7 +5830,7 @@
                     history = dedupeHistoryRecords([rec,...history]);
                 }
                 const names = current.teamNameOverrides || Object.fromEntries(oldTeams.map(t=>[String(t.id),t.name]));
-                const fresh = JSON.parse(JSON.stringify(defaultTeams)).map(t=>({...t,name:names[String(t.id)]||t.name}));
+                const fresh = JSON.parse(JSON.stringify(defaultTeams)).map(t=>({...t,name:names[String(t.id)]||t.name,sessionId:String(due)}));
                 return {...current,teams:fresh,teamNameOverrides:Object.fromEntries(fresh.map(t=>[String(t.id),t.name])),tournamentHistory:history,tournamentStartTimestamp:due,lastActionTimestamp:due,globalClickSequence:0,isMatchEnded:false,isTournamentLocked:false,lastActionSnapshot:null,lastActionDescription:"",undoHistoryStack:[],redoHistoryStack:[],sessionHistorySavedId:null,scheduledMatchStartAt:null,lastTriggeredScheduledStartAt:due,sessionStartGuard:{active:true,startedAt:due,sessionId:String(due)}};
             },(error,committed,snapshot)=>{
                 scheduledStartCheckInProgress = false;
