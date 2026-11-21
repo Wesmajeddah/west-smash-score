@@ -1237,18 +1237,21 @@
 
         // BWF INTERNATIONAL STANDARD TIE-BREAKER SORTING FUNCTION
         function getInternationalSortedTeams(teamsArray) {
-            return [...teamsArray].sort((a, b) => {
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                const aWins = Math.max(0, Number(a.wins) || 0);
-                const bWins = Math.max(0, Number(b.wins) || 0);
-                const aLosses = Math.max(0, Number(a.losses) || 0);
-                const bLosses = Math.max(0, Number(b.losses) || 0);
+            return [...(Array.isArray(teamsArray) ? teamsArray : [])].sort((a, b) => {
+                const aWins = Math.max(0, Number(a && a.wins) || 0);
+                const bWins = Math.max(0, Number(b && b.wins) || 0);
+                if (bWins !== aWins) return bWins - aWins;
+                const aLosses = Math.max(0, Number(a && a.losses) || 0);
+                const bLosses = Math.max(0, Number(b && b.losses) || 0);
                 if (aLosses !== bLosses) return aLosses - bLosses;
-                
-                let h2hWinA = 0;
-                let h2hWinB = 0;
-                if (a.defeatedDetails) h2hWinA = a.defeatedDetails.filter(d => d.name === b.name).length;
-                if (b.defeatedDetails) h2hWinB = b.defeatedDetails.filter(d => d.name === a.name).length;
+
+                // Prefer stable team IDs so renaming a team cannot erase its head-to-head result.
+                const defeatedBy = (winner, opponent) => (Array.isArray(winner && winner.defeatedDetails) ? winner.defeatedDetails : []).filter(detail =>
+                    detail && ((detail.teamId != null && String(detail.teamId) === String(opponent && opponent.id)) ||
+                        (detail.teamId == null && detail.name === (opponent && opponent.name)))
+                ).length;
+                const h2hWinA = defeatedBy(a, b);
+                const h2hWinB = defeatedBy(b, a);
                 if (h2hWinA !== h2hWinB) return h2hWinB - h2hWinA;
 
                 const aPlayed = Math.max(aWins + aLosses, 1);
@@ -1546,6 +1549,9 @@
                 gate.style.display = "none";
                 gate.classList.add("hidden");
             }
+            if (tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded) {
+                isLocalStartGateVisible = false;
+            }
             render();
             updateMatchStatusBadge();
             updateMainTopLastDefeatedBar();
@@ -1580,6 +1586,7 @@
             // Joining an already-running session is a local UI/timer action only.
             // Do NOT saveData() here: that could overwrite newer scores from another phone.
             tournamentStartTimestamp = safeStart;
+            teams.forEach(team => { if (team) team.sessionId = String(safeStart); });
             isMatchEnded = false;
             isTournamentLocked = false;
             isLocalStartGateVisible = false;
@@ -1598,6 +1605,9 @@
             const safeStart = Number(startedAt) || Date.now();
             tournamentStartTimestamp = safeStart;
             lastActionTimestamp = safeStart;
+            // The reset epoch is only provisional. Once START is confirmed, every
+            // team's sync epoch must match the active sessionStartGuard sessionId.
+            teams.forEach(team => { if (team) team.sessionId = String(safeStart); });
             isMatchEnded = false;
             isTournamentLocked = false;
             isLocalStartGateVisible = false;
@@ -1844,10 +1854,23 @@
                         // Remote Firebase snapshots are authoritative state, never local actions.
                         // Re-merging and saving a listener event caused additive score drift.
                         const incomingTeams = wesmaDeepClone(data.teams);
-                        const loadedSessionEpoch = String((data.sessionStartGuard && data.sessionStartGuard.sessionId) || "");
-                        if (loadedSessionEpoch) incomingTeams.forEach(team => { if (team && !team.sessionId) team.sessionId = loadedSessionEpoch; });
+                        // Normalize the local view to the active guard's epoch. Keep any
+                        // unsaved local edits by three-way merging them over the incoming
+                        // Firebase snapshot before advancing the sync base.
+                        const loadedSessionEpoch = String(
+                            (data.sessionStartGuard && data.sessionStartGuard.sessionId) ||
+                            (data.sessionStartGuard && data.sessionStartGuard.active === true && data.tournamentStartTimestamp) || ""
+                        );
+                        if (data.sessionStartGuard && data.sessionStartGuard.active === true && loadedSessionEpoch) {
+                            incomingTeams.forEach(team => { if (team) team.sessionId = loadedSessionEpoch; });
+                        } else if (loadedSessionEpoch) {
+                            incomingTeams.forEach(team => { if (team && !team.sessionId) team.sessionId = loadedSessionEpoch; });
+                        }
+                        const mergedIncomingTeams = teamSyncBase
+                            ? mergeChangedTeamSnapshot(incomingTeams, teamSyncBase, wesmaDeepClone(teams))
+                            : wesmaDeepClone(incomingTeams);
                         teamSyncBase = wesmaDeepClone(incomingTeams);
-                        teams = incomingTeams;
+                        teams = mergedIncomingTeams;
 
                         const incomingNameOverrides = data.teamNameOverrides && typeof data.teamNameOverrides === 'object'
                             ? wesmaDeepClone(data.teamNameOverrides)
@@ -1889,6 +1912,12 @@
                             const legacyActive = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
                             dbRef.child("sessionStartGuard").transaction(current => current || { active: legacyActive, startedAt: tournamentStartTimestamp || null }, () => {}, false);
                             startGuardActive = legacyActive;
+                        }
+                        // A device that has passed the DEVICE ADMIN approval gate can join
+                        // the currently running shared match immediately. Do not leave the
+                        // score buttons covered by the local START overlay on every reload.
+                        if (tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded) {
+                            isLocalStartGateVisible = false;
                         }
                         if (JSON.stringify(tournamentHistory) !== JSON.stringify(firebaseHistory)) {
                             persistMergedHistory();
@@ -1977,27 +2006,25 @@
         }
 
         function sortLatestFirst(records) {
-            // New records carry a global sequence. Legacy records without one retain
-            // their original relative order and are placed ahead of older sequence-less rows.
+            // Timestamp is the reliable cross-device order; sequence is only a tie-breaker
+            // because separate phones can briefly produce the same local sequence value.
             return (Array.isArray(records) ? records : [])
-                .map((item, index) => ({ item, index, seq: Number(item && item.seq) || 0 }))
-                .sort((a, b) => {
-                    if (a.seq > 0 && b.seq > 0) return b.seq - a.seq || b.index - a.index;
-                    if (a.seq > 0) return -1;
-                    if (b.seq > 0) return 1;
-                    return b.index - a.index;
-                })
+                .map((item, index) => ({ item, index, seq: Number(item && item.seq) || 0, timestamp: normalizeHistoryTimestamp(item && item.timestamp) }))
+                .sort((a, b) => b.timestamp - a.timestamp || b.seq - a.seq || b.index - a.index)
                 .map(entry => entry.item);
         }
 
         function getLatestDefeatRecord(team) {
             if (!team) return null;
             const logs = getCurrentSessionMatchHistory(team);
-            const losses = logs.filter(m => m && m.result === 'LOSS');
+            const losses = logs.filter(m => m && String(m.result || '').toUpperCase() === 'LOSS');
             if (losses.length) return sortLatestFirst(losses)[0];
             const recovered = [];
             teams.forEach(winner => (winner.matchHistoryLog || []).forEach(m => {
-                if (m && m.result === 'WIN' && (m.opponentId === team.id || (!m.opponentId && m.opponent === team.name))) recovered.push({opponent:winner.name,seq:Number(m.seq)||0,durationMinutes:m.durationMinutes||1});
+                if (m && String(m.result || '').toUpperCase() === 'WIN' &&
+                    ((m.opponentId != null && String(m.opponentId) === String(team.id)) || (m.opponentId == null && m.opponent === team.name))) {
+                    recovered.push({opponent:winner.name,seq:Number(m.seq)||0,timestamp:m.timestamp,durationMinutes:m.durationMinutes||1});
+                }
             }));
             return sortLatestFirst(recovered)[0] || null;
         }
@@ -2015,41 +2042,81 @@
         }
 
         function getCurrentSessionLastDefeatedEvents() {
-            // Only show completed, paired results from the current live session.
+            // Build the list from each winner's defeat records, but validate each
+            // record against BOTH sides of the current-session match logs.
+            // Important: sequence numbers alone are not globally unique across
+            // devices/teams, so they must never be used as a de-duplication key.
             const sessionStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
-            if (!sessionStart) return [];
+            if (!sessionStart || !Array.isArray(teams)) return [];
+            const currentSessionId = String(sessionStart);
             const events = [];
-            (Array.isArray(teams) ? teams : []).forEach(winner => {
+
+            teams.forEach(winner => {
                 if (!winner || !Array.isArray(winner.defeatedDetails)) return;
+                const winnerLogs = getCurrentSessionMatchHistory(winner);
+
                 winner.defeatedDetails.forEach(defeat => {
                     if (!defeat || !defeat.name) return;
+                    const defeatSessionId = String(defeat.sessionId || '');
                     const timestamp = normalizeHistoryTimestamp(defeat.timestamp);
-                    if (!timestamp || timestamp < sessionStart) return;
+                    if (defeatSessionId) {
+                        if (defeatSessionId !== currentSessionId) return;
+                    } else if (!timestamp || timestamp < sessionStart) {
+                        return;
+                    }
+                    if (!timestamp) return;
+
                     const seq = Number(defeat.seq) || 0;
+                    const matchId = String(defeat.matchId || '');
                     const loser = teams.find(team => team && (
                         (defeat.teamId != null && String(team.id) === String(defeat.teamId)) ||
-                        (team.name === defeat.name)
+                        (defeat.teamId == null && team.name === defeat.name) ||
+                        (defeat.teamId == null && winnerLogs.some(log => log && String(log.result || '').toUpperCase() === 'WIN' &&
+                            (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) &&
+                            log.opponentId != null && String(log.opponentId) === String(team.id)))
                     ));
-                    if (!loser) return;
-                    const hasWin = getCurrentSessionMatchHistory(winner).some(log => log && log.result === "WIN" &&
-                        (seq ? Number(log.seq) === seq :
-                            ((log.opponentId != null && String(log.opponentId) === String(loser.id)) || log.opponent === loser.name)));
-                    const hasLoss = getCurrentSessionMatchHistory(loser).some(log => log && log.result === "LOSS" &&
-                        (seq ? Number(log.seq) === seq :
-                            ((log.opponentId != null && String(log.opponentId) === String(winner.id)) || log.opponent === winner.name)));
+                    if (!loser || String(loser.id) === String(winner.id)) return;
+
+                    const matchesOpponent = (log, opponent) => {
+                        if (!log || !opponent) return false;
+                        const idMatches = log.opponentId != null && String(log.opponentId) === String(opponent.id);
+                        const nameMatches = String(log.opponent || '') === String(opponent.name || '');
+                        return idMatches || nameMatches;
+                    };
+                    const hasWin = winnerLogs.some(log =>
+                        String(log.result || '').toUpperCase() === 'WIN' &&
+                        (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) && matchesOpponent(log, loser)
+                    );
+                    const hasLoss = getCurrentSessionMatchHistory(loser).some(log =>
+                        String(log.result || '').toUpperCase() === 'LOSS' &&
+                        (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) && matchesOpponent(log, winner)
+                    );
                     if (!hasWin || !hasLoss) return;
+
                     events.push({
-                        winner: winner.name, loser: loser.name, seq, timestamp,
+                        winner: winner.name,
+                        loser: loser.name,
+                        winnerId: winner.id,
+                        loserId: loser.id,
+                        matchId,
+                        seq,
+                        timestamp,
                         durationMinutes: Number(defeat.durationMinutes) || 0
                     });
                 });
             });
+
             events.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
-            // Defensive de-duplication: each completed match appears once.
+            // Distinct matches remain distinct even if different devices produced
+            // the same sequence number. Only duplicate copies of the SAME pairing
+            // and sequence are collapsed.
             const seen = new Set();
             return events.filter(event => {
-                const key = event.seq > 0 ? `seq:${event.seq}` :
-                    `legacy:${event.timestamp}:${event.winner}:${event.loser}`;
+                const key = event.matchId
+                    ? `match-id:${event.matchId}`
+                    : (event.seq > 0
+                        ? `match:${event.seq}:${event.winnerId}:${event.loserId}`
+                        : `legacy:${event.timestamp}:${event.winnerId}:${event.loserId}`);
                 if (seen.has(key)) return false;
                 seen.add(key);
                 return true;
@@ -2131,11 +2198,11 @@
         }
 
         function getCurrentSessionWinCount(team) {
-            return getCurrentSessionMatchHistory(team).filter(log => log.result === 'WIN').length;
+            return getCurrentSessionMatchHistory(team).filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
         }
 
         function getCurrentSessionLossCount(team) {
-            return getCurrentSessionMatchHistory(team).filter(log => log.result === 'LOSS').length;
+            return getCurrentSessionMatchHistory(team).filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
         }
 
         function getTeamPlayedCount(team) {
@@ -2714,17 +2781,30 @@
                 const baseEpoch = String(baseTeam.sessionId || '');
                 const localEpoch = String(localTeam.sessionId || '');
                 const remoteEpoch = String(remoteTeam.sessionId || '');
-                // If this device has a newer reset epoch, replace the old session
-                // wholesale. If Firebase already has a newer epoch, ignore writes
-                // from a stale phone so old scores cannot resurrect after reset.
+                // Session epochs are millisecond timestamps. A newer local epoch
+                // replaces an older remote team; the same epoch is merged normally.
+                // If the base/local epoch is newer than Firebase, allow a safe one-time
+                // migration merge. Never let a genuinely newer remote session be
+                // overwritten by an older phone.
+                const baseEpochNumber = Number(baseEpoch) || 0;
+                const localEpochNumber = Number(localEpoch) || 0;
+                const remoteEpochNumber = Number(remoteEpoch) || 0;
                 if (localEpoch !== baseEpoch) {
-                    const fresh = wesmaDeepClone(localTeam);
-                    const at = remote.indexOf(remoteTeam);
-                    if (at >= 0) remote[at] = fresh;
-                    remoteById.set(id, fresh);
-                    return;
+                    if (remoteEpoch === baseEpoch || (localEpochNumber > 0 && remoteEpochNumber > 0 && localEpochNumber > remoteEpochNumber)) {
+                        const fresh = wesmaDeepClone(localTeam);
+                        const at = remote.indexOf(remoteTeam);
+                        if (at >= 0) remote[at] = fresh;
+                        remoteById.set(id, fresh);
+                        return;
+                    }
+                    if (remoteEpoch !== localEpoch) return;
+                } else if (remoteEpoch !== baseEpoch) {
+                    // A higher remote epoch means this device is stale. A lower
+                    // remote epoch means the base already knows the newer session and
+                    // Firebase's team node still needs its session-ID migration.
+                    if (!(baseEpochNumber > 0 && remoteEpochNumber > 0 && remoteEpochNumber < baseEpochNumber)) return;
+                    remoteTeam.sessionId = baseEpoch;
                 }
-                if (remoteEpoch !== baseEpoch) return;
 
                 Object.keys(localTeam).forEach(key => {
                     const localValue = localTeam[key];
@@ -2760,6 +2840,19 @@
                         remoteTeam[key] = wesmaDeepClone(localValue);
                     }
                 });
+                // Once match-history records exist, they are the source of truth for
+                // W/L/Played/time. Recompute these derived totals from the merged unique
+                // logs so a local Firebase value event cannot add the same score twice.
+                const hasMatchHistoryEvidence = [baseTeam, localTeam, remoteTeam].some(source =>
+                    Array.isArray(source && source.matchHistoryLog) && source.matchHistoryLog.length > 0
+                );
+                if (hasMatchHistoryEvidence) {
+                    const scoredLogs = (Array.isArray(remoteTeam.matchHistoryLog) ? remoteTeam.matchHistoryLog : [])
+                        .filter(log => log && ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase()));
+                    remoteTeam.wins = scoredLogs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
+                    remoteTeam.losses = scoredLogs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
+                    remoteTeam.totalTimeSpentMinutes = scoredLogs.reduce((sum, log) => sum + Math.max(0, Number(log.durationMinutes) || 0), 0);
+                }
                 remoteTeam.played = Math.max(0, Number(remoteTeam.wins) || 0) + Math.max(0, Number(remoteTeam.losses) || 0);
             });
 
@@ -2774,10 +2867,11 @@
                     ));
                     if (orphanLogs.length) {
                         team.matchHistoryLog = logs.filter(log => !orphanLogs.includes(log));
-                        team.wins = Math.max(0, (Number(team.wins) || 0) - orphanLogs.filter(log => log.result === 'WIN').length);
-                        team.losses = Math.max(0, (Number(team.losses) || 0) - orphanLogs.filter(log => log.result === 'LOSS').length);
-                        const removedMinutes = orphanLogs.reduce((sum, log) => sum + (Number(log.durationMinutes) || 0), 0);
-                        team.totalTimeSpentMinutes = Math.max(0, (Number(team.totalTimeSpentMinutes) || 0) - removedMinutes);
+                        const remainingScoredLogs = team.matchHistoryLog.filter(log => log &&
+                            ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase()));
+                        team.wins = remainingScoredLogs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
+                        team.losses = remainingScoredLogs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
+                        team.totalTimeSpentMinutes = remainingScoredLogs.reduce((sum, log) => sum + Math.max(0, Number(log.durationMinutes) || 0), 0);
                     }
                     team.defeatedDetails = (Array.isArray(team.defeatedDetails) ? team.defeatedDetails : []).filter(detail => detail &&
                         !deletedTeamIds.has(String(detail.teamId || detail.id || '')) &&
@@ -2835,9 +2929,6 @@
                 ...(extraRootUpdates && typeof extraRootUpdates === "object" ? extraRootUpdates : {})
             };
 
-            const localTeamsForWrite = wesmaDeepClone(teams);
-            const localNamesForWrite = { ...teamNameOverrides };
-
             firebaseWritePending += 1;
             firebaseWriteQueue = firebaseWriteQueue
                 .catch(() => false)
@@ -2845,12 +2936,22 @@
                     // Use the latest server-confirmed base at execution time for queued saves.
                     const baseTeamsForWrite = wesmaDeepClone(teamSyncBase);
                     const baseNamesForWrite = wesmaDeepClone(teamNameSyncBase);
+                    const localTeamsForWrite = wesmaDeepClone(teams);
+                    const localNamesForWrite = { ...teamNameOverrides };
                     const teamResult = await runFirebaseTransaction(dbRef.child("teams"), current =>
                         mergeChangedTeamSnapshot(current, baseTeamsForWrite, localTeamsForWrite));
                     if (!teamResult.committed || !Array.isArray(teamResult.value)) {
                         throw new Error("Firebase teams transaction was not committed");
                     }
-                    teamSyncBase = wesmaDeepClone(teamResult.value);
+                    // A Firebase value-listener may already have delivered a newer
+                    // snapshot while this transaction was in flight. Never roll that
+                    // base backwards. Otherwise, rebase any newer local edits on top
+                    // of the transaction result so concurrent phone scores are visible
+                    // locally and the next save cannot subtract a remote score.
+                    if (JSON.stringify(teamSyncBase) === JSON.stringify(baseTeamsForWrite)) {
+                        teams = mergeChangedTeamSnapshot(teamResult.value, localTeamsForWrite, wesmaDeepClone(teams));
+                        teamSyncBase = wesmaDeepClone(teamResult.value);
+                    }
                     if (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)) {
                         lastEndedChampionSnapshot.teams = wesmaDeepClone(teamResult.value);
                         payload.lastEndedChampionSnapshot = wesmaDeepClone(lastEndedChampionSnapshot);
@@ -2861,7 +2962,8 @@
                     if (!namesResult.committed) {
                         throw new Error("Firebase team-name transaction was not committed");
                     }
-                    if (namesResult.value && typeof namesResult.value === "object") {
+                    if (namesResult.value && typeof namesResult.value === "object" &&
+                        JSON.stringify(teamNameSyncBase) === JSON.stringify(baseNamesForWrite)) {
                         teamNameSyncBase = wesmaDeepClone(namesResult.value);
                     }
                     // Atomically fence stale devices at the root as well: a phone
@@ -2871,7 +2973,9 @@
                     const rootResult = await runFirebaseTransaction(dbRef, current => {
                         const root = current && typeof current === "object" ? current : {};
                         const remoteGuard = root.sessionStartGuard && typeof root.sessionStartGuard === "object" ? root.sessionStartGuard : {};
-                        const remoteEpoch = String(remoteGuard.sessionId || (root.teams && root.teams[0] && root.teams[0].sessionId) || "");
+                        const remoteEpoch = String(remoteGuard.sessionId ||
+                            (remoteGuard.active === true && Number(remoteGuard.startedAt) > 0 ? remoteGuard.startedAt : "") ||
+                            (root.teams && root.teams[0] && root.teams[0].sessionId) || "");
                         if (remoteEpoch && remoteEpoch !== localSessionEpoch) return;
                         return { ...root, ...payload };
                     });
@@ -3251,8 +3355,8 @@
                     // snapshot; mixed timestamped records cannot safely date unknown rows.
                     return !hasAnyUsableTimestamp && windowRange.mode !== "unknown";
                 });
-                team.wins = team.matchHistoryLog.filter(log => log && log.result === "WIN").length;
-                team.losses = team.matchHistoryLog.filter(log => log && log.result === "LOSS").length;
+                team.wins = team.matchHistoryLog.filter(log => log && String(log.result || "").toUpperCase() === "WIN").length;
+                team.losses = team.matchHistoryLog.filter(log => log && String(log.result || "").toUpperCase() === "LOSS").length;
                 team.played = team.wins + team.losses;
                 team.totalTimeSpentMinutes = team.matchHistoryLog.reduce((sum, log) => sum + (Number(log && log.durationMinutes) || 0), 0);
                 const validSeqs = new Set(team.matchHistoryLog.filter(log => log && Number(log.seq) > 0).map(log => Number(log.seq)));
@@ -3282,8 +3386,8 @@
                 });
                 const selectedSessionLogs = Array.isArray(correctedTeam.matchHistoryLog) ? correctedTeam.matchHistoryLog : [];
                 originalTeam.matchHistoryLog = [...otherSessionLogs, ...selectedSessionLogs].sort((a,b) => normalizeHistoryTimestamp(a && a.timestamp) - normalizeHistoryTimestamp(b && b.timestamp));
-                originalTeam.wins = originalTeam.matchHistoryLog.filter(log => log && log.result === "WIN").length;
-                originalTeam.losses = originalTeam.matchHistoryLog.filter(log => log && log.result === "LOSS").length;
+                originalTeam.wins = originalTeam.matchHistoryLog.filter(log => log && String(log.result || "").toUpperCase() === "WIN").length;
+                originalTeam.losses = originalTeam.matchHistoryLog.filter(log => log && String(log.result || "").toUpperCase() === "LOSS").length;
                 originalTeam.played = originalTeam.wins + originalTeam.losses;
                 originalTeam.totalTimeSpentMinutes = originalTeam.matchHistoryLog.reduce((sum, log) => sum + (Number(log && log.durationMinutes) || 0), 0);
                 const originalDetails = Array.isArray(originalTeam.defeatedDetails) ? originalTeam.defeatedDetails : [];
@@ -3302,24 +3406,30 @@
             const matches = [];
             (sourceTeams || []).forEach(winner => {
                 (winner.matchHistoryLog || []).forEach((log, logIndex) => {
-                    if (!log || log.result !== "WIN") return;
+                    if (!log || String(log.result || "").toUpperCase() !== "WIN") return;
                     const loser = sourceTeams.find(candidate => (log.opponentId != null && String(candidate.id) === String(log.opponentId)) ||
                         (log.opponentId == null && candidate.name === log.opponent));
                     if (!loser) return;
                     if (Number(log.seq) > 0) {
-                        const pairedLoss = (loser.matchHistoryLog || []).find(item => item && Number(item.seq) === Number(log.seq) && item.result === "LOSS" &&
-                            ((item.opponentId != null && String(item.opponentId) === String(winner.id)) || (item.opponentId == null && item.opponent === winner.name)));
+                        const matchesWinner = item => item && String(item.result || '').toUpperCase() === 'LOSS' &&
+                            ((item.opponentId != null && String(item.opponentId) === String(winner.id)) || (item.opponentId == null && item.opponent === winner.name));
+                        const pairedLoss = (loser.matchHistoryLog || []).find(item => matchesWinner(item) &&
+                            (log.matchId ? String(item.matchId || '') === String(log.matchId) : (Number(item.seq) === Number(log.seq) && (!log.timestamp || !item.timestamp || normalizeHistoryTimestamp(item.timestamp) === normalizeHistoryTimestamp(log.timestamp)))));
                         if (!pairedLoss) return;
-                        matches.push({ seq: String(Number(log.seq)), label: `MATCH #${Number(log.seq)}`, winnerId: winner.id, loserId: loser.id,
+                        const matchTimestamp = normalizeHistoryTimestamp(log.timestamp || pairedLoss.timestamp || 0);
+                        const matchKey = log.matchId
+                            ? `id:${log.matchId}`
+                            : `seq:${Number(log.seq)}:${winner.id}:${loser.id}:${matchTimestamp}`;
+                        matches.push({ seq: matchKey, label: `MATCH #${Number(log.seq)}`, matchId: String(log.matchId || ''), winnerId: winner.id, loserId: loser.id,
                             winnerName: winner.name, loserName: loser.name, duration: Number(log.durationMinutes || pairedLoss.durationMinutes || 0),
-                            timestamp: normalizeHistoryTimestamp(log.timestamp || pairedLoss.timestamp || 0) });
+                            timestamp: matchTimestamp });
                     } else {
                         // Older saved logs may not have a global sequence. Pair the nth
                         // result between the same two teams using their original log order.
-                        const priorWins = (winner.matchHistoryLog || []).slice(0, logIndex + 1).filter(item => item && !(Number(item.seq) > 0) && item.result === "WIN" &&
+                        const priorWins = (winner.matchHistoryLog || []).slice(0, logIndex + 1).filter(item => item && !(Number(item.seq) > 0) && String(item.result || "").toUpperCase() === "WIN" &&
                             ((item.opponentId != null && String(item.opponentId) === String(loser.id)) || (item.opponentId == null && item.opponent === loser.name))).length;
                         const legacyOrdinal = priorWins - 1;
-                        const matchingLosses = (loser.matchHistoryLog || []).filter(item => item && !(Number(item.seq) > 0) && item.result === "LOSS" &&
+                        const matchingLosses = (loser.matchHistoryLog || []).filter(item => item && !(Number(item.seq) > 0) && String(item.result || "").toUpperCase() === "LOSS" &&
                             ((item.opponentId != null && String(item.opponentId) === String(winner.id)) || (item.opponentId == null && item.opponent === winner.name)));
                         const pairedLoss = matchingLosses[legacyOrdinal];
                         if (!pairedLoss) return;
@@ -3338,7 +3448,10 @@
                 const aLegacy = Number(String(a.seq).split(":").pop()) || 0;
                 const bLegacy = Number(String(b.seq).split(":").pop()) || 0;
                 return bLegacy - aLegacy;
-            }).forEach(item => { if (!unique.has(item.seq)) unique.set(item.seq, item); });
+            }).forEach(item => {
+                const uniqueKey = item.matchId || `${item.seq}:${item.winnerId}:${item.loserId}:${item.timestamp}`;
+                if (!unique.has(uniqueKey)) unique.set(uniqueKey, item);
+            });
             return Array.from(unique.values());
         }
 
@@ -3404,21 +3517,32 @@
             const winner = editingTeams.find(t => String(t.id) === String(winnerIdRaw));
             const loser = editingTeams.find(t => String(t.id) === String(loserIdRaw));
             if (!winner || !loser) { alert("ടീം വിവരങ്ങൾ കണ്ടെത്താനായില്ല. മാച്ച് ഡിലീറ്റ് ചെയ്തിട്ടില്ല."); return; }
-            const legacy = String(sequence).match(/^legacy:([^:]+):([^:]+):(\d+)$/);
+            const sequenceKey = String(sequence);
+            const legacy = sequenceKey.match(/^legacy:([^:]+):([^:]+):(\d+)$/);
+            const matchIdKey = sequenceKey.match(/^id:(.+)$/);
+            const sequenceKeyMatch = sequenceKey.match(/^seq:(\d+):([^:]+):([^:]+):(\d+)$/);
+            const matchOpp = (log, opponent) => log &&
+                ((log.opponentId != null && String(log.opponentId) === String(opponent.id)) || (log.opponentId == null && log.opponent === opponent.name));
             let winLog, lossLog;
             if (legacy) {
                 const ordinal = Number(legacy[3]);
-                const matchOpp = (log, opponent) => log && ((log.opponentId != null && String(log.opponentId) === String(opponent.id)) || (log.opponentId == null && log.opponent === opponent.name));
-                winLog = (winner.matchHistoryLog || []).filter(log => log && !(Number(log.seq) > 0) && log.result === "WIN" && matchOpp(log, loser))[ordinal];
-                lossLog = (loser.matchHistoryLog || []).filter(log => log && !(Number(log.seq) > 0) && log.result === "LOSS" && matchOpp(log, winner))[ordinal];
+                winLog = (winner.matchHistoryLog || []).filter(log => log && !(Number(log.seq) > 0) && String(log.result || '').toUpperCase() === "WIN" && matchOpp(log, loser))[ordinal];
+                lossLog = (loser.matchHistoryLog || []).filter(log => log && !(Number(log.seq) > 0) && String(log.result || '').toUpperCase() === "LOSS" && matchOpp(log, winner))[ordinal];
+            } else if (matchIdKey) {
+                winLog = (winner.matchHistoryLog || []).find(log => log && String(log.matchId || '') === matchIdKey[1] && String(log.result || '').toUpperCase() === "WIN" && matchOpp(log, loser));
+                lossLog = (loser.matchHistoryLog || []).find(log => log && String(log.matchId || '') === matchIdKey[1] && String(log.result || '').toUpperCase() === "LOSS" && matchOpp(log, winner));
+            } else if (sequenceKeyMatch) {
+                const targetSeq = Number(sequenceKeyMatch[1]), targetTimestamp = Number(sequenceKeyMatch[4]);
+                winLog = (winner.matchHistoryLog || []).find(log => log && Number(log.seq) === targetSeq && String(log.result || '').toUpperCase() === "WIN" && matchOpp(log, loser) && (!targetTimestamp || normalizeHistoryTimestamp(log.timestamp) === targetTimestamp));
+                lossLog = (loser.matchHistoryLog || []).find(log => log && Number(log.seq) === targetSeq && String(log.result || '').toUpperCase() === "LOSS" && matchOpp(log, winner) && (!targetTimestamp || normalizeHistoryTimestamp(log.timestamp) === targetTimestamp));
             } else {
-                winLog = (winner.matchHistoryLog || []).find(log => log && Number(log.seq) === Number(sequence) && log.result === "WIN");
-                lossLog = (loser.matchHistoryLog || []).find(log => log && Number(log.seq) === Number(sequence) && log.result === "LOSS");
+                winLog = (winner.matchHistoryLog || []).find(log => log && Number(log.seq) === Number(sequence) && String(log.result || '').toUpperCase() === "WIN" && matchOpp(log, loser));
+                lossLog = (loser.matchHistoryLog || []).find(log => log && Number(log.seq) === Number(sequence) && String(log.result || '').toUpperCase() === "LOSS" && matchOpp(log, winner));
             }
             if (!winLog || !lossLog) { alert("Paired WIN/LOSS record ലഭ്യമല്ല. സുരക്ഷയ്ക്കായി മാച്ച് ഡിലീറ്റ് ചെയ്തിട്ടില്ല."); return; }
             const duration = Number(winLog.durationMinutes || lossLog.durationMinutes || 0);
-            if (!confirm(`MATCH ${legacy ? "(LEGACY)" : "#" + sequence} സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?\n${winner.name} vs ${loser.name}\nഈ മാച്ചിന്റെ WIN, LOSS, PLAYED, TIME കണക്കുകൾ മാത്രം കുറയ്ക്കും.`)) return;
-            if (isCurrent) captureUndoSnapshot(`DELETED MATCH ${sequence}`);
+            if (!confirm(`MATCH ${legacy ? "(LEGACY)" : "#" + (winLog.seq || sequence)} സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?\n${winner.name} vs ${loser.name}\nഈ മാച്ചിന്റെ WIN, LOSS, PLAYED, TIME കണക്കുകൾ മാത്രം കുറയ്ക്കും.`)) return;
+            if (isCurrent) captureUndoSnapshot(`DELETED MATCH ${winLog.seq || sequence}`);
             winner.matchHistoryLog = (winner.matchHistoryLog || []).filter(log => log !== winLog);
             loser.matchHistoryLog = (loser.matchHistoryLog || []).filter(log => log !== lossLog);
             winner.wins = Math.max(0,(Number(winner.wins)||0)-1);
@@ -3428,13 +3552,16 @@
             winner.totalTimeSpentMinutes = Math.max(0,(Number(winner.totalTimeSpentMinutes)||0)-duration);
             loser.totalTimeSpentMinutes = Math.max(0,(Number(loser.totalTimeSpentMinutes)||0)-duration);
             const seq = Number(winLog.seq || lossLog.seq || 0);
-            const removeDefeat = (team, opponentName) => {
+            const matchId = String(winLog.matchId || lossLog.matchId || '');
+            const removeDefeat = (team, opponentName, opponent) => {
                 if (!Array.isArray(team.defeatedDetails)) return;
-                const idx = team.defeatedDetails.findIndex(d => d && d.name === opponentName && (seq > 0 ? Number(d.seq) === seq : true));
+                const idx = team.defeatedDetails.findIndex(d => d && (matchId
+                    ? String(d.matchId || '') === matchId
+                    : (((d.teamId != null && String(d.teamId) === String(opponent.id)) || d.name === opponentName) && (seq > 0 ? Number(d.seq) === seq : true))));
                 if (idx >= 0) team.defeatedDetails.splice(idx,1);
             };
-            removeDefeat(winner,loser.name);
-            removeDefeat(loser,winner.name);
+            removeDefeat(winner,loser.name,loser);
+            removeDefeat(loser,winner.name,winner);
             if (isCurrent) {
                 saveData(); render(); renderMatchCorrectionList();
                 showToast("മാച്ച് ഡിലീറ്റ് ചെയ്തു. ബന്ധപ്പെട്ട ടീമുകളുടെ കണക്കുകൾ മാത്രം പുതുക്കി.");
@@ -3493,17 +3620,29 @@
                 return;
             }
 
-            const legacyMatch = String(sequence).match(/^legacy:([^:]+):([^:]+):(\d+)$/);
+            const sequenceKey = String(sequence);
+            const legacyMatch = sequenceKey.match(/^legacy:([^:]+):([^:]+):(\d+)$/);
+            const matchIdKey = sequenceKey.match(/^id:(.+)$/);
+            const sequenceKeyMatch = sequenceKey.match(/^seq:(\d+):([^:]+):([^:]+):(\d+)$/);
             let oldWinnerLog = null, oldLoserLog = null;
+            const matchesOpponent = (m, opponent) => m &&
+                ((m.opponentId != null && String(m.opponentId) === String(opponent.id)) || (m.opponentId == null && m.opponent === opponent.name));
             if (legacyMatch) {
                 const ordinal = Number(legacyMatch[3]);
-                const matchesOpponent = (m, opponent) => m &&
-                    ((m.opponentId != null && String(m.opponentId) === String(opponent.id)) || (m.opponentId == null && m.opponent === opponent.name));
-                oldWinnerLog = (oldWinner.matchHistoryLog || []).filter(m => m && !(Number(m.seq) > 0) && m.result === "WIN" && matchesOpponent(m, oldLoser))[ordinal] || null;
-                oldLoserLog = (oldLoser.matchHistoryLog || []).filter(m => m && !(Number(m.seq) > 0) && m.result === "LOSS" && matchesOpponent(m, oldWinner))[ordinal] || null;
+                oldWinnerLog = (oldWinner.matchHistoryLog || []).filter(m => m && !(Number(m.seq) > 0) && String(m.result || '').toUpperCase() === "WIN" && matchesOpponent(m, oldLoser))[ordinal] || null;
+                oldLoserLog = (oldLoser.matchHistoryLog || []).filter(m => m && !(Number(m.seq) > 0) && String(m.result || '').toUpperCase() === "LOSS" && matchesOpponent(m, oldWinner))[ordinal] || null;
+            } else if (matchIdKey) {
+                oldWinnerLog = (oldWinner.matchHistoryLog || []).find(m => m && String(m.matchId || '') === matchIdKey[1] && String(m.result || '').toUpperCase() === "WIN" && matchesOpponent(m, oldLoser));
+                oldLoserLog = (oldLoser.matchHistoryLog || []).find(m => m && String(m.matchId || '') === matchIdKey[1] && String(m.result || '').toUpperCase() === "LOSS" && matchesOpponent(m, oldWinner));
+            } else if (sequenceKeyMatch) {
+                const targetSeq = Number(sequenceKeyMatch[1]);
+                const targetTimestamp = Number(sequenceKeyMatch[4]);
+                oldWinnerLog = (oldWinner.matchHistoryLog || []).find(m => m && Number(m.seq) === targetSeq && String(m.result || '').toUpperCase() === "WIN" && matchesOpponent(m, oldLoser) && (!targetTimestamp || normalizeHistoryTimestamp(m.timestamp) === targetTimestamp));
+                oldLoserLog = (oldLoser.matchHistoryLog || []).find(m => m && Number(m.seq) === targetSeq && String(m.result || '').toUpperCase() === "LOSS" && matchesOpponent(m, oldWinner) && (!targetTimestamp || normalizeHistoryTimestamp(m.timestamp) === targetTimestamp));
             } else {
-                oldWinnerLog = (oldWinner.matchHistoryLog || []).find(m => m && Number(m.seq) === Number(sequence) && m.result === "WIN");
-                oldLoserLog = (oldLoser.matchHistoryLog || []).find(m => m && Number(m.seq) === Number(sequence) && m.result === "LOSS");
+                const targetSeq = Number(sequence);
+                oldWinnerLog = (oldWinner.matchHistoryLog || []).find(m => m && Number(m.seq) === targetSeq && String(m.result || '').toUpperCase() === "WIN" && matchesOpponent(m, oldLoser));
+                oldLoserLog = (oldLoser.matchHistoryLog || []).find(m => m && Number(m.seq) === targetSeq && String(m.result || '').toUpperCase() === "LOSS" && matchesOpponent(m, oldWinner));
             }
             if (!oldWinnerLog || !oldLoserLog) {
                 alert("ഈ മാച്ചിന്റെ paired WIN/LOSS റെക്കോർഡ് പൂർണ്ണമല്ല. സുരക്ഷയ്ക്കായി മാറ്റം നടത്തിയിട്ടില്ല.");
@@ -3515,8 +3654,8 @@
             const seq = Number(oldWinnerLog.seq || oldLoserLog.seq || 0);
             const oldWinnerName = oldWinner.name, oldLoserName = oldLoser.name;
             const actionLabel = markAsNotPlayed
-                ? `MARKED MATCH ${legacyMatch ? "(LEGACY)" : `#${sequence}`} AS NOT PLAYED`
-                : `CORRECTED MATCH ${legacyMatch ? "(LEGACY)" : `#${sequence}`}: ${newWinner.name} WON`;
+                ? `MARKED MATCH ${legacyMatch ? "(LEGACY)" : `#${oldWinnerLog.seq || sequence}`} AS NOT PLAYED`
+                : `CORRECTED MATCH ${legacyMatch ? "(LEGACY)" : `#${oldWinnerLog.seq || sequence}`}: ${newWinner.name} WON`;
             const confirmText = markAsNotPlayed
                 ? `ഈ ഒരു മാച്ച് മാത്രം നടന്നിട്ടില്ലെന്ന് അടയാളപ്പെടുത്തണോ?\nഇതിന്റെ WIN/LOSS, played count, time എന്നിവ പഴയ രണ്ട് ടീമുകളിൽ നിന്ന് മാത്രം ഒഴിവാക്കും.\nമറ്റ് ടീമുകളുടെയും മറ്റ് മാച്ചുകളുടെയും കണക്കുകൾ മാറ്റില്ല.`
                 : `MATCH RESULT മാറ്റണോ?\nWinner: ${newWinner.name}\nLoser: ${newLoser.name}\nമാറ്റം ആവശ്യമായ ടീമുകളുടെ കണക്കുകൾ മാത്രം അപ്ഡേറ്റ് ചെയ്യും.`;
@@ -3542,14 +3681,17 @@
                 oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
 
                 // Remove exactly one matching defeated-detail entry, not every past meeting.
-                const removeOneDefeat = (team, opponentName) => {
+                const removeOneDefeat = (team, opponentName, opponent) => {
                     if (!Array.isArray(team.defeatedDetails)) return;
-                    const index = team.defeatedDetails.findIndex(d => d && d.name === opponentName &&
-                        (seq > 0 ? Number(d.seq) === seq : !(Number(d.seq) > 0)));
+                    const matchId = String(oldWinnerLog.matchId || '');
+                    const index = team.defeatedDetails.findIndex(d => d &&
+                        (matchId ? String(d.matchId || '') === matchId :
+                            (((d.teamId != null && String(d.teamId) === String(opponent.id)) || d.name === opponentName) &&
+                             (seq > 0 ? Number(d.seq) === seq : !(Number(d.seq) > 0)))));
                     if (index >= 0) team.defeatedDetails.splice(index, 1);
                 };
-                removeOneDefeat(oldWinner, oldLoserName);
-                removeOneDefeat(oldLoser, oldWinnerName);
+                removeOneDefeat(oldWinner, oldLoserName, oldLoser);
+                removeOneDefeat(oldLoser, oldWinnerName, oldWinner);
             } else {
                 // Remove the original paired result and update only the original participants.
                 oldWinner.matchHistoryLog = (oldWinner.matchHistoryLog || []).filter(item => item !== oldWinnerLog);
@@ -3560,14 +3702,16 @@
                 oldLoser.played = getTeamPlayedCount(oldLoser);
                 oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
                 oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
-                const removeOneDefeatDetail = (team, opponentName) => {
+                const removeOneDefeatDetail = (team, opponentName, opponent) => {
                     if (!Array.isArray(team.defeatedDetails)) return;
-                    let index = -1;
-                    if (seq > 0) {
-                        index = team.defeatedDetails.findIndex(d => d && Number(d.seq) === seq);
-                    } else {
-                        const candidates = team.defeatedDetails
-                            .map((detail, detailIndex) => ({detail, detailIndex}))
+                    const matchId = String(oldWinnerLog.matchId || '');
+                    let index = matchId
+                        ? team.defeatedDetails.findIndex(d => d && String(d.matchId || '') === matchId)
+                        : team.defeatedDetails.findIndex(d => d &&
+                            ((d.teamId != null && String(d.teamId) === String(opponent.id)) || d.name === opponentName) &&
+                            (seq > 0 ? Number(d.seq) === seq : true));
+                    if (index < 0 && !matchId && seq === 0) {
+                        const candidates = team.defeatedDetails.map((detail, detailIndex) => ({detail, detailIndex}))
                             .filter(item => item.detail && item.detail.name === opponentName);
                         if (candidates.length) {
                             candidates.sort((a, b) => Math.abs(normalizeHistoryTimestamp(a.detail.timestamp) - timestamp) - Math.abs(normalizeHistoryTimestamp(b.detail.timestamp) - timestamp));
@@ -3576,11 +3720,13 @@
                     }
                     if (index >= 0) team.defeatedDetails.splice(index, 1);
                 };
-                removeOneDefeatDetail(oldWinner, oldLoserName);
-                removeOneDefeatDetail(oldLoser, oldWinnerName);
+                removeOneDefeatDetail(oldWinner, oldLoserName, oldLoser);
+                removeOneDefeatDetail(oldLoser, oldWinnerName, oldWinner);
 
+                const correctedMatchId = `${timestamp}-${Math.random().toString(36).slice(2, 10)}`;
                 const makeLog = (result, opponent) => ({
                     ...(seq > 0 ? { seq } : {}),
+                    matchId: correctedMatchId,
                     result, opponent: opponent.name, opponentId: opponent.id,
                     sessionId: String(tournamentStartTimestamp || timestamp),
                     durationMinutes: duration, timestamp
@@ -3597,7 +3743,7 @@
                 newLoser.totalTimeSpentMinutes = (Number(newLoser.totalTimeSpentMinutes) || 0) + duration;
                 if (!Array.isArray(newWinner.defeatedDetails)) newWinner.defeatedDetails = [];
                 newWinner.defeatedDetails.push({
-                    name: newLoser.name, teamId: newLoser.id,
+                    name: newLoser.name, teamId: newLoser.id, matchId: correctedMatchId,
                     ...(seq > 0 ? { seq } : {}), timestamp, durationMinutes: duration
                 });
             }
@@ -5018,6 +5164,10 @@
 
         function handleScoreChange(id, delta) {
             if (historyPreviewLiveState) { showToast("History Special View വായനയ്ക്കു മാത്രമാണ്. RETURN TO LIVE അമർത്തുക."); return; }
+            if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
+                showToast("സ്കോർ രേഖപ്പെടുത്താൻ ആദ്യം START അമർത്തി LIVE മാച്ചിൽ പ്രവേശിക്കുക.");
+                return;
+            }
             const team = teams.find(t => t.id === id);
             if (!team || team.isDisabled) return;
             const now = Date.now();
@@ -5039,7 +5189,7 @@
                 }
                 
                 if (team.wins > 0) {
-                    const winLogs = getCurrentSessionMatchHistory(team).filter(m => m && m.result === 'WIN');
+                    const winLogs = getCurrentSessionMatchHistory(team).filter(m => m && String(m.result || '').toUpperCase() === 'WIN');
                     const removedLog = sortLatestFirst(winLogs)[0] || null;
                     if (!removedLog) {
                         showToast("⚠️ ഈ വിജയത്തിന് ബന്ധപ്പെട്ട Match History ലഭ്യമല്ല. ഡാറ്റ മാറ്റിയിട്ടില്ല.");
@@ -5054,12 +5204,14 @@
                         showToast("⚠️ എതിര്‍ ടീമിനെ കണ്ടെത്താനായില്ല. ഡാറ്റ മാറ്റിയിട്ടില്ല.");
                         return;
                     }
-                    const pairedLossLog = getCurrentSessionMatchHistory(opponent).find(m =>
-                        m && m.result === 'LOSS' && (
-                            (removedSeq > 0 && Number(m.seq) === removedSeq) ||
-                            (removedSeq === 0 && ((m.opponentId != null && String(m.opponentId) === String(team.id)) || m.opponent === team.name))
-                        )
-                    );
+                    const removedMatchId = String(removedLog.matchId || '');
+                    const pairedLossLog = getCurrentSessionMatchHistory(opponent).find(m => {
+                        if (!m || String(m.result || '').toUpperCase() !== 'LOSS') return false;
+                        const opponentMatches = (m.opponentId != null && String(m.opponentId) === String(team.id)) || m.opponent === team.name;
+                        if (!opponentMatches) return false;
+                        if (removedMatchId) return String(m.matchId || '') === removedMatchId;
+                        return removedSeq > 0 ? (Number(m.seq) === removedSeq && normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp)) : (!removedLog.timestamp || normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp));
+                    });
                     const pairedLossIndex = (opponent.matchHistoryLog || []).indexOf(pairedLossLog);
                     if (pairedLossIndex < 0) {
                         showToast("⚠️ ബന്ധപ്പെട്ട LOSS റെക്കോർഡ് കണ്ടെത്താനായില്ല. ഡാറ്റ മാറ്റിയിട്ടില്ല.");
@@ -5070,9 +5222,13 @@
                     team.wins = Math.max(0, (Number(team.wins) || 0) - 1);
                     team.played = getTeamPlayedCount(team);
                     team.matchHistoryLog = (team.matchHistoryLog || []).filter(m => m !== removedLog);
-                    team.defeatedDetails = (team.defeatedDetails || []).filter(d =>
-                        removedSeq > 0 ? Number(d.seq) !== removedSeq : !(d.name === removedLog.opponent && !d.seq)
-                    );
+                    team.defeatedDetails = (team.defeatedDetails || []).filter(d => {
+                        if (!d) return false;
+                        if (removedMatchId) return String(d.matchId || '') !== removedMatchId;
+                        const sameOpponent = (d.teamId != null && String(d.teamId) === String(opponent.id)) || d.name === removedLog.opponent;
+                        const sameTime = !removedLog.timestamp || normalizeHistoryTimestamp(d.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp);
+                        return !(sameOpponent && sameTime && (removedSeq > 0 ? Number(d.seq) === removedSeq : !d.seq));
+                    });
                     opponent.losses = Math.max(0, (Number(opponent.losses) || 0) - 1);
                     opponent.played = getTeamPlayedCount(opponent);
                     opponent.matchHistoryLog.splice(pairedLossIndex, 1);
@@ -5172,14 +5328,14 @@
             const team = teams.find(t => t.id === winningTeamId);
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
             if (!team || !defeatedTeam) return;
-
-            captureUndoSnapshot(`WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`);
-            if (isMatchEnded) {
-                isMatchEnded = false;
-                updateMatchStatusBadge();
+            if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
+                showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക.");
+                return;
             }
 
+            captureUndoSnapshot(`WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`);
             const now = Date.now();
+            const matchId = `${now}-${Math.random().toString(36).slice(2, 10)}`;
             const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
             const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
             
@@ -5195,6 +5351,8 @@
             if (!team.defeatedDetails) team.defeatedDetails = [];
             team.defeatedDetails.push({
                 name: defeatedTeam.name,
+                teamId: defeatedTeam.id,
+                matchId,
                 sessionId: liveSessionId,
                 seq: globalClickSequence,
                 timestamp: now,
@@ -5205,6 +5363,7 @@
             team.matchHistoryLog.push({
                 opponent: defeatedTeam.name,
                 opponentId: defeatedTeam.id,
+                matchId,
                 sessionId: liveSessionId,
                 seq: globalClickSequence,
                 timestamp: now,
@@ -5216,6 +5375,7 @@
             defeatedTeam.matchHistoryLog.push({
                 opponent: team.name,
                 opponentId: team.id,
+                matchId,
                 sessionId: liveSessionId,
                 seq: globalClickSequence,
                 timestamp: now,
@@ -5811,7 +5971,7 @@
 
             const names = { ...(teamNameOverrides || {}) };
             teams = JSON.parse(JSON.stringify(defaultTeams)).map(team => ({
-                ...team, name: names[String(team.id)] || team.name
+                ...team, name: names[String(team.id)] || team.name, sessionId: String(due)
             }));
             teamNameOverrides = Object.fromEntries(teams.map(team => [String(team.id), team.name]));
             tournamentStartTimestamp = due;
