@@ -56,6 +56,12 @@
         body.history-preview-mode #history-special-view-modal,
         body.history-preview-mode #history-special-view-modal * { pointer-events:auto !important; }
         
+        /* Keep the top date control readable on narrow mobile screens. */
+        #header-date-badge-small { flex: 0 0 auto; min-width: 112px; max-width: 52%; }
+        #header-date-badge-small > button { min-height: 28px; white-space: nowrap; }
+        #header-date-text { display: inline-block; white-space: nowrap; overflow: visible; }
+        #header-date-badge-small #end-modal-reset-dropdown { max-width: min(84vw, 320px); max-height: 75vh; overflow-y: auto; }
+
         .wesma-title {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
@@ -469,7 +475,6 @@
       </div>
     </div>
 
-
     <!-- Startup Gate Modal -->
     <div id="startup-gate" class="fixed inset-0 bg-[#1e1715]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-white border gold-border w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-4 text-slate-900">
@@ -505,12 +510,11 @@
                     <button id="main-start-button" onclick="openStartMatchConfirmModal()" style="pointer-events: auto !important;" class="bg-gradient-to-r from-[#d4af37] to-[#a8793e] hover:from-[#c49b2e] hover:to-[#8c6239] text-[#2c221e] font-extrabold text-[8px] px-2 py-0.5 rounded shadow start-pop-btn uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-[#8c6239]"><i class="fa-solid fa-play text-[7px]"></i> START</button>
                 </div>
             </div>
-            <div id="header-date-badge-small" class="relative bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] rounded-md tracking-wider shadow-2xs flex items-center gap-1 px-1.5 py-1 min-w-0">
-                <button type="button" onclick="toggleEndModalResetDropdown(event)" class="px-1 flex items-center justify-center gap-1.5 cursor-pointer min-w-0" title="Open date menu">
-                    <span id="header-date-text" class="whitespace-nowrap"><i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> --</span>
+            <div id="header-date-badge-small" class="relative bg-[#f5f0eb] border border-[#d7ccc8] text-[#5c4033] font-bold text-[10px] rounded-md tracking-wider shadow-2xs">
+                <button type="button" onclick="toggleEndModalResetDropdown(event)" class="w-full h-full px-2 py-1 flex items-center justify-center gap-1.5 cursor-pointer" title="Open date menu">
+                    <span id="header-date-text"><i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> --</span>
                     <i class="fa-solid fa-chevron-down text-[7px]"></i>
                 </button>
-                <button id="wesma-admin-open" type="button" onclick="event.stopPropagation(); document.getElementById('wesma-device-status').style.display='flex'" class="rounded bg-[#5c4033] px-1.5 py-1 text-[8px] font-black text-white whitespace-nowrap" style="display:none">DEVICE ADMIN</button>
                 <div id="end-modal-reset-dropdown" class="hidden absolute right-0 top-full mt-1 w-52 bg-white border border-[#d7ccc8] rounded-xl shadow-2xl p-2.5 z-[90] text-left">
                     <div class="flex items-center gap-2 pb-2 mb-2 border-b border-[#e6decb]">
                         <span class="w-7 h-7 rounded-lg bg-[#f5f0eb] text-[#8c6239] flex items-center justify-center"><i class="fa-regular fa-calendar-days"></i></span>
@@ -520,6 +524,7 @@
                         </div>
                     </div>
                     <div class="text-[9px] text-slate-500 mb-2">Tournament options</div>
+                    <button id="wesma-admin-open" type="button" onclick="document.getElementById('wesma-device-status').style.display='flex'" class="w-full text-left bg-[#f5f0eb] hover:bg-[#ebdcd0] text-[#5c4033] font-bold py-2.5 px-2.5 rounded-lg border border-[#d7ccc8] text-[10px] flex items-center gap-1.5 cursor-pointer mb-2" style="display:none"><i class="fa-solid fa-mobile-screen-button"></i> DEVICE ADMIN</button>
                     <button type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); resetScores()" class="w-full text-left bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2.5 px-2.5 rounded-lg border border-rose-200 text-[10px] flex items-center gap-1.5 cursor-pointer"><i class="fa-solid fa-rotate-right text-rose-600"></i> ടൂർണമെന്റ് റീസെറ്റ് / Reset</button>
                     <div class="mt-2 pt-2 border-t border-[#e6decb] space-y-1.5">
                         <div class="text-[9px] font-black tracking-wider text-[#5c4033]"><i class="fa-regular fa-clock mr-1"></i> SCHEDULE AUTO RESET & START</div>
@@ -1384,7 +1389,7 @@
             const uid = user.uid;
             if (uid === WESMA_ADMIN_UID) {
                 const adminButton = document.getElementById("wesma-admin-open");
-                if (adminButton) adminButton.style.display = "block";
+                if (adminButton) adminButton.style.display = "flex";
                 showWesmaDeviceStatus("Administrator access granted. Use DEVICE ADMIN to approve or revoke devices.", uid);
                 attachWesmaAdminRequests();
                 startWesmaAfterApproval();
@@ -1725,15 +1730,7 @@
             const dateBadgeSmall = document.getElementById("header-date-badge-small");
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const dateText = document.getElementById("header-date-text");
-            if (dateText) {
-                dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
-                dateText.style.display = "inline";
-                dateText.style.visibility = "visible";
-            }
-            if (dateBadgeSmall) {
-                dateBadgeSmall.style.display = "flex";
-                dateBadgeSmall.style.visibility = "visible";
-            }
+            if(dateText) dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
             const dateMenuDate = document.getElementById("date-menu-current-date");
             if (dateMenuDate) dateMenuDate.textContent = todayStr;
 
@@ -1868,7 +1865,7 @@
             updateStartButtonState();
             if (autoResetInterval) clearInterval(autoResetInterval);
             refreshScheduledStartUI();
-            autoResetInterval = setInterval(checkScheduledMatchStart, 5000);
+            autoResetInterval = setInterval(() => { refreshScheduledStartUI(); checkScheduledMatchStart(); }, 1000);
             setTimeout(checkScheduledMatchStart, 2500);
         }
 
@@ -1930,55 +1927,39 @@
             return sortLatestFirst(team.defeatedDetails)[0];
         }
 
-        function getCurrentSessionDefeatEvents() {
-            const events = [];
-            (Array.isArray(teams) ? teams : []).forEach(winner => {
-                (Array.isArray(winner.matchHistoryLog) ? winner.matchHistoryLog : []).forEach(log => {
-                    if (!log || log.result !== "WIN") return;
-                    const loser = teams.find(team =>
-                        String(team.id) === String(log.opponentId) ||
-                        (!log.opponentId && String(team.name) === String(log.opponent))
-                    );
-                    events.push({
-                        winner: winner.name,
-                        loser: log.opponent || (loser && loser.name) || "Unknown team",
-                        seq: Number(log.seq) || 0,
-                        timestamp: Number(log.timestamp) || 0,
-                        durationMinutes: Number(log.durationMinutes) || 1
-                    });
-                });
-            });
-
-            // Compatibility fallback for older saved data that has defeatedDetails
-            // but predates matchHistoryLog. Do not mix this with modern logs, as
-            // doing so duplicates each defeat and can surface stale entries.
-            if (events.length === 0) {
-                (Array.isArray(teams) ? teams : []).forEach(winner => {
-                    (Array.isArray(winner.defeatedDetails) ? winner.defeatedDetails : []).forEach(item => {
-                        if (!item) return;
-                        events.push({
-                            winner: winner.name,
-                            loser: item.name || "Unknown team",
-                            seq: Number(item.seq) || 0,
-                            timestamp: Number(item.timestamp) || 0,
-                            durationMinutes: Number(item.durationMinutes) || 1
-                        });
-                    });
-                });
-            }
-
-            return events.sort((a, b) =>
-                (Number(b.seq) || 0) - (Number(a.seq) || 0) ||
-                (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)
-            );
+        function hasCompletedDefeatPair(winner, defeat) {
+            if (!winner || !defeat || !defeat.name) return false;
+            const loser = teams.find(candidate => candidate && (
+                (defeat.teamId != null && String(candidate.id) === String(defeat.teamId)) ||
+                candidate.name === defeat.name
+            ));
+            if (!loser) return false;
+            const seq = Number(defeat.seq) || 0;
+            const win = (winner.matchHistoryLog || []).some(log => log && log.result === "WIN" &&
+                (seq > 0 ? Number(log.seq) === seq : log.opponent === loser.name));
+            const loss = (loser.matchHistoryLog || []).some(log => log && log.result === "LOSS" &&
+                (seq > 0 ? Number(log.seq) === seq : log.opponent === winner.name));
+            return win && loss;
         }
 
         function updateMainTopLastDefeatedBar() {
             const barEl = document.getElementById("main-top-last-defeated-text");
             if (!barEl) return;
-            const allDefeats = getCurrentSessionDefeatEvents();
+
+            let allDefeats = [];
+            teams.forEach(t => {
+                if (!t.isDisabled && Array.isArray(t.defeatedDetails) && t.defeatedDetails.length > 0) {
+                    t.defeatedDetails.forEach(d => {
+                        if (!hasCompletedDefeatPair(t, d)) return;
+                        allDefeats.push({ winner: t.name, loser: d.name, seq: d.seq || 0 });
+                    });
+                }
+            });
+
+            allDefeats.sort((a, b) => (Number(b.seq)||0) - (Number(a.seq)||0));
+
             if (allDefeats.length > 0) {
-                const lastEvent = allDefeats[0];
+                let lastEvent = allDefeats[0];
                 barEl.innerHTML = `<span class="text-slate-950 font-bold">${escapeHtml(lastEvent.winner)}</span> Last Defeated <span class="text-rose-600 font-bold">${escapeHtml(lastEvent.loser)}</span>`;
             } else {
                 barEl.textContent = "No matches played yet";
@@ -1991,21 +1972,41 @@
             const content = document.getElementById("last-defeated-history-content");
             if (!modal || !content) return;
 
-            const allDefeats = getCurrentSessionDefeatEvents();
+            let allDefeats = [];
+            teams.forEach(t => {
+                if (Array.isArray(t.defeatedDetails) && t.defeatedDetails.length > 0) {
+                    t.defeatedDetails.forEach(d => {
+                        if (!hasCompletedDefeatPair(t, d)) return;
+                        allDefeats.push({
+                            winner: t.name,
+                            loser: d.name,
+                            seq: d.seq || 0,
+                            durationMinutes: d.durationMinutes || 1
+                        });
+                    });
+                }
+            });
+
+            allDefeats = sortLatestFirst(allDefeats);
+
             if (allDefeats.length === 0) {
                 content.innerHTML = `<div class="text-slate-500 italic text-center py-6">No matches played yet.</div>`;
             } else {
-                content.innerHTML = allDefeats.map((item, index) => `
-                    <div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] gap-2">
-                        <div class="min-w-0 flex-1 break-words leading-tight name-wrapper">
-                            <span class="text-[#5c4033] font-bold">#${allDefeats.length - index}</span>
-                            <span class="text-emerald-700 font-bold uppercase">${escapeHtml(item.winner)}</span>
-                            <span class="text-slate-600"> Defeated </span>
-                            <span class="text-rose-600 font-bold uppercase">${escapeHtml(item.loser)}</span>
+                let html = "";
+                allDefeats.forEach((item, index) => {
+                    html += `
+                        <div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] gap-2">
+                            <div class="min-w-0 flex-1 break-words leading-tight name-wrapper">
+                                <span class="text-[#5c4033] font-bold">#${allDefeats.length - index}</span> 
+                                <span class="text-emerald-700 font-bold uppercase">${escapeHtml(item.winner)}</span>
+                                <span class="text-slate-600"> Defeated </span>
+                                <span class="text-rose-600 font-bold uppercase">${escapeHtml(item.loser)}</span>
+                            </div>
+                            <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${item.durationMinutes}m</span>
                         </div>
-                        <span class="text-[#5c4033] text-[9px] font-semibold bg-white px-1.5 py-0.5 rounded border border-[#e6decb] shrink-0">${item.durationMinutes}m</span>
-                    </div>
-                `).join("");
+                    `;
+                });
+                content.innerHTML = html;
             }
             modal.classList.remove("hidden");
         }
@@ -2558,21 +2559,13 @@
                         const delta = (Number(localValue) || 0) - (Number(baseValue) || 0);
                         remoteTeam[key] = (Number(remoteTeam[key]) || 0) + delta;
                     } else if (mergeArrayFields.has(key) && Array.isArray(localValue)) {
-                        const baseArray = Array.isArray(baseValue) ? baseValue : [];
-                        // A shorter array means this device intentionally removed records
-                        // or reset the active session. Preserve that deletion on Firebase;
-                        // otherwise old defeated/history entries reappear after reset.
-                        if (localValue.length < baseArray.length) {
-                            remoteTeam[key] = wesmaDeepClone(localValue);
-                        } else {
-                            const combined = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
-                            const seen = new Set(combined.map(item => JSON.stringify(item)));
-                            localValue.forEach(item => {
-                                const signature = JSON.stringify(item);
-                                if (!seen.has(signature)) { combined.push(wesmaDeepClone(item)); seen.add(signature); }
-                            });
-                            remoteTeam[key] = combined;
-                        }
+                        const combined = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
+                        const seen = new Set(combined.map(item => JSON.stringify(item)));
+                        localValue.forEach(item => {
+                            const signature = JSON.stringify(item);
+                            if (!seen.has(signature)) { combined.push(wesmaDeepClone(item)); seen.add(signature); }
+                        });
+                        remoteTeam[key] = combined;
                     } else {
                         remoteTeam[key] = wesmaDeepClone(localValue);
                     }
@@ -3062,7 +3055,21 @@
             const container = document.getElementById("match-correction-list");
             if (!scope || !container) return;
             const sourceTeams = getCorrectionTeamsForScope(scope.value);
-            const matches = getCorrectionMatches(sourceTeams);
+            let matches = getCorrectionMatches(sourceTeams);
+            // A historical selection represents one saved date/session. Match logs
+            // can be cumulative in older snapshots, so restrict timestamped entries
+            // to the selected record's local calendar date instead of showing totals.
+            const historyScope = String(scope.value || "").match(/^history:(\d+)$/);
+            if (historyScope) {
+                const selectedRecord = tournamentHistory[Number(historyScope[1])];
+                const selectedDateKey = selectedRecord ? historyDateKey(selectedRecord) : "";
+                if (selectedDateKey) matches = matches.filter(item => {
+                    if (!Number(item.timestamp)) return true;
+                    const d = new Date(Number(item.timestamp));
+                    const itemDateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    return itemDateKey === selectedDateKey;
+                });
+            }
             if (!matches.length) {
                 container.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">തിരുത്താവുന്ന paired match records കണ്ടെത്തിയില്ല.<br><span class="text-[10px]">ഈ സെഷനിൽ WIN/LOSS ആയി രേഖപ്പെടുത്തിയ മാച്ചുകൾ ഇവിടെ കാണിക്കും.</span></div>';
                 return;
@@ -5361,7 +5368,21 @@
                 const d = new Date(Number(scheduledMatchStartAt));
                 input.value = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
             }
-            if (status) status.textContent = scheduledMatchStartAt ? `Scheduled: ${new Date(Number(scheduledMatchStartAt)).toLocaleString()}` : "No scheduled reset.";
+            if (status) {
+                if (!scheduledMatchStartAt) status.textContent = "No scheduled reset.";
+                else {
+                    const remaining = Number(scheduledMatchStartAt) - Date.now();
+                    if (remaining <= 0) status.textContent = "Timer reached — starting…";
+                    else {
+                        const totalSeconds = Math.ceil(remaining / 1000);
+                        const days = Math.floor(totalSeconds / 86400);
+                        const hours = Math.floor((totalSeconds % 86400) / 3600);
+                        const minutes = Math.floor((totalSeconds % 3600) / 60);
+                        const seconds = totalSeconds % 60;
+                        status.textContent = `Scheduled: ${new Date(Number(scheduledMatchStartAt)).toLocaleString()} • ${days ? days + "d " : ""}${hours}h ${minutes}m ${seconds}s remaining`;
+                    }
+                }
+            }
         }
         async function saveScheduledMatchStart() {
             const input = document.getElementById("scheduled-match-start-input");
@@ -5379,10 +5400,12 @@
             if (dbRef && navigator.onLine !== false) {
                 try {
                     await dbRef.child("scheduledMatchStartAt").set(at);
-                    showToast("Scheduled reset & auto-start set ചെയ്തു.");
+                    showToast("Scheduled reset & auto-start set ചെയ്തു. Timer countdown ആരംഭിച്ചു.");
                     return;
                 } catch (e) {
                     console.error("Remote schedule save failed; local schedule retained:", e);
+                    showToast("⚠️ Firebase-ൽ Timer sync ആയില്ല. ഈ ഉപകരണത്തിൽ മാത്രം Timer പ്രവർത്തിക്കും.");
+                    return;
                 }
             }
             showToast("ഈ ഉപകരണത്തിൽ Timer സജ്ജമാക്കി. ഇന്റർനെറ്റ് ഇല്ലാത്തതിനാൽ മറ്റ് ഫോണുകളിലേക്ക് sync ആവില്ല.");
@@ -5413,7 +5436,8 @@
             const already = (tournamentHistory || []).some(r =>
                 String(r.sessionId || r.startTimestamp || r.id || "") === sid);
 
-            if (plays > 0 && !already) {
+            const oldDurationMs = Math.max(0, due - oldStart);
+            if (plays > 0 && !already && oldDurationMs >= 60 * 60 * 1000) {
                 const date = new Date(oldStart).toLocaleString("en-GB", {
                     day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
                 });
@@ -5422,8 +5446,8 @@
                     dateKey: historyDateKey({ startTimestamp: sid }),
                     teams: oldTeams, totalPlays: plays,
                     totalMatches: Math.floor((plays + 0.5) / 2),
-                    durationMinutes: Math.max(0, Math.floor((due - oldStart) / 60000)),
-                    durationMs: Math.max(0, due - oldStart)
+                    durationMinutes: Math.floor(oldDurationMs / 60000),
+                    durationMs: oldDurationMs
                 };
                 tournamentHistory = dedupeHistoryRecords([rec, ...(tournamentHistory || [])]);
             }
@@ -5482,9 +5506,10 @@
                 let history = dedupeHistoryRecords(current.tournamentHistory || []);
                 const sid = String(oldStart);
                 const already = history.some(r=>String(r.sessionId||r.startTimestamp||r.id||"")===sid);
-                if (plays > 0 && !already) {
+                const oldDurationMs = Math.max(0, due - oldStart);
+                if (plays > 0 && !already && oldDurationMs >= 60 * 60 * 1000) {
                     const date = new Date(oldStart).toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
-                    const rec = {id:sid,sessionId:sid,startTimestamp:sid,date,dateKey:historyDateKey({startTimestamp:sid}),teams:JSON.parse(JSON.stringify(oldTeams)),totalPlays:plays,totalMatches:Math.floor((plays+0.5)/2),durationMinutes:Math.max(0,Math.floor((due-oldStart)/60000)),durationMs:Math.max(0,due-oldStart)};
+                    const rec = {id:sid,sessionId:sid,startTimestamp:sid,date,dateKey:historyDateKey({startTimestamp:sid}),teams:JSON.parse(JSON.stringify(oldTeams)),totalPlays:plays,totalMatches:Math.floor((plays+0.5)/2),durationMinutes:Math.floor(oldDurationMs/60000),durationMs:oldDurationMs};
                     history = dedupeHistoryRecords([rec,...history]);
                 }
                 const names = current.teamNameOverrides || Object.fromEntries(oldTeams.map(t=>[String(t.id),t.name]));
