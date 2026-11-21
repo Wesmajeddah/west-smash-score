@@ -1148,6 +1148,10 @@
         let audioContext = null;
         let globalClickSequence = 0;
         let pendingWinningTeamId = null;
+        // One score action may be pending at a time on this device. The Firebase
+        // reservation below also fences simultaneous submissions from other phones.
+        let pendingWinActionInProgress = false;
+        let pendingWinCommitInProgress = false;
         let autoWinTimeout = null;
         let lastActionSnapshot = null;
         let lastActionDescription = "";
@@ -5164,6 +5168,8 @@
 
         function handleScoreChange(id, delta) {
             if (historyPreviewLiveState) { showToast("History Special View വായനയ്ക്കു മാത്രമാണ്. RETURN TO LIVE അമർത്തുക."); return; }
+            // Ignore rapid/repeated taps while the winner/loser selection is open.
+            if (pendingWinActionInProgress || pendingWinCommitInProgress) return;
             if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
                 showToast("സ്കോർ രേഖപ്പെടുത്താൻ ആദ്യം START അമർത്തി LIVE മാച്ചിൽ പ്രവേശിക്കുക.");
                 return;
@@ -5178,6 +5184,7 @@
                     return;
                 }
                 pendingWinningTeamId = id;
+                pendingWinActionInProgress = true;
                 openDefeatedTeamModal(id);
                 
             } else if (delta < 0) {
@@ -5305,7 +5312,7 @@
                         btn.classList.add('defeated-option-selected');
                         
                         setTimeout(() => {
-                            closeDefeatedTeamModal();
+                            closeDefeatedTeamModal(true);
                             confirmWinAndDefeatedTeam(winningTeamId, t.id);
                         }, 1000);
                     };
@@ -5315,23 +5322,44 @@
             modal.classList.remove("hidden");
         }
 
-        function closeDefeatedTeamModal() {
+        function closeDefeatedTeamModal(preservePendingAction = false) {
             if (autoWinTimeout) {
                 clearTimeout(autoWinTimeout);
                 autoWinTimeout = null;
             }
             const modal = document.getElementById("defeated-team-modal");
             if (modal) modal.classList.add("hidden");
+            // A selected winner/loser pair keeps its lock until the commit finishes.
+            if (!preservePendingAction && !pendingWinCommitInProgress) {
+                pendingWinActionInProgress = false;
+                pendingWinningTeamId = null;
+            }
         }
 
-        function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
+        async function confirmWinAndDefeatedTeam(winningTeamId, defeatedTeamId) {
+            if (pendingWinCommitInProgress) return;
+            pendingWinCommitInProgress = true;
+            const finishPendingWin = () => {
+                pendingWinCommitInProgress = false;
+                pendingWinActionInProgress = false;
+                pendingWinningTeamId = null;
+            };
             const team = teams.find(t => t.id === winningTeamId);
             const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
-            if (!team || !defeatedTeam) return;
-            if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
-                showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക.");
+            if (!team || !defeatedTeam || String(winningTeamId) === String(defeatedTeamId)) {
+                finishPendingWin();
                 return;
             }
+            if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
+                showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക.");
+                finishPendingWin();
+                return;
+            }
+
+            // Do not require a separate scoreActionLocks database path here:
+            // restrictive Firebase rules can reject that extra write and block every +1.
+            // Local duplicate-tap protection remains active, and the existing per-team
+            // 60-second cooldown is still enforced by lastClickTime.
 
             captureUndoSnapshot(`WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`);
             const now = Date.now();
@@ -5401,6 +5429,7 @@
             triggerWinCelebration();
 
             showToast(`🏆 ${team.name} Won!`);
+            finishPendingWin();
         }
 
         function openUndoModal() {
