@@ -1239,8 +1239,10 @@
         function getInternationalSortedTeams(teamsArray) {
             return [...teamsArray].sort((a, b) => {
                 if (b.wins !== a.wins) return b.wins - a.wins;
-                let aLosses = a.losses || 0;
-                let bLosses = b.losses || 0;
+                const aWins = Math.max(0, Number(a.wins) || 0);
+                const bWins = Math.max(0, Number(b.wins) || 0);
+                const aLosses = Math.max(0, Number(a.losses) || 0);
+                const bLosses = Math.max(0, Number(b.losses) || 0);
                 if (aLosses !== bLosses) return aLosses - bLosses;
                 
                 let h2hWinA = 0;
@@ -1249,9 +1251,9 @@
                 if (b.defeatedDetails) h2hWinB = b.defeatedDetails.filter(d => d.name === a.name).length;
                 if (h2hWinA !== h2hWinB) return h2hWinB - h2hWinA;
 
-                let aPlayed = Math.max(a.played || 0, 1);
-                let bPlayed = Math.max(b.played || 0, 1);
-                return (b.wins / bPlayed) - (a.wins / aPlayed);
+                const aPlayed = Math.max(aWins + aLosses, 1);
+                const bPlayed = Math.max(bWins + bLosses, 1);
+                return (bWins / bPlayed) - (aWins / aPlayed);
             });
         }
 
@@ -1269,7 +1271,10 @@
             const recent = historyRows.slice(0,4);
             const aggregateFor = candidateId => {
                 const rows = recent.map(r => (r.teams || []).find(t => String(t.id) === String(candidateId))).filter(Boolean);
-                const totals = rows.reduce((a,t) => ({wins:a.wins+(Number(t.wins)||0),played:a.played+Math.max(Number(t.played)||0,(Number(t.wins)||0)+(Number(t.losses)||0))}),{wins:0,played:0});
+                const totals = rows.reduce((a,t) => ({
+                    wins: a.wins + Math.max(0, Number(t.wins) || 0),
+                    played: a.played + Math.max(0, Number(t.wins) || 0) + Math.max(0, Number(t.losses) || 0)
+                }), {wins:0, played:0});
                 return {id:String(candidateId),records:rows.length,wins:totals.wins,played:totals.played,rate:totals.played?totals.wins/totals.played:0};
             };
             const ordered = activeTeams.map(t => aggregateFor(t.id)).filter(x => x.records >= 4 && x.played >= 4 && x.wins >= 4).sort((a,b) => b.rate-a.rate || b.wins-a.wins);
@@ -2623,12 +2628,15 @@
             const local = Array.isArray(localTeams) ? localTeams : [];
             const remoteById = new Map(remote.map(team => [String(team.id), team]));
             const baseById = new Map(base.map(team => [String(team.id), team]));
-            const additiveFields = new Set(['wins', 'losses', 'played', 'totalTimeSpentMinutes']);
+            const additiveFields = new Set(['wins', 'losses', 'totalTimeSpentMinutes']);
             const mergeArrayFields = new Set(['defeatedDetails', 'matchHistoryLog']);
 
             // A team removed locally after the last confirmed snapshot is a real
             // deletion. Remove it from the remote list instead of silently restoring it.
             const localIds = new Set(local.map(team => String(team.id)));
+            const deletedTeams = base.filter(team => !localIds.has(String(team.id)));
+            const deletedTeamIds = new Set(deletedTeams.map(team => String(team.id)));
+            const deletedTeamNames = new Set(deletedTeams.map(team => String(team.name || '')).filter(Boolean));
             base.forEach(baseTeam => {
                 const id = String(baseTeam.id);
                 if (!localIds.has(id)) remoteById.delete(id);
@@ -2671,18 +2679,56 @@
                         const delta = (Number(localValue) || 0) - (Number(baseValue) || 0);
                         remoteTeam[key] = (Number(remoteTeam[key]) || 0) + delta;
                     } else if (mergeArrayFields.has(key) && Array.isArray(localValue)) {
-                        const combined = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
-                        const seen = new Set(combined.map(item => JSON.stringify(item)));
+                        // Three-way merge: propagate local deletions/edits from the last
+                        // confirmed base, while retaining additions made concurrently remotely.
+                        const baseArray = Array.isArray(baseValue) ? baseValue : [];
+                        const remoteArray = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
+                        const signature = item => JSON.stringify(item);
+                        const baseSet = new Set(baseArray.map(signature));
+                        const localSet = new Set(localValue.map(signature));
+                        const removedByLocal = new Set([...baseSet].filter(value => !localSet.has(value)));
+                        const combined = remoteArray.filter(item => !removedByLocal.has(signature(item)));
+                        const combinedSet = new Set(combined.map(signature));
                         localValue.forEach(item => {
-                            const signature = JSON.stringify(item);
-                            if (!seen.has(signature)) { combined.push(wesmaDeepClone(item)); seen.add(signature); }
+                            const itemSignature = signature(item);
+                            if (!baseSet.has(itemSignature) && !combinedSet.has(itemSignature)) {
+                                combined.push(wesmaDeepClone(item));
+                                combinedSet.add(itemSignature);
+                            }
                         });
                         remoteTeam[key] = combined;
+                    } else if (key === 'played') {
+                        // Derived field; recompute after all additive W/L deltas are merged.
+                        return;
                     } else {
                         remoteTeam[key] = wesmaDeepClone(localValue);
                     }
                 });
+                remoteTeam.played = Math.max(0, Number(remoteTeam.wins) || 0) + Math.max(0, Number(remoteTeam.losses) || 0);
             });
+
+            // A concurrent device may have added a result involving a team that this
+            // device deleted after its last sync. Strip those newly-arrived orphan links too.
+            if (deletedTeamIds.size || deletedTeamNames.size) {
+                remote.forEach(team => {
+                    const logs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+                    const orphanLogs = logs.filter(log => log && (
+                        deletedTeamIds.has(String(log.opponentId || log.teamId || '')) ||
+                        deletedTeamNames.has(String(log.opponent || ''))
+                    ));
+                    if (orphanLogs.length) {
+                        team.matchHistoryLog = logs.filter(log => !orphanLogs.includes(log));
+                        team.wins = Math.max(0, (Number(team.wins) || 0) - orphanLogs.filter(log => log.result === 'WIN').length);
+                        team.losses = Math.max(0, (Number(team.losses) || 0) - orphanLogs.filter(log => log.result === 'LOSS').length);
+                        const removedMinutes = orphanLogs.reduce((sum, log) => sum + (Number(log.durationMinutes) || 0), 0);
+                        team.totalTimeSpentMinutes = Math.max(0, (Number(team.totalTimeSpentMinutes) || 0) - removedMinutes);
+                    }
+                    team.defeatedDetails = (Array.isArray(team.defeatedDetails) ? team.defeatedDetails : []).filter(detail => detail &&
+                        !deletedTeamIds.has(String(detail.teamId || detail.id || '')) &&
+                        !deletedTeamNames.has(String(detail.name || '')));
+                    team.played = Math.max(0, Number(team.wins) || 0) + Math.max(0, Number(team.losses) || 0);
+                });
+            }
             return remote;
         }
 
@@ -3443,10 +3489,24 @@
                 oldLoser.played = getTeamPlayedCount(oldLoser);
                 oldWinner.totalTimeSpentMinutes = Math.max(0, (Number(oldWinner.totalTimeSpentMinutes) || 0) - duration);
                 oldLoser.totalTimeSpentMinutes = Math.max(0, (Number(oldLoser.totalTimeSpentMinutes) || 0) - duration);
-                oldWinner.defeatedDetails = (oldWinner.defeatedDetails || []).filter(d =>
-                    seq > 0 ? Number(d.seq) !== seq : !(d && d.name === oldLoserName));
-                oldLoser.defeatedDetails = (oldLoser.defeatedDetails || []).filter(d =>
-                    seq > 0 ? Number(d.seq) !== seq : !(d && d.name === oldWinnerName));
+                const removeOneDefeatDetail = (team, opponentName) => {
+                    if (!Array.isArray(team.defeatedDetails)) return;
+                    let index = -1;
+                    if (seq > 0) {
+                        index = team.defeatedDetails.findIndex(d => d && Number(d.seq) === seq);
+                    } else {
+                        const candidates = team.defeatedDetails
+                            .map((detail, detailIndex) => ({detail, detailIndex}))
+                            .filter(item => item.detail && item.detail.name === opponentName);
+                        if (candidates.length) {
+                            candidates.sort((a, b) => Math.abs(normalizeHistoryTimestamp(a.detail.timestamp) - timestamp) - Math.abs(normalizeHistoryTimestamp(b.detail.timestamp) - timestamp));
+                            index = candidates[0].detailIndex;
+                        }
+                    }
+                    if (index >= 0) team.defeatedDetails.splice(index, 1);
+                };
+                removeOneDefeatDetail(oldWinner, oldLoserName);
+                removeOneDefeatDetail(oldLoser, oldWinnerName);
 
                 const makeLog = (result, opponent) => ({
                     ...(seq > 0 ? { seq } : {}),
@@ -3464,7 +3524,10 @@
                 newWinner.totalTimeSpentMinutes = (Number(newWinner.totalTimeSpentMinutes) || 0) + duration;
                 newLoser.totalTimeSpentMinutes = (Number(newLoser.totalTimeSpentMinutes) || 0) + duration;
                 if (!Array.isArray(newWinner.defeatedDetails)) newWinner.defeatedDetails = [];
-                newWinner.defeatedDetails.push({ name: newLoser.name, ...(seq > 0 ? { seq } : {}), durationMinutes: duration });
+                newWinner.defeatedDetails.push({
+                    name: newLoser.name, teamId: newLoser.id,
+                    ...(seq > 0 ? { seq } : {}), timestamp, durationMinutes: duration
+                });
             }
 
             if (scopeEl.value === "current") {
@@ -5316,8 +5379,17 @@
                 // Remove the deleted team's own row and references to it from all
                 // remaining live team logs. Do not leave orphaned score totals behind.
                 teams.forEach(otherTeam => {
-                    otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item => String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
-                    otherTeam.matchHistoryLog = (otherTeam.matchHistoryLog || []).filter(item => String(item.opponentId || item.teamId || '') !== deletedTeamId && String(item.opponent || '') !== deletedTeamName);
+                    const oldLogs = Array.isArray(otherTeam.matchHistoryLog) ? otherTeam.matchHistoryLog : [];
+                    const removedLogs = oldLogs.filter(item =>
+                        String(item.opponentId || item.teamId || '') === deletedTeamId || String(item.opponent || '') === deletedTeamName);
+                    otherTeam.matchHistoryLog = oldLogs.filter(item => !removedLogs.includes(item));
+                    otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item =>
+                        String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
+                    otherTeam.wins = Math.max(0, (Number(otherTeam.wins) || 0) - removedLogs.filter(item => item && item.result === 'WIN').length);
+                    otherTeam.losses = Math.max(0, (Number(otherTeam.losses) || 0) - removedLogs.filter(item => item && item.result === 'LOSS').length);
+                    otherTeam.played = getTeamPlayedCount(otherTeam);
+                    const removedMinutes = removedLogs.reduce((sum, item) => sum + (Number(item && item.durationMinutes) || 0), 0);
+                    otherTeam.totalTimeSpentMinutes = Math.max(0, (Number(otherTeam.totalTimeSpentMinutes) || 0) - removedMinutes);
                 });
 
                 const stripDeletedTeam = snapshot => {
@@ -5325,9 +5397,22 @@
                     if (Array.isArray(snapshot.teams)) {
                         snapshot.teams = snapshot.teams.filter(item => String(item.id) !== deletedTeamId);
                         snapshot.teams.forEach(otherTeam => {
-                            otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item => String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
-                            otherTeam.matchHistoryLog = (otherTeam.matchHistoryLog || []).filter(item => String(item.opponentId || item.teamId || '') !== deletedTeamId && String(item.opponent || '') !== deletedTeamName);
+                            const oldLogs = Array.isArray(otherTeam.matchHistoryLog) ? otherTeam.matchHistoryLog : [];
+                            const removedLogs = oldLogs.filter(item =>
+                                String(item.opponentId || item.teamId || '') === deletedTeamId || String(item.opponent || '') === deletedTeamName);
+                            otherTeam.matchHistoryLog = oldLogs.filter(item => !removedLogs.includes(item));
+                            otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item =>
+                                String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
+                            otherTeam.wins = Math.max(0, (Number(otherTeam.wins) || 0) - removedLogs.filter(item => item && item.result === 'WIN').length);
+                            otherTeam.losses = Math.max(0, (Number(otherTeam.losses) || 0) - removedLogs.filter(item => item && item.result === 'LOSS').length);
+                            otherTeam.played = getTeamPlayedCount(otherTeam);
+                            const removedMinutes = removedLogs.reduce((sum, item) => sum + (Number(item && item.durationMinutes) || 0), 0);
+                            otherTeam.totalTimeSpentMinutes = Math.max(0, (Number(otherTeam.totalTimeSpentMinutes) || 0) - removedMinutes);
                         });
+                        if (Object.prototype.hasOwnProperty.call(snapshot, 'totalPlays')) {
+                            snapshot.totalPlays = snapshot.teams.reduce((sum, item) => sum + getTeamPlayedCount(item), 0);
+                            snapshot.totalMatches = Math.floor(snapshot.totalPlays / 2);
+                        }
                     }
                     if (snapshot.lastEndedChampionSnapshot) stripDeletedTeam(snapshot.lastEndedChampionSnapshot);
                     if (Array.isArray(snapshot.undoHistoryStack)) snapshot.undoHistoryStack.forEach(stripDeletedTeam);
@@ -5579,7 +5664,7 @@
             const oldTeams = JSON.parse(JSON.stringify(teams || []));
             const oldStart = Number(tournamentStartTimestamp) || due;
             const plays = oldTeams.reduce((n, t) =>
-                n + Math.max(0, Number(t.played) || 0, (Number(t.wins) || 0) + (Number(t.losses) || 0)), 0);
+                n + Math.max(0, Number(t.wins) || 0) + Math.max(0, Number(t.losses) || 0), 0);
             const sid = String(oldStart);
             const already = (tournamentHistory || []).some(r =>
                 String(r.sessionId || r.startTimestamp || r.id || "") === sid);
@@ -5649,7 +5734,7 @@
                 if (Number(current.scheduledMatchStartAt) !== due || Number(current.lastTriggeredScheduledStartAt) === due) return;
                 const oldTeams = current.teams;
                 const oldStart = Number(current.tournamentStartTimestamp) || due;
-                const plays = oldTeams.reduce((n,t)=>n+Math.max(0,Number(t.played)||0,(Number(t.wins)||0)+(Number(t.losses)||0)),0);
+                const plays = oldTeams.reduce((n,t)=>n+Math.max(0,Number(t.wins)||0)+Math.max(0,Number(t.losses)||0),0);
                 let history = dedupeHistoryRecords(current.tournamentHistory || []);
                 const sid = String(oldStart);
                 const already = history.some(r=>String(r.sessionId||r.startTimestamp||r.id||"")===sid);
