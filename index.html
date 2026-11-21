@@ -357,10 +357,11 @@
 
 
         /* Keep the existing date menu visible in the compact main header. */
-        #capture-area > div:first-child { display:flex; align-items:center; gap:6px; min-width:0; }
+        #capture-area > div:first-child { display:flex !important; flex-wrap:nowrap !important; align-items:center; justify-content:space-between; gap:6px; width:100%; min-width:0; }
         #capture-area > div:first-child > div:first-child { flex:1 1 auto; min-width:0; }
-        #header-date-badge-small { display:flex !important; flex:0 0 auto !important; min-width:max-content; position:relative; z-index:100; }
-        #header-date-badge-small > button { display:flex !important; white-space:nowrap; min-height:30px; }
+        #header-date-badge-small { display:flex !important; flex:0 0 auto !important; width:max-content !important; min-width:max-content !important; max-width:none !important; position:relative; z-index:100; visibility:visible !important; opacity:1 !important; }
+        #header-date-badge-small > button { display:flex !important; flex:0 0 auto !important; width:max-content !important; min-width:max-content !important; white-space:nowrap !important; min-height:32px; padding:5px 8px; visibility:visible !important; opacity:1 !important; }
+        #header-date-text { display:inline-flex !important; align-items:center; flex:0 0 auto !important; width:max-content !important; min-width:max-content !important; white-space:nowrap !important; color:#5c4033 !important; visibility:visible !important; }
         #end-modal-reset-dropdown { z-index:200 !important; max-width:min(84vw, 320px); max-height:75vh; overflow-y:auto; }
 
         /* Correct / match-review controls stay inside their existing boxes on mobile. */
@@ -1727,13 +1728,19 @@
             }
         }
 
-        function initData() {
-            const dateBadgeSmall = document.getElementById("header-date-badge-small");
+        function refreshVisibleDateLabels() {
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const dateText = document.getElementById("header-date-text");
-            if(dateText) dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
+            if (dateText) dateText.innerHTML = `<i class="fa-regular fa-calendar-days text-[9px] mr-1"></i> ${todayStr}`;
             const dateMenuDate = document.getElementById("date-menu-current-date");
             if (dateMenuDate) dateMenuDate.textContent = todayStr;
+        }
+
+        // Populate the date as soon as the main interface markup is available.
+        refreshVisibleDateLabels();
+
+        function initData() {
+            refreshVisibleDateLabels();
 
             renderHeaderTitle();
             render();
@@ -2982,55 +2989,62 @@
             const record = tournamentHistory[Number(match[1])];
             if (!record || !Array.isArray(record.teams)) return [];
 
-            // History snapshots can contain cumulative team totals from older dates.
-            // Build an isolated, editable copy containing only matches from this session.
-            const sessionStart = Number(record.startTimestamp || record.sessionId || record.id) || 0;
-            const sessionDuration = Number(record.durationMs) || (Number(record.durationMinutes) || 0) * 60000;
-            const nextSessionStart = sessionStart ? (tournamentHistory || [])
-                .map(item => Number(item && (item.startTimestamp || item.sessionId || item.id)) || 0)
-                .filter(stamp => stamp > sessionStart)
-                .sort((a, b) => a - b)[0] || 0 : 0;
-            const sessionEnd = sessionStart
-                ? (sessionDuration ? sessionStart + sessionDuration : (nextSessionStart ? nextSessionStart - 1 : Date.now()))
-                : 0;
-            const dateStart = (() => {
-                if (sessionStart) return 0;
-                const parsed = Date.parse(record.date || "");
-                if (!Number.isFinite(parsed)) return 0;
-                const d = new Date(parsed); d.setHours(0,0,0,0); return d.getTime();
-            })();
-            const dateEnd = dateStart ? dateStart + 86400000 : 0;
+            // Correct is date-scoped: never mix match logs from other calendar dates.
+            const selectedDateKey = historyDateKey(record);
+            const selectedDate = selectedDateKey ? selectedDateKey.split("-").map(Number) : [];
+            const dateStart = selectedDate.length === 3 && selectedDate.every(Number.isFinite)
+                ? new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]).getTime() : 0;
+            const dateEnd = dateStart ? new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2] + 1).getTime() : 0;
 
             return JSON.parse(JSON.stringify(record.teams)).map(team => {
                 const originalLogs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
-                const sessionLogs = originalLogs.filter(log => {
-                    if (!log) return false;
-                    const stamp = Number(log.timestamp) || 0;
-                    if (stamp) {
-                        if (sessionStart) return stamp >= sessionStart && (!sessionEnd || stamp <= sessionEnd);
-                        if (dateStart) return stamp >= dateStart && stamp < dateEnd;
-                        return false;
-                    }
-                    // Untimestamped legacy entries cannot safely be assigned to a date
-                    // when the snapshot contains multiple sessions; exclude them.
-                    return !sessionStart && !dateStart && originalLogs.length > 0;
+                team.matchHistoryLog = originalLogs.filter(log => {
+                    const stamp = Number(log && log.timestamp) || 0;
+                    return stamp && dateStart && stamp >= dateStart && stamp < dateEnd;
                 });
-                team.matchHistoryLog = sessionLogs;
-                team.wins = sessionLogs.filter(log => log.result === "WIN").length;
-                team.losses = sessionLogs.filter(log => log.result === "LOSS").length;
+                team.wins = team.matchHistoryLog.filter(log => log.result === "WIN").length;
+                team.losses = team.matchHistoryLog.filter(log => log.result === "LOSS").length;
                 team.played = team.wins + team.losses;
-                team.totalTimeSpentMinutes = sessionLogs.reduce((sum, log) => sum + (Number(log.durationMinutes) || 0), 0);
-                const winSeqs = new Set(sessionLogs.filter(log => log.result === "WIN" && Number(log.seq) > 0).map(log => Number(log.seq)));
+                team.totalTimeSpentMinutes = team.matchHistoryLog.reduce((sum, log) => sum + (Number(log.durationMinutes) || 0), 0);
+                const winSeqs = new Set(team.matchHistoryLog.filter(log => log.result === "WIN" && Number(log.seq) > 0).map(log => Number(log.seq)));
                 team.defeatedDetails = (Array.isArray(team.defeatedDetails) ? team.defeatedDetails : []).filter(detail => {
-                    if (!detail) return false;
-                    const stamp = Number(detail.timestamp) || 0;
-                    if (stamp) {
-                        if (sessionStart) return stamp >= sessionStart && (!sessionEnd || stamp <= sessionEnd);
-                        if (dateStart) return stamp >= dateStart && stamp < dateEnd;
-                    }
-                    return Number(detail.seq) > 0 && winSeqs.has(Number(detail.seq));
+                    const stamp = Number(detail && detail.timestamp) || 0;
+                    return (stamp && dateStart && stamp >= dateStart && stamp < dateEnd) ||
+                        (!stamp && Number(detail && detail.seq) > 0 && winSeqs.has(Number(detail.seq)));
                 });
                 return team;
+            });
+        }
+
+        function mergeCorrectedDateIntoHistoryTeams(record, correctedDateTeams) {
+            const selectedDateKey = historyDateKey(record);
+            const parts = selectedDateKey ? selectedDateKey.split("-").map(Number) : [];
+            const dateStart = parts.length === 3 && parts.every(Number.isFinite)
+                ? new Date(parts[0], parts[1] - 1, parts[2]).getTime() : 0;
+            const dateEnd = dateStart ? new Date(parts[0], parts[1] - 1, parts[2] + 1).getTime() : 0;
+            return JSON.parse(JSON.stringify(record.teams || [])).map(originalTeam => {
+                const correctedTeam = (correctedDateTeams || []).find(team => String(team.id) === String(originalTeam.id));
+                if (!correctedTeam) return originalTeam;
+                const allOriginalLogs = Array.isArray(originalTeam.matchHistoryLog) ? originalTeam.matchHistoryLog : [];
+                const otherDateLogs = allOriginalLogs.filter(log => {
+                    const stamp = Number(log && log.timestamp) || 0;
+                    // Keep untimestamped legacy entries intact; their date cannot be inferred safely.
+                    return !stamp || !dateStart || stamp < dateStart || stamp >= dateEnd;
+                });
+                const selectedDateLogs = Array.isArray(correctedTeam.matchHistoryLog) ? correctedTeam.matchHistoryLog : [];
+                originalTeam.matchHistoryLog = [...otherDateLogs, ...selectedDateLogs].sort((a,b) => (Number(a && a.timestamp)||0) - (Number(b && b.timestamp)||0));
+                originalTeam.wins = originalTeam.matchHistoryLog.filter(log => log && log.result === "WIN").length;
+                originalTeam.losses = originalTeam.matchHistoryLog.filter(log => log && log.result === "LOSS").length;
+                originalTeam.played = originalTeam.wins + originalTeam.losses;
+                originalTeam.totalTimeSpentMinutes = originalTeam.matchHistoryLog.reduce((sum, log) => sum + (Number(log && log.durationMinutes) || 0), 0);
+                const originalDetails = Array.isArray(originalTeam.defeatedDetails) ? originalTeam.defeatedDetails : [];
+                const otherDateDetails = originalDetails.filter(detail => {
+                    const stamp = Number(detail && detail.timestamp) || 0;
+                    return !stamp || !dateStart || stamp < dateStart || stamp >= dateEnd;
+                });
+                const correctedDetails = Array.isArray(correctedTeam.defeatedDetails) ? correctedTeam.defeatedDetails : [];
+                originalTeam.defeatedDetails = [...otherDateDetails, ...correctedDetails];
+                return originalTeam;
             });
         }
 
@@ -3181,9 +3195,10 @@
                 if (!record) { alert("History record കണ്ടെത്താനായില്ല."); return; }
                 const key = String(record.sessionId || record.startTimestamp || record.id || "");
                 const fingerprint = historyRecordFingerprint(record);
+                const correctedFullTeams = mergeCorrectedDateIntoHistoryTeams(record, editingTeams);
                 const updateRecords = list => (Array.isArray(list) ? list : Object.values(list || {})).map(item => {
                     const itemKey = String(item.sessionId || item.startTimestamp || item.id || "");
-                    return (key ? itemKey === key : historyRecordFingerprint(item) === fingerprint) ? {...item, teams:editingTeams} : item;
+                    return (key ? itemKey === key : historyRecordFingerprint(item) === fingerprint) ? {...item, teams:correctedFullTeams} : item;
                 });
                 if (dbRef) {
                     dbRef.child("tournamentHistory").transaction(current => updateRecords(current), (error, committed, snapshot) => {
@@ -3333,7 +3348,7 @@
                 if (!selectedRecord) { alert("History record കണ്ടെത്താനായില്ല."); return; }
                 const selectedKey = String(selectedRecord.sessionId || selectedRecord.startTimestamp || selectedRecord.id || "");
                 const selectedFingerprint = historyRecordFingerprint(selectedRecord);
-                const correctedTeams = editingTeams;
+                const correctedTeams = mergeCorrectedDateIntoHistoryTeams(selectedRecord, editingTeams);
                 const applyRecord = list => {
                     const normalized = Array.isArray(list) ? list : (list && typeof list === "object" ? Object.values(list) : []);
                     return normalized.map(record => {
