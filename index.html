@@ -1270,27 +1270,46 @@
 
         function getDynamicBadgeTitle(team, sessionTeams = teams, historyRows = tournamentHistory) {
             if (!team || !Array.isArray(historyRows) || !historyRows.length) return "";
-            const teamKey = String(team.id);
-            let firstPlaceCount = 0;
-            const firstPlaceCounts = new Map();
 
+            // Special Tag eligibility is calculated ONLY from saved History.
+            // Each team's points are its accumulated match wins across all saved sessions.
+            // A team must have at least six historical wins; a team with fewer than six
+            // wins can never receive the tag, even if it leads a short history.
+            const totalsByTeam = new Map();
             historyRows.forEach(record => {
                 if (!record || !Array.isArray(record.teams)) return;
-                const historicalTeams = record.teams.filter(t => t && !t.isDisabled);
-                if (!historicalTeams.length) return;
-                const firstPlaceGroup = getPodiumGroups(historicalTeams).find(group => group.rank === 1);
-                if (!firstPlaceGroup) return;
-                firstPlaceGroup.teams.forEach(historicalTeam => {
+                record.teams.forEach(historicalTeam => {
+                    if (!historicalTeam || historicalTeam.isDisabled || historicalTeam.id == null) return;
                     const key = String(historicalTeam.id);
-                    firstPlaceCounts.set(key, (firstPlaceCounts.get(key) || 0) + 1);
+                    const current = totalsByTeam.get(key) || {
+                        id: historicalTeam.id,
+                        name: historicalTeam.name || "",
+                        wins: 0,
+                        losses: 0,
+                        defeatedDetails: []
+                    };
+                    current.wins += Math.max(0, Number(historicalTeam.wins) || 0);
+                    current.losses += Math.max(0, Number(historicalTeam.losses) || 0);
+                    if (Array.isArray(historicalTeam.defeatedDetails)) {
+                        current.defeatedDetails.push(...historicalTeam.defeatedDetails);
+                    }
+                    totalsByTeam.set(key, current);
                 });
             });
 
-            firstPlaceCount = firstPlaceCounts.get(teamKey) || 0;
-            const highestFirstPlaceCount = Math.max(0, ...Array.from(firstPlaceCounts.values()));
-            // Only the team(s) with the most historical first-place finishes,
-            // or a team with at least six first-place finishes, can receive this tag.
-            if (!firstPlaceCount || (firstPlaceCount !== highestFirstPlaceCount && firstPlaceCount < 6)) return "";
+            const historicalStandings = getInternationalSortedTeams(Array.from(totalsByTeam.values()));
+            if (!historicalStandings.length) return "";
+
+            // Wins are the historical points. Equal wins are separated by fewer losses;
+            // teams level on both wins and losses share the same eligible position.
+            const highestPoints = Number(historicalStandings[0].wins) || 0;
+            if (highestPoints < 6) return "";
+            const leadingTeams = historicalStandings.filter(candidate =>
+                (Number(candidate.wins) || 0) === highestPoints &&
+                (Number(candidate.losses) || 0) === (Number(historicalStandings[0].losses) || 0)
+            );
+            const isEligibleLeader = leadingTeams.some(candidate => String(candidate.id) === String(team.id));
+            if (!isEligibleLeader) return "";
 
             const phrases = [
                 "A FORCE THAT IS HARD TO STOP",
@@ -1303,7 +1322,7 @@
                 "THE GAME-CHANGERS ON COURT"
             ];
             if (!window.wesmaSpecialTagPhraseCache) window.wesmaSpecialTagPhraseCache = {};
-            const cacheKey = `${teamKey}:${firstPlaceCount}`;
+            const cacheKey = `${String(team.id)}:${highestPoints}:${Number(historicalStandings[0].losses) || 0}`;
             if (!window.wesmaSpecialTagPhraseCache[cacheKey]) {
                 const previous = Number(window.wesmaSpecialTagPhraseCache.__lastIndex);
                 let next = Math.floor(Math.random() * phrases.length);
