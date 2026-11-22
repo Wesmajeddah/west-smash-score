@@ -2256,6 +2256,35 @@
             return getCurrentSessionWinCount(team) + getCurrentSessionLossCount(team);
         }
 
+        function getHistoryRecordMatchLogs(team, historyRecord) {
+            if (!team) return [];
+            const logs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+            const sessionId = String(historyRecord && (historyRecord.sessionId || historyRecord.startTimestamp || historyRecord.id) || '');
+            const sessionStart = normalizeHistoryTimestamp(sessionId);
+            const durationMs = Math.max(0, Number(historyRecord && historyRecord.durationMs) || (Number(historyRecord && historyRecord.durationMinutes) || 0) * 60000);
+            const sessionEnd = sessionStart && durationMs ? sessionStart + durationMs + 1 : 0;
+            const hasSessionTaggedLogs = logs.some(log => log && log.sessionId != null && String(log.sessionId) === sessionId);
+            let selected = logs.filter(log => {
+                if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
+                if (hasSessionTaggedLogs) return String(log.sessionId || '') === sessionId;
+                const stamp = normalizeHistoryTimestamp(log.timestamp);
+                if (sessionStart && stamp) return stamp >= sessionStart && (!sessionEnd || stamp < sessionEnd);
+                return !sessionStart && !log.sessionId;
+            });
+            // Older saved snapshots may contain counters but no match log. Preserve
+            // their recorded play total rather than showing zero in archived reports.
+            if (!selected.length && !logs.length) {
+                const wins = Math.max(0, Number(team.wins) || 0);
+                const losses = Math.max(0, Number(team.losses) || 0);
+                return Array.from({length: wins}, () => ({result:'WIN'})).concat(Array.from({length: losses}, () => ({result:'LOSS'})));
+            }
+            return dedupeMatchHistoryLogs(selected);
+        }
+
+        function getHistoryRecordTeamPlayedCount(team, historyRecord) {
+            return getHistoryRecordMatchLogs(team, historyRecord).filter(log => ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase())).length;
+        }
+
         function calculateTotalPlays() {
             // Each completed match contributes exactly one play to each participant.
             return (Array.isArray(teams) ? teams : []).reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
@@ -3076,9 +3105,8 @@
                         const oldKey = String(item.sessionId || item.startTimestamp || item.id || "");
                         return (newKey && oldKey === newKey) || (!oldKey && historyRecordFingerprint(item) === historyRecordFingerprint(record));
                     });
-                    const sessionLongEnough = (Number(record.durationMs) || (Number(record.durationMinutes) || 0) * 60000) >= 60 * 60 * 1000;
-                    // History eligibility depends only on this session's duration, not the gap between records.
-                    return (exists || !sessionLongEnough) ? list : dedupeHistoryRecords([record, ...list]);
+                    // Save every completed session that has played matches; short sessions are valid too.
+                    return exists ? list : dedupeHistoryRecords([record, ...list]);
                 }, (error, committed, snapshot) => {
                     if (error) {
                         console.error("Firebase history transaction failed:", error);
@@ -3111,13 +3139,6 @@
             }
 
             const sessionDurationMs = tournamentStartTimestamp ? Math.max(0, Date.now() - Number(tournamentStartTimestamp)) : 0;
-            if (sessionDurationMs < 60 * 60 * 1000) {
-                // Do not mark this session as saved yet: if the same session later
-                // reaches one hour, End Match must still be able to archive it.
-                saveLocalBackup();
-                showToast("⏳ ഒരു മണിക്കൂർ പൂർത്തിയായ സെഷനുകൾ മാത്രമേ History-യിൽ സേവ് ചെയ്യൂ.");
-                return false;
-            }
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
 
@@ -4007,7 +4028,7 @@
                 let mins = t.totalTimeSpentMinutes || 0;
                 let formattedTime = formatHoursAndMins(mins);
                 let animClass = `unique-summary-card-${((t.id - 1) % 5) + 1}`;
-                let playedCount = getTeamPlayedCount(t);
+                let playedCount = getHistoryRecordTeamPlayedCount(t, item);
                 let colorClass = `team-name-${(((t.id - 1) % 5) + 1)}`;
                 
                 html += `
@@ -4227,13 +4248,13 @@
             if (!item || !content) return;
             const buildFallbackHistorySummary = (label) => {
                 const fallbackTeams = getInternationalSortedTeams((item.teams || []).filter(team => !team.isDisabled));
-                const fallbackRows = fallbackTeams.map((team, index) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-white px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${index + 1}. ${escapeHtml(team.name)}</div><div class="text-[8px] text-slate-500">${getTeamPlayedCount(team)} MATCHES PLAYED</div></div><div class="text-right shrink-0"><div class="text-[11px] leading-tight font-black text-emerald-700">${Number(team.wins)||0} WINS</div><div class="text-[8px] font-bold text-rose-700">${Number(team.losses)||0} LOSSES</div></div></div>`).join("");
+                const fallbackRows = fallbackTeams.map((team, index) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-white px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${index + 1}. ${escapeHtml(team.name)}</div><div class="text-[8px] text-slate-500">${getHistoryRecordTeamPlayedCount(team, item)} MATCHES PLAYED</div></div><div class="text-right shrink-0"><div class="text-[11px] leading-tight font-black text-emerald-700">${Number(team.wins)||0} WINS</div><div class="text-[8px] font-bold text-rose-700">${Number(team.losses)||0} LOSSES</div></div></div>`).join("");
                 return `<div id="history-special-capture" class="space-y-2 rounded-xl border-2 border-[#c6a15b] bg-[#fcfbf9] p-3"><div class="text-center text-sm font-black text-[#5c4033]">${label}</div><div class="text-center text-[9px] text-slate-500">${escapeHtml(item.endMatchHeaderDate || item.date || "SAVED MATCH")}</div>${fallbackRows || '<div class="text-center text-xs text-slate-500 py-4">No historical team data</div>'}<div class="text-[8px] text-slate-500 text-center pt-1">ORIGINAL SNAPSHOT NOT STORED • SHOWN FROM SAVED HISTORY DATA</div></div>`;
             };
             if (view === "main") {
                 if (!item.mainInterfaceSnapshot) {
                     const fallbackTeams = getInternationalSortedTeams((item.teams || []).filter(team => !team.isDisabled));
-                    const fallbackRows = fallbackTeams.map((team, index) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-white px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${index + 1}. ${escapeHtml(team.name)}</div><div class="text-[8px] text-slate-500">${getTeamPlayedCount(team)} MATCHES PLAYED</div></div><div class="text-right shrink-0"><div class="text-sm font-black text-emerald-700">${Number(team.wins)||0} WINS</div><div class="text-[8px] font-bold text-rose-700">${Number(team.losses)||0} LOSSES</div></div></div>`).join("");
+                    const fallbackRows = fallbackTeams.map((team, index) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-white px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${index + 1}. ${escapeHtml(team.name)}</div><div class="text-[8px] text-slate-500">${getHistoryRecordTeamPlayedCount(team, item)} MATCHES PLAYED</div></div><div class="text-right shrink-0"><div class="text-sm font-black text-emerald-700">${Number(team.wins)||0} WINS</div><div class="text-[8px] font-bold text-rose-700">${Number(team.losses)||0} LOSSES</div></div></div>`).join("");
                     content.innerHTML = `<div id="history-special-capture" class="space-y-2 rounded-xl border border-[#e6decb] bg-[#fcfbf9] p-3"><div class="text-center font-black text-sm text-[#5c4033]">HISTORICAL MAIN SUMMARY</div><div class="text-center text-[9px] text-slate-500">${escapeHtml(item.date || "SAVED MATCH")}</div>${fallbackRows || '<div class="text-center text-xs text-slate-500 py-4">No historical team data</div>'}<div class="text-[8px] text-slate-500 text-center pt-1">READ ONLY • GENERATED FROM SAVED HISTORY DATA</div></div>`;
                     return;
                 }
@@ -4250,7 +4271,7 @@
                 const championNames = (championGroup.teams || []).map(team => escapeHtml(team.name)).join(" &amp; ") || "No champion recorded";
                 const rows = sortedHistorical.map(team => {
                     const rank = rankMap.get(standingPositionKey(team)) || 0;
-                    const played = getTeamPlayedCount(team);
+                    const played = getHistoryRecordTeamPlayedCount(team, item);
                     const isChampion = championIds.has(String(team.id));
                     return `<div class="flex items-center justify-between gap-2 rounded-xl border ${isChampion ? 'border-amber-400 bg-amber-50' : 'border-[#e6decb] bg-white'} px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${rank}. ${escapeHtml(team.name)} ${isChampion ? '👑' : ''}</div><div class="text-[8px] text-slate-500">${played} MATCHES PLAYED</div></div><div class="shrink-0 rounded-lg bg-[#f5f0eb] border border-[#d7ccc8] px-3 py-1 text-center"><div class="text-sm font-black text-emerald-700">${Number(team.wins)||0}</div><div class="text-[7px] font-black tracking-widest text-[#8c6239]">WINS</div></div></div>`;
                 }).join("");
@@ -4283,7 +4304,7 @@
             }
             if (!item.endMatchSnapshot) {
                 const fallbackTeams = getInternationalSortedTeams((item.teams || []).filter(team => !team.isDisabled));
-                const fallbackRows = fallbackTeams.map((team, index) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-white px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${index + 1}. ${escapeHtml(team.name)}</div><div class="text-[8px] text-slate-500">${getTeamPlayedCount(team)} MATCHES PLAYED</div></div><div class="text-right shrink-0"><div class="text-sm font-black text-emerald-700">${Number(team.wins)||0} WINS</div><div class="text-[8px] font-bold text-rose-700">${Number(team.losses)||0} LOSSES</div></div></div>`).join("");
+                const fallbackRows = fallbackTeams.map((team, index) => `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-white px-3 py-2"><div class="min-w-0"><div class="text-[10px] font-black text-[#38251d] break-words">${index + 1}. ${escapeHtml(team.name)}</div><div class="text-[8px] text-slate-500">${getHistoryRecordTeamPlayedCount(team, item)} MATCHES PLAYED</div></div><div class="text-right shrink-0"><div class="text-sm font-black text-emerald-700">${Number(team.wins)||0} WINS</div><div class="text-[8px] font-bold text-rose-700">${Number(team.losses)||0} LOSSES</div></div></div>`).join("");
                 content.innerHTML = `<div id="history-special-capture" class="space-y-2 rounded-xl border-2 border-[#c6a15b] bg-[#fcfbf9] p-3"><div class="text-center text-sm font-black text-[#5c4033]">WESMA • END MATCH SUMMARY</div><div class="text-center text-[9px] text-slate-500">${escapeHtml(item.endMatchHeaderDate || item.date || "SAVED MATCH")}</div>${fallbackRows || '<div class="text-center text-xs text-slate-500 py-4">No historical team data</div>'}<div class="text-[8px] text-slate-500 text-center pt-1">READ ONLY • GENERATED FROM SAVED HISTORY DATA</div></div>`;
                 return;
             }
@@ -4345,7 +4366,7 @@
             triggerHapticFeedback([30]);
             const item = tournamentHistory[historyIndex];
             if (!item || !item.teams) return;
-            const team = item.teams.find(t => t.id === teamId);
+            const team = item.teams.find(t => String(t.id) === String(teamId));
             if (!team) return;
 
             const modal = document.getElementById("history-team-info-detail-modal");
@@ -4354,15 +4375,16 @@
 
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
             const historyBadge = getHistoryBadgeTitle(team, historyIndex);
+            const historyLogs = getHistoryRecordMatchLogs(team, item);
             let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}${historyBadge ? ` <span class="dangerous-badge">${historyBadge}</span>` : ""}</div>`;
 
             if (type === 'wins') {
                 html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
-                if (!team.matchHistoryLog || team.matchHistoryLog.filter(m => m.result === 'WIN').length === 0) {
+                if (!historyLogs || historyLogs.filter(m => m.result === 'WIN').length === 0) {
                     html += `<div class="text-slate-500 italic">No wins.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
-                    let winMatches = sortLatestFirst(team.matchHistoryLog.filter(m => m.result === 'WIN'));
+                    let winMatches = sortLatestFirst(historyLogs.filter(m => m.result === 'WIN'));
                     winMatches.forEach((m, idx) => {
                         html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
                             <div class="name-wrapper flex-1">
@@ -4377,7 +4399,7 @@
             } else if (type === 'losses') {
                 html += `<div class="text-rose-600 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Losses: (${team.losses || 0})</div>`;
                 
-                let lossMatches = sortLatestFirst((team.matchHistoryLog || []).filter(m => m && m.result === 'LOSS').map(m => ({
+                let lossMatches = sortLatestFirst((historyLogs || []).filter(m => m && m.result === 'LOSS').map(m => ({
                     winner: m.opponent,
                     seq: Number(m.seq) || 0,
                     durationMinutes: m.durationMinutes
@@ -4398,18 +4420,18 @@
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                let playedCount = getTeamPlayedCount(team);
+                let playedCount = historyLogs.filter(m => m && (m.result === 'WIN' || m.result === 'LOSS')).length;
                 html += `<div class="text-[#5c4033] font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> Total Matches: (${playedCount})</div>`;
                 
-                if (!team.matchHistoryLog || team.matchHistoryLog.length === 0) {
+                if (!historyLogs || historyLogs.length === 0) {
                     html += `<div class="text-slate-500 italic">No matches.</div>`;
                 } else {
                     html += `<div class="space-y-1.5 pt-1">`;
-                    sortLatestFirst(team.matchHistoryLog).forEach((m, idx) => {
+                    sortLatestFirst(historyLogs).forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-700' : (m.result === 'VOID' ? 'text-amber-700' : 'text-rose-600');
                         html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
                             <div class="name-wrapper flex-1">
-                                <span class="text-[#5c4033] font-bold">Play #${team.matchHistoryLog.length - idx}:</span> 
+                                <span class="text-[#5c4033] font-bold">Play #${historyLogs.length - idx}:</span> 
                                 <span class="text-slate-600">vs <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
@@ -5223,7 +5245,7 @@
                 showToast("സ്കോർ രേഖപ്പെടുത്താൻ ആദ്യം START അമർത്തി LIVE മാച്ചിൽ പ്രവേശിക്കുക.");
                 return;
             }
-            const team = teams.find(t => t.id === id);
+            const team = teams.find(t => String(t.id) === String(id));
             if (!team || team.isDisabled) return;
             const now = Date.now();
             
@@ -5311,7 +5333,7 @@
             const winningSubSpan = document.getElementById("winning-team-last-defeated-sub");
             if (!modal || !container) return;
 
-            const winningTeam = teams.find(t => t.id === winningTeamId);
+            const winningTeam = teams.find(t => String(t.id) === String(winningTeamId));
             if (winningNameSpan && winningTeam) {
                 winningNameSpan.textContent = `WINNER: ${winningTeam.name}`;
             }
@@ -5319,7 +5341,12 @@
             if (winningSubSpan && winningTeam) {
                 if (winningTeam.defeatedDetails && winningTeam.defeatedDetails.length > 0) {
                     let lastDef = getLatestDefeatedByRecord(winningTeam);
-                    winningSubSpan.textContent = `Last Defeated Before: ${lastDef.name}`;
+                    // Old-session defeatedDetails can exist without a valid record
+                    // in the current session. Never let that stale entry crash the
+                    // winner-selection modal (which would make the + button appear dead).
+                    winningSubSpan.textContent = lastDef && lastDef.name
+                        ? `Last Defeated Before: ${lastDef.name}`
+                        : `No previous defeats in this LIVE session`;
                     winningSubSpan.classList.remove("hidden");
                 } else {
                     winningSubSpan.textContent = `First Match for this team`;
@@ -5329,7 +5356,7 @@
 
             container.innerHTML = "";
             teams.filter(t => !t.isDisabled).forEach(t => {
-                if (t.id !== winningTeamId) {
+                if (String(t.id) !== String(winningTeamId)) {
                     let lastDefeatedText = "മുമ്പ് തോൽവികളൊന്നും ഉണ്ടായിട്ടില്ല / No previous defeats";
                     const lastLoss = getLatestDefeatRecord(t);
                     if (lastLoss && lastLoss.opponent) lastDefeatedText = `അവസാനം തോറ്റത് / Last lost to: ${lastLoss.opponent}`;
@@ -5427,7 +5454,7 @@
                 const normalized = normalizeHistoryTimestamp(value);
                 return normalized > 0 ? String(normalized) : String(value || "").trim();
             };
-            let requestedSessionId = canonicalSessionKey(tournamentStartTimestamp || now);
+            const requestedSessionId = canonicalSessionKey(tournamentStartTimestamp || now);
             const MIN_MATCH_INTERVAL_MS = 2000; // 2-second duplicate-tap protection; do not block normal scoring.
 
             try {
@@ -5484,17 +5511,21 @@
                 const result = await runFirebaseTransaction(dbRef, current => {
                     const root = current && typeof current === 'object' ? current : {};
                     const remoteGuard = root.sessionStartGuard && typeof root.sessionStartGuard === 'object' ? root.sessionStartGuard : {};
-                    // The active Firebase guard is the canonical session authority.
-                    // Older clients can retain a stale local timestamp or team.sessionId;
-                    // when the shared guard is active, reconcile this score transaction
-                    // to that one shared epoch instead of rejecting every tap as mismatch.
-                    const guardedStartedAt = remoteGuard.active === true
-                        ? (Number(remoteGuard.startedAt) || normalizeHistoryTimestamp(remoteGuard.sessionId))
-                        : 0;
-                    const rootStartedAt = normalizeHistoryTimestamp(root.tournamentStartTimestamp);
-                    const authoritativeStartedAt = guardedStartedAt || rootStartedAt;
-                    if (!authoritativeStartedAt) {
-                        transactionBlockReason = "No active Firebase LIVE session was found. Start the session from Device Admin and refresh this device.";
+                    // Older WESMA builds may leave a stale sessionId inside
+                    // sessionStartGuard while startedAt or tournamentStartTimestamp
+                    // already points to the current LIVE session. Compare every
+                    // authoritative root-level session marker after normalizing
+                    // seconds/milliseconds, rather than trusting one stale field.
+                    const remoteSessionCandidates = [
+                        remoteGuard.active === true ? remoteGuard.startedAt : null,
+                        root.tournamentStartTimestamp,
+                        remoteGuard.sessionId,
+                        root.teams && root.teams[0] ? root.teams[0].sessionId : null
+                    ].map(canonicalSessionKey).filter(Boolean);
+                    const sessionMatches = remoteSessionCandidates.includes(requestedSessionId);
+
+                    if (!sessionMatches) {
+                        transactionBlockReason = "LIVE session mismatch. The active session on this phone does not match any current Firebase session marker. Start/join the LIVE session from Device Admin, then refresh all devices.";
                         return;
                     }
                     if (root.isTournamentLocked === true || root.isMatchEnded === true) {
@@ -5502,11 +5533,7 @@
                         return;
                     }
 
-                    requestedSessionId = canonicalSessionKey(authoritativeStartedAt);
                     const remoteTeams = Array.isArray(root.teams) ? wesmaDeepClone(root.teams) : [];
-                    // Keep all participants on the same session epoch. Historical logs
-                    // are preserved; only the active team-level sync marker is reconciled.
-                    remoteTeams.forEach(t => { if (t) t.sessionId = requestedSessionId; });
                     const winner = remoteTeams.find(t => String(t.id) === String(winningTeamId));
                     const loser = remoteTeams.find(t => String(t.id) === String(defeatedTeamId));
                     if (!winner || !loser || winner.isDisabled || loser.isDisabled || String(winner.id) === String(loser.id)) {
@@ -5585,7 +5612,6 @@
                     return {
                         ...root,
                         teams: remoteTeams,
-                        tournamentStartTimestamp: authoritativeStartedAt,
                         globalClickSequence: nextSeq,
                         lastActionTimestamp: now
                     };
@@ -5825,9 +5851,6 @@
 
             if (window.confirm(`"${team.name}" എന്ന ടീമിനെ നീക്കം ചെയ്യണോ? / Delete team?`)) {
                 triggerHapticFeedback([60]);
-                // Preserve the full pre-delete state so Undo can restore the team,
-                // its score, match logs, and opponent references exactly.
-                captureUndoSnapshot(`TEAM DELETED: ${team.name}`);
                 const deletedTeamId = String(editingTeamId);
                 const deletedTeamName = String(team.name || '');
                 teams = teams.filter(t => String(t.id) !== deletedTeamId);
@@ -5881,8 +5904,9 @@
                     return copy;
                 });
                 if (lastEndedChampionSnapshot) stripDeletedTeam(lastEndedChampionSnapshot);
-                // Do not strip undo/redo snapshots: the immediately preceding
-                // snapshot must still contain the deleted team for restoration.
+                (undoHistoryStack || []).forEach(stripDeletedTeam);
+                (redoHistoryStack || []).forEach(stripDeletedTeam);
+                if (lastActionSnapshot) stripDeletedTeam(lastActionSnapshot);
                 saveLocalBackup();
                 persistMergedHistory();
                 saveData();
