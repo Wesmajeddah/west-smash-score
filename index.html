@@ -2860,38 +2860,27 @@
                         const delta = (Number(localValue) || 0) - (Number(baseValue) || 0);
                         remoteTeam[key] = (Number(remoteTeam[key]) || 0) + delta;
                     } else if (mergeArrayFields.has(key) && Array.isArray(localValue)) {
-                        // Merge records by logical match identity. Full-JSON comparison
-                        // allowed a deleted match to return when Firebase changed only
-                        // metadata/timestamps during another device's transaction.
+                        // Three-way merge: propagate local deletions/edits from the last
+                        // confirmed base, while retaining additions made concurrently remotely.
                         const baseArray = Array.isArray(baseValue) ? baseValue : [];
                         const remoteArray = Array.isArray(remoteTeam[key]) ? remoteTeam[key].slice() : [];
-                        const signature = item => item && item.matchId
-                            ? `match-id:${String(item.matchId)}`
-                            : `legacy:${JSON.stringify(item)}`;
-                        const baseByKey = new Map(baseArray.map(item => [signature(item), item]));
-                        const localByKey = new Map(localValue.map(item => [signature(item), item]));
-                        const removedByLocal = new Set([...baseByKey.keys()].filter(recordKey => !localByKey.has(recordKey)));
+                        const signature = item => JSON.stringify(item);
+                        const baseSet = new Set(baseArray.map(signature));
+                        const localSet = new Set(localValue.map(signature));
+                        const removedByLocal = new Set([...baseSet].filter(value => !localSet.has(value)));
                         const combined = remoteArray.filter(item => !removedByLocal.has(signature(item)));
-                        const combinedIndex = new Map();
-                        combined.forEach((item, index) => combinedIndex.set(signature(item), index));
-
+                        const combinedSet = new Set(combined.map(signature));
                         localValue.forEach(item => {
-                            const recordKey = signature(item);
-                            const baseItem = baseByKey.get(recordKey);
-                            const existingIndex = combinedIndex.get(recordKey);
-                            if (baseItem && JSON.stringify(item) !== JSON.stringify(baseItem)) {
-                                // Local edits replace the previous copy of the same match.
-                                if (existingIndex !== undefined) combined[existingIndex] = wesmaDeepClone(item);
-                                else {
-                                    combinedIndex.set(recordKey, combined.length);
-                                    combined.push(wesmaDeepClone(item));
-                                }
-                            } else if (!baseItem && existingIndex === undefined) {
-                                combinedIndex.set(recordKey, combined.length);
+                            const itemSignature = signature(item);
+                            if (!baseSet.has(itemSignature) && !combinedSet.has(itemSignature)) {
                                 combined.push(wesmaDeepClone(item));
+                                combinedSet.add(itemSignature);
                             }
                         });
-
+                        // matchHistoryLog is authoritative for live W/L/time. Its
+                        // logical identity is matchId, not the full JSON object: the
+                        // same match can be re-serialized with a different timestamp or
+                        // metadata during a Firebase listener/transaction cycle.
                         remoteTeam[key] = key === 'matchHistoryLog'
                             ? dedupeMatchHistoryLogs(combined)
                             : combined;
@@ -5068,8 +5057,8 @@
                     const countdownEl = document.getElementById(`cool-countdown-${team.id}`);
                     if (!plusBtn || !overlay) return;
                     const diff = now - (team.lastClickTime || 0);
-                    if (diff < 60000 && !team.isDisabled) {
-                        const remainingSecs = Math.ceil((60000 - diff) / 1000);
+                    if (diff < 2000 && !team.isDisabled) {
+                        const remainingSecs = Math.ceil((2000 - diff) / 1000);
                         plusBtn.disabled = true;
                         overlay.classList.remove("hidden");
                         if (countdownEl) countdownEl.textContent = `${remainingSecs}s`;
@@ -5116,7 +5105,7 @@
             const now = Date.now();
             sortedTeams.forEach((team) => {
                 const diff = now - (team.lastClickTime || 0);
-                const inCooldown = diff < 60000;
+                const inCooldown = diff < 2000;
                 
                 const rankPos = teamRanksMap[team.id] || 1;
                 const isWinner = (rankPos === 1 && team.wins > 0 && !team.isDisabled);
@@ -5239,7 +5228,7 @@
             const now = Date.now();
             
             if (delta > 0) {
-                if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
+                if (team.lastClickTime && (now - team.lastClickTime < 2000)) {
                     showToast("⚠️ ദയവായി കുറച്ചുസമയം കാത്തിരിക്കൂ!");
                     return;
                 }
@@ -5434,8 +5423,12 @@
             captureUndoSnapshot(`WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`);
 
             const now = Date.now();
-            const requestedSessionId = String(normalizeHistoryTimestamp(tournamentStartTimestamp) || now);
-            const MIN_MATCH_INTERVAL_MS = 60000; // 1 minute between wins for the same team.
+            const canonicalSessionKey = value => {
+                const normalized = normalizeHistoryTimestamp(value);
+                return normalized > 0 ? String(normalized) : String(value || "").trim();
+            };
+            const requestedSessionId = canonicalSessionKey(tournamentStartTimestamp || now);
+            const MIN_MATCH_INTERVAL_MS = 2000; // 2-second duplicate-tap protection; do not block normal scoring.
 
             try {
                 if (!dbRef) {
@@ -5444,7 +5437,7 @@
                     // whenever the database is available.
                     const localLastClick = Number(team.lastClickTime) || 0;
                     if (localLastClick && (now - localLastClick < MIN_MATCH_INTERVAL_MS)) {
-                        showToast("⚠️ ഈ ടീമിന് 1 മിനിറ്റ് interval പൂർത്തിയായിട്ടില്ല.");
+                        showToast("⚠️ Duplicate tap protection: please wait 2 seconds.");
                         finishPendingWin();
                         return;
                     }
@@ -5487,35 +5480,56 @@
                     return;
                 }
 
+                let transactionBlockReason = "";
                 const result = await runFirebaseTransaction(dbRef, current => {
                     const root = current && typeof current === 'object' ? current : {};
                     const remoteGuard = root.sessionStartGuard && typeof root.sessionStartGuard === 'object' ? root.sessionStartGuard : {};
-                    const remoteSessionId = String(
-                        remoteGuard.sessionId ||
-                        (remoteGuard.active === true && Number(remoteGuard.startedAt) > 0 ? remoteGuard.startedAt : '') ||
-                        root.tournamentStartTimestamp ||
-                        ''
-                    );
+                    // Older WESMA builds may leave a stale sessionId inside
+                    // sessionStartGuard while startedAt or tournamentStartTimestamp
+                    // already points to the current LIVE session. Compare every
+                    // authoritative root-level session marker after normalizing
+                    // seconds/milliseconds, rather than trusting one stale field.
+                    const remoteSessionCandidates = [
+                        remoteGuard.active === true ? remoteGuard.startedAt : null,
+                        root.tournamentStartTimestamp,
+                        remoteGuard.sessionId,
+                        root.teams && root.teams[0] ? root.teams[0].sessionId : null
+                    ].map(canonicalSessionKey).filter(Boolean);
+                    const sessionMatches = remoteSessionCandidates.includes(requestedSessionId);
 
-                    // Never allow a stale phone to score into a newer session.
-                    if (!remoteSessionId || remoteSessionId !== requestedSessionId) return;
-                    if (root.isTournamentLocked === true || root.isMatchEnded === true) return;
+                    if (!sessionMatches) {
+                        transactionBlockReason = "LIVE session mismatch. The active session on this phone does not match any current Firebase session marker. Start/join the LIVE session from Device Admin, then refresh all devices.";
+                        return;
+                    }
+                    if (root.isTournamentLocked === true || root.isMatchEnded === true) {
+                        transactionBlockReason = "The tournament is locked or the match has ended. Start the LIVE session again.";
+                        return;
+                    }
 
                     const remoteTeams = Array.isArray(root.teams) ? wesmaDeepClone(root.teams) : [];
                     const winner = remoteTeams.find(t => String(t.id) === String(winningTeamId));
                     const loser = remoteTeams.find(t => String(t.id) === String(defeatedTeamId));
-                    if (!winner || !loser || winner.isDisabled || loser.isDisabled || String(winner.id) === String(loser.id)) return;
+                    if (!winner || !loser || winner.isDisabled || loser.isDisabled || String(winner.id) === String(loser.id)) {
+                        transactionBlockReason = "Team validation failed. Refresh the page so all devices load the same team list.";
+                        return;
+                    }
 
                     // Server-side duplicate/rapid-tap guard. This is what prevents
                     // two devices from creating two matches from the same action.
                     const winnerLastClick = Number(winner.lastClickTime) || 0;
-                    if (winnerLastClick > 0 && (now - winnerLastClick < MIN_MATCH_INTERVAL_MS)) return;
+                    if (winnerLastClick > 0 && (now - winnerLastClick < MIN_MATCH_INTERVAL_MS)) {
+                        transactionBlockReason = "Duplicate tap blocked. Wait 2 seconds, then try again.";
+                        return;
+                    }
 
                     const allLogs = remoteTeams.flatMap(t => Array.isArray(t.matchHistoryLog) ? t.matchHistoryLog : []);
                     const maxSeq = allLogs.reduce((max, log) => Math.max(max, Number(log && log.seq) || 0), Number(root.globalClickSequence) || 0);
                     const nextSeq = maxSeq + 1;
                     const matchId = `${requestedSessionId}-${nextSeq}-${winningTeamId}-${defeatedTeamId}`;
-                    if (allLogs.some(log => String(log && log.matchId || '') === matchId)) return;
+                    if (allLogs.some(log => String(log && log.matchId || '') === matchId)) {
+                        transactionBlockReason = "This match has already been recorded. Refresh the page before another score.";
+                        return;
+                    }
 
                     const previousAction = Number(root.lastActionTimestamp) || Number(root.tournamentStartTimestamp) || now;
                     const intervalMinutes = Math.max(1, Math.round((now - previousAction) / 60000));
@@ -5577,7 +5591,7 @@
                 });
 
                 if (!result.committed || !result.value || !Array.isArray(result.value.teams)) {
-                    showToast("⚠️ Duplicate/rapid score blocked. 1 minute interval is active.");
+                    showToast("⚠️ " + (transactionBlockReason || "Firebase did not commit the score. Check device approval and database rules."));
                     finishPendingWin();
                     return;
                 }
@@ -5596,7 +5610,10 @@
                 showToast(`🏆 ${team.name} Won!`);
             } catch (error) {
                 console.error("Atomic score commit failed:", error);
-                showToast("⚠️ Score save failed. No duplicate score was added.");
+                const firebaseCode = error && error.code ? String(error.code) : "";
+                const firebaseMessage = error && error.message ? String(error.message) : String(error || "Unknown error");
+                console.error("Atomic score commit failed:", firebaseCode, firebaseMessage);
+                showToast("⚠️ Firebase score save failed" + (firebaseCode ? " (" + firebaseCode + ")" : "") + ": " + firebaseMessage);
             } finally {
                 finishPendingWin();
             }
