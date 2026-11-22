@@ -525,7 +525,11 @@
         <div class="text-lg font-black text-[#5c4033]">WESMA DEVICE ACCESS</div>
         <div id="wesma-device-message" class="mt-2 text-sm">Connecting securely…</div>
         <div class="mt-3 rounded-lg bg-slate-100 p-3 text-xs break-all"><b>Device ID:</b><br><code id="wesma-device-uid">Waiting for Firebase…</code></div>
-        <button type="button" onclick="copyWesmaDeviceId()" class="mt-2 rounded-lg bg-[#5c4033] px-4 py-2 text-sm font-bold text-white">COPY DEVICE ID</button>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <button type="button" onclick="copyWesmaDeviceId()" class="rounded-lg bg-[#5c4033] px-4 py-2 text-sm font-bold text-white">COPY DEVICE ID</button>
+          <button type="button" id="wesma-request-access-btn" onclick="requestWesmaDeviceAccess()" class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white">REQUEST ACCESS</button>
+        </div>
+        <div class="mt-2 text-xs text-slate-500" id="wesma-request-status">Send an access request to the administrator.</div>
         <div class="mt-3 flex justify-end"><button type="button" onclick="document.getElementById('wesma-device-status').style.display='none'" class="rounded bg-slate-200 px-3 py-2 text-xs font-bold">CLOSE</button></div>
         <div id="wesma-admin-requests" class="mt-4"></div>
       </div>
@@ -580,7 +584,7 @@
                         </div>
                     </div>
                     <div class="text-[9px] text-slate-500 mb-2">Tournament options</div>
-                    <button id="wesma-admin-open" type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); document.getElementById('wesma-device-status').style.display='flex'; attachWesmaAdminRequests();" class="w-full text-left bg-[#5c4033] hover:bg-[#4e342e] text-white font-bold py-2.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1.5 cursor-pointer" style="display:none"><i class="fa-solid fa-shield-halved"></i> DEVICE ADMIN</button>
+                    <button id="wesma-admin-open" type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); openWesmaDeviceAdminPanel();" class="w-full text-left bg-[#5c4033] hover:bg-[#4e342e] text-white font-bold py-2.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1.5 cursor-pointer" style="display:none"><i class="fa-solid fa-shield-halved"></i> DEVICE ADMIN</button>
                     <button type="button" onclick="document.getElementById('end-modal-reset-dropdown').classList.add('hidden'); resetScores()" class="w-full text-left bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2.5 px-2.5 rounded-lg border border-rose-200 text-[10px] flex items-center gap-1.5 cursor-pointer"><i class="fa-solid fa-rotate-right text-rose-600"></i> ടൂർണമെന്റ് റീസെറ്റ് / Reset</button>
                     <div class="mt-2 pt-2 border-t border-[#e6decb] space-y-1.5">
                         <div class="text-[9px] font-black tracking-wider text-[#5c4033]"><i class="fa-regular fa-clock mr-1"></i> SCHEDULE AUTO RESET & START</div>
@@ -1406,28 +1410,82 @@
         function escapeWesmaHtml(value) {
             return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
         }
+        function openWesmaDeviceAdminPanel() {
+            const panel = document.getElementById("wesma-device-status");
+            if (panel) panel.style.display = "flex";
+            if (wesmaAuth && wesmaAuth.currentUser && wesmaAuth.currentUser.uid === WESMA_ADMIN_UID) {
+                showWesmaDeviceStatus("Administrator access granted. Review pending requests below.", WESMA_ADMIN_UID);
+                attachWesmaAdminRequests();
+            }
+        }
+        window.openWesmaDeviceAdminPanel = openWesmaDeviceAdminPanel;
+
+        async function requestWesmaDeviceAccess() {
+            const user = wesmaAuth && wesmaAuth.currentUser;
+            const status = document.getElementById("wesma-request-status");
+            const button = document.getElementById("wesma-request-access-btn");
+            if (!user || !wesmaAccessRoot) {
+                if (status) status.textContent = "Device authentication is not ready. Please wait and try again.";
+                return false;
+            }
+            if (user.uid === WESMA_ADMIN_UID) {
+                if (status) status.textContent = "This device is the administrator device.";
+                return true;
+            }
+            if (button) { button.disabled = true; button.textContent = "SENDING…"; }
+            try {
+                const approved = await wesmaAccessRoot.child("approved").child(user.uid).once("value");
+                if (approved.val() === true) {
+                    if (status) status.textContent = "This device is already approved. Reloading…";
+                    location.reload();
+                    return true;
+                }
+                await wesmaAccessRoot.child("requests").child(user.uid).set({
+                    status: "pending",
+                    label: (navigator.userAgent || "Web device").slice(0, 180),
+                    requestedAt: firebase.database.ServerValue.TIMESTAMP
+                });
+                if (status) status.textContent = "Access request sent. Ask the administrator to open DEVICE ADMIN and approve this device.";
+                const msg = document.getElementById("wesma-device-message");
+                if (msg) msg.textContent = "Access request sent. Waiting for administrator approval.";
+                return true;
+            } catch (error) {
+                console.error("WESMA access request failed:", error);
+                if (status) status.textContent = "Request failed: " + (error.code || error.message || error) + ". Check Firebase Rules.";
+                return false;
+            } finally {
+                if (button) { button.disabled = false; button.textContent = "REQUEST ACCESS"; }
+            }
+        }
+        window.requestWesmaDeviceAccess = requestWesmaDeviceAccess;
+
         function attachWesmaAdminRequests() {
-            if (wesmaApprovalListenerAttached || !wesmaAccessRoot) return;
+            if (!wesmaAccessRoot || !wesmaAuth || !wesmaAuth.currentUser || wesmaAuth.currentUser.uid !== WESMA_ADMIN_UID) return;
+            const box = document.getElementById("wesma-admin-requests");
+            if (!box) return;
+            if (wesmaApprovalListenerAttached) return;
             wesmaApprovalListenerAttached = true;
             wesmaAccessRoot.child("requests").on("value", snap => {
-                const box = document.getElementById("wesma-admin-requests");
-                if (!box || !wesmaAuth.currentUser || wesmaAuth.currentUser.uid !== WESMA_ADMIN_UID) return;
+                const currentBox = document.getElementById("wesma-admin-requests");
+                if (!currentBox || !wesmaAuth.currentUser || wesmaAuth.currentUser.uid !== WESMA_ADMIN_UID) return;
                 const requests = snap.val() || {};
-                const rows = Object.entries(requests).filter(([uid, data]) => data && data.status !== "approved" && data.status !== "rejected");
-                box.innerHTML = '<div class="border-t pt-3"><div class="font-bold text-sm mb-2">DEVICE APPROVAL REQUESTS (' + rows.length + ')</div>' +
-                  (rows.length ? rows.map(([uid, data]) => '<div class="mb-2 rounded-lg border p-3"><div class="break-all text-xs font-mono">' + escapeWesmaHtml(uid) + '</div><div class="mt-1 text-xs text-slate-500">' + escapeWesmaHtml(data.label || "New device") + '</div><div class="mt-2 flex gap-2"><button data-wesma-approve="' + escapeWesmaHtml(uid) + '" class="rounded bg-green-700 px-3 py-2 text-xs font-bold text-white">APPROVE</button><button data-wesma-reject="' + escapeWesmaHtml(uid) + '" class="rounded bg-red-700 px-3 py-2 text-xs font-bold text-white">REJECT</button></div></div>').join("") : '<div class="text-xs text-slate-500">No pending requests.</div>') +
+                const rows = Object.entries(requests).filter(([uid, data]) => data && typeof data === "object" && data.status !== "approved" && data.status !== "rejected");
+                currentBox.innerHTML = '<div class="border-t pt-3"><div class="font-bold text-sm mb-2">DEVICE APPROVAL REQUESTS (' + rows.length + ')</div>' +
+                  (rows.length ? rows.map(([uid, data]) => '<div class="mb-2 rounded-lg border p-3"><div class="break-all text-xs font-mono">' + escapeWesmaHtml(uid) + '</div><div class="mt-1 text-xs text-slate-500">' + escapeWesmaHtml(data.label || "New device") + '</div><div class="mt-1 text-[10px] text-slate-500">Status: ' + escapeWesmaHtml(data.status || "pending") + '</div><div class="mt-2 flex gap-2"><button data-wesma-approve="' + escapeWesmaHtml(uid) + '" class="rounded bg-green-700 px-3 py-2 text-xs font-bold text-white">APPROVE</button><button data-wesma-reject="' + escapeWesmaHtml(uid) + '" class="rounded bg-red-700 px-3 py-2 text-xs font-bold text-white">REJECT</button></div></div>').join("") : '<div class="text-xs text-slate-500">No pending requests. Ask the other phone to press REQUEST ACCESS.</div>') +
                   '<div class="mt-3 border-t pt-3"><div class="font-bold text-sm mb-2">APPROVED DEVICES</div><div id="wesma-approved-list" class="text-xs text-slate-600">Loading…</div></div></div>';
-                box.querySelectorAll("[data-wesma-approve]").forEach(btn => btn.addEventListener("click", async () => {
+                currentBox.querySelectorAll("[data-wesma-approve]").forEach(btn => btn.addEventListener("click", async () => {
                     const uid = btn.getAttribute("data-wesma-approve");
+                    btn.disabled = true;
                     try {
                         await wesmaAccessRoot.child("approved").child(uid).set(true);
                         await wesmaAccessRoot.child("requests").child(uid).update({status:"approved", reviewedAt: firebase.database.ServerValue.TIMESTAMP});
-                    } catch (e) { alert("Approval failed: " + (e.message || e)); }
+                    } catch (e) { btn.disabled = false; alert("Approval failed: " + (e.code || e.message || e) + ". Check Firebase Rules."); }
                 }));
-                box.querySelectorAll("[data-wesma-reject]").forEach(btn => btn.addEventListener("click", async () => {
+                currentBox.querySelectorAll("[data-wesma-reject]").forEach(btn => btn.addEventListener("click", async () => {
                     const uid = btn.getAttribute("data-wesma-reject");
+                    btn.disabled = true;
                     try { await wesmaAccessRoot.child("requests").child(uid).update({status:"rejected", reviewedAt: firebase.database.ServerValue.TIMESTAMP}); }
-                    catch (e) { alert("Reject failed: " + (e.message || e)); }
+                    catch (e) { btn.disabled = false; alert("Reject failed: " + (e.code || e.message || e)); }
                 }));
                 wesmaAccessRoot.child("approved").once("value").then(approvedSnap => {
                     const list = document.getElementById("wesma-approved-list");
@@ -1438,9 +1496,18 @@
                         const uid = btn.getAttribute("data-wesma-revoke");
                         if (!confirm("Revoke access for this device?")) return;
                         try { await wesmaAccessRoot.child("approved").child(uid).remove(); }
-                        catch (e) { alert("Revoke failed: " + (e.message || e)); }
+                        catch (e) { alert("Revoke failed: " + (e.code || e.message || e)); }
                     }));
-                }).catch(e => console.error("Approved device list error:", e));
+                }).catch(e => {
+                    console.error("Approved device list error:", e);
+                    const list = document.getElementById("wesma-approved-list");
+                    if (list) list.textContent = "Could not load approved devices: " + (e.code || e.message || e);
+                });
+            }, error => {
+                console.error("WESMA admin request listener failed:", error);
+                const currentBox = document.getElementById("wesma-admin-requests");
+                if (currentBox) currentBox.innerHTML = '<div class="rounded border border-rose-300 bg-rose-50 p-3 text-xs text-rose-700">Cannot read device requests: ' + escapeWesmaHtml(error.code || error.message || error) + '. Update Firebase Rules, then reload this page.</div>';
+                wesmaApprovalListenerAttached = false;
             });
         }
 
@@ -1471,10 +1538,12 @@
                 }
                 const requestRef = wesmaAccessRoot.child("requests").child(uid);
                 const requestSnap = await requestRef.once("value");
-                if (!requestSnap.exists() || requestSnap.val().status === "rejected") {
+                if (!requestSnap.exists() || !requestSnap.val() || requestSnap.val().status === "rejected") {
                     await requestRef.set({status:"pending", label:(navigator.userAgent || "Web device").slice(0,180), requestedAt:firebase.database.ServerValue.TIMESTAMP});
                 }
-                const status = requestSnap.exists() && requestSnap.val().status === "rejected" ? "Your previous request was rejected. Contact the administrator." : "Access request sent. This device will open automatically after administrator approval.";
+                const status = requestSnap.exists() && requestSnap.val() && requestSnap.val().status === "rejected" ? "Your previous request was rejected. You may send a new request below." : "Access request sent. This device will open automatically after administrator approval.";
+                const requestStatus = document.getElementById("wesma-request-status");
+                if (requestStatus) requestStatus.textContent = status;
                 showWesmaDeviceStatus(status, uid);
                 wesmaAccessRoot.child("approved").child(uid).on("value", approvedState => {
                     if (approvedState.val() === true) location.reload();
@@ -2232,14 +2301,25 @@
             const currentSessionId = String(sessionStart);
             const filtered = team.matchHistoryLog.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
-                const logSessionId = String(log.sessionId || '');
-                if (logSessionId) return logSessionId === currentSessionId;
-                // Legacy live records do not carry sessionId; their timestamp is the
-                // only safe way to separate them from matches in earlier sessions.
+                const logSessionId = normalizeHistoryTimestamp(log.sessionId);
                 const stamp = normalizeHistoryTimestamp(log.timestamp);
-                return stamp >= sessionStart;
+                // Firebase/older app versions may store session IDs in seconds or
+                // milliseconds. Compare normalized timestamps, then use the actual
+                // match timestamp as a compatibility fallback.
+                if (logSessionId && logSessionId === sessionStart) return true;
+                if (stamp && stamp >= sessionStart) return true;
+                return !log.sessionId && !stamp && String(team.sessionId || '') === currentSessionId;
             });
-            return dedupeMatchHistoryLogs(filtered);
+            const deduped = dedupeMatchHistoryLogs(filtered);
+            if (deduped.length) return deduped;
+            // Some older records retained session counters but omitted match logs.
+            // Use them only when the team itself is tagged to this exact session.
+            if (normalizeHistoryTimestamp(team.sessionId) === sessionStart) {
+                const wins = Math.max(0, Number(team.wins) || 0);
+                const losses = Math.max(0, Number(team.losses) || 0);
+                return Array.from({length: wins}, () => ({result:'WIN'})).concat(Array.from({length: losses}, () => ({result:'LOSS'})));
+            }
+            return [];
         }
 
         function getCurrentSessionWinCount(team) {
@@ -2263,22 +2343,23 @@
             const sessionStart = normalizeHistoryTimestamp(sessionId);
             const durationMs = Math.max(0, Number(historyRecord && historyRecord.durationMs) || (Number(historyRecord && historyRecord.durationMinutes) || 0) * 60000);
             const sessionEnd = sessionStart && durationMs ? sessionStart + durationMs + 1 : 0;
-            const hasSessionTaggedLogs = logs.some(log => log && log.sessionId != null && String(log.sessionId) === sessionId);
             let selected = logs.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
-                if (hasSessionTaggedLogs) return String(log.sessionId || '') === sessionId;
+                const logSession = normalizeHistoryTimestamp(log.sessionId);
                 const stamp = normalizeHistoryTimestamp(log.timestamp);
+                if (sessionStart && logSession === sessionStart) return true;
                 if (sessionStart && stamp) return stamp >= sessionStart && (!sessionEnd || stamp < sessionEnd);
                 return !sessionStart && !log.sessionId;
             });
-            // Older saved snapshots may contain counters but no match log. Preserve
-            // their recorded play total rather than showing zero in archived reports.
-            if (!selected.length && !logs.length) {
+            selected = dedupeMatchHistoryLogs(selected);
+            // Older saved snapshots may contain counters but no matching session logs.
+            // Use counters only when the saved team snapshot is tagged to this session.
+            if (!selected.length && (!logs.length || normalizeHistoryTimestamp(team.sessionId) === sessionStart)) {
                 const wins = Math.max(0, Number(team.wins) || 0);
                 const losses = Math.max(0, Number(team.losses) || 0);
                 return Array.from({length: wins}, () => ({result:'WIN'})).concat(Array.from({length: losses}, () => ({result:'LOSS'})));
             }
-            return dedupeMatchHistoryLogs(selected);
+            return selected;
         }
 
         function getHistoryRecordTeamPlayedCount(team, historyRecord) {
@@ -3149,7 +3230,7 @@
             const record = {
                 id: sessionId, sessionId, startTimestamp: sessionId, date: dateStr,
                 dateKey: historyDateKey({ startTimestamp: sessionId }),
-                teams: JSON.parse(JSON.stringify(teams)),
+                teams: JSON.parse(JSON.stringify(teams.map(team => ({ ...team, sessionId: String(team.sessionId || sessionId) })))),
                 totalPlays, totalMatches: Math.floor((totalPlays + 0.5) / 2),
                 durationMinutes: sessionDurationMins, durationMs: sessionDurationMs
             };
