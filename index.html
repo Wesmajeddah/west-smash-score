@@ -1771,34 +1771,25 @@
             const container = document.getElementById("fireworks-container");
             if (!container) return;
             container.innerHTML = "";
-
             const colors = ['#5c4033', '#8c6239', '#16a34a', '#722f37', '#37474f', '#6d4c41', '#2c221e'];
-            
-            for (let i = 0; i < 9; i++) {
-                setTimeout(() => {
-                    const x = 15 + Math.random() * 70;
-                    const y = 15 + Math.random() * 60;
-                    
-                    for (let p = 0; p < 40; p++) {
-                        const particle = document.createElement("div");
-                        particle.className = "firework-particle";
-                        particle.style.left = `${x}%`;
-                        particle.style.top = `${y}%`;
-                        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                        
-                        const angle = (p / 40) * 360;
-                        const distance = 90 + Math.random() * 130;
-                        const tx = Math.cos(angle * Math.PI / 180) * distance;
-                        const ty = Math.sin(angle * Math.PI / 180) * distance;
-                        
-                        particle.style.setProperty('--tx', `${tx}px`);
-                        particle.style.setProperty('--ty', `${ty}px`);
-                        
-                        container.appendChild(particle);
-                        setTimeout(() => particle.remove(), 1200);
-                    }
-                }, i * 280);
-            }
+            const endAt = Date.now() + 30000;
+            const burst = () => {
+                if (Date.now() >= endAt) { container.innerHTML = ""; return; }
+                const x = 15 + Math.random() * 70, y = 15 + Math.random() * 60;
+                for (let p = 0; p < 40; p++) {
+                    const particle = document.createElement("div");
+                    particle.className = "firework-particle";
+                    particle.style.left = `${x}%`; particle.style.top = `${y}%`;
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    const angle = p / 40 * 360, distance = 90 + Math.random() * 130;
+                    particle.style.setProperty('--tx', `${Math.cos(angle * Math.PI / 180) * distance}px`);
+                    particle.style.setProperty('--ty', `${Math.sin(angle * Math.PI / 180) * distance}px`);
+                    container.appendChild(particle);
+                    setTimeout(() => particle.remove(), 1200);
+                }
+                setTimeout(burst, 900);
+            };
+            burst();
         }
 
         function refreshVisibleDateLabels() {
@@ -5057,8 +5048,8 @@
                     const countdownEl = document.getElementById(`cool-countdown-${team.id}`);
                     if (!plusBtn || !overlay) return;
                     const diff = now - (team.lastClickTime || 0);
-                    if (diff < 60000 && !team.isDisabled) {
-                        const remainingSecs = Math.ceil((60000 - diff) / 1000);
+                    if (diff < 30000 && !team.isDisabled) {
+                        const remainingSecs = Math.ceil((30000 - diff) / 1000);
                         plusBtn.disabled = true;
                         overlay.classList.remove("hidden");
                         if (countdownEl) countdownEl.textContent = `${remainingSecs}s`;
@@ -5105,7 +5096,7 @@
             const now = Date.now();
             sortedTeams.forEach((team) => {
                 const diff = now - (team.lastClickTime || 0);
-                const inCooldown = diff < 60000;
+                const inCooldown = diff < 30000;
                 
                 const rankPos = teamRanksMap[team.id] || 1;
                 const isWinner = (rankPos === 1 && team.wins > 0 && !team.isDisabled);
@@ -5228,7 +5219,7 @@
             const now = Date.now();
             
             if (delta > 0) {
-                if (team.lastClickTime && (now - team.lastClickTime < 60000)) {
+                if (team.lastClickTime && (now - team.lastClickTime < 30000)) {
                     showToast("⚠️ ദയവായി കുറച്ചുസമയം കാത്തിരിക്കൂ!");
                     return;
                 }
@@ -5393,92 +5384,101 @@
                 pendingWinActionInProgress = false;
                 pendingWinningTeamId = null;
             };
-            const team = teams.find(t => t.id === winningTeamId);
-            const defeatedTeam = teams.find(t => t.id === defeatedTeamId);
-            if (!team || !defeatedTeam || String(winningTeamId) === String(defeatedTeamId)) {
-                finishPendingWin();
-                return;
-            }
+            const winnerId = String(winningTeamId);
+            const loserId = String(defeatedTeamId);
+            const localWinner = teams.find(t => String(t.id) === winnerId);
+            const localLoser = teams.find(t => String(t.id) === loserId);
+            if (!localWinner || !localLoser || winnerId === loserId) { finishPendingWin(); return; }
             if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
-                showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക.");
-                finishPendingWin();
-                return;
+                showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക."); finishPendingWin(); return;
             }
+            if (!dbRef) { showToast("⚠️ Firebase connection ലഭ്യമല്ല. Score save ചെയ്തിട്ടില്ല."); finishPendingWin(); return; }
 
-            // Do not require a separate scoreActionLocks database path here:
-            // restrictive Firebase rules can reject that extra write and block every +1.
-            // Local duplicate-tap protection remains active, and the existing per-team
-            // 60-second cooldown is still enforced by lastClickTime.
-
-            captureUndoSnapshot(`WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`);
             const now = Date.now();
-            const matchId = `${now}-${Math.random().toString(36).slice(2, 10)}`;
-            const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
-            const intervalMinutes = Math.max(1, Math.round((now - referenceTime) / 60000));
-            
-            team.matchInterval = intervalMinutes;
-            team.lastMatchTime = intervalMinutes;
-            
-            team.totalTimeSpentMinutes = (team.totalTimeSpentMinutes || 0) + intervalMinutes;
-            defeatedTeam.totalTimeSpentMinutes = (defeatedTeam.totalTimeSpentMinutes || 0) + intervalMinutes;
-
-            globalClickSequence += 1;
-            const liveSessionId = String(tournamentStartTimestamp || now);
-
-            if (!team.defeatedDetails) team.defeatedDetails = [];
-            team.defeatedDetails.push({
-                name: defeatedTeam.name,
-                teamId: defeatedTeam.id,
-                matchId,
-                sessionId: liveSessionId,
-                seq: globalClickSequence,
-                timestamp: now,
-                durationMinutes: intervalMinutes
-            });
-
-            if (!team.matchHistoryLog) team.matchHistoryLog = [];
-            team.matchHistoryLog.push({
-                opponent: defeatedTeam.name,
-                opponentId: defeatedTeam.id,
-                matchId,
-                sessionId: liveSessionId,
-                seq: globalClickSequence,
-                timestamp: now,
-                result: 'WIN',
-                durationMinutes: intervalMinutes
-            });
-
-            if (!defeatedTeam.matchHistoryLog) defeatedTeam.matchHistoryLog = [];
-            defeatedTeam.matchHistoryLog.push({
-                opponent: team.name,
-                opponentId: team.id,
-                matchId,
-                sessionId: liveSessionId,
-                seq: globalClickSequence,
-                timestamp: now,
-                result: 'LOSS',
-                durationMinutes: intervalMinutes
-            });
-
-            team.clickOrder = globalClickSequence;
-            team.lastClickTime = now;
-            
-            if (!tournamentStartTimestamp) tournamentStartTimestamp = now;
-            lastActionTimestamp = now;
-            saveLastActionTimestampMonotonic(now);
-            
-            team.wins = Math.max(0, Number(team.wins) || 0) + 1;
-            defeatedTeam.losses = Math.max(0, Number(defeatedTeam.losses) || 0) + 1;
-            // Keep the legacy field synchronized, but the UI derives it from W/L.
-            team.played = getTeamPlayedCount(team);
-            defeatedTeam.played = getTeamPlayedCount(defeatedTeam);
-            
-            saveData();
-            render();
-            triggerWinCelebration();
-
-            showToast(`🏆 ${team.name} Won!`);
-            finishPendingWin();
+            const expectedSession = String(tournamentStartTimestamp);
+            const actionId = `${expectedSession}:${winnerId}:${loserId}:${now}:${Math.random().toString(36).slice(2,10)}`;
+            let rejection = "NOT_COMMITTED";
+            let committedMatch = null;
+            try {
+                const result = await runFirebaseTransaction(dbRef, current => {
+                    if (!current || !Array.isArray(current.teams)) { rejection = "NO_DATA"; return; }
+                    const activeSession = normalizeHistoryTimestamp(current.tournamentStartTimestamp);
+                    if (!activeSession || String(activeSession) !== expectedSession || current.isTournamentLocked === true || current.isMatchEnded === true) {
+                        rejection = "STALE_OR_LOCKED"; return;
+                    }
+                    const root = wesmaDeepClone(current);
+                    const winner = root.teams.find(t => t && String(t.id) === winnerId && !t.isDisabled);
+                    const loser = root.teams.find(t => t && String(t.id) === loserId && !t.isDisabled);
+                    if (!winner || !loser) { rejection = "TEAM_NOT_FOUND"; return; }
+                    const lastClick = Number(winner.lastClickTime) || 0;
+                    if (lastClick > 0 && now - lastClick < 30000) { rejection = "COOLDOWN"; return; }
+                    if (!Array.isArray(winner.matchHistoryLog)) winner.matchHistoryLog = [];
+                    if (!Array.isArray(loser.matchHistoryLog)) loser.matchHistoryLog = [];
+                    if (!Array.isArray(winner.defeatedDetails)) winner.defeatedDetails = [];
+                    if ([...winner.matchHistoryLog, ...loser.matchHistoryLog].some(m => m && String(m.actionId || "") === actionId)) {
+                        rejection = "DUPLICATE"; return;
+                    }
+                    const seq = Math.max(0, Number(root.globalClickSequence) || 0) + 1;
+                    const referenceTime = Number(root.lastActionTimestamp) || activeSession || now;
+                    const intervalMinutes = Math.max(0, Math.floor((now - referenceTime) / 60000));
+                    const matchId = `${expectedSession}-${seq}`;
+                    const winLog = { actionId, matchId, sessionId: expectedSession, seq, timestamp: now, opponent: loser.name, opponentId: loser.id, result: "WIN", durationMinutes: intervalMinutes };
+                    const lossLog = { actionId, matchId, sessionId: expectedSession, seq, timestamp: now, opponent: winner.name, opponentId: winner.id, result: "LOSS", durationMinutes: intervalMinutes };
+                    winner.matchHistoryLog.push(winLog);
+                    loser.matchHistoryLog.push(lossLog);
+                    winner.defeatedDetails.push({ actionId, matchId, sessionId: expectedSession, seq, timestamp: now, name: loser.name, teamId: loser.id, durationMinutes: intervalMinutes });
+                    [winner, loser].forEach(t => {
+                        const unique = dedupeMatchHistoryLogs(t.matchHistoryLog || []).filter(m => m && ["WIN","LOSS"].includes(String(m.result || "").toUpperCase()));
+                        t.matchHistoryLog = unique;
+                        t.wins = unique.filter(m => String(m.result).toUpperCase() === "WIN").length;
+                        t.losses = unique.filter(m => String(m.result).toUpperCase() === "LOSS").length;
+                        t.played = t.wins + t.losses;
+                        t.totalTimeSpentMinutes = unique.reduce((sum,m) => sum + Math.max(0, Number(m.durationMinutes) || 0), 0);
+                    });
+                    winner.clickOrder = seq;
+                    winner.lastClickTime = now;
+                    winner.matchInterval = intervalMinutes;
+                    winner.lastMatchTime = intervalMinutes;
+                    loser.lastMatchTime = intervalMinutes;
+                    root.globalClickSequence = seq;
+                    root.lastActionTimestamp = now;
+                    root.lastActionDescription = `WON: ${winner.name} vs DEFEATED: ${loser.name}`;
+                    root.teams = root.teams.map(t => String(t.id) === winnerId ? winner : (String(t.id) === loserId ? loser : t));
+                    committedMatch = { matchId, seq, winnerName: winner.name, loserName: loser.name };
+                    return root;
+                });
+                if (!result.committed) {
+                    if (rejection === "COOLDOWN") {
+                        const currentWinner = teams.find(t => String(t.id) === winnerId);
+                        const left = currentWinner ? Math.max(0, 30000 - (Date.now() - (Number(currentWinner.lastClickTime) || 0))) : 0;
+                        showToast(`⚠️ വീണ്ടും സ്കോർ ചെയ്യാൻ ${Math.ceil(left / 1000)} സെക്കൻഡ് കാത്തിരിക്കണം.`);
+                    } else if (rejection === "STALE_OR_LOCKED") showToast("⚠️ Match session മാറിയിട്ടുണ്ട് അല്ലെങ്കിൽ അവസാനിച്ചു. വീണ്ടും sync ചെയ്യുക.");
+                    else showToast("⚠️ Firebase score commit നടന്നില്ല. Score മാറ്റിയിട്ടില്ല.");
+                    finishPendingWin(); return;
+                }
+                // Keep a pre-action undo snapshot only after Firebase confirms the commit.
+                // The local state is still the pre-commit state at this point.
+                captureUndoSnapshot(`WON: ${localWinner.name} vs DEFEATED: ${localLoser.name}`);
+                const committedRoot = result.value;
+                teams = wesmaDeepClone(committedRoot.teams || teams);
+                teamSyncBase = wesmaDeepClone(committedRoot.teams || teams);
+                globalClickSequence = Number(committedRoot.globalClickSequence) || 0;
+                lastActionTimestamp = Number(committedRoot.lastActionTimestamp) || now;
+                lastActionDescription = committedRoot.lastActionDescription || "";
+                saveLastActionTimestampMonotonic(lastActionTimestamp);
+                saveLocalBackup();
+                render();
+                updateMainTopLastDefeatedBar();
+                updateHistorySummaryText();
+                triggerWinCelebration();
+                triggerFireworksEffect();
+                showToast(`🏆 ${committedMatch.winnerName} Won!`);
+                finishPendingWin();
+            } catch (error) {
+                console.error("Atomic score commit failed:", error);
+                showToast("⚠️ Firebase score save failed. Score മാറ്റിയിട്ടില്ല.");
+                finishPendingWin();
+            }
         }
 
         function openUndoModal() {
