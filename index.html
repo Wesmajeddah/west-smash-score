@@ -2331,9 +2331,15 @@
         }
 
         function getTeamPlayedCount(team) {
-            // Live Play counts come from this session's match records only. Do not
-            // use old W/L counters or the legacy `played` field as a fallback.
-            return getCurrentSessionWinCount(team) + getCurrentSessionLossCount(team);
+            if (!team) return 0;
+            // A team's wins and losses are reset at the start of each session and
+            // are also stored in each archived session snapshot. Use them as the
+            // durable play-count source; match logs provide a consistency check.
+            // This avoids showing zero when a saved/older record has counters but
+            // its log session IDs were written by an older app version.
+            const counterPlays = Math.max(0, Number(team.wins) || 0) + Math.max(0, Number(team.losses) || 0);
+            const logPlays = getCurrentSessionWinCount(team) + getCurrentSessionLossCount(team);
+            return Math.max(counterPlays, logPlays);
         }
 
         function getHistoryRecordMatchLogs(team, historyRecord) {
@@ -2363,7 +2369,26 @@
         }
 
         function getHistoryRecordTeamPlayedCount(team, historyRecord) {
-            return getHistoryRecordMatchLogs(team, historyRecord).filter(log => ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase())).length;
+            if (!team) return 0;
+            const logPlays = getHistoryRecordMatchLogs(team, historyRecord)
+                .filter(log => ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase())).length;
+            // Archived team snapshots retain the session's W/L counters. These
+            // remain authoritative for the count when legacy logs have missing or
+            // mismatched session IDs.
+            const counterPlays = Math.max(0, Number(team.wins) || 0) + Math.max(0, Number(team.losses) || 0);
+            return Math.max(logPlays, counterPlays);
+        }
+
+        function getHistoryRecordTotalPlays(historyRecord) {
+            if (!historyRecord) return 0;
+            const storedPlays = Math.max(0, Number(historyRecord.totalPlays) || 0);
+            const teamPlays = (Array.isArray(historyRecord.teams) ? historyRecord.teams : [])
+                .reduce((sum, team) => sum + getHistoryRecordTeamPlayedCount(team, historyRecord), 0);
+            return Math.max(storedPlays, teamPlays);
+        }
+
+        function getHistoryRecordTotalMatches(historyRecord) {
+            return Math.floor((getHistoryRecordTotalPlays(historyRecord) + 0.5) / 2);
         }
 
         function calculateTotalPlays() {
@@ -3979,7 +4004,7 @@
                     card.className = "bg-[#fcfbf9] border border-[#e6decb] rounded-xl p-3 space-y-2 shadow-2xs relative text-slate-800";
                     let teamsListHtml = "";
                     sortedTeams.forEach((t, i) => {
-                        let playedCount = getTeamPlayedCount(t);
+                        let playedCount = getHistoryRecordTeamPlayedCount(t, item);
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-[11px] font-medium text-slate-700 py-1 border-b border-[#e6decb] gap-2">
                                 <span class="name-wrapper flex-1">${i + 1}. ${escapeHtml(t.name)}${getHistoryBadgeTitle(t, idx) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, idx)}</span>` : ""}</span>
@@ -3996,7 +4021,7 @@
                             <div class="name-wrapper flex-1">
                                 <div class="text-xs font-bold text-[#5c4033]">Session #${tournamentHistory.length - displayIndex} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
                                 <div class="text-[10px] font-medium text-slate-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
-                                <div class="text-[10px] font-extrabold text-[#8c6239] mt-0.5">TOTAL MATCHES: ${Number(item.totalMatches) || Math.floor(((Number(item.totalPlays) || 0) + 0.5) / 2)}</div>
+                                <div class="text-[10px] font-extrabold text-[#8c6239] mt-0.5">TOTAL MATCHES: ${getHistoryRecordTotalMatches(item)}</div>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <button onclick="deleteSingleHistory(${idx})" class="w-6 h-6 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center border border-rose-200 text-[10px] cursor-pointer" title="ഡിലീറ്റ് / Delete">
@@ -4104,7 +4129,7 @@
 
             let sortedTeamsForSummary = getInternationalSortedTeams(item.teams);
 
-            let html = `<div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl px-3 py-2 text-center text-[10px] font-extrabold text-[#5c4033]">${item.date || ""} • TOTAL MATCHES: ${Number(item.totalMatches) || Math.floor(((Number(item.totalPlays) || 0) + 0.5) / 2)}</div>`;
+            let html = `<div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-xl px-3 py-2 text-center text-[10px] font-extrabold text-[#5c4033]">${item.date || ""} • TOTAL MATCHES: ${getHistoryRecordTotalMatches(item)}</div>`;
             sortedTeamsForSummary.forEach((t, idx) => {
                 let mins = t.totalTimeSpentMinutes || 0;
                 let formattedTime = formatHoursAndMins(mins);
@@ -4501,7 +4526,7 @@
                     html += `</div>`;
                 }
             } else if (type === 'played') {
-                let playedCount = historyLogs.filter(m => m && (m.result === 'WIN' || m.result === 'LOSS')).length;
+                let playedCount = getHistoryRecordTeamPlayedCount(team, item);
                 html += `<div class="text-[#5c4033] font-semibold flex items-center gap-1.5"><i class="fa-solid fa-gamepad"></i> Total Matches: (${playedCount})</div>`;
                 
                 if (!historyLogs || historyLogs.length === 0) {
