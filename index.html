@@ -321,6 +321,27 @@
             animation: liveDotPulseRed 1.2s infinite ease-in-out;
         }
 
+        /* Compact STATUS ↔ SHARE live animation — uses the existing gap only. */
+        .status-gap-animation{position:relative;flex:1;min-width:42px;height:28px;overflow:hidden;border-radius:8px;background:linear-gradient(90deg,rgba(140,98,57,.04),rgba(255,255,255,.55),rgba(140,98,57,.04));}
+        .status-gap-animation:before{content:"";position:absolute;left:6%;right:6%;bottom:6px;height:1px;background:linear-gradient(90deg,transparent,rgba(140,98,57,.28),transparent);}
+        .status-gap-animation .mini-net{position:absolute;left:50%;bottom:6px;width:1px;height:13px;background:rgba(92,64,51,.32);}
+        .status-gap-animation .mini-player{position:absolute;left:16%;bottom:6px;width:13px;height:20px;animation:statusPlayerMove 1.8s ease-in-out infinite;}
+        .status-gap-animation .mini-player:before{content:"";position:absolute;left:4px;top:0;width:5px;height:5px;border-radius:50%;background:#5c4033;}
+        .status-gap-animation .mini-player:after{content:"";position:absolute;left:4px;top:6px;width:6px;height:10px;border-radius:5px 5px 3px 3px;background:linear-gradient(90deg,#5c4033,#8c6239);}
+        .status-gap-animation .mini-racket{position:absolute;left:10px;top:1px;width:9px;height:12px;border:1px solid #8c6239;border-radius:50%;transform:rotate(-28deg);transform-origin:bottom center;animation:statusRacketSwing 1.8s ease-in-out infinite;}
+        .status-gap-animation .mini-shuttle{position:absolute;left:70%;top:4px;font-size:9px;line-height:1;color:#8c6239;filter:drop-shadow(0 1px 1px rgba(92,64,51,.25));animation:statusShuttleFly 1.8s cubic-bezier(.45,.05,.55,.95) infinite;}
+        .status-gap-animation .mini-trail{position:absolute;left:62%;top:11px;width:18px;height:1px;background:linear-gradient(90deg,transparent,rgba(140,98,57,.5));transform:rotate(-18deg);transform-origin:right center;animation:statusTrailMove 1.8s ease-in-out infinite;}
+        .status-gap-animation .mini-live{position:absolute;right:5%;top:3px;font-size:6px;font-weight:900;letter-spacing:.08em;color:#8c6239;opacity:.72;animation:statusLivePulse 1.8s ease-in-out infinite;}
+        @keyframes statusPlayerMove{0%,100%{transform:translate(0,0) rotate(0)}42%{transform:translate(4px,-2px) rotate(-4deg)}60%{transform:translate(2px,-1px) rotate(2deg)}}
+        @keyframes statusRacketSwing{0%,100%{transform:rotate(-28deg)}42%{transform:rotate(-48deg) translateY(-1px)}60%{transform:rotate(6deg)}}
+        @keyframes statusShuttleFly{0%{left:70%;top:4px;transform:rotate(-12deg) scale(.8)}42%{left:52%;top:1px;transform:rotate(16deg) scale(1)}68%{left:33%;top:13px;transform:rotate(40deg) scale(.72)}100%{left:70%;top:4px;transform:rotate(-12deg) scale(.8)}}
+        @keyframes statusTrailMove{0%,100%{opacity:.15;transform:rotate(-18deg) scaleX(.55)}42%{opacity:.75;transform:rotate(-18deg) scaleX(1)}68%{opacity:.1;transform:rotate(-18deg) scaleX(.35)}}
+        @keyframes statusLivePulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+        /* End Match names/tags must remain inside their own cards. */
+        .finish-name-wrapper{min-width:0!important;max-width:100%!important;width:100%;overflow:hidden!important;overflow-wrap:anywhere!important;word-break:break-word!important;box-sizing:border-box!important;}
+        .finish-name-wrapper .dangerous-badge{max-width:100%!important;box-sizing:border-box!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;vertical-align:middle!important;}
+
         /* Elegant badminton victory animation — same 88px stage size */
         .dance-stage-container{position:relative;width:100%;height:88px;background:radial-gradient(ellipse at 50% 0%,#fff8e8 0%,#f4e8d5 48%,#e9d7bd 100%);border:1px solid rgba(140,98,57,.45);border-radius:.85rem;overflow:hidden;box-shadow:inset 0 0 18px rgba(92,64,51,.10),0 3px 10px rgba(92,64,51,.10)}
         .dance-stage-container:before{content:"";position:absolute;left:8%;right:8%;bottom:12px;height:1px;background:linear-gradient(90deg,transparent,rgba(140,98,57,.45),transparent)}
@@ -338,6 +359,29 @@
         @keyframes wesmaRacketRight{0%,100%{transform:rotate(32deg) scaleX(-1) translateY(0)}50%{transform:rotate(24deg) scaleX(-1) translateY(-4px)}}
         @keyframes wesmaShuttleDance{0%,100%{top:12px;transform:translateX(-50%) rotate(-22deg) scale(.9)}50%{top:1px;transform:translateX(-50%) rotate(24deg) scale(1.1)}}
         @keyframes wesmaSparkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:.9;transform:scale(1.25)}}
+
+        /* Realistic live-court celebration — fixed 88px stage, no size change */
+        .real-court-lines{position:absolute;inset:0;z-index:1;opacity:.62;background:linear-gradient(90deg,transparent 9%,rgba(92,64,51,.34) 9.5%,transparent 10%),linear-gradient(90deg,transparent 89%,rgba(92,64,51,.34) 89.5%,transparent 90%)}
+        .real-court-lines:before{content:"";position:absolute;left:9%;right:9%;bottom:12px;height:24px;border:1px solid rgba(92,64,51,.38);border-bottom:0;border-radius:50% 50% 0 0 / 35% 35% 0 0}
+        .real-net{position:absolute;left:50%;top:20px;bottom:11px;width:1px;background:rgba(92,64,51,.5);z-index:2;box-shadow:0 0 0 1px rgba(255,255,255,.22)}
+        .real-net:before{content:"";position:absolute;left:-18px;right:-18px;top:0;height:20px;border-top:2px solid rgba(92,64,51,.55);border-bottom:1px solid rgba(92,64,51,.28);background:repeating-linear-gradient(90deg,transparent 0 3px,rgba(92,64,51,.12) 3px 4px),repeating-linear-gradient(0deg,transparent 0 3px,rgba(92,64,51,.12) 3px 4px)}
+        .badminton-player{position:absolute;left:31%;bottom:12px;width:30px;height:48px;z-index:4;animation:wesmaPlayerMove 1.9s ease-in-out infinite}
+        .player-head{position:absolute;left:11px;top:0;width:9px;height:9px;border-radius:50%;background:#2f2926;box-shadow:0 0 0 1px rgba(255,255,255,.22)}
+        .player-body{position:absolute;left:10px;top:10px;width:11px;height:19px;border-radius:7px 7px 4px 4px;background:linear-gradient(90deg,#3a302c,#6a5144,#342b28);transform:rotate(8deg)}
+        .player-arm{position:absolute;left:18px;top:12px;width:20px;height:4px;border-radius:4px;background:#3d312c;transform-origin:left center;transform:rotate(-27deg);animation:wesmaPlayerArm 1.9s ease-in-out infinite}
+        .player-racket{position:absolute;left:35px;top:0;width:13px;height:18px;border:2px solid #8c6239;border-radius:50%;transform:rotate(-25deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);animation:wesmaRacketSwing 1.9s ease-in-out infinite}
+        .player-racket:after{content:"";position:absolute;width:3px;height:15px;left:4px;top:15px;border-radius:3px;background:#6f4b33;transform:rotate(8deg)}
+        .player-leg{position:absolute;top:27px;width:4px;height:18px;border-radius:4px;background:#342b28;transform-origin:top center}
+        .player-leg.left{left:11px;transform:rotate(17deg);animation:wesmaLegLeft 1.9s ease-in-out infinite}
+        .player-leg.right{left:19px;transform:rotate(-18deg);animation:wesmaLegRight 1.9s ease-in-out infinite}
+        .real-shuttle{position:absolute;left:63%;top:13px;z-index:5;color:#f5f0eb;font-size:13px;filter:drop-shadow(0 2px 2px rgba(44,34,30,.45));animation:wesmaRealShuttle 1.9s cubic-bezier(.45,.05,.55,.95) infinite}
+        .real-shuttle:after{content:"";position:absolute;width:24px;height:1px;right:7px;top:7px;background:linear-gradient(90deg,rgba(140,98,57,0),rgba(140,98,57,.65));transform:rotate(-18deg);transform-origin:right center}
+        @keyframes wesmaPlayerMove{0%,100%{transform:translate(0,0) rotate(0)}45%{transform:translate(5px,-2px) rotate(-3deg)}65%{transform:translate(2px,-1px) rotate(2deg)}}
+        @keyframes wesmaPlayerArm{0%,100%{transform:rotate(-27deg)}45%{transform:rotate(-50deg)}65%{transform:rotate(-8deg)}}
+        @keyframes wesmaRacketSwing{0%,100%{transform:rotate(-25deg)}45%{transform:rotate(-48deg) translateY(-2px)}65%{transform:rotate(5deg)}}
+        @keyframes wesmaLegLeft{0%,100%{transform:rotate(17deg)}50%{transform:rotate(29deg)}}
+        @keyframes wesmaLegRight{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(-34deg)}}
+        @keyframes wesmaRealShuttle{0%{left:62%;top:15px;transform:rotate(-15deg) scale(.9)}45%{left:50%;top:7px;transform:rotate(18deg) scale(1)}70%{left:39%;top:23px;transform:rotate(42deg) scale(.82)}100%{left:62%;top:15px;transform:rotate(-15deg) scale(.9)}}
 
         #fireworks-container {
             position: absolute;
@@ -727,10 +771,17 @@
 
         <div class="grid grid-cols-1 gap-2">
             <div id="main-live-status-box" class="flex items-center justify-between bg-gradient-to-r from-[#fffdf8] to-[#f5f0eb] border border-[#d4af70] rounded-xl px-2.5 py-2 shadow-md">
-                <span class="text-[10px] text-slate-700 font-bold flex items-center gap-1">
+                <span class="text-[10px] text-slate-700 font-bold flex items-center gap-1 shrink-0">
                     <span class="live-dot-green"></span> STATUS:
                 </span>
-                <button onclick="openCurrentStatusModal()" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold py-1.5 px-2.5 rounded-lg shadow flex items-center gap-1 text-[10px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer">
+                <div class="status-gap-animation" aria-hidden="true">
+                    <span class="mini-net"></span>
+                    <span class="mini-player"><span class="mini-racket"></span></span>
+                    <span class="mini-trail"></span>
+                    <span class="mini-shuttle"><i class="fa-solid fa-shuttlecock"></i></span>
+                    <span class="mini-live">LIVE</span>
+                </div>
+                <button onclick="openCurrentStatusModal()" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold py-1.5 px-2.5 rounded-lg shadow flex items-center gap-1 text-[10px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer shrink-0">
                     <i class="fa-solid fa-share-nodes"></i> SHARE
                 </button>
             </div>
@@ -4176,7 +4227,7 @@
                         let playedCount = getHistoryRecordTeamPlayedCount(t, item);
                         teamsListHtml += `
                             <div class="flex justify-between items-center text-[11px] font-medium text-slate-700 py-1 border-b border-[#e6decb] gap-2">
-                                <span class="name-wrapper flex-1">${i + 1}. ${escapeHtml(t.name)}${getHistoryBadgeTitle(t, idx) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, idx)}</span>` : ""}</span>
+                                <span class="finish-name-wrapper flex-1">${i + 1}. ${escapeHtml(t.name)}${getHistoryBadgeTitle(t, idx) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, idx)}</span>` : ""}</span>
                                 <div class="flex gap-2 shrink-0">
                                     <span class="text-[#5c4033] font-semibold">${playedCount} P</span>
                                     <span class="text-emerald-700 font-semibold">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></span>
@@ -4187,7 +4238,7 @@
                     });
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-[#e6decb] pb-2 gap-2">
-                            <div class="name-wrapper flex-1">
+                            <div class="finish-name-wrapper flex-1">
                                 <div class="text-xs font-bold text-[#5c4033]">Session #${tournamentHistory.length - displayIndex} • <i class="fa-solid fa-crown text-amber-600"></i> ${winnersNames}</div>
                                 <div class="text-[10px] font-medium text-slate-500">${item.date} (${formatHoursAndMins(item.durationMinutes || 0)})</div>
                                 <div class="text-[10px] font-extrabold text-[#8c6239] mt-0.5">TOTAL MATCHES: ${getHistoryRecordTotalMatches(item)}</div>
@@ -4311,7 +4362,7 @@
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
                             <span class="flex items-center gap-1 pl-0.5 min-w-0 truncate">
                                 <span class="text-[#5c4033] font-black">#${idx + 1}</span>
-                                <span class="uppercase tracking-wider name-wrapper ${colorClass}">${escapeHtml(t.name)}${getHistoryBadgeTitle(t, historyIndex) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, historyIndex)}</span>` : ""}</span>
+                                <span class="uppercase tracking-wider finish-name-wrapper ${colorClass}">${escapeHtml(t.name)}${getHistoryBadgeTitle(t, historyIndex) ? ` <span class="dangerous-badge">${getHistoryBadgeTitle(t, historyIndex)}</span>` : ""}</span>
                             </span>
                             <span class="text-[#5c4033] font-bold bg-[#f5f0eb] px-2 py-0.5 rounded border border-[#d7ccc8] text-[9px] shrink-0">
                                 TIME: ${formattedTime}
@@ -4651,7 +4702,7 @@
             let colorClass = `team-name-${(((team.id - 1) % 5) + 1)}`;
             const historyBadge = getHistoryBadgeTitle(team, historyIndex);
             const historyLogs = getHistoryRecordMatchLogs(team, item);
-            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 name-wrapper">${escapeHtml(team.name)}${historyBadge ? ` <span class="dangerous-badge">${historyBadge}</span>` : ""}</div>`;
+            let html = `<div class="font-bold ${colorClass} text-xs uppercase text-center border-b border-[#e6decb] pb-2 finish-name-wrapper">${escapeHtml(team.name)}${historyBadge ? ` <span class="dangerous-badge">${historyBadge}</span>` : ""}</div>`;
 
             if (type === 'wins') {
                 html += `<div class="text-emerald-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-trophy"></i> Wins: (${team.wins})</div>`;
@@ -4662,7 +4713,7 @@
                     let winMatches = sortLatestFirst(historyLogs.filter(m => m.result === 'WIN'));
                     winMatches.forEach((m, idx) => {
                         html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
-                            <div class="name-wrapper flex-1">
+                            <div class="finish-name-wrapper flex-1">
                                 <span class="text-[#5c4033] font-bold">Play #${winMatches.length - idx}:</span> 
                                 <span class="text-slate-600">Defeated: <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
@@ -4685,7 +4736,7 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     lossMatches.forEach((m, idx) => {
                         html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
-                            <div class="name-wrapper flex-1">
+                            <div class="finish-name-wrapper flex-1">
                                 <span class="text-rose-600 font-bold">Play #${lossMatches.length - idx}:</span> 
                                 <span class="text-slate-600">Lost to: <b class="text-slate-900">${escapeHtml(m.winner)}</b></span>
                             </div>
@@ -4705,7 +4756,7 @@
                     sortLatestFirst(historyLogs).forEach((m, idx) => {
                         let resColor = m.result === 'WIN' ? 'text-emerald-700' : (m.result === 'VOID' ? 'text-amber-700' : 'text-rose-600');
                         html += `<div class="bg-[#fcfbf9] p-2 rounded-lg border border-[#e6decb] flex justify-between items-center text-[10px] text-slate-800 gap-2">
-                            <div class="name-wrapper flex-1">
+                            <div class="finish-name-wrapper flex-1">
                                 <span class="text-[#5c4033] font-bold">Play #${historyLogs.length - idx}:</span> 
                                 <span class="text-slate-600">vs <b class="text-slate-900">${escapeHtml(m.opponent)}</b></span>
                             </div>
@@ -4800,11 +4851,14 @@
             const statusStandingGroups = getStandingGroups(activeTeams, true);
             const firstPlaceIds = (statusStandingGroups[0] || { teams: [] }).teams.map(t => t.id);
             const secondPlaceIds = (statusStandingGroups[1] || { teams: [] }).teams.map(t => t.id);
+            const thirdPlaceIds = (statusStandingGroups[2] || { teams: [] }).teams.map(t => t.id);
 
             let topScorerName = "ഇതുവരെ കളികളില്ല / No Matches";
             let topScorerWins = 0;
             let secondPlaceName = "None";
             let secondPlaceWins = 0;
+            let thirdPlaceName = "None";
+            let thirdPlaceWins = 0;
 
             if (activeTeams.some(t => (Number(t.wins) || 0) > 0)) {
                 let firstTeams = sortedTeams.filter(t => firstPlaceIds.includes(t.id));
@@ -4815,6 +4869,12 @@
                 if (secondTeams.length > 0) {
                     secondPlaceName = secondTeams.map(t => escapeHtml(t.name)).join(", ");
                     secondPlaceWins = secondTeams[0].wins;
+                }
+
+                let thirdTeams = sortedTeams.filter(t => thirdPlaceIds.includes(t.id));
+                if (thirdTeams.length > 0) {
+                    thirdPlaceName = thirdTeams.map(t => escapeHtml(t.name)).join(", ");
+                    thirdPlaceWins = thirdTeams[0].wins;
                 }
             }
 
@@ -4864,7 +4924,7 @@
                                 <div class="text-[9px] text-emerald-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-crown text-amber-500"></i> ഒന്നാം സ്ഥാനം / 1st Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 name-wrapper">${topScorerName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${topScorerName}</div>
                             </div>
                             <div class="bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-emerald-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
@@ -4877,11 +4937,24 @@
                                 <div class="text-[9px] text-[#5c4033] font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-medal text-[#8c6239]"></i> രണ്ടാം സ്ഥാനം / 2nd Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 name-wrapper">${secondPlaceName}</div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${secondPlaceName}</div>
                             </div>
                             <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-[#5c4033] uppercase block font-bold">Wins / ജയങ്ങൾ</span>
                                 <span class="text-sm font-black text-[#5c4033]">${secondPlaceWins} 🏆</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs flex items-center justify-between gap-2 min-w-0 overflow-hidden">
+                            <div class="min-w-0 flex-1 pr-2">
+                                <div class="text-[9px] text-[#5c4033] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fa-solid fa-award text-[#8c6239]"></i> മൂന്നാം സ്ഥാനം / 3rd Place
+                                </div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${thirdPlaceName}</div>
+                            </div>
+                            <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-2.5 py-1.5 text-center shrink-0">
+                                <span class="text-[8px] text-[#5c4033] uppercase block font-bold">Wins / ജയങ്ങൾ</span>
+                                <span class="text-sm font-black text-[#5c4033]">${thirdPlaceWins} 🏆</span>
                             </div>
                         </div>
 
@@ -5224,7 +5297,7 @@
                 
                 teamsTableHtml += `
                     <tr class="border-b border-[#e6decb] text-center text-slate-800 ${rowBg}">
-                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor} name-wrapper">${t.rank}. ${renderTeamNameWithTagline(t)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
+                        <td class="py-1 px-1 text-left font-semibold ${rowTextColor} finish-name-wrapper">${t.rank}. ${renderTeamNameWithTagline(t)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
                         <td class="py-1 px-1">${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-600">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
                         <td class="py-1 px-1 font-bold text-rose-600">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
@@ -5234,11 +5307,16 @@
 
             container.innerHTML = `
                 <!-- Elegant badminton victory moment: trophy, crossed rackets and shuttlecock -->
-                <div class="dance-stage-container my-1" role="img" aria-label="Elegant badminton victory celebration with trophy, rackets and shuttlecock">
-                    <div class="dance-floor-glow"></div><span class="dance-sparkle one">✦</span><span class="dance-sparkle two">✧</span>
-                    <span class="victory-racket left" aria-hidden="true"></span><span class="victory-racket right" aria-hidden="true"></span>
-                    <div class="victory-trophy" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
-                    <div class="dance-shuttlecock" aria-hidden="true"><i class="fa-solid fa-shuttlecock"></i></div>
+                <div class="dance-stage-container my-1" role="img" aria-label="Realistic badminton court action animation">
+                    <div class="dance-floor-glow"></div>
+                    <div class="real-court-lines" aria-hidden="true"></div>
+                    <div class="real-net" aria-hidden="true"></div>
+                    <div class="badminton-player" aria-hidden="true">
+                        <span class="player-head"></span><span class="player-body"></span><span class="player-arm"></span><span class="player-racket"></span>
+                        <span class="player-leg left"></span><span class="player-leg right"></span>
+                    </div>
+                    <span class="real-shuttle" aria-hidden="true"><i class="fa-solid fa-shuttlecock"></i></span>
+                    <span class="dance-sparkle one">✦</span><span class="dance-sparkle two">✧</span>
                 </div>
 
                 <!-- Prominent Champions Box -->
@@ -5246,7 +5324,7 @@
                     <div class="text-[10px] sm:text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-crown text-amber-600 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-sm"></i>
                     </div>
-                    <div class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
+                    <div class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
                         ✨ ${championNamesDisplay} ✨
                     </div>
                     <div class="inline-block pt-0.5">
@@ -5261,7 +5339,7 @@
                     <div class="text-[9px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-medal text-[#8c6239] text-xs"></i> 2nd PLACE / രണ്ടാം സ്ഥാനം
                     </div>
-                    <div class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide leading-snug break-words px-1 name-wrapper">
+                    <div class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
                         🌟 ${secondNamesDisplay} 🌟
                     </div>
                     <div class="inline-block">
@@ -5277,7 +5355,7 @@
                         <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-award text-[#8c6239]"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
-                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words name-wrapper w-full text-center">${thirdNamesDisplay}</div>
+                        <div class="text-slate-900 font-bold uppercase text-[10px] break-words finish-name-wrapper w-full text-center">${thirdNamesDisplay}</div>
                         <div class="text-[8px] text-[#5c4033] font-bold">Wins: ${thirdWins}</div>
                     </div>
 
