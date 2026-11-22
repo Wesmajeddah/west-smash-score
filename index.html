@@ -2332,14 +2332,16 @@
 
         function getTeamPlayedCount(team) {
             if (!team) return 0;
-            // A team's wins and losses are reset at the start of each session and
-            // are also stored in each archived session snapshot. Use them as the
-            // durable play-count source; match logs provide a consistency check.
-            // This avoids showing zero when a saved/older record has counters but
-            // its log session IDs were written by an older app version.
-            const counterPlays = Math.max(0, Number(team.wins) || 0) + Math.max(0, Number(team.losses) || 0);
+            // Prefer the strongest available session-level evidence. Older saved
+            // records may have `played` but no W/L counters; newer records may have
+            // counters but incomplete logs. Taking the maximum avoids false zeros
+            // without adding the same match twice.
+            const wins = Math.max(0, Number(team.wins) || 0);
+            const losses = Math.max(0, Number(team.losses) || 0);
+            const counterPlays = wins + losses;
+            const storedPlayed = Math.max(0, Number(team.played) || 0);
             const logPlays = getCurrentSessionWinCount(team) + getCurrentSessionLossCount(team);
-            return Math.max(counterPlays, logPlays);
+            return Math.max(counterPlays, storedPlayed, logPlays);
         }
 
         function getHistoryRecordMatchLogs(team, historyRecord) {
@@ -2372,11 +2374,9 @@
             if (!team) return 0;
             const logPlays = getHistoryRecordMatchLogs(team, historyRecord)
                 .filter(log => ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase())).length;
-            // Archived team snapshots retain the session's W/L counters. These
-            // remain authoritative for the count when legacy logs have missing or
-            // mismatched session IDs.
             const counterPlays = Math.max(0, Number(team.wins) || 0) + Math.max(0, Number(team.losses) || 0);
-            return Math.max(logPlays, counterPlays);
+            const storedPlayed = Math.max(0, Number(team.played) || 0);
+            return Math.max(logPlays, counterPlays, storedPlayed);
         }
 
         function getHistoryRecordTotalPlays(historyRecord) {
@@ -2388,7 +2388,10 @@
         }
 
         function getHistoryRecordTotalMatches(historyRecord) {
-            return Math.floor((getHistoryRecordTotalPlays(historyRecord) + 0.5) / 2);
+            if (!historyRecord) return 0;
+            const calculated = Math.floor((getHistoryRecordTotalPlays(historyRecord) + 0.5) / 2);
+            const stored = Math.max(0, Number(historyRecord.totalMatches) || 0);
+            return Math.max(calculated, stored);
         }
 
         function calculateTotalPlays() {
@@ -2769,10 +2772,9 @@
         }
 
         function openChampionStatusModal() {
-            if (!isMatchEnded) {
-                showToast("Champions കാണാൻ ആദ്യം END MATCH ചെയ്ത് മത്സരം അവസാനിപ്പിക്കുക.");
-                return;
-            }
+            // Champions interface can be opened during a live session as well as
+            // after End Match. The poster reads live teams until an ended snapshot
+            // exists, then switches to the immutable final snapshot.
             const modal=document.getElementById('champion-status-modal');
             if(!modal) return;
 
