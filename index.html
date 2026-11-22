@@ -176,11 +176,14 @@
             border-radius:3px !important; height:12px !important; line-height:1 !important;
             box-shadow:0 0 5px rgba(180,120,25,.28) !important; border:1px solid #f5d98b !important;
             animation:specialTagShimmer 3.2s ease-in-out infinite !important;
-            display:table !important; margin:3px 0 2px !important; width:fit-content !important;
-            max-width:100% !important; white-space:normal !important; overflow-wrap:anywhere !important;
+            display:inline-block !important; margin:3px 0 2px !important; width:auto !important;
+            max-width:100% !important; box-sizing:border-box !important; white-space:nowrap !important;
+            overflow:hidden !important; text-overflow:ellipsis !important; vertical-align:middle !important;
             transform-origin:center;
         }
         .dangerous-badge::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(105deg,transparent 28%,rgba(255,255,255,.48) 48%,transparent 68%); transform:translateX(-130%); animation:specialTagSweep 3.2s ease-in-out infinite; }
+        .name-wrapper { min-width:0 !important; max-width:100% !important; overflow:hidden !important; }
+        .name-wrapper .dangerous-badge { max-width:100% !important; }
         .dangerous-badge { border:2px solid #e8bf58 !important; box-shadow:0 0 0 2px rgba(232,191,88,.24),0 0 12px rgba(212,175,55,.38) !important; }
         @keyframes specialTagShimmer { 0%,100% {background-position:100% 50%; filter:brightness(.96)} 50% {background-position:0% 50%; filter:brightness(1.12)} }
         @keyframes specialTagSweep { 0%,55% {transform:translateX(-130%);opacity:0} 68% {opacity:.8} 90%,100% {transform:translateX(130%);opacity:0} }
@@ -263,6 +266,35 @@
         .start-pop-btn {
             animation: startButtonPop 1.8s infinite ease-in-out;
         }
+
+        /* Strong live-match indicator for the main STATUS box.
+           It stays inside the existing box and never changes its size. */
+        @keyframes liveMatchStatusPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(22,163,74,.10), 0 4px 12px rgba(92,64,51,.10); border-color: #d4af70; }
+            50% { box-shadow: 0 0 0 3px rgba(22,163,74,.16), 0 0 20px rgba(22,163,74,.28), 0 4px 12px rgba(92,64,51,.12); border-color: #16a34a; }
+        }
+        @keyframes liveMatchSweep {
+            0% { transform: translateX(-120%); opacity: 0; }
+            18% { opacity: .0; }
+            45% { opacity: .65; }
+            72% { opacity: .0; }
+            100% { transform: translateX(120%); opacity: 0; }
+        }
+        #main-live-status-box.live-match-status-active {
+            position: relative !important;
+            overflow: hidden !important;
+            animation: liveMatchStatusPulse 1.8s ease-in-out infinite !important;
+        }
+        #main-live-status-box.live-match-status-active::after {
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0; left: 0; width: 42%;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.58), transparent);
+            transform: translateX(-120%);
+            animation: liveMatchSweep 2.2s ease-in-out infinite;
+        }
+        #main-live-status-box.live-match-status-active > * { position: relative; z-index: 1; }
 
         @keyframes liveDotPulseGreen {
             0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(22, 163, 74, 0.8); }
@@ -694,7 +726,7 @@
         </div>
 
         <div class="grid grid-cols-1 gap-2">
-            <div class="flex items-center justify-between bg-gradient-to-r from-[#fffdf8] to-[#f5f0eb] border border-[#d4af70] rounded-xl px-2.5 py-2 shadow-md">
+            <div id="main-live-status-box" class="flex items-center justify-between bg-gradient-to-r from-[#fffdf8] to-[#f5f0eb] border border-[#d4af70] rounded-xl px-2.5 py-2 shadow-md">
                 <span class="text-[10px] text-slate-700 font-bold flex items-center gap-1">
                     <span class="live-dot-green"></span> STATUS:
                 </span>
@@ -705,28 +737,23 @@
         </div>
 
         <div class="bg-gradient-to-r from-[#fffdf8] via-white to-[#f5f0eb] border border-[#d4af70] rounded-xl px-2 py-2 grid grid-cols-5 gap-1 shadow-md">
-            <div class="contents">
-                <button onclick="openUndoModal()" class="w-full min-w-0 text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-1.5 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer">
-                    🔄 UNDO
+                <button onclick="openUndoModal()" class="w-full min-w-0 overflow-hidden text-[9px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-1 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-0.5 uppercase tracking-wide cursor-pointer whitespace-nowrap">
+                    <span class="truncate">🔄 UNDO</span>
                 </button>
-                <button onclick="openAddTeamModal()" class="w-full h-8 min-w-0 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
+                <button onclick="openAddTeamModal()" class="w-full h-8 min-w-0 overflow-hidden bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
                     <i class="fa-solid fa-user-plus text-[10px]"></i>
                 </button>
-                <div class="bg-gradient-to-r from-[#fffaf0] to-[#f5f0eb] border border-[#d4af70] rounded-lg px-1 py-1 flex items-center justify-center gap-1 shadow-sm min-w-0 w-full">
-                    <i class="fa-solid fa-chart-pie text-[#5c4033] text-[9px]"></i>
-                    <button onclick="openTimeSummaryModal()" class="w-full min-w-0 bg-gradient-to-r from-[#5c4033] to-[#8c6239] text-white font-extrabold text-[8px] px-1 py-1 rounded-md shadow uppercase tracking-wide transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-0.5 whitespace-nowrap">
-                        <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
+                <div class="w-full min-w-0 overflow-hidden bg-gradient-to-r from-[#fffaf0] to-[#f5f0eb] border border-[#d4af70] rounded-lg px-0.5 py-1 flex items-center justify-center gap-0.5 shadow-sm">
+                    <button onclick="openTimeSummaryModal()" class="w-full min-w-0 overflow-hidden bg-gradient-to-r from-[#5c4033] to-[#8c6239] text-white font-extrabold text-[7px] px-0.5 py-1 rounded-md shadow uppercase tracking-wide transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-0.5 whitespace-nowrap">
+                        <i class="fa-solid fa-clock-rotate-left text-[7px] shrink-0"></i><span class="truncate">RECORDS</span>
                     </button>
                 </div>
-            </div>
-            <div class="contents">
-                <button onclick="openHistoryModal()" class="w-full h-8 box-border min-w-0 text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-2.5 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
-                    <i class="fa-solid fa-folder-open"></i> HISTORY
+                <button onclick="openHistoryModal()" class="w-full h-8 box-border min-w-0 overflow-hidden text-[9px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-1 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-0.5 cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-folder-open text-[8px] shrink-0"></i><span class="truncate">HISTORY</span>
                 </button>
-                <button onclick="openMatchCorrectionModal()" class="w-full h-8 box-border min-w-0 text-[10px] bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-2.5 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
+                <button onclick="openMatchCorrectionModal()" class="w-full h-8 box-border min-w-0 overflow-hidden text-[9px] bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-1 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-0.5 cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-pen-to-square"></i> CORRECT
                 </button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 gap-2">
@@ -1275,7 +1302,11 @@
             let firstPlaceCount = 0;
             const firstPlaceCounts = new Map();
 
-            historyRows.forEach(record => {
+            // Special tags are based only on the first-place finishers from the
+            // most recent seven saved History records. Older history must not
+            // keep a tag alive indefinitely.
+            const recentHistoryRows = sortLatestFirst(historyRows).slice(0, 7);
+            recentHistoryRows.forEach(record => {
                 if (!record || !Array.isArray(record.teams)) return;
                 const historicalTeams = record.teams.filter(t => t && !t.isDisabled);
                 if (!historicalTeams.length) return;
@@ -1289,9 +1320,10 @@
 
             firstPlaceCount = firstPlaceCounts.get(teamKey) || 0;
             const highestFirstPlaceCount = Math.max(0, ...Array.from(firstPlaceCounts.values()));
-            // Only the team(s) with the most historical first-place finishes,
-            // or a team with at least six first-place finishes, can receive this tag.
-            if (!firstPlaceCount || (firstPlaceCount !== highestFirstPlaceCount && firstPlaceCount < 6)) return "";
+            // Only teams that actually appear as first-place finishers in the
+            // latest seven History records can receive this tag. Among those,
+            // the stronger historical first-place record is preferred.
+            if (!firstPlaceCount || firstPlaceCount < highestFirstPlaceCount) return "";
 
             const phrases = [
                 "HARD TO DEFEAT",
@@ -2094,6 +2126,9 @@
                 championsOption.classList.toggle("cursor-pointer", !!isMatchEnded);
             }
             if (!badge || !dot || !text) return;
+
+            const liveStatusBox = document.getElementById("main-live-status-box");
+            if (liveStatusBox) liveStatusBox.classList.toggle("live-match-status-active", !(isMatchEnded || isTournamentLocked));
 
             if (isMatchEnded || isTournamentLocked) {
                 badge.className = "bg-rose-50 border border-rose-300 text-rose-700 font-black text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-wider";
