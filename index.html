@@ -449,7 +449,6 @@
             50% { filter: drop-shadow(0 0 4px rgba(245, 205, 112, .28)); }
         }
         #champion-status-capture { animation: championStatsGlowPulse 2.8s ease-in-out infinite; }
-        @keyframes championAmpersandPulse { 0% { opacity:.72; filter:brightness(.9) drop-shadow(0 0 2px rgba(255,190,65,.55)); transform:translate(-50%,-50%) scale(.94); } 100% { opacity:1; filter:brightness(1.35) drop-shadow(0 0 11px rgba(255,205,75,1)); transform:translate(-50%,-50%) scale(1.13); } }
         #champion-status-modal button[aria-label="Back"] {
             background: linear-gradient(135deg,#111b2c,#050a13) !important;
             border: 1px solid #d4af37 !important;
@@ -705,21 +704,26 @@
             </div>
         </div>
 
-        <div class="bg-gradient-to-r from-[#fffdf8] via-white to-[#f5f0eb] border border-[#d4af70] rounded-xl px-1.5 py-2 shadow-md">
-            <div class="grid grid-cols-5 gap-1 w-full">
-                <button onclick="openUndoModal()" class="min-w-0 h-9 bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-1 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 text-[9px] uppercase tracking-tight cursor-pointer whitespace-nowrap">
-                    <i class="fa-solid fa-rotate-left"></i> UNDO
+        <div class="bg-gradient-to-r from-[#fffdf8] via-white to-[#f5f0eb] border border-[#d4af70] rounded-xl px-2 py-2 grid grid-cols-5 gap-1 shadow-md">
+            <div class="contents">
+                <button onclick="openUndoModal()" class="w-full min-w-0 text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-1.5 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer">
+                    🔄 UNDO
                 </button>
-                <button onclick="openAddTeamModal()" class="min-w-0 h-9 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center gap-1 cursor-pointer shadow-2xs text-[9px] font-extrabold whitespace-nowrap" title="Add Team">
-                    <i class="fa-solid fa-user-plus"></i> ADD
+                <button onclick="openAddTeamModal()" class="w-full h-8 min-w-0 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
+                    <i class="fa-solid fa-user-plus text-[10px]"></i>
                 </button>
-                <button onclick="openTimeSummaryModal()" class="min-w-0 h-9 bg-gradient-to-r from-[#5c4033] to-[#8c6239] text-white font-extrabold text-[9px] px-1 py-1 rounded-lg shadow uppercase tracking-tight transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 whitespace-nowrap">
-                    <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
-                </button>
-                <button onclick="openHistoryModal()" class="min-w-0 h-9 bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-1 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 text-[9px] cursor-pointer whitespace-nowrap">
+                <div class="bg-gradient-to-r from-[#fffaf0] to-[#f5f0eb] border border-[#d4af70] rounded-lg px-1 py-1 flex items-center justify-center gap-1 shadow-sm min-w-0 w-full">
+                    <i class="fa-solid fa-chart-pie text-[#5c4033] text-[9px]"></i>
+                    <button onclick="openTimeSummaryModal()" class="w-full min-w-0 bg-gradient-to-r from-[#5c4033] to-[#8c6239] text-white font-extrabold text-[8px] px-1 py-1 rounded-md shadow uppercase tracking-wide transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-0.5 whitespace-nowrap">
+                        <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
+                    </button>
+                </div>
+            </div>
+            <div class="contents">
+                <button onclick="openHistoryModal()" class="w-full h-8 box-border min-w-0 text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-2.5 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-folder-open"></i> HISTORY
                 </button>
-                <button onclick="openMatchCorrectionModal()" class="min-w-0 h-9 bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-1 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 text-[9px] cursor-pointer whitespace-nowrap">
+                <button onclick="openMatchCorrectionModal()" class="w-full h-8 box-border min-w-0 text-[10px] bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-2.5 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
                     <i class="fa-solid fa-pen-to-square"></i> CORRECT
                 </button>
             </div>
@@ -915,13 +919,10 @@
     <!-- Instagram Story-style WESMA Winner Status -->
     <div id="champion-status-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[110] hidden">
         <div class="relative w-full h-full flex flex-col items-center justify-center gap-2 px-2 py-2">
-            <div id="champion-poster-wrap" class="relative mx-auto" style="width:min(520px,calc(100vw - 12px));aspect-ratio:1122/1402;max-height:calc(100dvh - 64px);">
-                <canvas id="champion-status-capture" aria-label="WESMA Champions dynamic poster"
-                    class="block mx-auto shadow-2xl"
-                    width="1122" height="1402"
-                    style="width:100%;height:auto;max-height:calc(100dvh - 64px);aspect-ratio:1122/1402;object-fit:contain;background:#080608;"></canvas>
-                <span id="champion-ampersand-overlay" aria-hidden="true" style="display:none;position:absolute;z-index:2;transform:translate(-50%,-50%);font-family:Georgia,serif;font-style:italic;font-weight:900;line-height:1;background:linear-gradient(180deg,#fff4b8 0%,#ffd34f 48%,#d88b18 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 0 7px rgba(255,204,75,.9),0 0 16px rgba(255,170,35,.72);animation:championAmpersandPulse 1.65s ease-in-out infinite alternate;pointer-events:none;">&amp;</span>
-            </div>
+            <canvas id="champion-status-capture" aria-label="WESMA Champions dynamic poster"
+                class="block mx-auto shadow-2xl"
+                width="1122" height="1402"
+                style="width:min(520px,calc(100vw - 12px));height:auto;max-height:calc(100dvh - 64px);aspect-ratio:1122/1402;object-fit:contain;background:#080608;"></canvas>
             <button type="button" onclick="closeChampionStatusModal()" aria-label="Back" class="shrink-0 min-w-[110px] h-9 px-6 rounded-full bg-black/80 border border-[#d8ad45] text-[#ffe6a0] flex items-center justify-center text-[11px] font-black tracking-[0.2em] shadow-lg">BACK</button>
         </div>
     </div>
@@ -1293,14 +1294,14 @@
             if (!firstPlaceCount || (firstPlaceCount !== highestFirstPlaceCount && firstPlaceCount < 6)) return "";
 
             const phrases = [
-                "A FORCE THAT IS HARD TO STOP",
-                "A DANGEROUS TEAM ON COURT",
-                "TOUGH OPPONENTS. NO EASY WINS.",
-                "BUILT TO TAKE CONTROL",
-                "OPPONENTS MUST STAY ALERT",
-                "A SERIOUS THREAT IN EVERY MATCH",
-                "A TEAM THAT NEVER BACKS DOWN",
-                "THE GAME-CHANGERS ON COURT"
+                "HARD TO DEFEAT",
+                "DANGEROUS OPPONENT",
+                "HARD TO STOP",
+                "VICTORY POWER",
+                "WATCH OUT",
+                "STRONG THREAT",
+                "TOUGH TEAM",
+                "GAME CHANGER"
             ];
             if (!window.wesmaSpecialTagPhraseCache) window.wesmaSpecialTagPhraseCache = {};
             const cacheKey = `${teamKey}:${firstPlaceCount}`;
@@ -2808,8 +2809,6 @@
 
             // Winner name: slightly larger and distinctly heavier for the first-place champion.
             if(headlineTeams.length>1){
-                const ampOverlay=document.getElementById('champion-ampersand-overlay');
-                if(ampOverlay) ampOverlay.style.display='none';
                 // Keep each co-champion name at the exact same nominal size as a single champion.
                 // Separate lines prevent the combined text from shrinking to fit one long line.
                 const coChampionOne=String(headlineTeams[0].name||'').toUpperCase();
@@ -2821,28 +2820,8 @@
                 wesmaPosterText(ctx,coChampionTwo,720,561,680,170,{color:'gold',italic:true,strokeScale:0.075,font:'Georgia, Times New Roman, serif'});
             } else if(parts.length>=2){
                 wesmaPosterText(ctx,parts[0],720,440,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
-                const remainingChampionNames=parts.slice(1).join(' & ');
-                wesmaPosterText(ctx,remainingChampionNames,720,550,680,126,{color:'gold',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
-                // Overlay the ampersand as a separate animated gold element so only '&' receives the special treatment.
-                const ampOverlay=document.getElementById('champion-ampersand-overlay');
-                const ampFullLine='& '+remainingChampionNames;
-                let ampFontSize=126;
-                ctx.save();
-                ctx.font=`italic 900 ${ampFontSize}px Georgia, Times New Roman, serif`;
-                while(ctx.measureText(ampFullLine).width>680 && ampFontSize>15){ ampFontSize-=2; ctx.font=`italic 900 ${ampFontSize}px Georgia, Times New Roman, serif`; }
-                const ampX=720-(ctx.measureText(ampFullLine).width/2)+(ctx.measureText('&').width/2);
-                ctx.restore();
-                if(ampOverlay){
-                    ampOverlay.style.left=`${(ampX/1122)*100}%`;
-                    ampOverlay.style.top=`${(550/1402)*100}%`;
-                    ampOverlay.style.fontSize=`${ampFontSize}px`;
-                    ampOverlay.style.display='block';
-                }
-            } else {
-                const ampOverlay=document.getElementById('champion-ampersand-overlay');
-                if(ampOverlay) ampOverlay.style.display='none';
-                wesmaPosterText(ctx,name,720,495,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
-            }
+                wesmaPosterText(ctx,'& '+parts.slice(1).join(' & '),720,550,680,126,{color:'gold',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
+            } else wesmaPosterText(ctx,name,720,495,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
 
             // Keep exactly one decorative shuttlecock in the Champions background: the upper-right one.
             // The lower-left shuttlecock is masked only inside its own small background area.
