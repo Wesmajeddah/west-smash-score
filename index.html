@@ -444,6 +444,12 @@
             border-radius: 8px;
             box-shadow: 0 0 0 3px rgba(9,18,32,.9), 0 0 28px rgba(212,175,55,.22), 0 18px 50px rgba(0,0,0,.55);
         }
+        @keyframes championStatsGlowPulse {
+            0%, 100% { filter: drop-shadow(0 0 1px rgba(245, 205, 112, .12)); }
+            50% { filter: drop-shadow(0 0 4px rgba(245, 205, 112, .28)); }
+        }
+        #champion-status-capture { animation: championStatsGlowPulse 2.8s ease-in-out infinite; }
+        @keyframes championAmpersandPulse { 0% { opacity:.72; filter:brightness(.9) drop-shadow(0 0 2px rgba(255,190,65,.55)); transform:translate(-50%,-50%) scale(.94); } 100% { opacity:1; filter:brightness(1.35) drop-shadow(0 0 11px rgba(255,205,75,1)); transform:translate(-50%,-50%) scale(1.13); } }
         #champion-status-modal button[aria-label="Back"] {
             background: linear-gradient(135deg,#111b2c,#050a13) !important;
             border: 1px solid #d4af37 !important;
@@ -670,7 +676,7 @@
             </div>
 
             <!-- Compact champion shortcut only; opens the Instagram-style winner poster -->
-            <button id="official-combined-section" type="button" onclick="openChampionStatusModal()" class="relative w-full overflow-hidden rounded-lg border border-[#9b633d] px-3 py-2 shadow-lg text-left active:scale-[0.99] transition" style="background:radial-gradient(circle at 82% 18%,rgba(153,35,28,.52),transparent 42%),linear-gradient(125deg,#080608 0%,#21090d 58%,#3a1013 100%);">
+            <button id="official-combined-section" type="button" onclick="openChampionStatusModal()" class="hidden relative w-full overflow-hidden rounded-lg border border-[#9b633d] px-3 py-2 shadow-lg text-left active:scale-[0.99] transition" style="background:radial-gradient(circle at 82% 18%,rgba(153,35,28,.52),transparent 42%),linear-gradient(125deg,#080608 0%,#21090d 58%,#3a1013 100%);">
                 <span class="absolute -right-5 -top-7 w-24 h-24 rounded-full border-[10px] border-red-900/20 pointer-events-none"></span>
                 <span class="relative flex items-center justify-between gap-2">
                     <span class="flex items-center gap-2 min-w-0"><i class="fa-solid fa-crown text-[#e5b85c] text-sm"></i><span class="text-[10px] font-black tracking-[0.2em] text-white">CHAMPION</span></span>
@@ -682,20 +688,13 @@
 
     <!-- Match Controls & Compact Summary -->
     <div class="w-full max-w-xl mt-2.5 pt-3 space-y-2.5 p-2.5 rounded-2xl border-2 border-[#b88a4a] shadow-xl" style="background:linear-gradient(145deg,#21150f 0%,#3a1717 48%,#171014 100%);box-shadow:0 12px 28px rgba(33,21,15,.22),inset 0 1px 0 rgba(255,255,255,.12);">
-        <div class="bg-gradient-to-r from-[#fffaf0] via-white to-[#f5f0eb] border border-[#d4af70] rounded-xl p-2.5 shadow-md flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-chart-pie text-[#5c4033] text-sm"></i>
-                <div>
-                    <div class="text-xs font-bold text-slate-800">SUMMARY / സംഗ്രഹം</div>
-                    <div class="text-[9px] text-slate-500 font-light">ടീമുകളുടെ സമയം, ജയം & ഫലങ്ങൾ / Time, Win & Results</div>
-                </div>
-            </div>
-            <button onclick="openTimeSummaryModal()" class="bg-gradient-to-r from-[#5c4033] to-[#8c6239] hover:from-[#4e342e] hover:to-[#78522f] text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg shadow uppercase tracking-wider transition-all active:scale-95 cursor-pointer flex items-center gap-1">
-                <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
+        <div class="bg-gradient-to-r from-[#fff8f7] via-white to-[#fce8e7] border border-rose-300 rounded-xl p-2.5 shadow-md">
+            <button onclick="manualFinishMatch()" class="w-full bg-gradient-to-r from-rose-700 via-rose-600 to-[#8f2525] hover:from-rose-600 hover:to-[#7b1f1f] text-white font-black text-sm px-4 py-3 rounded-lg border border-rose-800 shadow-lg uppercase tracking-wider transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-flag-checkered"></i> END MATCH
             </button>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 gap-2">
             <div class="flex items-center justify-between bg-gradient-to-r from-[#fffdf8] to-[#f5f0eb] border border-[#d4af70] rounded-xl px-2.5 py-2 shadow-md">
                 <span class="text-[10px] text-slate-700 font-bold flex items-center gap-1">
                     <span class="live-dot-green"></span> STATUS:
@@ -704,40 +703,30 @@
                     <i class="fa-solid fa-share-nodes"></i> SHARE
                 </button>
             </div>
-            <div class="flex items-center justify-between bg-gradient-to-r from-[#fff8f7] to-[#fce8e7] border border-rose-300 rounded-xl px-2 py-2 shadow-md">
-                <span class="text-[8px] text-rose-700 font-bold flex items-center gap-0.5 uppercase tracking-tighter shrink-0">
-                    <i class="fa-solid fa-flag-checkered text-[#5c4033] text-[8px]"></i> TOURNAMENT:
-                </span>
-                <button onclick="manualFinishMatch()" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold py-1.5 px-2 rounded-lg border border-rose-700 flex items-center gap-1 text-[9px] transition-all active:scale-95 uppercase tracking-wider cursor-pointer shrink-0 shadow-2xs">
-                    END MATCH
-                </button>
-            </div>
         </div>
 
-        <div class="bg-gradient-to-r from-[#fffdf8] via-white to-[#f5f0eb] border border-[#d4af70] rounded-xl px-3 py-2 flex items-center justify-between shadow-md">
-            <div class="flex items-center gap-2">
-                <button onclick="openUndoModal()" class="text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-1 uppercase tracking-wider cursor-pointer">
-                    🔄 UNDO
+        <div class="bg-gradient-to-r from-[#fffdf8] via-white to-[#f5f0eb] border border-[#d4af70] rounded-xl px-1.5 py-2 shadow-md">
+            <div class="grid grid-cols-5 gap-1 w-full">
+                <button onclick="openUndoModal()" class="min-w-0 h-9 bg-[#5c4033] hover:bg-[#4e342e] text-white font-extrabold px-1 py-1 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 text-[9px] uppercase tracking-tight cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-rotate-left"></i> UNDO
                 </button>
-                <button onclick="openAddTeamModal()" class="w-7 h-7 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center cursor-pointer shadow-2xs" title="പുതിയ ടീമിനെ ചേർക്കുക / Add Team">
-                    <i class="fa-solid fa-user-plus text-[10px]"></i>
+                <button onclick="openAddTeamModal()" class="min-w-0 h-9 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white rounded-lg flex items-center justify-center gap-1 cursor-pointer shadow-2xs text-[9px] font-extrabold whitespace-nowrap" title="Add Team">
+                    <i class="fa-solid fa-user-plus"></i> ADD
                 </button>
-                <span id="history-summary-text" class="text-[10px] text-slate-500 font-medium italic truncate max-w-[100px] sm:max-w-[150px]">
-                    സെഷൻ റെക്കോർഡുകൾ / Session Records
-                </span>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="openHistoryModal()" class="h-8 box-border text-[10px] bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-2.5 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
+                <button onclick="openTimeSummaryModal()" class="min-w-0 h-9 bg-gradient-to-r from-[#5c4033] to-[#8c6239] text-white font-extrabold text-[9px] px-1 py-1 rounded-lg shadow uppercase tracking-tight transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 whitespace-nowrap">
+                    <i class="fa-solid fa-clock-rotate-left"></i> RECORDS
+                </button>
+                <button onclick="openHistoryModal()" class="min-w-0 h-9 bg-[#5c4033] hover:bg-[#4e342e] text-white font-semibold px-1 rounded-lg shadow transition-all active:scale-95 flex items-center justify-center gap-1 text-[9px] cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-folder-open"></i> HISTORY
                 </button>
-                <button onclick="openMatchCorrectionModal()" class="h-8 box-border text-[10px] bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-2.5 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
+                <button onclick="openMatchCorrectionModal()" class="min-w-0 h-9 bg-amber-100 hover:bg-amber-200 text-[#5c4033] border border-[#c6a15b] font-extrabold px-1 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 text-[9px] cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-pen-to-square"></i> CORRECT
                 </button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 gap-2">
-            <button onclick="openUnifiedReportModal()" class="w-full bg-gradient-to-r from-[#c49a54] via-[#8c6239] to-[#4b2d23] hover:from-[#d4ad6a] hover:to-[#5c4033] text-white font-extrabold py-3 px-1 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-[#e3c17d] cursor-pointer tracking-wide">
+            <button onclick="openUnifiedReportModal()" class="hidden w-full bg-gradient-to-r from-[#c49a54] via-[#8c6239] to-[#4b2d23] hover:from-[#d4ad6a] hover:to-[#5c4033] text-white font-extrabold py-3 px-1 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all active:scale-95 border border-[#e3c17d] cursor-pointer tracking-wide">
                 <i class="fa-solid fa-images text-amber-200"></i> OFFICIAL COMBINED REPORT • IMAGE SHARE
             </button>
         </div>
@@ -926,10 +915,13 @@
     <!-- Instagram Story-style WESMA Winner Status -->
     <div id="champion-status-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[110] hidden">
         <div class="relative w-full h-full flex flex-col items-center justify-center gap-2 px-2 py-2">
-            <canvas id="champion-status-capture" aria-label="WESMA Champions dynamic poster"
-                class="block mx-auto shadow-2xl"
-                width="1122" height="1402"
-                style="width:min(520px,calc(100vw - 12px));height:auto;max-height:calc(100dvh - 64px);aspect-ratio:1122/1402;object-fit:contain;background:#080608;"></canvas>
+            <div id="champion-poster-wrap" class="relative mx-auto" style="width:min(520px,calc(100vw - 12px));aspect-ratio:1122/1402;max-height:calc(100dvh - 64px);">
+                <canvas id="champion-status-capture" aria-label="WESMA Champions dynamic poster"
+                    class="block mx-auto shadow-2xl"
+                    width="1122" height="1402"
+                    style="width:100%;height:auto;max-height:calc(100dvh - 64px);aspect-ratio:1122/1402;object-fit:contain;background:#080608;"></canvas>
+                <span id="champion-ampersand-overlay" aria-hidden="true" style="display:none;position:absolute;z-index:2;transform:translate(-50%,-50%);font-family:Georgia,serif;font-style:italic;font-weight:900;line-height:1;background:linear-gradient(180deg,#fff4b8 0%,#ffd34f 48%,#d88b18 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 0 7px rgba(255,204,75,.9),0 0 16px rgba(255,170,35,.72);animation:championAmpersandPulse 1.65s ease-in-out infinite alternate;pointer-events:none;">&amp;</span>
+            </div>
             <button type="button" onclick="closeChampionStatusModal()" aria-label="Back" class="shrink-0 min-w-[110px] h-9 px-6 rounded-full bg-black/80 border border-[#d8ad45] text-[#ffe6a0] flex items-center justify-center text-[11px] font-black tracking-[0.2em] shadow-lg">BACK</button>
         </div>
     </div>
@@ -1035,7 +1027,7 @@
         <div class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
             <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
                 <h3 class="text-xs font-semibold text-[#5c4033] flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT LOGS
+                    <i class="fa-solid fa-trophy text-[#8c6239]"></i> TOURNAMENT LOGS (1 HOUR+)
                 </h3>
                 <button onclick="closeHistoryModal()" class="w-7 h-7 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg flex items-center justify-center text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -1277,19 +1269,49 @@
         }
 
         function getDynamicBadgeTitle(team, sessionTeams = teams, historyRows = tournamentHistory) {
-            // The special tag is evaluated after at least six played matches.
-            // Only the sole first-place team in the six-match performance table
-            // receives it; tied first place does not award a unique champion tag.
-            if (!team || !Array.isArray(sessionTeams)) return "";
-            const activeTeams = sessionTeams.filter(t => t && !t.isDisabled);
-            const candidate = activeTeams.find(t => String(t.id) === String(team.id));
-            if (!candidate) return "";
-            const played = Math.max(0, Number(candidate.wins) || 0) + Math.max(0, Number(candidate.losses) || 0);
-            if (played < 6) return "";
-            const ranked = getInternationalSortedTeams(activeTeams);
-            if (!ranked.length || String(ranked[0].id) !== String(candidate.id)) return "";
-            if (ranked.length > 1 && sameStandingPosition(ranked[0], ranked[1])) return "";
-            return "SIX-MATCH CHAMPION";
+            if (!team || !Array.isArray(historyRows) || !historyRows.length) return "";
+            const teamKey = String(team.id);
+            let firstPlaceCount = 0;
+            const firstPlaceCounts = new Map();
+
+            historyRows.forEach(record => {
+                if (!record || !Array.isArray(record.teams)) return;
+                const historicalTeams = record.teams.filter(t => t && !t.isDisabled);
+                if (!historicalTeams.length) return;
+                const firstPlaceGroup = getPodiumGroups(historicalTeams).find(group => group.rank === 1);
+                if (!firstPlaceGroup) return;
+                firstPlaceGroup.teams.forEach(historicalTeam => {
+                    const key = String(historicalTeam.id);
+                    firstPlaceCounts.set(key, (firstPlaceCounts.get(key) || 0) + 1);
+                });
+            });
+
+            firstPlaceCount = firstPlaceCounts.get(teamKey) || 0;
+            const highestFirstPlaceCount = Math.max(0, ...Array.from(firstPlaceCounts.values()));
+            // Only the team(s) with the most historical first-place finishes,
+            // or a team with at least six first-place finishes, can receive this tag.
+            if (!firstPlaceCount || (firstPlaceCount !== highestFirstPlaceCount && firstPlaceCount < 6)) return "";
+
+            const phrases = [
+                "A FORCE THAT IS HARD TO STOP",
+                "A DANGEROUS TEAM ON COURT",
+                "TOUGH OPPONENTS. NO EASY WINS.",
+                "BUILT TO TAKE CONTROL",
+                "OPPONENTS MUST STAY ALERT",
+                "A SERIOUS THREAT IN EVERY MATCH",
+                "A TEAM THAT NEVER BACKS DOWN",
+                "THE GAME-CHANGERS ON COURT"
+            ];
+            if (!window.wesmaSpecialTagPhraseCache) window.wesmaSpecialTagPhraseCache = {};
+            const cacheKey = `${teamKey}:${firstPlaceCount}`;
+            if (!window.wesmaSpecialTagPhraseCache[cacheKey]) {
+                const previous = Number(window.wesmaSpecialTagPhraseCache.__lastIndex);
+                let next = Math.floor(Math.random() * phrases.length);
+                if (phrases.length > 1 && next === previous) next = (next + 1) % phrases.length;
+                window.wesmaSpecialTagPhraseCache.__lastIndex = next;
+                window.wesmaSpecialTagPhraseCache[cacheKey] = phrases[next];
+            }
+            return window.wesmaSpecialTagPhraseCache[cacheKey];
         }
 
         function renderTeamNameWithTagline(team, badgeTitle = getDynamicBadgeTitle(team)) {
@@ -1301,9 +1323,8 @@
         function getHistoryBadgeTitle(team, historyIndex) {
             const record = tournamentHistory[Number(historyIndex)];
             if (!record || !Array.isArray(record.teams)) return "";
-            // History is stored newest first; only older sessions (following this row)
-            // are used to assess the historical title for this session.
-            return getDynamicBadgeTitle(team, record.teams, tournamentHistory.slice(Number(historyIndex) + 1, Number(historyIndex) + 5));
+            // Special tags are earned from the complete saved History record.
+            return getDynamicBadgeTitle(team, record.teams, tournamentHistory);
         }
 
         function formatHoursAndMins(totalMins) {
@@ -2120,17 +2141,41 @@
             return sortLatestFirst(currentDetails)[0] || null;
         }
 
+        function getCurrentSessionStartTimestamp() {
+            const activeStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
+            if (activeStart) return activeStart;
+
+            const endedStart = normalizeHistoryTimestamp(
+                lastEndedChampionSnapshot && (lastEndedChampionSnapshot.startedAt || lastEndedChampionSnapshot.sessionId)
+            );
+            if (endedStart) return endedStart;
+
+            const endedTeamSessionStart = (lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)
+                ? lastEndedChampionSnapshot.teams : [])
+                .map(team => normalizeHistoryTimestamp(team && team.sessionId))
+                .find(Boolean);
+            if (endedTeamSessionStart) return endedTeamSessionStart;
+
+            const teamSessionStart = (Array.isArray(teams) ? teams : [])
+                .map(team => normalizeHistoryTimestamp(team && team.sessionId))
+                .find(Boolean);
+            return teamSessionStart || 0;
+        }
+
         function getCurrentSessionLastDefeatedEvents() {
             // Build the list from each winner's defeat records, but validate each
             // record against BOTH sides of the current-session match logs.
             // Important: sequence numbers alone are not globally unique across
             // devices/teams, so they must never be used as a de-duplication key.
-            const sessionStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
+            const sessionStart = getCurrentSessionStartTimestamp();
             if (!sessionStart || !Array.isArray(teams)) return [];
             const currentSessionId = String(sessionStart);
+            const sessionTeams = isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)
+                ? lastEndedChampionSnapshot.teams
+                : teams;
             const events = [];
 
-            teams.forEach(winner => {
+            sessionTeams.forEach(winner => {
                 if (!winner || !Array.isArray(winner.defeatedDetails)) return;
                 const winnerLogs = getCurrentSessionMatchHistory(winner);
 
@@ -2147,7 +2192,7 @@
 
                     const seq = Number(defeat.seq) || 0;
                     const matchId = String(defeat.matchId || '');
-                    const loser = teams.find(team => team && (
+                    const loser = sessionTeams.find(team => team && (
                         (defeat.teamId != null && String(team.id) === String(defeat.teamId)) ||
                         (defeat.teamId == null && team.name === defeat.name) ||
                         (defeat.teamId == null && winnerLogs.some(log => log && String(log.result || '').toUpperCase() === 'WIN' &&
@@ -2207,10 +2252,13 @@
         }
 
         function getCurrentSessionTotalMatches() {
-            const sessionStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
+            const sessionStart = getCurrentSessionStartTimestamp();
+            const sessionTeams = isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)
+                ? lastEndedChampionSnapshot.teams
+                : teams;
             const seen = new Set();
             let winLogCount = 0;
-            (Array.isArray(teams) ? teams : []).forEach(team => {
+            (Array.isArray(sessionTeams) ? sessionTeams : []).forEach(team => {
                 if (!Array.isArray(team.matchHistoryLog) || !team.matchHistoryLog.length) return;
                 getCurrentSessionMatchHistory(team).forEach(log => {
                     if (!log || String(log.result || '').toUpperCase() !== 'WIN') return;
@@ -2226,7 +2274,9 @@
             // One WIN record represents one completed match. If an older session
             // has counters but no logs, fall back to paired team plays.
             if (winLogCount > 0) return winLogCount;
-            return Math.floor(Math.max(0, calculateTotalPlays()) / 2);
+            const plays = (Array.isArray(sessionTeams) ? sessionTeams : []).reduce((sum, team) =>
+                sum + Math.max(0, Number(team && team.wins) || 0) + Math.max(0, Number(team && team.losses) || 0), 0);
+            return Math.floor(plays / 2);
         }
 
         function updateMainTopLastDefeatedBar() {
@@ -2325,26 +2375,21 @@
 
         function getCurrentSessionMatchHistory(team) {
             if (!team || !Array.isArray(team.matchHistoryLog)) return [];
-            const sessionStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
-            // No active session means no live-session plays. Saved tournament history
+            const sessionStart = getCurrentSessionStartTimestamp();
+            // No active or just-ended session means no live-session plays. Saved tournament history
             // is displayed through its separate History view, never through this list.
             if (!sessionStart) return [];
             const currentSessionId = String(sessionStart);
-            const sessionEnd = isMatchEnded && lastEndedChampionSnapshot && Number(lastEndedChampionSnapshot.endedAt) > 0
-                ? Number(lastEndedChampionSnapshot.endedAt) : Date.now();
             const filtered = team.matchHistoryLog.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
                 const logSessionId = normalizeHistoryTimestamp(log.sessionId);
                 const stamp = normalizeHistoryTimestamp(log.timestamp);
-                // A present sessionId is authoritative: never pull a log from a
-                // different session merely because its timestamp is later.
-                if (log.sessionId !== null && log.sessionId !== undefined && String(log.sessionId).trim() !== '') {
-                    return logSessionId === sessionStart;
-                }
-                // Legacy logs without a sessionId are accepted only inside this
-                // session's actual time window, never from a future/stale session.
-                if (stamp) return stamp >= sessionStart && stamp <= sessionEnd;
-                return normalizeHistoryTimestamp(team.sessionId) === sessionStart;
+                // Firebase/older app versions may store session IDs in seconds or
+                // milliseconds. Compare normalized timestamps, then use the actual
+                // match timestamp as a compatibility fallback.
+                if (logSessionId && logSessionId === sessionStart) return true;
+                if (stamp && stamp >= sessionStart) return true;
+                return !log.sessionId && !stamp && String(team.sessionId || '') === currentSessionId;
             });
             const deduped = dedupeMatchHistoryLogs(filtered);
             if (deduped.length) return deduped;
@@ -2531,8 +2576,14 @@
         function mergeHistoryRecords(preferredRecords, additionalRecords) {
             const first = Array.isArray(preferredRecords) ? preferredRecords : (preferredRecords && typeof preferredRecords === "object" ? Object.values(preferredRecords) : []);
             const second = Array.isArray(additionalRecords) ? additionalRecords : (additionalRecords && typeof additionalRecords === "object" ? Object.values(additionalRecords) : []);
-            // Preserve every valid saved session, regardless of duration.
-            return dedupeHistoryRecords([...first, ...second]);
+            const meetsOneHourRule = record => {
+                if (!record) return false;
+                const duration = Math.max(0, Number(record.durationMs) || (Number(record.durationMinutes) || 0) * 60000);
+                // Preserve legacy records with no duration metadata; reject every
+                // known record shorter than one hour.
+                return duration === 0 || duration >= 60 * 60 * 1000;
+            };
+            return dedupeHistoryRecords([...first, ...second].filter(meetsOneHourRule));
         }
 
         function getDailyTotalMatches(record) {
@@ -2757,6 +2808,8 @@
 
             // Winner name: slightly larger and distinctly heavier for the first-place champion.
             if(headlineTeams.length>1){
+                const ampOverlay=document.getElementById('champion-ampersand-overlay');
+                if(ampOverlay) ampOverlay.style.display='none';
                 // Keep each co-champion name at the exact same nominal size as a single champion.
                 // Separate lines prevent the combined text from shrinking to fit one long line.
                 const coChampionOne=String(headlineTeams[0].name||'').toUpperCase();
@@ -2768,8 +2821,28 @@
                 wesmaPosterText(ctx,coChampionTwo,720,561,680,170,{color:'gold',italic:true,strokeScale:0.075,font:'Georgia, Times New Roman, serif'});
             } else if(parts.length>=2){
                 wesmaPosterText(ctx,parts[0],720,440,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
-                wesmaPosterText(ctx,'& '+parts.slice(1).join(' & '),720,550,680,126,{color:'gold',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
-            } else wesmaPosterText(ctx,name,720,495,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
+                const remainingChampionNames=parts.slice(1).join(' & ');
+                wesmaPosterText(ctx,remainingChampionNames,720,550,680,126,{color:'gold',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
+                // Overlay the ampersand as a separate animated gold element so only '&' receives the special treatment.
+                const ampOverlay=document.getElementById('champion-ampersand-overlay');
+                const ampFullLine='& '+remainingChampionNames;
+                let ampFontSize=126;
+                ctx.save();
+                ctx.font=`italic 900 ${ampFontSize}px Georgia, Times New Roman, serif`;
+                while(ctx.measureText(ampFullLine).width>680 && ampFontSize>15){ ampFontSize-=2; ctx.font=`italic 900 ${ampFontSize}px Georgia, Times New Roman, serif`; }
+                const ampX=720-(ctx.measureText(ampFullLine).width/2)+(ctx.measureText('&').width/2);
+                ctx.restore();
+                if(ampOverlay){
+                    ampOverlay.style.left=`${(ampX/1122)*100}%`;
+                    ampOverlay.style.top=`${(550/1402)*100}%`;
+                    ampOverlay.style.fontSize=`${ampFontSize}px`;
+                    ampOverlay.style.display='block';
+                }
+            } else {
+                const ampOverlay=document.getElementById('champion-ampersand-overlay');
+                if(ampOverlay) ampOverlay.style.display='none';
+                wesmaPosterText(ctx,name,720,495,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
+            }
 
             // Keep exactly one decorative shuttlecock in the Champions background: the upper-right one.
             // The lower-left shuttlecock is masked only inside its own small background area.
@@ -2836,26 +2909,14 @@
         }
 
         function openChampionsFromFinish() {
-            if (!isMatchEnded) { showToast("End Match ആദ്യം പൂർത്തിയാക്കുക."); return; }
-            closeFinishMatchModal();
             openChampionStatusModal();
         }
 
         function openCombinedFromFinish() {
-            if (!isMatchEnded) { showToast("End Match ആദ്യം പൂർത്തിയാക്കുക."); return; }
-            closeFinishMatchModal();
             openUnifiedReportModal();
         }
 
         function openChampionStatusModal() {
-            // Match the Combined Report access rule: Champions is available only
-            // after the current match has been ended by the End Match action.
-            if (!isMatchEnded) {
-                showToast("Champions തുറക്കാൻ ആദ്യം END MATCH അമർത്തി മത്സരം അവസാനിപ്പിക്കുക.");
-                return;
-            }
-            const finishModal = document.getElementById("finish-match-modal");
-            if (finishModal) finishModal.classList.add("hidden");
             const modal=document.getElementById('champion-status-modal');
             if(!modal) return;
 
@@ -3289,7 +3350,8 @@
         }
 
         function saveHistoryRecordTransaction(record) {
-            if (!dbRef || !record || !Array.isArray(record.teams)) return Promise.resolve(false);
+            const recordDurationMs = Math.max(0, Number(record && record.durationMs) || (Number(record && record.durationMinutes) || 0) * 60000);
+            if (!dbRef || !record || recordDurationMs < 60 * 60 * 1000) return Promise.resolve(false);
             const historyRef = dbRef.child('tournamentHistory');
             historyWriteQueue = historyWriteQueue.catch(() => false).then(() => new Promise((resolve) => {
                 historyRef.transaction((current) => {
@@ -3299,6 +3361,8 @@
                         const oldKey = String(item.sessionId || item.startTimestamp || item.id || "");
                         return (newKey && oldKey === newKey) || (!oldKey && historyRecordFingerprint(item) === historyRecordFingerprint(record));
                     });
+                    // Do not persist a session shorter than one full hour.
+                    if (recordDurationMs < 60 * 60 * 1000) return list;
                     return exists ? list : dedupeHistoryRecords([record, ...list]);
                 }, (error, committed, snapshot) => {
                     if (error) {
@@ -3334,6 +3398,11 @@
             const sessionDurationMs = tournamentStartTimestamp ? Math.max(0, Date.now() - Number(tournamentStartTimestamp)) : 0;
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
+            if (sessionDurationMs < 60 * 60 * 1000) {
+                showToast("History saved only after a session reaches 1 hour. This match can still be ended normally.");
+                return false;
+            }
+
             const sessionDurationMins = Math.floor(sessionDurationMs / 60000);
             const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -4881,12 +4950,6 @@
         let unifiedReportBusy = false;
 
         function openUnifiedReportModal() {
-            if (!isMatchEnded) {
-                showToast("Combined Report തുറക്കാൻ ആദ്യം END MATCH അമർത്തി മത്സരം അവസാനിപ്പിക്കുക.");
-                return;
-            }
-            const finishModal = document.getElementById("finish-match-modal");
-            if (finishModal) finishModal.classList.add("hidden");
             const modal = document.getElementById("unified-report-modal");
             const content = document.getElementById("unified-report-content");
             const status = document.getElementById("unified-report-status");
@@ -4991,7 +5054,6 @@
         }
 
         async function shareUnifiedReportImage() {
-            if (!isMatchEnded) { showToast("End Match കഴിഞ്ഞാൽ മാത്രമേ report share ചെയ്യാൻ കഴിയൂ."); return; }
             if (!unifiedReportCanvas) { await generateUnifiedReportImage(); }
             if (!unifiedReportCanvas) return;
             const status = document.getElementById("unified-report-status");
@@ -5239,6 +5301,7 @@
             saveHistorySpecialSnapshots(activeSessionId);
             modal.classList.remove("hidden");
             finishProcessing = false;
+            updateMainTopLastDefeatedBar();
             updateMatchStatusBadge();
             updateOfficialCombinedSection();
             triggerWinCelebration();
@@ -6554,7 +6617,7 @@
             const already = (tournamentHistory || []).some(r =>
                 String(r.sessionId || r.startTimestamp || r.id || "") === sid);
 
-            if (plays > 0 && !already) {
+            if (plays > 0 && !already && (due - oldStart) >= 60 * 60 * 1000) {
                 const date = new Date(oldStart).toLocaleString("en-GB", {
                     day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
                 });
@@ -6623,7 +6686,7 @@
                 let history = dedupeHistoryRecords(current.tournamentHistory || []);
                 const sid = String(oldStart);
                 const already = history.some(r=>String(r.sessionId||r.startTimestamp||r.id||"")===sid);
-                if (plays > 0 && !already) {
+                if (plays > 0 && !already && (due - oldStart) >= 60 * 60 * 1000) {
                     const date = new Date(oldStart).toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
                     const rec = {id:sid,sessionId:sid,startTimestamp:sid,date,dateKey:historyDateKey({startTimestamp:sid}),teams:JSON.parse(JSON.stringify(oldTeams)),totalPlays:plays,totalMatches:Math.floor((plays+0.5)/2),durationMinutes:Math.max(0,Math.floor((due-oldStart)/60000)),durationMs:Math.max(0,due-oldStart)};
                     history = dedupeHistoryRecords([rec,...history]);
