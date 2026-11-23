@@ -508,114 +508,6 @@
         #match-correction-modal button i { flex:0 0 auto; }
         #match-correction-modal .text-\[9px\], #match-correction-modal .text-\[10px\] { overflow-wrap:anywhere; }
 
-        /* End Match Champions — premium badminton victory theme.
-           Visual-only: does not change ranking or match data. */
-        #finish-match-modal-content .wesma-champions-box {
-            position:relative !important;
-            overflow:hidden !important;
-            isolation:isolate !important;
-            background:
-                radial-gradient(circle at 50% 20%, rgba(255,220,110,.22), transparent 38%),
-                linear-gradient(135deg,#071525 0%,#102c42 46%,#1a1220 100%) !important;
-            border:2px solid #d4af37 !important;
-            box-shadow:0 0 0 2px rgba(212,175,55,.20),0 0 24px rgba(212,175,55,.34),inset 0 0 28px rgba(0,0,0,.38) !important;
-        }
-        #finish-match-modal-content .wesma-champions-box::before {
-            content:"" !important;
-            position:absolute !important;
-            inset:-40% !important;
-            background:
-                linear-gradient(120deg,transparent 35%,rgba(255,255,255,.16) 48%,rgba(255,221,120,.34) 52%,transparent 66%),
-                repeating-linear-gradient(90deg,transparent 0 38px,rgba(255,255,255,.035) 39px 40px) !important;
-            transform:translateX(-55%) rotate(8deg) !important;
-            animation:wesmaChampionsSweep 4.2s ease-in-out infinite !important;
-            pointer-events:none !important;
-            z-index:0 !important;
-        }
-        #finish-match-modal-content .wesma-champions-box::after {
-            content:"✦  🏸  ✦  🏆  ✦  🏸  ✦" !important;
-            position:absolute !important;
-            left:0 !important; right:0 !important; bottom:2px !important;
-            text-align:center !important;
-            font-size:8px !important;
-            letter-spacing:9px !important;
-            color:rgba(255,221,120,.62) !important;
-            animation:wesmaChampionsSpark 2.2s ease-in-out infinite !important;
-            pointer-events:none !important; z-index:0 !important;
-        }
-        #finish-match-modal-content .wesma-champions-box > * { position:relative !important; z-index:1 !important; }
-        #finish-match-modal-content .wesma-champions-title {
-            font-size:14px !important;
-            line-height:1.25 !important;
-            color:#ffe8a3 !important;
-            text-shadow:0 0 6px rgba(255,214,91,.72),0 0 16px rgba(212,175,55,.52) !important;
-            animation:wesmaChampionsTextGlow 1.8s ease-in-out infinite !important;
-        }
-        #finish-match-modal-content .wesma-champions-name {
-            font-size:1.35rem !important;
-            line-height:1.2 !important;
-            color:#fff3b0 !important;
-            background:linear-gradient(90deg,#fff7c7,#d4af37,#fff3b0,#f4d36d,#fff7c7) !important;
-            background-size:260% 100% !important;
-            -webkit-background-clip:text !important;
-            background-clip:text !important;
-            -webkit-text-fill-color:transparent !important;
-            text-shadow:0 0 10px rgba(212,175,55,.46) !important;
-            animation:wesmaChampionsGoldFlow 3s linear infinite, wesmaChampionsNamePulse 1.9s ease-in-out infinite !important;
-        }
-        #finish-match-modal-content .wesma-champions-name {
-            display:flex !important;
-            align-items:center !important;
-            justify-content:center !important;
-            gap:10px !important;
-        }
-        #finish-match-modal-content .wesma-champions-name-text {
-            min-width:0 !important;
-            flex:0 1 auto !important;
-        }
-        #finish-match-modal-content .wesma-champions-line {
-            width:34px !important;
-            height:2px !important;
-            flex:0 0 34px !important;
-            border-radius:999px !important;
-            background:linear-gradient(90deg,transparent,#f4d36d,#fff3b0,#f4d36d,transparent) !important;
-            box-shadow:0 0 8px rgba(244,211,109,.8) !important;
-            animation:wesmaChampionsLineGlow 1.8s ease-in-out infinite !important;
-        }
-        #finish-match-modal-content .wesma-champions-wins {
-            font-size:12px !important;
-            line-height:1.25 !important;
-            color:#fff7cf !important;
-            background:linear-gradient(90deg,#6d4b0e,#c99a2e,#f4dc83,#c99a2e,#6d4b0e) !important;
-            border-color:#f0d37a !important;
-            box-shadow:0 0 12px rgba(212,175,55,.28) !important;
-        }
-        @keyframes wesmaChampionsLineGlow {
-            0%,100%{opacity:.55;transform:scaleX(.82)}
-            50%{opacity:1;transform:scaleX(1)}
-        }
-        @keyframes wesmaChampionsSweep {
-            0%,18%{transform:translateX(-55%) rotate(8deg);opacity:0}
-            38%{opacity:.9}
-            68%,100%{transform:translateX(55%) rotate(8deg);opacity:0}
-        }
-        @keyframes wesmaChampionsTextGlow {
-            0%,100%{filter:brightness(.95);text-shadow:0 0 5px rgba(255,214,91,.5),0 0 12px rgba(212,175,55,.35)}
-            50%{filter:brightness(1.22);text-shadow:0 0 9px rgba(255,231,151,.95),0 0 22px rgba(212,175,55,.72)}
-        }
-        @keyframes wesmaChampionsGoldFlow {
-            0%{background-position:0% 50%}
-            100%{background-position:260% 50%}
-        }
-        @keyframes wesmaChampionsNamePulse {
-            0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(212,175,55,.35))}
-            50%{transform:scale(1.018);filter:drop-shadow(0 0 9px rgba(255,219,102,.72))}
-        }
-        @keyframes wesmaChampionsSpark {
-            0%,100%{opacity:.25;transform:translateY(0) scale(.95)}
-            50%{opacity:.95;transform:translateY(-2px) scale(1.08)}
-        }
-
         /* Premium Champions presentation only — no score or ranking logic changed. */
         #champion-status-modal {
             background:
@@ -2770,137 +2662,32 @@
         }
 
         function getCurrentSessionMatchHistory(team) {
-            if (!team) return [];
-
-            // After END MATCH the live `teams` array may be replaced/reset by the
-            // Firebase listener. Always prefer the immutable ended-session snapshot
-            // for this detail view when it exists, so the exact match rows are read
-            // from the same data that was captured at END MATCH.
-            const endedTeams = (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
-                ? lastEndedChampionSnapshot.teams
-                : null;
-            const sessionTeams = endedTeams || (Array.isArray(teams) ? teams : []);
-            const sourceTeam = sessionTeams.find(t => String(t && t.id) === String(team.id)) || team;
-
-            let sessionStart = normalizeHistoryTimestamp(
-                isMatchEnded && lastEndedChampionSnapshot
-                    ? (lastEndedChampionSnapshot.startedAt || lastEndedChampionSnapshot.sessionId)
-                    : tournamentStartTimestamp
-            );
-            if (!sessionStart) sessionStart = normalizeHistoryTimestamp(sourceTeam.sessionId);
-            if (!sessionStart) sessionStart = getCurrentSessionStartTimestamp();
+            if (!team || !Array.isArray(team.matchHistoryLog)) return [];
+            const sessionStart = getCurrentSessionStartTimestamp();
+            // No active or just-ended session means no live-session plays. Saved tournament history
+            // is displayed through its separate History view, never through this list.
             if (!sessionStart) return [];
-
             const currentSessionId = String(sessionStart);
-            const isInSession = item => {
-                if (!item) return false;
-                const sid = normalizeHistoryTimestamp(item.sessionId);
-                const stamp = normalizeHistoryTimestamp(item.timestamp);
-                if (sid) return sid === sessionStart;
-                return !!stamp && stamp >= sessionStart;
-            };
-
-            const rawLogs = Array.isArray(sourceTeam.matchHistoryLog) ? sourceTeam.matchHistoryLog : [];
-            const filtered = rawLogs.filter(log => {
+            const filtered = team.matchHistoryLog.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
-                return isInSession(log) || (!log.sessionId && !log.timestamp && String(sourceTeam.sessionId || '') === currentSessionId);
+                const logSessionId = normalizeHistoryTimestamp(log.sessionId);
+                const stamp = normalizeHistoryTimestamp(log.timestamp);
+                // Firebase/older app versions may store session IDs in seconds or
+                // milliseconds. Compare normalized timestamps, then use the actual
+                // match timestamp as a compatibility fallback.
+                if (logSessionId && logSessionId === sessionStart) return true;
+                if (stamp && stamp >= sessionStart) return true;
+                return !log.sessionId && !stamp && String(team.sessionId || '') === currentSessionId;
             });
-            const directLogs = dedupeMatchHistoryLogs(filtered).map(log => ({
-                ...log,
-                opponent: String(log && log.opponent || '').trim(),
-                durationMinutes: Math.max(0, Number(log && log.durationMinutes) || 0)
-            }));
-            // A direct log without an opponent is incomplete. Do not return it as
-            // the final answer; the cross-team recovery below can supply the exact
-            // opponent from the paired team's record.
-            if (directLogs.some(log => log.opponent)) return directLogs;
-
-            /*
-             * CROSS-TEAM RECOVERY
-             * A completed Firebase snapshot can contain the paired result on the
-             * other team even when this team's own matchHistoryLog is missing.
-             * Rebuild the exact row from the other team's paired WIN/LOSS record.
-             * This is the critical path for the End Match detail window.
-             */
-            const recovered = [];
-
-            // WIN rows: this team defeated another team. Use this team's persisted
-            // defeatedDetails first because it contains the exact opponent ID/name.
-            const defeatedDetails = Array.isArray(sourceTeam.defeatedDetails) ? sourceTeam.defeatedDetails : [];
-            defeatedDetails.filter(isInSession).forEach(detail => {
-                const opponent = sessionTeams.find(other =>
-                    String(other && other.id) === String(detail.teamId)
-                );
-                recovered.push({
-                    opponent: String(detail.name || (opponent && opponent.name) || '').trim(),
-                    opponentId: detail.teamId != null ? detail.teamId : (opponent && opponent.id),
-                    matchId: detail.matchId || '',
-                    sessionId: detail.sessionId || currentSessionId,
-                    seq: Number(detail.seq) || 0,
-                    timestamp: detail.timestamp,
-                    result: 'WIN',
-                    durationMinutes: Number(detail.durationMinutes) || 0
-                });
-            });
-
-            // Scan every other team for the paired result. This works in both
-            // directions: LOSS on the other team reconstructs our WIN, while WIN
-            // on the other team reconstructs our LOSS.
-            sessionTeams.forEach(other => {
-                if (!other || String(other.id) === String(sourceTeam.id)) return;
-
-                const otherLogs = Array.isArray(other.matchHistoryLog) ? other.matchHistoryLog : [];
-                otherLogs.filter(isInSession).forEach(log => {
-                    const result = String(log.result || '').toUpperCase();
-                    if (!['WIN', 'LOSS'].includes(result)) return;
-
-                    const opponentMatches =
-                        (log.opponentId != null && String(log.opponentId) === String(sourceTeam.id)) ||
-                        (log.opponentId == null && String(log.opponent || '') === String(sourceTeam.name || ''));
-                    if (!opponentMatches) return;
-
-                    // If the other team has WIN, this team LOST; if the other team
-                    // has LOSS, this team WON.
-                    recovered.push({
-                        opponent: String(other.name || log.opponent || '').trim(),
-                        opponentId: other.id,
-                        matchId: log.matchId || '',
-                        sessionId: log.sessionId || currentSessionId,
-                        seq: Number(log.seq) || 0,
-                        timestamp: log.timestamp,
-                        result: result === 'WIN' ? 'LOSS' : 'WIN',
-                        durationMinutes: Number(log.durationMinutes) || 0
-                    });
-                });
-
-                // Legacy snapshots may have defeatedDetails but no matchHistoryLog.
-                const otherDetails = Array.isArray(other.defeatedDetails) ? other.defeatedDetails : [];
-                otherDetails.filter(isInSession).forEach(detail => {
-                    const sameOpponent =
-                        (detail.teamId != null && String(detail.teamId) === String(sourceTeam.id)) ||
-                        (detail.teamId == null && String(detail.name || '') === String(sourceTeam.name || ''));
-                    if (!sameOpponent) return;
-                    recovered.push({
-                        opponent: String(other.name || '').trim(),
-                        opponentId: other.id,
-                        matchId: detail.matchId || '',
-                        sessionId: detail.sessionId || currentSessionId,
-                        seq: Number(detail.seq) || 0,
-                        timestamp: detail.timestamp,
-                        result: 'LOSS',
-                        durationMinutes: Number(detail.durationMinutes) || 0
-                    });
-                });
-            });
-
-            const recoveredDeduped = dedupeMatchHistoryLogs(recovered)
-                .filter(log => log && String(log.opponent || '').trim());
-            if (recoveredDeduped.length) return recoveredDeduped;
-
-            // Final legacy compatibility: if a very old record has only counters,
-            // do NOT fabricate an opponent or duration. Returning empty here makes
-            // the UI correctly say that the historical detail record itself is
-            // missing instead of displaying false `undefined` data.
+            const deduped = dedupeMatchHistoryLogs(filtered);
+            if (deduped.length) return deduped;
+            // Some older records retained session counters but omitted match logs.
+            // Use them only when the team itself is tagged to this exact session.
+            if (normalizeHistoryTimestamp(team.sessionId) === sessionStart) {
+                const wins = Math.max(0, Number(team.wins) || 0);
+                const losses = Math.max(0, Number(team.losses) || 0);
+                return Array.from({length: wins}, () => ({result:'WIN'})).concat(Array.from({length: losses}, () => ({result:'LOSS'})));
+            }
             return [];
         }
 
@@ -3830,7 +3617,7 @@
 
         function saveHistoryRecordTransaction(record) {
             const recordDurationMs = Math.max(0, Number(record && record.durationMs) || (Number(record && record.durationMinutes) || 0) * 60000);
-            if (!dbRef || !record) return Promise.resolve(false);
+            if (!dbRef || !record || recordDurationMs < 60 * 60 * 1000) return Promise.resolve(false);
             const historyRef = dbRef.child('tournamentHistory');
             historyWriteQueue = historyWriteQueue.catch(() => false).then(() => new Promise((resolve) => {
                 historyRef.transaction((current) => {
@@ -3840,9 +3627,8 @@
                         const oldKey = String(item.sessionId || item.startTimestamp || item.id || "");
                         return (newKey && oldKey === newKey) || (!oldKey && historyRecordFingerprint(item) === historyRecordFingerprint(record));
                     });
-                    // Every completed session is a permanent record. Do not discard
-                    // short sessions: their match logs are required by Last Defeated,
-                    // PLAY details and the Combined Report.
+                    // Do not persist a session shorter than one full hour.
+                    if (recordDurationMs < 60 * 60 * 1000) return list;
                     return exists ? list : dedupeHistoryRecords([record, ...list]);
                 }, (error, committed, snapshot) => {
                     if (error) {
@@ -3878,9 +3664,10 @@
             const sessionDurationMs = tournamentStartTimestamp ? Math.max(0, Date.now() - Number(tournamentStartTimestamp)) : 0;
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
-            // Completed sessions must be archived immediately. End Match is the
-            // authoritative boundary; a short session must never lose its match logs,
-            // Last Defeated details, or per-team PLAY/WIN/LOSS information.
+            if (sessionDurationMs < 60 * 60 * 1000) {
+                showToast("History saved only after a session reaches 1 hour. This match can still be ended normally.");
+                return false;
+            }
 
             const sessionDurationMins = Math.floor(sessionDurationMs / 60000);
             const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', {
@@ -4824,9 +4611,6 @@
         function saveHistorySpecialSnapshots(sessionId) {
             const record = (tournamentHistory || []).find(item => String(item.sessionId || item.startTimestamp || item.id || "") === String(sessionId));
             const finishContent = document.getElementById("finish-match-modal-content");
-            // The permanent history record is created before this snapshot function.
-            // If a concurrent Firebase listener temporarily has not merged it yet,
-            // never silently drop the snapshot work.
             if (!record || !finishContent) return;
             const mainInterface = document.getElementById("capture-area");
             // Preserve the complete visible main interface and its share-card source
@@ -5500,17 +5284,10 @@
                 ? nonPodiumTeams.filter(t => (Number(t.losses) || 0) > 0).sort((a,b) => (Number(b.losses)||0)-(Number(a.losses)||0)).map(t => `<div class="flex items-start gap-1 text-left"><span class="shrink-0">•</span><span class="min-w-0 break-words">${escapeHtml(t.name)} <b>(${Number(t.losses)||0} L)</b></span></div>`).join("")
                 : `<div class="text-left">• No losses recorded</div>`;
             const podiumRow = (label, groupedTeams, fallback) => {
-                const teamsForRow = Array.isArray(groupedTeams) ? groupedTeams : [];
-                const names = teamsForRow.length ? teamsForRow.map(team => escapeHtml(team.name)).join(", ") : fallback;
-                const details = teamsForRow.length
-                    ? teamsForRow.map(team => `${Number(team.wins)||0}W / ${Number(team.losses)||0}L`).join(" • ")
-                    : "—";
+                const names = groupedTeams && groupedTeams.length ? groupedTeams.map(team => escapeHtml(team.name)).join(", ") : fallback;
                 const extraClass = label === "2ND PLACE" ? " combined-second-place" : "";
-                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239] shrink-0">${label}</span><span class="combined-team-name font-black text-right text-[#5c4033] min-w-0">${names}<span class="block text-[8px] font-extrabold text-slate-500 mt-0.5">${details}</span></span></div>`;
+                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="combined-team-name font-black text-right text-[#5c4033]">${names}</span></div>`;
             };
-            const winnerDetails = leaders.length
-                ? leaders.map(team => `${Number(team.wins)||0}W / ${Number(team.losses)||0}L`).join(" • ")
-                : "0W / 0L";
             content.innerHTML = `
                 <div class="text-center border-b border-[#e6decb] pb-2">
                     <div class="text-2xl font-black tracking-[0.22em] text-[#5c4033]">WESMA</div><div class="text-[10px] font-bold tracking-[0.25em] text-[#8c6239]">BADMINTON CLUB</div><div class="text-[8px] font-bold tracking-[0.2em] text-slate-500 mt-1">OFFICIAL MATCH REPORT • SINCE 2026</div><div class="text-[9px] text-slate-500 mt-2">${dateText}</div>
@@ -5523,7 +5300,7 @@
                 <section class="space-y-1.5">
                     <div class="text-[7px] font-bold tracking-widest text-[#8c6239]">MAIN INTERFACE • TEAM SNAPSHOT</div>
                     <div class="grid grid-cols-2 gap-1">${mainCards}</div>
-                    <div class="combined-match-winner flex items-center justify-between gap-2 rounded-lg bg-[#f7f5f0] border border-[#e6decb] px-2.5 py-2"><div class="min-w-0"><div class="combined-winner-label text-[7px] font-bold tracking-widest text-[#8c6239]">1ST PLACE / MATCH WINNER</div><div class="text-[11px] font-black text-[#5c4033] break-words">${leadersText}</div><div class="text-[8px] font-extrabold text-slate-500 mt-0.5">${winnerDetails}</div></div><div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${leaderWins}</div><div class="text-[7px] font-bold text-slate-500">WINS</div></div></div>
+                    <div class="combined-match-winner flex items-center justify-between gap-2 rounded-lg bg-[#f7f5f0] border border-[#e6decb] px-2.5 py-2"><div class="min-w-0"><div class="combined-winner-label text-[7px] font-bold tracking-widest text-[#8c6239]">MATCH WINNER</div><div class="text-[11px] font-black text-[#5c4033] break-words">${leadersText}</div></div><div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${leaderWins}</div><div class="text-[7px] font-bold text-slate-500">WINS</div></div></div>
                     <div class="grid grid-cols-2 gap-1">${podiumRow("2ND PLACE", secondPlaceTeams, "Not available")}${podiumRow("3RD PLACE", thirdPlaceTeams, "Not available")}</div>
                     <div class="rounded-md border border-rose-100 bg-rose-50/60 px-2 py-1.5 text-[8px] min-w-0"><span class="font-bold text-rose-700">MOST LOSSES:</span> <span class="font-semibold text-rose-800">${mostLossTeams}</span></div>
                     <div class="text-[7px] font-bold tracking-widest text-[#8c6239] pt-1">TEAM STATISTICS</div>
@@ -5745,17 +5522,15 @@
                 </div>
 
                 <!-- Prominent Champions Box -->
-                <div class="wesma-champions-box border-2 rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
-                    <div class="wesma-champions-title text-[10px] sm:text-[11px] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-crown text-amber-300 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-300 text-sm"></i>
+                <div class="bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
+                    <div class="text-[10px] sm:text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-crown text-amber-600 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-sm"></i>
                     </div>
-                    <div class="wesma-champions-name text-base sm:text-lg font-black uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
-                        <span class="wesma-champions-line" aria-hidden="true"></span>
-                        <span class="wesma-champions-name-text">${championNamesDisplay}</span>
-                        <span class="wesma-champions-line" aria-hidden="true"></span>
+                    <div class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
+                        ✨ ${championNamesDisplay} ✨
                     </div>
                     <div class="inline-block pt-0.5">
-                        <span class="wesma-champions-wins text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border shadow-2xs">
+                        <span class="text-[10px] text-emerald-800 font-extrabold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
                             🏆 Wins: ${firstWins}
                         </span>
                     </div>
