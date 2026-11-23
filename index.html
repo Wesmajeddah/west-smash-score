@@ -999,6 +999,13 @@
         }
 
 
+        #finish-match-modal { z-index:200 !important; width:100vw !important; max-width:100vw !important; height:100vh !important; height:100dvh !important; max-height:100dvh !important; }
+        #finish-match-modal:not(.hidden) { display:flex !important; visibility:visible !important; opacity:1 !important; }
+        #finish-match-modal #screenshot-target-card { width:100% !important; max-width:none !important; min-height:0 !important; }
+        @supports (height: 100svh) {
+            #finish-match-modal { height:100svh !important; max-height:100svh !important; }
+        }
+
         /* Full-screen End Match report: fill the device viewport, including safe areas. */
         #finish-match-modal { height:100vh !important; height:100dvh !important; width:100vw !important; }
         #finish-match-modal #screenshot-target-card { height:auto !important; flex:1 1 0 !important; min-height:0 !important; max-height:none !important; }
@@ -1371,7 +1378,7 @@
     </div>
 
     <!-- End Match Modal Window (Target for Auto Screenshot) -->
-    <div id="finish-match-modal" class="fixed inset-0 bg-[#071b2c] flex flex-col items-stretch justify-start gap-0 p-0 z-50 hidden">
+    <div id="finish-match-modal" class="fixed inset-0 bg-[#071b2c] flex flex-col items-stretch justify-start gap-0 p-0 z-[200] hidden" style="width:100vw;height:100vh;height:100dvh;max-width:100vw;max-height:100dvh;">
         <div id="screenshot-target-card" class="bg-white border-0 w-full max-w-none rounded-none shadow-none overflow-hidden flex flex-col flex-1 min-h-0 text-center relative text-slate-800 html2canvas-container-fix">
             <div id="match-ended-banner" class="shrink-0 w-full text-center py-2 px-3 bg-gradient-to-r from-[#071b2c] via-[#155e63] to-[#071b2c] text-[#fff2c2] border-b border-[#d4af37]/70 text-xs sm:text-sm font-black tracking-[.18em] shadow-md">🏁 MATCH ENDED • മാച്ച് അവസാനിച്ചു</div>
             <div id="fireworks-container"></div>
@@ -3185,8 +3192,13 @@
         }
 
         function calculateTotalPlays() {
+            // The immutable finished-session snapshot remains authoritative after End Match.
+            const sourceTeams = (isMatchEnded && lastEndedChampionSnapshot &&
+                Array.isArray(lastEndedChampionSnapshot.teams) && lastEndedChampionSnapshot.teams.length)
+                ? lastEndedChampionSnapshot.teams
+                : teams;
             // Each completed match contributes exactly one play to each participant.
-            return (Array.isArray(teams) ? teams : []).reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
+            return (Array.isArray(sourceTeams) ? sourceTeams : []).reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
         }
 
         function normalizeHistoryTimestamp(value) {
@@ -3957,10 +3969,9 @@
                         teams = mergeChangedTeamSnapshot(teamResult.value, localTeamsForWrite, wesmaDeepClone(teams));
                         teamSyncBase = wesmaDeepClone(teamResult.value);
                     }
-                    if (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)) {
-                        lastEndedChampionSnapshot.teams = wesmaDeepClone(teamResult.value);
-                        payload.lastEndedChampionSnapshot = wesmaDeepClone(lastEndedChampionSnapshot);
-                    }
+                    // Do not replace the immutable End Match snapshot with a later
+                    // Firebase transaction result. It is the source of truth for the
+                    // completed match's main-board PLAY/WIN/LOSS and defeated details.
 
                     const namesResult = await runFirebaseTransaction(dbRef.child("teamNameOverrides"), current =>
                         mergeChangedObjectSnapshot(current, baseNamesForWrite, localNamesForWrite));
@@ -5851,6 +5862,11 @@
             // Persist a lightweight lock with the teams themselves. The fast /teams
             // score transaction checks this, so another device cannot score after End Match.
             teams.forEach(team => { if (team) team.scoreLocked = true; });
+            // Freeze the exact completed-session values after applying the end lock.
+            // Later listeners/saves must not rewrite this archived display snapshot.
+            if (lastEndedChampionSnapshot) {
+                lastEndedChampionSnapshot.teams = JSON.parse(JSON.stringify(teams));
+            }
             startGuardActive = false;
             if (dbRef) dbRef.child("sessionStartGuard").transaction(current => ({ ...(current || {}), active: false, endedAt: Date.now() }), error => { if (error) console.error("Start guard release failed:", error); }, false);
             updateMatchStatusBadge();
@@ -6009,9 +6025,23 @@
                 </div>
             `;
 
-            saveHistorySpecialSnapshots(activeSessionId);
+            // Show the finished-match screen immediately; optional History/share snapshot
+            // generation must never prevent the primary End Match interface from appearing.
             modal.classList.remove("hidden");
+            modal.style.display = "flex";
+            modal.style.visibility = "visible";
+            modal.style.opacity = "1";
+            modal.style.zIndex = "200";
             finishProcessing = false;
+            try {
+                saveHistorySpecialSnapshots(activeSessionId);
+            } catch (historySnapshotError) {
+                console.error("End Match History snapshot failed; report remains visible:", historySnapshotError);
+                const combinedModal = document.getElementById("unified-report-modal");
+                if (combinedModal) combinedModal.classList.add("hidden");
+                const statusModal = document.getElementById("current-status-modal");
+                if (statusModal) statusModal.classList.add("hidden");
+            }
             updateMainTopLastDefeatedBar();
             updateMatchStatusBadge();
             updateOfficialCombinedSection();
@@ -6041,7 +6071,13 @@
 
         function closeFinishMatchModal() {
             const modal = document.getElementById("finish-match-modal");
-            if (modal) modal.classList.add("hidden");
+            if (modal) {
+                modal.classList.add("hidden");
+                modal.style.display = "";
+                modal.style.visibility = "";
+                modal.style.opacity = "";
+                modal.style.zIndex = "";
+            }
         }
 
         function startCooldownTickers() {
@@ -6072,7 +6108,14 @@
             if(!container) return;
             container.innerHTML = "";
             
-            let sortedTeams = getInternationalSortedTeams(teams);
+            // After END MATCH, keep the main board bound to the immutable finished-session
+            // snapshot. Firebase listeners or later metadata writes must not blank/replace
+            // the visible PLAY/WIN/LOSS and defeated-team details for the completed match.
+            const boardTeams = (isMatchEnded && lastEndedChampionSnapshot &&
+                Array.isArray(lastEndedChampionSnapshot.teams) && lastEndedChampionSnapshot.teams.length)
+                ? lastEndedChampionSnapshot.teams
+                : teams;
+            let sortedTeams = getInternationalSortedTeams(boardTeams);
 
             // Determine highest winning team to award title only to top performer
             let maxWinsOverall = 0;
@@ -6080,7 +6123,7 @@
                 maxWinsOverall = sortedTeams[0].wins;
             }
 
-            let teamsWithTime = teams.filter(t => !t.isDisabled && t.wins > 0 && t.lastMatchTime > 0);
+            let teamsWithTime = boardTeams.filter(t => !t.isDisabled && t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
