@@ -3157,14 +3157,9 @@
         function mergeHistoryRecords(preferredRecords, additionalRecords) {
             const first = Array.isArray(preferredRecords) ? preferredRecords : (preferredRecords && typeof preferredRecords === "object" ? Object.values(preferredRecords) : []);
             const second = Array.isArray(additionalRecords) ? additionalRecords : (additionalRecords && typeof additionalRecords === "object" ? Object.values(additionalRecords) : []);
-            const meetsOneHourRule = record => {
-                if (!record) return false;
-                const duration = Math.max(0, Number(record.durationMs) || (Number(record.durationMinutes) || 0) * 60000);
-                // Preserve legacy records with no duration metadata; reject every
-                // known record shorter than one hour.
-                return duration === 0 || duration >= 60 * 60 * 1000;
-            };
-            return dedupeHistoryRecords([...first, ...second].filter(meetsOneHourRule));
+            // History records are valid regardless of session duration. Duration is
+            // descriptive metadata only; never discard a completed short session.
+            return dedupeHistoryRecords([...first, ...second]);
         }
 
         function getDailyTotalMatches(record) {
@@ -7216,7 +7211,7 @@
             const already = (tournamentHistory || []).some(r =>
                 String(r.sessionId || r.startTimestamp || r.id || "") === sid);
 
-            if (plays > 0 && !already && (due - oldStart) >= 60 * 60 * 1000) {
+            if (plays > 0 && !already) {
                 const date = new Date(oldStart).toLocaleString("en-GB", {
                     day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
                 });
@@ -7285,7 +7280,7 @@
                 let history = dedupeHistoryRecords(current.tournamentHistory || []);
                 const sid = String(oldStart);
                 const already = history.some(r=>String(r.sessionId||r.startTimestamp||r.id||"")===sid);
-                if (plays > 0 && !already && (due - oldStart) >= 60 * 60 * 1000) {
+                if (plays > 0 && !already) {
                     const date = new Date(oldStart).toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
                     const rec = {id:sid,sessionId:sid,startTimestamp:sid,date,dateKey:historyDateKey({startTimestamp:sid}),teams:JSON.parse(JSON.stringify(oldTeams)),totalPlays:plays,totalMatches:Math.floor((plays+0.5)/2),durationMinutes:Math.max(0,Math.floor((due-oldStart)/60000)),durationMs:Math.max(0,due-oldStart)};
                     history = dedupeHistoryRecords([rec,...history]);
