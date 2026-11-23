@@ -2509,8 +2509,13 @@
                         // Firebase snapshot before advancing the sync base.
                         const loadedSessionEpoch = String(
                             (data.sessionStartGuard && data.sessionStartGuard.sessionId) ||
+                            (data.sessionStartGuard && data.sessionStartGuard.active === true && data.sessionStartGuard.startedAt) ||
                             (data.sessionStartGuard && data.sessionStartGuard.active === true && data.tournamentStartTimestamp) || ""
                         );
+                        // Compare the raw Firebase records before normalizing incomingTeams.
+                        // The previous check inspected normalized copies, so migration never ran.
+                        const remoteTeamsNeedEpochRepair = !!loadedSessionEpoch &&
+                            data.teams.some(team => team && String(team.sessionId || "") !== loadedSessionEpoch);
                         if (data.sessionStartGuard && data.sessionStartGuard.active === true && loadedSessionEpoch) {
                             incomingTeams.forEach(team => { if (team) team.sessionId = loadedSessionEpoch; });
                         } else if (loadedSessionEpoch) {
@@ -2566,8 +2571,7 @@
                         // One-time migration repair for active sessions created by builds
                         // that changed team.sessionId only locally. Align Firebase team
                         // records with the authoritative active guard before Plus is used.
-                        if (startGuardActive && loadedSessionEpoch &&
-                            incomingTeams.some(team => team && String(team.sessionId || "") !== loadedSessionEpoch) &&
+                        if (startGuardActive && loadedSessionEpoch && remoteTeamsNeedEpochRepair &&
                             sessionEpochRepairPending !== loadedSessionEpoch) {
                             sessionEpochRepairPending = loadedSessionEpoch;
                             runFirebaseTransaction(dbRef.child("teams"), current => {
@@ -6427,6 +6431,11 @@
 
             if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
                 showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക.");
+                finishPendingWin();
+                return;
+            }
+            if (sessionEpochRepairPending) {
+                showToast("LIVE session sync ശരിയാക്കുകയാണ്. ഒരു നിമിഷം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.");
                 finishPendingWin();
                 return;
             }
