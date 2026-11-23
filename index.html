@@ -2776,14 +2776,19 @@
             // Firebase listener. Always prefer the immutable ended-session snapshot
             // for this detail view when it exists, so the exact match rows are read
             // from the same data that was captured at END MATCH.
-            const endedTeams = (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
+            // The End Match snapshot is the authoritative completed-session source.
+            // Do not require `isMatchEnded === true` here: Firebase can deliver the
+            // final teams/root fields in separate listener events, so that flag may
+            // briefly be false while the completed snapshot is already available.
+            const endedTeams = (lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
                 ? lastEndedChampionSnapshot.teams
                 : null;
             const sessionTeams = endedTeams || (Array.isArray(teams) ? teams : []);
             const sourceTeam = sessionTeams.find(t => String(t && t.id) === String(team.id)) || team;
+            const usingEndedSnapshot = !!(endedTeams && sourceTeam && sessionTeams.includes(sourceTeam));
 
             let sessionStart = normalizeHistoryTimestamp(
-                isMatchEnded && lastEndedChampionSnapshot
+                lastEndedChampionSnapshot
                     ? (lastEndedChampionSnapshot.startedAt || lastEndedChampionSnapshot.sessionId)
                     : tournamentStartTimestamp
             );
@@ -2803,6 +2808,10 @@
             const rawLogs = Array.isArray(sourceTeam.matchHistoryLog) ? sourceTeam.matchHistoryLog : [];
             const filtered = rawLogs.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
+                // A completed End Match snapshot already belongs to one exact
+                // session. Its logs must not be discarded merely because an older
+                // build stored a missing/mismatched sessionId on individual logs.
+                if (usingEndedSnapshot) return true;
                 return isInSession(log) || (!log.sessionId && !log.timestamp && String(sourceTeam.sessionId || '') === currentSessionId);
             });
             const directLogs = dedupeMatchHistoryLogs(filtered).map(log => ({
