@@ -913,7 +913,90 @@
             border-width: 1px !important;
         }
 
-    </style>
+            /* User-requested End Match refinements: champion contrast and compact podium cards. */
+        #finish-match-modal-content .wesma-champions-box {
+            background:
+                radial-gradient(circle at 18% 8%,rgba(72,187,180,.24),transparent 34%),
+                radial-gradient(circle at 88% 88%,rgba(244,211,109,.22),transparent 36%),
+                linear-gradient(135deg,#071b2c 0%,#123d50 52%,#24213a 100%) !important;
+        }
+        #finish-match-modal-content .wesma-champions-title {
+            color:#fff2c2 !important;
+            -webkit-text-fill-color:#fff2c2 !important;
+            text-shadow:0 1px 2px rgba(0,0,0,.65),0 0 12px rgba(255,226,150,.62) !important;
+        }
+        #finish-match-modal-content .wesma-champions-name {
+            color:#fff !important;
+            background:none !important;
+            -webkit-background-clip:border-box !important;
+            background-clip:border-box !important;
+            -webkit-text-fill-color:#fff !important;
+            text-shadow:none !important;
+            filter:none !important;
+        }
+        #finish-match-modal-content .wesma-champions-name-text {
+            display:inline-block !important;
+            max-width:100% !important;
+            color:#fff4c7 !important;
+            background:linear-gradient(90deg,#fff9dc 0%,#f5d36e 28%,#ffffff 52%,#f5d36e 76%,#fff9dc 100%) !important;
+            background-size:220% 100% !important;
+            -webkit-background-clip:text !important;
+            background-clip:text !important;
+            -webkit-text-fill-color:transparent !important;
+            text-shadow:0 1px 2px rgba(0,0,0,.35) !important;
+            animation:wesmaChampionsGoldFlow 3s linear infinite !important;
+        }
+        #finish-match-modal-content .wesma-champions-line {
+            background:linear-gradient(90deg,transparent,#7de1d2,#fff1b8,#7de1d2,transparent) !important;
+            box-shadow:0 0 8px rgba(125,225,210,.62) !important;
+        }
+        #finish-match-modal-content .wesma-champions-wins {
+            color:#172b36 !important;
+            background:linear-gradient(90deg,#fff1b8,#f1d477,#fff8d8) !important;
+            border-color:#fff0b0 !important;
+            -webkit-text-fill-color:#172b36 !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box {
+            padding:7px 10px !important;
+            background:linear-gradient(120deg,#eef8f7 0%,#ffffff 48%,#f6f0df 100%) !important;
+            border-color:#b8d9d3 !important;
+            box-shadow:0 3px 10px rgba(49,95,90,.10) !important;
+            border-width:1px !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box > div:nth-child(2) {
+            font-size:11px !important;
+            line-height:1.2 !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box {
+            padding:6px 8px !important;
+            background:linear-gradient(145deg,#f1f5fb 0%,#ffffff 54%,#f8eee2 100%) !important;
+            border-color:#c7d4e4 !important;
+            box-shadow:0 2px 8px rgba(46,75,105,.09) !important;
+            border-width:1px !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:nth-child(2) {
+            font-size:9px !important;
+            line-height:1.15 !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:last-child {
+            font-size:7px !important;
+        }
+        /* Coordinated elegant color tones across existing End Match content. */
+        #finish-match-modal-content > div:first-child {
+            background:linear-gradient(145deg,#f4f8fb 0%,#ffffff 42%,#f7f0e3 100%) !important;
+        }
+        #finish-match-modal-content .overflow-x-auto {
+            background:linear-gradient(135deg,#ffffff 0%,#f0f7f7 100%) !important;
+            border-color:#bfd8d4 !important;
+        }
+        #finish-match-modal-content tbody tr:nth-child(odd) {
+            background:rgba(239,247,246,.76) !important;
+        }
+        #finish-match-modal-content tbody tr:nth-child(even) {
+            background:rgba(248,243,231,.78) !important;
+        }
+
+</style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
 
@@ -1662,14 +1745,28 @@
             });
         }
 
+        const wesmaBadgeHistoryCache = new WeakMap();
+
         function getDynamicBadgeTitle(team, sessionTeams = teams, historyRows = tournamentHistory) {
             if (!team || !Array.isArray(historyRows) || !historyRows.length) return "";
             const teamKey = String(team.id);
 
-            // Special tag rule: inspect ONLY the latest six History records.
-            // A team must have finished 1st in at least five of those six records.
+            // Cache History standings while the same History array is being rendered.
+            // Live score taps do not change History, so repeated sorting/ranking was
+            // unnecessary UI work on every main-interface and selection-modal render.
+            let historyCache = wesmaBadgeHistoryCache.get(historyRows);
+            if (!historyCache) {
+                historyCache = new Map();
+                wesmaBadgeHistoryCache.set(historyRows, historyCache);
+            }
+            if (historyCache.has(teamKey)) return historyCache.get(teamKey);
+
+            // Special tag: first place in ALL of the latest six completed History records.
             const recentHistoryRows = sortLatestFirst(historyRows).slice(0, 6);
-            if (recentHistoryRows.length < 5) return "";
+            if (recentHistoryRows.length < 6) {
+                historyCache.set(teamKey, "");
+                return "";
+            }
 
             let firstPlaceCount = 0;
             recentHistoryRows.forEach(record => {
@@ -1683,7 +1780,10 @@
                 }
             });
 
-            if (firstPlaceCount < 5) return "";
+            if (firstPlaceCount < 6) {
+                historyCache.set(teamKey, "");
+                return "";
+            }
 
             const phrases = [
                 "HARD TO DEFEAT",
@@ -1704,7 +1804,9 @@
                 window.wesmaSpecialTagPhraseCache.__lastIndex = next;
                 window.wesmaSpecialTagPhraseCache[cacheKey] = phrases[next];
             }
-            return window.wesmaSpecialTagPhraseCache[cacheKey];
+            const badgeTitle = window.wesmaSpecialTagPhraseCache[cacheKey];
+            historyCache.set(teamKey, badgeTitle);
+            return badgeTitle;
         }
 
         function renderTeamNameWithTagline(team, badgeTitle = getDynamicBadgeTitle(team)) {
@@ -3927,7 +4029,7 @@
                 let colorClass = `team-name-${((((Number(t.id) || 1) - 1) % 5) + 1)}`;
                 html += `
                     <div class="bg-[#fcfbf9] p-2.5 rounded-xl border border-[#e6decb] flex justify-between items-center text-xs text-slate-800">
-                        <span class="font-bold ${colorClass} name-wrapper pr-1">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
+                        <span class="font-bold ${colorClass} name-wrapper pr-1">${escapeHtml(t.name)}${dynamicBadgeTitle ? ` <span class="dangerous-badge">${dynamicBadgeTitle}</span>` : ""}</span>
                         <div class="flex items-center gap-2 shrink-0">
                             <span class="text-[#5c4033] font-extrabold bg-white px-2 py-0.5 rounded border border-[#e6decb]">${played} Plays</span>
                             <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${getCurrentSessionWinCount(t)} <i class="fa-solid fa-bolt text-[9px]"></i></span>
@@ -5762,7 +5864,7 @@
                 </div>
 
                 <!-- Balanced 2nd Place Section -->
-                <div class="bg-gradient-to-r from-[#fcfbf9] via-white to-[#fcfbf9] border border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs text-center space-y-1 relative overflow-hidden">
+                <div class="wesma-end-second-place-box bg-gradient-to-r from-[#fcfbf9] via-white to-[#fcfbf9] border border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs text-center space-y-1 relative overflow-hidden">
                     <div class="text-[9px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-medal text-[#8c6239] text-xs"></i> 2nd PLACE / രണ്ടാം സ്ഥാനം
                     </div>
@@ -5778,7 +5880,7 @@
 
                 <!-- 3rd Place & Defeated Team Highlight -->
                 <div class="grid grid-cols-2 gap-2 text-xs items-stretch">
-                    <div class="bg-gradient-to-b from-[#fffdf8] to-[#f1e9df] border border-[#d7ccc8] rounded-xl p-2.5 text-center shadow-sm flex flex-col justify-center items-center gap-1 min-w-0 overflow-hidden">
+                    <div class="wesma-end-third-place-box bg-gradient-to-b from-[#fffdf8] to-[#f1e9df] border border-[#d7ccc8] rounded-xl p-2.5 text-center shadow-sm flex flex-col justify-center items-center gap-1 min-w-0 overflow-hidden">
                         <div class="font-bold text-[#5c4033] uppercase text-[8px] flex items-center justify-center gap-1">
                             <i class="fa-solid fa-award text-[#8c6239]"></i> 3rd Place / മൂന്നാം സ്ഥാനം
                         </div>
@@ -5806,7 +5908,7 @@
                             <thead>
                                 <tr class="border-b border-[#e6decb] text-[8px] text-slate-500 uppercase text-center font-bold">
                                     <th class="py-0.5 px-1 text-left">🏸 ടീം / Team</th>
-                                    <th class="py-0.5 px-1">🎮 PLAY</th>
+                                    <th class="py-0.5 px-1">🏸 PLAY</th>
                                     <th class="py-0.5 px-1">🏆 WIN</th>
                                     <th class="py-0.5 px-1">❌ LOSS</th>
                                 </tr>
@@ -5943,8 +6045,8 @@
                     specialBadgeHtml = `<span class="rank-badge bg-slate-200 text-slate-600 border border-slate-300 shadow-xs"><i class="fa-solid fa-user-slash text-[5px] mr-0.5"></i>ABSENT</span>`;
                 }
 
-                // DYNAMICALLY AWARD TITLE BADGE ONLY TO TOP POINT-GAINING WINNER TEAM
-                // The performance title is rendered beside the team name below, not as a detached label.
+                // Resolve the History title once per team per render.
+                const dynamicBadgeTitle = getDynamicBadgeTitle(team);
                 let dangerousBadgeHtml = "";
 
                 const teamBoxUniqueClass = `team-box-${((team.id - 1) % 5) + 1}`;
@@ -5962,7 +6064,7 @@
                                     ${specialBadgeHtml}
                                     <!-- Dynamic Name Display with integrated Edit Pen Icon -->
                                     <div onclick="openCustomNameModal(${team.id}, '${escapeHtml(team.name)}')" class="text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex-1 flex items-center justify-between hover:opacity-80 py-0.5 min-w-0" title="Click to edit name, status or delete">
-                                        <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}${getDynamicBadgeTitle(team) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(team)}</span>` : ""}</span>
+                                        <span class="leading-snug break-words pr-1 min-w-0 name-wrapper team-name-${((team.id - 1) % 5) + 1} font-black">${escapeHtml(team.name)}${dynamicBadgeTitle ? ` <span class="dangerous-badge">${dynamicBadgeTitle}</span>` : ""}</span>
                                         <i class="fa-solid fa-pen text-[10px] text-[#8c6239] shrink-0 ml-1 hover:scale-125 transition-all"></i>
                                     </div>
                                 </div>
@@ -6064,23 +6166,42 @@
                         return;
                     }
                     const removedMatchId = String(removedLog.matchId || '');
-                    const pairedLossLog = getCurrentSessionMatchHistory(opponent).find(m => {
+
+                    // getCurrentSessionMatchHistory returns normalized COPIES of raw logs.
+                    // Object.indexOf(copy) can never locate the original Firebase-backed row.
+                    // Find the actual rows by stable matchId (with legacy fallbacks).
+                    const rawWinnerLogs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+                    const rawWinLogIndex = rawWinnerLogs.findIndex(m => {
+                        if (!m || String(m.result || '').toUpperCase() !== 'WIN') return false;
+                        if (removedMatchId) return String(m.matchId || '') === removedMatchId;
+                        const sameOpponent = (m.opponentId != null && String(m.opponentId) === String(opponent.id)) || m.opponent === removedLog.opponent;
+                        const sameTime = !removedLog.timestamp || normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp);
+                        return sameOpponent && sameTime && (removedSeq > 0 ? Number(m.seq) === removedSeq : !m.seq);
+                    });
+                    if (rawWinLogIndex < 0) {
+                        showToast("⚠️ യഥാർത്ഥ WIN റെക്കോർഡ് കണ്ടെത്താനായില്ല. ഡാറ്റ മാറ്റിയിട്ടില്ല.");
+                        return;
+                    }
+
+                    const rawOpponentLogs = Array.isArray(opponent.matchHistoryLog) ? opponent.matchHistoryLog : [];
+                    const pairedLossIndex = rawOpponentLogs.findIndex(m => {
                         if (!m || String(m.result || '').toUpperCase() !== 'LOSS') return false;
                         const opponentMatches = (m.opponentId != null && String(m.opponentId) === String(team.id)) || m.opponent === team.name;
                         if (!opponentMatches) return false;
                         if (removedMatchId) return String(m.matchId || '') === removedMatchId;
-                        return removedSeq > 0 ? (Number(m.seq) === removedSeq && normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp)) : (!removedLog.timestamp || normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp));
+                        return removedSeq > 0
+                            ? (Number(m.seq) === removedSeq && normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp))
+                            : (!removedLog.timestamp || normalizeHistoryTimestamp(m.timestamp) === normalizeHistoryTimestamp(removedLog.timestamp));
                     });
-                    const pairedLossIndex = (opponent.matchHistoryLog || []).indexOf(pairedLossLog);
                     if (pairedLossIndex < 0) {
                         showToast("⚠️ ബന്ധപ്പെട്ട LOSS റെക്കോർഡ് കണ്ടെത്താനായില്ല. ഡാറ്റ മാറ്റിയിട്ടില്ല.");
                         return;
                     }
 
-                    captureUndoSnapshot(`${team.name} team win score reduced by -1.`);
+                    captureUndoSnapshot(`${team.name} team score reduced by -1.`);
                     team.wins = Math.max(0, (Number(team.wins) || 0) - 1);
                     team.played = getTeamPlayedCount(team);
-                    team.matchHistoryLog = (team.matchHistoryLog || []).filter(m => m !== removedLog);
+                    team.matchHistoryLog = rawWinnerLogs.filter((m, index) => index !== rawWinLogIndex);
                     team.defeatedDetails = (team.defeatedDetails || []).filter(d => {
                         if (!d) return false;
                         if (removedMatchId) return String(d.matchId || '') !== removedMatchId;
@@ -6090,7 +6211,7 @@
                     });
                     opponent.losses = Math.max(0, (Number(opponent.losses) || 0) - 1);
                     opponent.played = getTeamPlayedCount(opponent);
-                    opponent.matchHistoryLog.splice(pairedLossIndex, 1);
+                    opponent.matchHistoryLog = rawOpponentLogs.filter((m, index) => index !== pairedLossIndex);
                     // Keep the global sequence monotonic; removed history entries must not reuse old IDs.
 
                     saveData();
@@ -6142,6 +6263,7 @@
                     const lastLoss = getLatestDefeatRecord(t);
                     if (lastLoss && lastLoss.opponent) lastDefeatedText = `അവസാനം തോറ്റത് / Last lost to: ${lastLoss.opponent}`;
 
+                    const dynamicBadgeTitle = getDynamicBadgeTitle(t);
                     const btn = document.createElement("button");
                     btn.type = "button";
                     btn.className = "w-full bg-white hover:bg-[#fff8f7] text-slate-900 font-extrabold py-3.5 px-4 rounded-2xl border-2 border-slate-200 text-xs sm:text-sm text-left transition-all cursor-pointer flex flex-col gap-1 shadow-sm";
@@ -6168,10 +6290,12 @@
                         triggerHapticFeedback([100, 80, 100, 80, 150]);
                         btn.classList.add('defeated-option-selected');
                         
+                        // Keep a brief selection acknowledgement, then commit without
+                        // the old one-second artificial delay.
                         setTimeout(() => {
                             closeDefeatedTeamModal(true);
                             confirmWinAndDefeatedTeam(winningTeamId, t.id);
-                        }, 1000);
+                        }, 120);
                     };
                     container.appendChild(btn);
                 }
@@ -6775,7 +6899,7 @@
                 return;
             }
 
-            const team = teams.find(t => t.id === editingTeamId);
+            const team = teams.find(t => String(t.id) === String(editingTeamId));
             if (!team) return;
 
             if (teams.length <= 2) {
@@ -6795,11 +6919,18 @@
                 // remaining live team logs. Do not leave orphaned score totals behind.
                 teams.forEach(otherTeam => {
                     const oldLogs = Array.isArray(otherTeam.matchHistoryLog) ? otherTeam.matchHistoryLog : [];
-                    const removedLogs = oldLogs.filter(item =>
-                        String(item.opponentId || item.teamId || '') === deletedTeamId || String(item.opponent || '') === deletedTeamName);
+                    const removedLogs = oldLogs.filter(item => {
+                        const referencedId = item && (item.opponentId ?? item.opponentTeamId ?? item.teamId);
+                        const referencedName = String(item && (item.opponent || item.opponentName) || '').trim().toLocaleUpperCase();
+                        return (referencedId != null && String(referencedId) === deletedTeamId) ||
+                            (!!deletedTeamName && referencedName === deletedTeamName.trim().toLocaleUpperCase());
+                    });
                     otherTeam.matchHistoryLog = oldLogs.filter(item => !removedLogs.includes(item));
-                    otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item =>
-                        String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
+                    otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item => {
+                        const referencedId = item && (item.teamId ?? item.id);
+                        return !(referencedId != null && String(referencedId) === deletedTeamId) &&
+                            String(item && item.name || '').trim().toLocaleUpperCase() !== deletedTeamName.trim().toLocaleUpperCase();
+                    });
                     otherTeam.wins = Math.max(0, (Number(otherTeam.wins) || 0) - removedLogs.filter(item => item && item.result === 'WIN').length);
                     otherTeam.losses = Math.max(0, (Number(otherTeam.losses) || 0) - removedLogs.filter(item => item && item.result === 'LOSS').length);
                     otherTeam.played = Math.max(0, Number(otherTeam.wins) || 0) + Math.max(0, Number(otherTeam.losses) || 0);
@@ -6813,11 +6944,18 @@
                         snapshot.teams = snapshot.teams.filter(item => String(item.id) !== deletedTeamId);
                         snapshot.teams.forEach(otherTeam => {
                             const oldLogs = Array.isArray(otherTeam.matchHistoryLog) ? otherTeam.matchHistoryLog : [];
-                            const removedLogs = oldLogs.filter(item =>
-                                String(item.opponentId || item.teamId || '') === deletedTeamId || String(item.opponent || '') === deletedTeamName);
+                            const removedLogs = oldLogs.filter(item => {
+                                const referencedId = item && (item.opponentId ?? item.opponentTeamId ?? item.teamId);
+                                const referencedName = String(item && (item.opponent || item.opponentName) || '').trim().toLocaleUpperCase();
+                                return (referencedId != null && String(referencedId) === deletedTeamId) ||
+                                    (!!deletedTeamName && referencedName === deletedTeamName.trim().toLocaleUpperCase());
+                            });
                             otherTeam.matchHistoryLog = oldLogs.filter(item => !removedLogs.includes(item));
-                            otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item =>
-                                String(item.teamId || item.id || '') !== deletedTeamId && String(item.name || '') !== deletedTeamName);
+                            otherTeam.defeatedDetails = (otherTeam.defeatedDetails || []).filter(item => {
+                                const referencedId = item && (item.teamId ?? item.id);
+                                return !(referencedId != null && String(referencedId) === deletedTeamId) &&
+                                    String(item && item.name || '').trim().toLocaleUpperCase() !== deletedTeamName.trim().toLocaleUpperCase();
+                            });
                             otherTeam.wins = Math.max(0, (Number(otherTeam.wins) || 0) - removedLogs.filter(item => item && item.result === 'WIN').length);
                             otherTeam.losses = Math.max(0, (Number(otherTeam.losses) || 0) - removedLogs.filter(item => item && item.result === 'LOSS').length);
                             otherTeam.played = Math.max(0, Number(otherTeam.wins) || 0) + Math.max(0, Number(otherTeam.losses) || 0);
@@ -6894,6 +7032,7 @@
             teams.push({
                 id: newId,
                 name: nameInput,
+                sessionId: normalizeHistoryTimestamp(tournamentStartTimestamp) ? String(normalizeHistoryTimestamp(tournamentStartTimestamp)) : "",
                 wins: 0,
                 losses: 0,
                 played: 0,
