@@ -3022,11 +3022,66 @@
                 ? lastEndedChampionSnapshot.endedAt
                 : Date.now();
 
-            window.wesmaChampionPosterState = { winner, ranked, rankMap, endedAt };
+            const themeIndex = isMatchEnded && lastEndedChampionSnapshot && Number.isFinite(Number(lastEndedChampionSnapshot.themeIndex))
+                ? Number(lastEndedChampionSnapshot.themeIndex)
+                : (Number(endedAt) % WESMA_CHAMPION_BACKGROUND_THEMES.length);
+            window.wesmaChampionPosterState = { winner, ranked, rankMap, endedAt, themeIndex };
             championStatusCanvas = null;
             renderWesmaChampionPoster().catch(error => {
                 console.error('Live Champions poster refresh failed:', error);
             });
+        }
+
+        // Thirty rotating, realistic arena/court atmosphere treatments for Champions.
+        // These tint only the poster background; standings, text, and all scoring logic stay untouched.
+        const WESMA_CHAMPION_BACKGROUND_THEMES = [
+            ['#123b35','#0b1728','#d5b36a'], ['#173b5d','#10172d','#8cc8dc'],
+            ['#4b2525','#171321','#e5ad68'], ['#24452f','#101e25','#c5d69b'],
+            ['#34305c','#111a31','#c4a7e8'], ['#5a3a1d','#1b1720','#f0c77a'],
+            ['#174b50','#101b2a','#8dd8c7'], ['#4b263e','#171528','#e6a6c5'],
+            ['#283d65','#101827','#a9c8ef'], ['#3d4828','#151d20','#d1d49a'],
+            ['#5a3020','#1b1820','#e9b58c'], ['#183e48','#111b2d','#a4d5df'],
+            ['#3c3154','#15182a','#d2b5ef'], ['#365044','#111d24','#a8d4b6'],
+            ['#563b22','#1b1b24','#e6cc8e'], ['#1e4568','#111a2b','#9dc8f5'],
+            ['#542d32','#191522','#e8a6a1'], ['#2b4c3d','#111d25','#c2d8a8'],
+            ['#41315f','#17172a','#c7b4ef'], ['#5b3d2a','#1b1a22','#f1c68b'],
+            ['#17434a','#101b28','#8ed0d2'], ['#49304b','#171727','#e0b2d7'],
+            ['#34475a','#111a29','#b6d2e6'], ['#4c4025','#181a22','#e7d28c'],
+            ['#244d45','#111c27','#a6dfc8'], ['#51302a','#191722','#edb59c'],
+            ['#293e61','#111a2a','#b1c4e8'], ['#4a3a53','#171727','#d7b6e5'],
+            ['#284b58','#101b28','#9bcbd8'], ['#51402c','#191a22','#e8c98c']
+        ];
+
+        function drawWesmaChampionBackgroundTheme(ctx, canvas, themeIndex) {
+            const palette = WESMA_CHAMPION_BACKGROUND_THEMES[((Number(themeIndex) || 0) % WESMA_CHAMPION_BACKGROUND_THEMES.length + WESMA_CHAMPION_BACKGROUND_THEMES.length) % WESMA_CHAMPION_BACKGROUND_THEMES.length];
+            const [upper, lower, accent] = palette;
+            ctx.save();
+            const atmosphere = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            atmosphere.addColorStop(0, upper + '66');
+            atmosphere.addColorStop(0.52, lower + '33');
+            atmosphere.addColorStop(1, accent + '22');
+            ctx.globalCompositeOperation = 'soft-light';
+            ctx.fillStyle = atmosphere;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+            const glow = ctx.createRadialGradient(canvas.width * .72, canvas.height * .18, 8, canvas.width * .72, canvas.height * .18, canvas.width * .72);
+            glow.addColorStop(0, accent + '26');
+            glow.addColorStop(1, accent + '00');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = accent + '20';
+            ctx.lineWidth = Math.max(2, canvas.width * .0015);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width * .53, canvas.height * .12);
+            ctx.lineTo(canvas.width * .96, canvas.height * .12);
+            ctx.lineTo(canvas.width * .96, canvas.height * .69);
+            ctx.lineTo(canvas.width * .53, canvas.height * .69);
+            ctx.moveTo(canvas.width * .745, canvas.height * .12);
+            ctx.lineTo(canvas.width * .745, canvas.height * .69);
+            ctx.moveTo(canvas.width * .53, canvas.height * .40);
+            ctx.lineTo(canvas.width * .96, canvas.height * .40);
+            ctx.stroke();
+            ctx.restore();
         }
 
         async function renderWesmaChampionPoster() {
@@ -3035,6 +3090,7 @@
             const img=await loadWesmaChampionTemplate();
             const ctx=canvas.getContext('2d'); canvas.width=img.naturalWidth; canvas.height=img.naturalHeight;
             ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.width,canvas.height);
+            drawWesmaChampionBackgroundTheme(ctx, canvas, window.wesmaChampionPosterState.themeIndex);
             // User-supplied WESMA copper logo: restrained watermark on the dark Champions background.
             if (!window.wesmaCopperLogoImage) {
                 window.wesmaCopperLogoImage = new Image();
@@ -3195,7 +3251,10 @@
                 ? lastEndedChampionSnapshot.endedAt
                 : Date.now();
 
-            window.wesmaChampionPosterState = { winner, ranked, rankMap, endedAt };
+            const themeIndex = isMatchEnded && lastEndedChampionSnapshot && Number.isFinite(Number(lastEndedChampionSnapshot.themeIndex))
+                ? Number(lastEndedChampionSnapshot.themeIndex)
+                : (Number(endedAt) % WESMA_CHAMPION_BACKGROUND_THEMES.length);
+            window.wesmaChampionPosterState = { winner, ranked, rankMap, endedAt, themeIndex };
             championStatusCanvas = null;
             renderWesmaChampionPoster().catch(error=>{
                 console.error('Champions poster render failed:',error);
@@ -5285,8 +5344,11 @@
                 : `<div class="text-left">• No losses recorded</div>`;
             const podiumRow = (label, groupedTeams, fallback) => {
                 const names = groupedTeams && groupedTeams.length ? groupedTeams.map(team => escapeHtml(team.name)).join(", ") : fallback;
+                const stats = groupedTeams && groupedTeams.length
+                    ? groupedTeams.map(team => `${Number(team.wins) || 0} W • ${Number(team.losses) || 0} L`).join(" / ")
+                    : "Wins: 0 • Losses: 0";
                 const extraClass = label === "2ND PLACE" ? " combined-second-place" : "";
-                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="combined-team-name font-black text-right text-[#5c4033]">${names}</span></div>`;
+                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="combined-team-name text-right text-[#5c4033]"><span class="block font-black">${names}</span><span class="block text-[7px] font-bold text-slate-500 mt-0.5">${stats}</span></span></div>`;
             };
             content.innerHTML = `
                 <div class="text-center border-b border-[#e6decb] pb-2">
@@ -5433,7 +5495,8 @@
                 endedAt,
                 teams: JSON.parse(JSON.stringify(teams)),
                 totalPlays: calculateTotalPlays(),
-                totalMatches: Math.floor(calculateTotalPlays() / 2)
+                totalMatches: Math.floor(calculateTotalPlays() / 2),
+                themeIndex: (Array.isArray(tournamentHistory) ? tournamentHistory.length : 0) % 30
             };
             isMatchEnded = true;
             startGuardActive = false;
@@ -5500,7 +5563,7 @@
                 teamsTableHtml += `
                     <tr class="border-b border-[#e6decb] text-center text-slate-800 ${rowBg}">
                         <td class="py-1 px-1 text-left font-semibold ${rowTextColor} finish-name-wrapper"><span class="finish-team-name">${t.rank}. ${renderTeamNameWithTagline(t)}</span> ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
-                        <td class="py-1 px-1 finish-stat-play">🎮 ${played}</td>
+                        <td class="py-1 px-1 finish-stat-play">🏸 ${played}</td>
                         <td class="py-1 px-1 font-bold text-emerald-600 finish-stat-win">🏆 ${t.wins}</td>
                         <td class="py-1 px-1 font-bold text-rose-600 finish-stat-loss">❌ ${t.losses || 0}</td>
                     </tr>
@@ -5581,7 +5644,7 @@
                             <thead>
                                 <tr class="border-b border-[#e6decb] text-[8px] text-slate-500 uppercase text-center font-bold">
                                     <th class="py-0.5 px-1 text-left">🏸 ടീം / Team</th>
-                                    <th class="py-0.5 px-1">🎮 PLAY</th>
+                                    <th class="py-0.5 px-1">🏸 PLAY</th>
                                     <th class="py-0.5 px-1">🏆 WIN</th>
                                     <th class="py-0.5 px-1">❌ LOSS</th>
                                 </tr>
