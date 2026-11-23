@@ -2355,88 +2355,73 @@
         }
 
         function getCurrentSessionLastDefeatedEvents() {
-            // Build the list from each winner's defeat records, but validate each
-            // record against BOTH sides of the current-session match logs.
-            // Important: sequence numbers alone are not globally unique across
-            // devices/teams, so they must never be used as a de-duplication key.
+            // Derive Last Defeated directly from paired WIN/LOSS match logs.
+            // This guarantees every displayed event corresponds to one real
+            // completed match and prevents stale/partial defeatedDetails entries
+            // from creating false or missing records.
             const sessionStart = getCurrentSessionStartTimestamp();
             if (!sessionStart || !Array.isArray(teams)) return [];
-            const currentSessionId = String(sessionStart);
+
             const sessionTeams = isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)
                 ? lastEndedChampionSnapshot.teams
                 : teams;
             const events = [];
+            const usedMatches = new Set();
+
+            const sameMatch = (a, b) => {
+                if (!a || !b) return false;
+                const aId = String(a.matchId || '').trim();
+                const bId = String(b.matchId || '').trim();
+                if (aId && bId) return aId === bId;
+                const aSeq = Number(a.seq) || 0;
+                const bSeq = Number(b.seq) || 0;
+                const aTime = normalizeHistoryTimestamp(a.timestamp);
+                const bTime = normalizeHistoryTimestamp(b.timestamp);
+                return aSeq > 0 && bSeq > 0 && aSeq === bSeq && aTime === bTime;
+            };
 
             sessionTeams.forEach(winner => {
-                if (!winner || !Array.isArray(winner.defeatedDetails)) return;
-                const winnerLogs = getCurrentSessionMatchHistory(winner);
+                getCurrentSessionMatchHistory(winner)
+                    .filter(log => String(log.result || '').toUpperCase() === 'WIN')
+                    .forEach(winLog => {
+                        const loser = sessionTeams.find(team => team &&
+                            String(team.id) !== String(winner.id) &&
+                            ((winLog.opponentId != null && String(team.id) === String(winLog.opponentId)) ||
+                             (winLog.opponentId == null && String(team.name) === String(winLog.opponent)))
+                        );
+                        if (!loser) return;
 
-                winner.defeatedDetails.forEach(defeat => {
-                    if (!defeat || !defeat.name) return;
-                    const defeatSessionId = String(defeat.sessionId || '');
-                    const timestamp = normalizeHistoryTimestamp(defeat.timestamp);
-                    if (defeatSessionId) {
-                        if (defeatSessionId !== currentSessionId) return;
-                    } else if (!timestamp || timestamp < sessionStart) {
-                        return;
-                    }
-                    if (!timestamp) return;
+                        const loserLog = getCurrentSessionMatchHistory(loser).find(log =>
+                            String(log.result || '').toUpperCase() === 'LOSS' &&
+                            ((log.opponentId != null && String(log.opponentId) === String(winner.id)) ||
+                             (log.opponentId == null && String(log.opponent) === String(winner.name))) &&
+                            sameMatch(winLog, log)
+                        );
+                        if (!loserLog) return;
 
-                    const seq = Number(defeat.seq) || 0;
-                    const matchId = String(defeat.matchId || '');
-                    const loser = sessionTeams.find(team => team && (
-                        (defeat.teamId != null && String(team.id) === String(defeat.teamId)) ||
-                        (defeat.teamId == null && team.name === defeat.name) ||
-                        (defeat.teamId == null && winnerLogs.some(log => log && String(log.result || '').toUpperCase() === 'WIN' &&
-                            (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) &&
-                            log.opponentId != null && String(log.opponentId) === String(team.id)))
-                    ));
-                    if (!loser || String(loser.id) === String(winner.id)) return;
+                        const matchId = String(winLog.matchId || loserLog.matchId || '').trim();
+                        const seq = Number(winLog.seq || loserLog.seq) || 0;
+                        const timestamp = normalizeHistoryTimestamp(winLog.timestamp || loserLog.timestamp);
+                        const key = matchId
+                            ? `id:${matchId}`
+                            : `pair:${seq}:${winner.id}:${loser.id}:${timestamp}`;
+                        if (usedMatches.has(key)) return;
+                        usedMatches.add(key);
 
-                    const matchesOpponent = (log, opponent) => {
-                        if (!log || !opponent) return false;
-                        const idMatches = log.opponentId != null && String(log.opponentId) === String(opponent.id);
-                        const nameMatches = String(log.opponent || '') === String(opponent.name || '');
-                        return idMatches || nameMatches;
-                    };
-                    const hasWin = winnerLogs.some(log =>
-                        String(log.result || '').toUpperCase() === 'WIN' &&
-                        (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) && matchesOpponent(log, loser)
-                    );
-                    const hasLoss = getCurrentSessionMatchHistory(loser).some(log =>
-                        String(log.result || '').toUpperCase() === 'LOSS' &&
-                        (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) && matchesOpponent(log, winner)
-                    );
-                    if (!hasWin || !hasLoss) return;
-
-                    events.push({
-                        winner: winner.name,
-                        loser: loser.name,
-                        winnerId: winner.id,
-                        loserId: loser.id,
-                        matchId,
-                        seq,
-                        timestamp,
-                        durationMinutes: Number(defeat.durationMinutes) || 0
+                        events.push({
+                            winner: winner.name,
+                            loser: loser.name,
+                            winnerId: winner.id,
+                            loserId: loser.id,
+                            matchId,
+                            seq,
+                            timestamp,
+                            durationMinutes: Math.max(0, Number(winLog.durationMinutes) || Number(loserLog.durationMinutes) || 0)
+                        });
                     });
-                });
             });
 
-            events.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
-            // Distinct matches remain distinct even if different devices produced
-            // the same sequence number. Only duplicate copies of the SAME pairing
-            // and sequence are collapsed.
-            const seen = new Set();
-            return events.filter(event => {
-                const key = event.matchId
-                    ? `match-id:${event.matchId}`
-                    : (event.seq > 0
-                        ? `match:${event.seq}:${event.winnerId}:${event.loserId}`
-                        : `legacy:${event.timestamp}:${event.winnerId}:${event.loserId}`);
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            });
+            return events.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
         }
 
         function getCurrentSessionLastDefeated() {
@@ -2571,28 +2556,23 @@
             // No active or just-ended session means no live-session plays. Saved tournament history
             // is displayed through its separate History view, never through this list.
             if (!sessionStart) return [];
-            const currentSessionId = String(sessionStart);
+
             const filtered = team.matchHistoryLog.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
                 const logSessionId = normalizeHistoryTimestamp(log.sessionId);
                 const stamp = normalizeHistoryTimestamp(log.timestamp);
-                // Firebase/older app versions may store session IDs in seconds or
-                // milliseconds. Compare normalized timestamps, then use the actual
-                // match timestamp as a compatibility fallback.
-                if (logSessionId && logSessionId === sessionStart) return true;
-                if (stamp && stamp >= sessionStart) return true;
-                return !log.sessionId && !stamp && String(team.sessionId || '') === currentSessionId;
+
+                // Session ID is authoritative when present. Timestamp is used only
+                // for legacy records that do not carry a usable session ID.
+                if (logSessionId) return logSessionId === sessionStart;
+                if (stamp) return stamp >= sessionStart;
+                return normalizeHistoryTimestamp(team.sessionId) === sessionStart;
             });
-            const deduped = dedupeMatchHistoryLogs(filtered);
-            if (deduped.length) return deduped;
-            // Some older records retained session counters but omitted match logs.
-            // Use them only when the team itself is tagged to this exact session.
-            if (normalizeHistoryTimestamp(team.sessionId) === sessionStart) {
-                const wins = Math.max(0, Number(team.wins) || 0);
-                const losses = Math.max(0, Number(team.losses) || 0);
-                return Array.from({length: wins}, () => ({result:'WIN'})).concat(Array.from({length: losses}, () => ({result:'LOSS'})));
-            }
-            return [];
+
+            // The actual matchHistoryLog is the single source of truth for live
+            // Play / Win / Loss counts. Never fabricate placeholder log rows here,
+            // because those rows cannot contain opponent/match details.
+            return dedupeMatchHistoryLogs(filtered);
         }
 
         function getCurrentSessionWinCount(team) {
@@ -2605,17 +2585,27 @@
 
         function getTeamPlayedCount(team) {
             if (!team) return 0;
-            // Current-session match logs are the primary source of truth. W/L
-            // counters are the compatibility fallback. A stale cached `played`
-            // value must never inflate a current score or total-match calculation.
+
+            // Exact live-session calculation: every completed match creates exactly
+            // one WIN or one LOSS log for this team. When logs exist, they are
+            // authoritative and are never combined with cached counters.
+            const logs = getCurrentSessionMatchHistory(team);
+            if (logs.length) {
+                return logs.filter(log => ['WIN', 'LOSS'].includes(String(log.result || '').toUpperCase())).length;
+            }
+
+            // Compatibility fallback for old records that genuinely have no logs.
             const wins = Math.max(0, Number(team.wins) || 0);
             const losses = Math.max(0, Number(team.losses) || 0);
-            const counterPlays = wins + losses;
-            const logPlays = getCurrentSessionWinCount(team) + getCurrentSessionLossCount(team);
-            if (logPlays > 0) return Math.max(counterPlays, logPlays);
-            if (counterPlays > 0) return counterPlays;
-            // `played` is used only for legacy records with no W/L or log evidence.
+            if (wins + losses > 0) return wins + losses;
             return Math.max(0, Number(team.played) || 0);
+        }
+
+        function getExactCurrentSessionStats(team) {
+            const logs = getCurrentSessionMatchHistory(team);
+            const wins = logs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
+            const losses = logs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
+            return { logs, wins, losses, played: wins + losses };
         }
 
         function getHistoryRecordMatchLogs(team, historyRecord) {
@@ -3612,21 +3602,29 @@
 
             let html = "";
             teams.filter(t => !t.isDisabled)
-                .map((t, originalIndex) => ({ team: t, originalIndex, played: getTeamPlayedCount(t) }))
+                .map((t, originalIndex) => {
+                    const stats = getExactCurrentSessionStats(t);
+                    return { team: t, originalIndex, ...stats };
+                })
                 .sort((a, b) => b.played - a.played || a.originalIndex - b.originalIndex)
-                .forEach(({ team: t, played }) => {
-                let colorClass = `team-name-${((((Number(t.id) || 1) - 1) % 5) + 1)}`;
-                html += `
-                    <div class="bg-[#fcfbf9] p-2.5 rounded-xl border border-[#e6decb] flex justify-between items-center text-xs text-slate-800">
-                        <span class="font-bold ${colorClass} name-wrapper pr-1">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-[#5c4033] font-extrabold bg-white px-2 py-0.5 rounded border border-[#e6decb]">${played} Plays</span>
-                            <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${getCurrentSessionWinCount(t)} <i class="fa-solid fa-bolt text-[9px]"></i></span>
-                            <span class="text-[10px] text-rose-600 font-semibold flex items-center gap-1">${getCurrentSessionLossCount(t)} <i class="fa-solid fa-shield text-[9px]"></i></span>
+                .forEach(({ team: t, wins, losses, played }) => {
+                    let colorClass = `team-name-${((((Number(t.id) || 1) - 1) % 5) + 1)}`;
+                    html += `
+                        <div class="bg-[#fcfbf9] p-2.5 rounded-xl border border-[#e6decb] text-xs text-slate-800">
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="font-bold ${colorClass} name-wrapper pr-1 flex-1">${escapeHtml(t.name)}${getDynamicBadgeTitle(t) ? ` <span class="dangerous-badge">${getDynamicBadgeTitle(t)}</span>` : ""}</span>
+                                <button type="button" onclick="showTeamInfoDetail(${t.id}, 'played')" class="record-detail-btn cursor-pointer shrink-0" title="Exact play details">
+                                    <i class="fa-solid fa-list-ul"></i> DETAILS
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-end gap-2 mt-2">
+                                <span class="text-[#5c4033] font-extrabold bg-white px-2 py-0.5 rounded border border-[#e6decb]">${played} Plays</span>
+                                <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">${wins} 🏆</span>
+                                <span class="text-[10px] text-rose-600 font-semibold flex items-center gap-1">${losses} ❌</span>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
 
             content.innerHTML = html;
             modal.classList.remove("hidden");
