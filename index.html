@@ -545,11 +545,15 @@
         }
         #finish-match-modal-content .wesma-champions-box > * { position:relative !important; z-index:1 !important; }
         #finish-match-modal-content .wesma-champions-title {
+            font-size:14px !important;
+            line-height:1.25 !important;
             color:#ffe8a3 !important;
             text-shadow:0 0 6px rgba(255,214,91,.72),0 0 16px rgba(212,175,55,.52) !important;
             animation:wesmaChampionsTextGlow 1.8s ease-in-out infinite !important;
         }
         #finish-match-modal-content .wesma-champions-name {
+            font-size:1.35rem !important;
+            line-height:1.2 !important;
             color:#fff3b0 !important;
             background:linear-gradient(90deg,#fff7c7,#d4af37,#fff3b0,#f4d36d,#fff7c7) !important;
             background-size:260% 100% !important;
@@ -559,11 +563,36 @@
             text-shadow:0 0 10px rgba(212,175,55,.46) !important;
             animation:wesmaChampionsGoldFlow 3s linear infinite, wesmaChampionsNamePulse 1.9s ease-in-out infinite !important;
         }
+        #finish-match-modal-content .wesma-champions-name {
+            display:flex !important;
+            align-items:center !important;
+            justify-content:center !important;
+            gap:10px !important;
+        }
+        #finish-match-modal-content .wesma-champions-name-text {
+            min-width:0 !important;
+            flex:0 1 auto !important;
+        }
+        #finish-match-modal-content .wesma-champions-line {
+            width:34px !important;
+            height:2px !important;
+            flex:0 0 34px !important;
+            border-radius:999px !important;
+            background:linear-gradient(90deg,transparent,#f4d36d,#fff3b0,#f4d36d,transparent) !important;
+            box-shadow:0 0 8px rgba(244,211,109,.8) !important;
+            animation:wesmaChampionsLineGlow 1.8s ease-in-out infinite !important;
+        }
         #finish-match-modal-content .wesma-champions-wins {
+            font-size:12px !important;
+            line-height:1.25 !important;
             color:#fff7cf !important;
             background:linear-gradient(90deg,#6d4b0e,#c99a2e,#f4dc83,#c99a2e,#6d4b0e) !important;
             border-color:#f0d37a !important;
             box-shadow:0 0 12px rgba(212,175,55,.28) !important;
+        }
+        @keyframes wesmaChampionsLineGlow {
+            0%,100%{opacity:.55;transform:scaleX(.82)}
+            50%{opacity:1;transform:scaleX(1)}
         }
         @keyframes wesmaChampionsSweep {
             0%,18%{transform:translateX(-55%) rotate(8deg);opacity:0}
@@ -2741,13 +2770,14 @@
         }
 
         function getCurrentSessionMatchHistory(team) {
-            if (!team || !Array.isArray(team.matchHistoryLog)) return [];
+            if (!team) return [];
             const sessionStart = getCurrentSessionStartTimestamp();
             // No active or just-ended session means no live-session plays. Saved tournament history
             // is displayed through its separate History view, never through this list.
             if (!sessionStart) return [];
             const currentSessionId = String(sessionStart);
-            const filtered = team.matchHistoryLog.filter(log => {
+            const rawLogs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+            const filtered = rawLogs.filter(log => {
                 if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
                 const logSessionId = normalizeHistoryTimestamp(log.sessionId);
                 const stamp = normalizeHistoryTimestamp(log.timestamp);
@@ -2760,12 +2790,95 @@
             });
             const deduped = dedupeMatchHistoryLogs(filtered);
             if (deduped.length) return deduped;
-            // Some older records retained session counters but omitted match logs.
-            // Use them only when the team itself is tagged to this exact session.
+
+            /*
+             * IMPORTANT RECOVERY PATH:
+             * Some completed-session snapshots can retain the W/L counters and
+             * defeatedDetails while matchHistoryLog is missing, stale, or stored
+             * under an older session-id format. Never manufacture anonymous rows
+             * such as { result:'WIN' } because the detail window then renders
+             * "undefined" for the opponent and duration. Reconstruct the exact
+             * match rows from the persisted defeatedDetails and the paired team's
+             * WIN/LOSS log whenever possible.
+             */
+            const sessionTeams = (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
+                ? lastEndedChampionSnapshot.teams
+                : (Array.isArray(teams) ? teams : []);
+            const recovered = [];
+            const inSession = item => {
+                if (!item) return false;
+                const sid = normalizeHistoryTimestamp(item.sessionId);
+                const stamp = normalizeHistoryTimestamp(item.timestamp);
+                if (sid) return sid === sessionStart;
+                return stamp >= sessionStart;
+            };
+
+            // Winner-side persisted defeatedDetails are the most reliable legacy
+            // source for a WIN row because they contain opponent + match identity.
+            if (Array.isArray(team.defeatedDetails)) {
+                team.defeatedDetails.filter(inSession).forEach(detail => {
+                    recovered.push({
+                        opponent: detail.name || '',
+                        opponentId: detail.teamId,
+                        matchId: detail.matchId || '',
+                        sessionId: detail.sessionId || currentSessionId,
+                        seq: Number(detail.seq) || 0,
+                        timestamp: detail.timestamp,
+                        result: 'WIN',
+                        durationMinutes: Number(detail.durationMinutes) || 0
+                    });
+                });
+            }
+
+            // Loss rows can be reconstructed from the winner's paired WIN log or
+            // winner-side defeatedDetails. This keeps the opponent name intact.
+            sessionTeams.forEach(other => {
+                if (!other || String(other.id) === String(team.id)) return;
+                const otherLogs = Array.isArray(other.matchHistoryLog) ? other.matchHistoryLog : [];
+                otherLogs.forEach(log => {
+                    if (!log || String(log.result || '').toUpperCase() !== 'WIN' || !inSession(log)) return;
+                    const sameTeam = (log.opponentId != null && String(log.opponentId) === String(team.id)) ||
+                        (log.opponentId == null && String(log.opponent || '') === String(team.name || ''));
+                    if (!sameTeam) return;
+                    recovered.push({
+                        opponent: other.name || log.opponent || '',
+                        opponentId: other.id,
+                        matchId: log.matchId || '',
+                        sessionId: log.sessionId || currentSessionId,
+                        seq: Number(log.seq) || 0,
+                        timestamp: log.timestamp,
+                        result: 'LOSS',
+                        durationMinutes: Number(log.durationMinutes) || 0
+                    });
+                });
+                // Legacy fallback: if the winner's log is absent, use defeatedDetails.
+                (Array.isArray(other.defeatedDetails) ? other.defeatedDetails : []).filter(inSession).forEach(detail => {
+                    const sameTeam = (detail.teamId != null && String(detail.teamId) === String(team.id)) ||
+                        (detail.teamId == null && String(detail.name || '') === String(team.name || ''));
+                    if (!sameTeam) return;
+                    recovered.push({
+                        opponent: other.name || '',
+                        opponentId: other.id,
+                        matchId: detail.matchId || '',
+                        sessionId: detail.sessionId || currentSessionId,
+                        seq: Number(detail.seq) || 0,
+                        timestamp: detail.timestamp,
+                        result: 'LOSS',
+                        durationMinutes: Number(detail.durationMinutes) || 0
+                    });
+                });
+            });
+
+            const recoveredDeduped = dedupeMatchHistoryLogs(recovered);
+            if (recoveredDeduped.length) return recoveredDeduped;
+
+            // Last-resort legacy counters: keep the count available, but never
+            // create fake opponent/duration values that appear as "undefined".
             if (normalizeHistoryTimestamp(team.sessionId) === sessionStart) {
                 const wins = Math.max(0, Number(team.wins) || 0);
                 const losses = Math.max(0, Number(team.losses) || 0);
-                return Array.from({length: wins}, () => ({result:'WIN'})).concat(Array.from({length: losses}, () => ({result:'LOSS'})));
+                return Array.from({length: wins}, () => ({result:'WIN', opponent:'Opponent details unavailable', durationMinutes:0}))
+                    .concat(Array.from({length: losses}, () => ({result:'LOSS', opponent:'Opponent details unavailable', durationMinutes:0})));
             }
             return [];
         }
@@ -5616,7 +5729,9 @@
                         <i class="fa-solid fa-crown text-amber-300 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-300 text-sm"></i>
                     </div>
                     <div class="wesma-champions-name text-base sm:text-lg font-black uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
-                        ✨ ${championNamesDisplay} ✨
+                        <span class="wesma-champions-line" aria-hidden="true"></span>
+                        <span class="wesma-champions-name-text">${championNamesDisplay}</span>
+                        <span class="wesma-champions-line" aria-hidden="true"></span>
                     </div>
                     <div class="inline-block pt-0.5">
                         <span class="wesma-champions-wins text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border shadow-2xs">
