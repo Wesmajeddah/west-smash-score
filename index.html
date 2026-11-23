@@ -1714,6 +1714,13 @@
         let matchCorrectionTarget = null;
         let firebaseLastWriteError = null;
         let startGuardActive = false;
+        // Tracks whether Firebase's authoritative /teams records have been migrated
+        // to the active session epoch. The UI listener previously normalized only
+        // its local copy, leaving Firebase's records stale and causing every score
+        // transaction to fail with LIVE session mismatch.
+        let remoteTeamsSessionEpoch = "";
+        let sessionEpochSyncPromise = null;
+        let sessionEpochSyncTarget = "";
         let finishProcessing = false;
         let historyPreviewLiveState = null;
         let undoRedoInProgress = false;
@@ -2507,14 +2514,30 @@
                         // Normalize the local view to the active guard's epoch. Keep any
                         // unsaved local edits by three-way merging them over the incoming
                         // Firebase snapshot before advancing the sync base.
-                        const loadedSessionEpoch = String(
-                            (data.sessionStartGuard && data.sessionStartGuard.sessionId) ||
-                            (data.sessionStartGuard && data.sessionStartGuard.active === true && data.tournamentStartTimestamp) || ""
-                        );
-                        if (data.sessionStartGuard && data.sessionStartGuard.active === true && loadedSessionEpoch) {
+                        const incomingGuard = data.sessionStartGuard && typeof data.sessionStartGuard === "object"
+                            ? data.sessionStartGuard : null;
+                        // startedAt is the session clock used by History and score logs.
+                        // Prefer it over a stale/mismatched legacy sessionId field, while
+                        // retaining sessionId as a fallback for older Firebase records.
+                        const activeEpochNumber = incomingGuard && incomingGuard.active === true
+                            ? normalizeHistoryTimestamp(incomingGuard.startedAt || incomingGuard.sessionId || data.tournamentStartTimestamp)
+                            : 0;
+                        const loadedSessionEpoch = activeEpochNumber > 0
+                            ? String(activeEpochNumber)
+                            : String((incomingGuard && incomingGuard.sessionId) || "");
+                        if (incomingGuard && incomingGuard.active === true && loadedSessionEpoch) {
                             incomingTeams.forEach(team => { if (team) team.sessionId = loadedSessionEpoch; });
+                            // Mark already-correct Firebase team nodes as synced. If the
+                            // remote node is stale, the score path performs one guarded
+                            // migration before committing the first score.
+                            remoteTeamsSessionEpoch = data.teams.every(team =>
+                                team && normalizeHistoryTimestamp(team.sessionId) === activeEpochNumber
+                            ) ? loadedSessionEpoch : "";
                         } else if (loadedSessionEpoch) {
                             incomingTeams.forEach(team => { if (team && !team.sessionId) team.sessionId = loadedSessionEpoch; });
+                            remoteTeamsSessionEpoch = "";
+                        } else {
+                            remoteTeamsSessionEpoch = "";
                         }
                         const mergedIncomingTeams = teamSyncBase
                             ? mergeChangedTeamSnapshot(incomingTeams, teamSyncBase, wesmaDeepClone(teams))
@@ -2533,7 +2556,9 @@
                             const savedName = teamNameOverrides[String(team.id)];
                             if (savedName) team.name = savedName;
                         });
-                        tournamentStartTimestamp = data.tournamentStartTimestamp || null;
+                        tournamentStartTimestamp = activeEpochNumber > 0
+                            ? activeEpochNumber
+                            : (data.tournamentStartTimestamp || null);
                         lastActionTimestamp = data.lastActionTimestamp || null;
                         historyDeletedKeys = Array.isArray(data.historyDeletedKeys) ? data.historyDeletedKeys : historyDeletedKeys;
                         const firebaseHistory = dedupeHistoryRecords(data.tournamentHistory || []);
@@ -2553,8 +2578,8 @@
                             startGuardActive = data.sessionStartGuard.active === true;
                             // Only an ACTIVE guard may restore a start timestamp.
                             // An inactive reset guard must never resurrect an old session.
-                            if (startGuardActive && Number(data.sessionStartGuard.startedAt) > 0) {
-                                tournamentStartTimestamp = Number(data.sessionStartGuard.startedAt);
+                            if (startGuardActive && activeEpochNumber > 0) {
+                                tournamentStartTimestamp = activeEpochNumber;
                             } else if (data.isTournamentLocked === true || data.isMatchEnded === true) {
                                 tournamentStartTimestamp = null;
                             }
@@ -3892,6 +3917,57 @@
                     resolve({ committed: !!committed, value: snapshot ? snapshot.val() : null });
                 }, false);
             });
+        }
+
+        async function ensureFirebaseTeamsSessionEpoch(targetEpoch) {
+            const targetNumber = normalizeHistoryTimestamp(targetEpoch);
+            const target = targetNumber > 0 ? String(targetNumber) : String(targetEpoch || "").trim();
+            if (!dbRef || !target) return false;
+            if (remoteTeamsSessionEpoch === target) return true;
+            if (sessionEpochSyncPromise && sessionEpochSyncTarget === target) return sessionEpochSyncPromise;
+
+            sessionEpochSyncTarget = target;
+            sessionEpochSyncPromise = (async () => {
+                try {
+                    // Confirm that this device is migrating to the CURRENT shared
+                    // guard, not reviving an older session from a stale browser tab.
+                    const guardSnapshot = await dbRef.child("sessionStartGuard").once("value");
+                    const guard = guardSnapshot.val();
+                    const guardEpoch = normalizeHistoryTimestamp(
+                        guard && (guard.startedAt || guard.sessionId)
+                    );
+                    if (!guard || guard.active !== true || !guardEpoch || String(guardEpoch) !== target) {
+                        console.warn("Session epoch migration skipped: active Firebase guard does not match.", { target, guard });
+                        return false;
+                    }
+
+                    const migration = await runFirebaseTransaction(dbRef.child("teams"), current => {
+                        if (!Array.isArray(current) || !current.length) return;
+                        const currentEpochs = current.map(team => normalizeHistoryTimestamp(team && team.sessionId));
+                        // Never let a stale device overwrite a newer session epoch.
+                        if (currentEpochs.some(epoch => epoch > targetNumber)) return;
+                        if (currentEpochs.every(epoch => epoch === targetNumber)) return current;
+                        return current.map(team => team ? { ...team, sessionId: target } : team);
+                    });
+                    if (!migration.committed || !Array.isArray(migration.value)) return false;
+                    const allMatched = migration.value.every(team =>
+                        team && normalizeHistoryTimestamp(team.sessionId) === targetNumber
+                    );
+                    if (!allMatched) return false;
+                    remoteTeamsSessionEpoch = target;
+                    // Refresh the merge base with the exact Firebase-confirmed records;
+                    // do not replace the live UI array or any locally rendered state.
+                    teamSyncBase = wesmaDeepClone(migration.value);
+                    return true;
+                } catch (error) {
+                    console.error("Firebase team session migration failed:", error);
+                    return false;
+                } finally {
+                    sessionEpochSyncPromise = null;
+                    sessionEpochSyncTarget = "";
+                }
+            })();
+            return sessionEpochSyncPromise;
         }
 
         function saveData(extraRootUpdates = {}) {
@@ -6493,6 +6569,19 @@
                     return;
                 }
 
+                // The listener used to normalize sessionId only in its local copy.
+                // Firebase /teams could therefore remain tagged with the previous
+                // session and reject every score. Repair that exact mismatch once,
+                // guarded by the currently active Firebase sessionStartGuard.
+                if (remoteTeamsSessionEpoch !== requestedSessionId) {
+                    const epochReady = await ensureFirebaseTeamsSessionEpoch(requestedSessionId);
+                    if (!epochReady) {
+                        showToast("⚠️ LIVE Session sync പൂർത്തിയായിട്ടില്ല. Device Admin-ൽ നിലവിലെ LIVE session പരിശോധിച്ച് Refresh ചെയ്യുക.");
+                        finishPendingWin();
+                        return;
+                    }
+                }
+
                 let transactionBlockReason = "";
                 let remoteUndoSnapshot = null;
                 let committedSequence = Math.max(0, Number(globalClickSequence) || 0);
@@ -6619,6 +6708,7 @@
                 globalClickSequence = Math.max(Number(globalClickSequence) || 0, committedSequence);
                 lastActionTimestamp = now;
                 teamSyncBase = wesmaDeepClone(teams);
+                remoteTeamsSessionEpoch = requestedSessionId;
                 teamNameSyncBase = wesmaDeepClone(teamNameOverrides || {});
                 lastActionSnapshot = remoteUndoSnapshot || lastActionSnapshot;
                 lastActionDescription = (remoteUndoSnapshot && remoteUndoSnapshot.description) || lastActionDescription;
