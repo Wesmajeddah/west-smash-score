@@ -2771,93 +2771,117 @@
 
         function getCurrentSessionMatchHistory(team) {
             if (!team) return [];
-            const sessionStart = getCurrentSessionStartTimestamp();
-            // No active or just-ended session means no live-session plays. Saved tournament history
-            // is displayed through its separate History view, never through this list.
-            if (!sessionStart) return [];
-            const currentSessionId = String(sessionStart);
-            const rawLogs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
-            const filtered = rawLogs.filter(log => {
-                if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
-                const logSessionId = normalizeHistoryTimestamp(log.sessionId);
-                const stamp = normalizeHistoryTimestamp(log.timestamp);
-                // Firebase/older app versions may store session IDs in seconds or
-                // milliseconds. Compare normalized timestamps, then use the actual
-                // match timestamp as a compatibility fallback.
-                if (logSessionId && logSessionId === sessionStart) return true;
-                if (stamp && stamp >= sessionStart) return true;
-                return !log.sessionId && !stamp && String(team.sessionId || '') === currentSessionId;
-            });
-            const deduped = dedupeMatchHistoryLogs(filtered);
-            if (deduped.length) return deduped;
 
-            /*
-             * IMPORTANT RECOVERY PATH:
-             * Some completed-session snapshots can retain the W/L counters and
-             * defeatedDetails while matchHistoryLog is missing, stale, or stored
-             * under an older session-id format. Never manufacture anonymous rows
-             * such as { result:'WIN' } because the detail window then renders
-             * "undefined" for the opponent and duration. Reconstruct the exact
-             * match rows from the persisted defeatedDetails and the paired team's
-             * WIN/LOSS log whenever possible.
-             */
-            const sessionTeams = (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
+            // After END MATCH the live `teams` array may be replaced/reset by the
+            // Firebase listener. Always prefer the immutable ended-session snapshot
+            // for this detail view when it exists, so the exact match rows are read
+            // from the same data that was captured at END MATCH.
+            const endedTeams = (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
                 ? lastEndedChampionSnapshot.teams
-                : (Array.isArray(teams) ? teams : []);
-            const recovered = [];
-            const inSession = item => {
+                : null;
+            const sessionTeams = endedTeams || (Array.isArray(teams) ? teams : []);
+            const sourceTeam = sessionTeams.find(t => String(t && t.id) === String(team.id)) || team;
+
+            let sessionStart = normalizeHistoryTimestamp(
+                isMatchEnded && lastEndedChampionSnapshot
+                    ? (lastEndedChampionSnapshot.startedAt || lastEndedChampionSnapshot.sessionId)
+                    : tournamentStartTimestamp
+            );
+            if (!sessionStart) sessionStart = normalizeHistoryTimestamp(sourceTeam.sessionId);
+            if (!sessionStart) sessionStart = getCurrentSessionStartTimestamp();
+            if (!sessionStart) return [];
+
+            const currentSessionId = String(sessionStart);
+            const isInSession = item => {
                 if (!item) return false;
                 const sid = normalizeHistoryTimestamp(item.sessionId);
                 const stamp = normalizeHistoryTimestamp(item.timestamp);
                 if (sid) return sid === sessionStart;
-                return stamp >= sessionStart;
+                return !!stamp && stamp >= sessionStart;
             };
 
-            // Winner-side persisted defeatedDetails are the most reliable legacy
-            // source for a WIN row because they contain opponent + match identity.
-            if (Array.isArray(team.defeatedDetails)) {
-                team.defeatedDetails.filter(inSession).forEach(detail => {
-                    recovered.push({
-                        opponent: detail.name || '',
-                        opponentId: detail.teamId,
-                        matchId: detail.matchId || '',
-                        sessionId: detail.sessionId || currentSessionId,
-                        seq: Number(detail.seq) || 0,
-                        timestamp: detail.timestamp,
-                        result: 'WIN',
-                        durationMinutes: Number(detail.durationMinutes) || 0
-                    });
-                });
-            }
+            const rawLogs = Array.isArray(sourceTeam.matchHistoryLog) ? sourceTeam.matchHistoryLog : [];
+            const filtered = rawLogs.filter(log => {
+                if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
+                return isInSession(log) || (!log.sessionId && !log.timestamp && String(sourceTeam.sessionId || '') === currentSessionId);
+            });
+            const directLogs = dedupeMatchHistoryLogs(filtered).map(log => ({
+                ...log,
+                opponent: String(log && log.opponent || '').trim(),
+                durationMinutes: Math.max(0, Number(log && log.durationMinutes) || 0)
+            }));
+            // A direct log without an opponent is incomplete. Do not return it as
+            // the final answer; the cross-team recovery below can supply the exact
+            // opponent from the paired team's record.
+            if (directLogs.some(log => log.opponent)) return directLogs;
 
-            // Loss rows can be reconstructed from the winner's paired WIN log or
-            // winner-side defeatedDetails. This keeps the opponent name intact.
+            /*
+             * CROSS-TEAM RECOVERY
+             * A completed Firebase snapshot can contain the paired result on the
+             * other team even when this team's own matchHistoryLog is missing.
+             * Rebuild the exact row from the other team's paired WIN/LOSS record.
+             * This is the critical path for the End Match detail window.
+             */
+            const recovered = [];
+
+            // WIN rows: this team defeated another team. Use this team's persisted
+            // defeatedDetails first because it contains the exact opponent ID/name.
+            const defeatedDetails = Array.isArray(sourceTeam.defeatedDetails) ? sourceTeam.defeatedDetails : [];
+            defeatedDetails.filter(isInSession).forEach(detail => {
+                const opponent = sessionTeams.find(other =>
+                    String(other && other.id) === String(detail.teamId)
+                );
+                recovered.push({
+                    opponent: String(detail.name || (opponent && opponent.name) || '').trim(),
+                    opponentId: detail.teamId != null ? detail.teamId : (opponent && opponent.id),
+                    matchId: detail.matchId || '',
+                    sessionId: detail.sessionId || currentSessionId,
+                    seq: Number(detail.seq) || 0,
+                    timestamp: detail.timestamp,
+                    result: 'WIN',
+                    durationMinutes: Number(detail.durationMinutes) || 0
+                });
+            });
+
+            // Scan every other team for the paired result. This works in both
+            // directions: LOSS on the other team reconstructs our WIN, while WIN
+            // on the other team reconstructs our LOSS.
             sessionTeams.forEach(other => {
-                if (!other || String(other.id) === String(team.id)) return;
+                if (!other || String(other.id) === String(sourceTeam.id)) return;
+
                 const otherLogs = Array.isArray(other.matchHistoryLog) ? other.matchHistoryLog : [];
-                otherLogs.forEach(log => {
-                    if (!log || String(log.result || '').toUpperCase() !== 'WIN' || !inSession(log)) return;
-                    const sameTeam = (log.opponentId != null && String(log.opponentId) === String(team.id)) ||
-                        (log.opponentId == null && String(log.opponent || '') === String(team.name || ''));
-                    if (!sameTeam) return;
+                otherLogs.filter(isInSession).forEach(log => {
+                    const result = String(log.result || '').toUpperCase();
+                    if (!['WIN', 'LOSS'].includes(result)) return;
+
+                    const opponentMatches =
+                        (log.opponentId != null && String(log.opponentId) === String(sourceTeam.id)) ||
+                        (log.opponentId == null && String(log.opponent || '') === String(sourceTeam.name || ''));
+                    if (!opponentMatches) return;
+
+                    // If the other team has WIN, this team LOST; if the other team
+                    // has LOSS, this team WON.
                     recovered.push({
-                        opponent: other.name || log.opponent || '',
+                        opponent: String(other.name || log.opponent || '').trim(),
                         opponentId: other.id,
                         matchId: log.matchId || '',
                         sessionId: log.sessionId || currentSessionId,
                         seq: Number(log.seq) || 0,
                         timestamp: log.timestamp,
-                        result: 'LOSS',
+                        result: result === 'WIN' ? 'LOSS' : 'WIN',
                         durationMinutes: Number(log.durationMinutes) || 0
                     });
                 });
-                // Legacy fallback: if the winner's log is absent, use defeatedDetails.
-                (Array.isArray(other.defeatedDetails) ? other.defeatedDetails : []).filter(inSession).forEach(detail => {
-                    const sameTeam = (detail.teamId != null && String(detail.teamId) === String(team.id)) ||
-                        (detail.teamId == null && String(detail.name || '') === String(team.name || ''));
-                    if (!sameTeam) return;
+
+                // Legacy snapshots may have defeatedDetails but no matchHistoryLog.
+                const otherDetails = Array.isArray(other.defeatedDetails) ? other.defeatedDetails : [];
+                otherDetails.filter(isInSession).forEach(detail => {
+                    const sameOpponent =
+                        (detail.teamId != null && String(detail.teamId) === String(sourceTeam.id)) ||
+                        (detail.teamId == null && String(detail.name || '') === String(sourceTeam.name || ''));
+                    if (!sameOpponent) return;
                     recovered.push({
-                        opponent: other.name || '',
+                        opponent: String(other.name || '').trim(),
                         opponentId: other.id,
                         matchId: detail.matchId || '',
                         sessionId: detail.sessionId || currentSessionId,
@@ -2869,17 +2893,14 @@
                 });
             });
 
-            const recoveredDeduped = dedupeMatchHistoryLogs(recovered);
+            const recoveredDeduped = dedupeMatchHistoryLogs(recovered)
+                .filter(log => log && String(log.opponent || '').trim());
             if (recoveredDeduped.length) return recoveredDeduped;
 
-            // Last-resort legacy counters: keep the count available, but never
-            // create fake opponent/duration values that appear as "undefined".
-            if (normalizeHistoryTimestamp(team.sessionId) === sessionStart) {
-                const wins = Math.max(0, Number(team.wins) || 0);
-                const losses = Math.max(0, Number(team.losses) || 0);
-                return Array.from({length: wins}, () => ({result:'WIN', opponent:'Opponent details unavailable', durationMinutes:0}))
-                    .concat(Array.from({length: losses}, () => ({result:'LOSS', opponent:'Opponent details unavailable', durationMinutes:0})));
-            }
+            // Final legacy compatibility: if a very old record has only counters,
+            // do NOT fabricate an opponent or duration. Returning empty here makes
+            // the UI correctly say that the historical detail record itself is
+            // missing instead of displaying false `undefined` data.
             return [];
         }
 
