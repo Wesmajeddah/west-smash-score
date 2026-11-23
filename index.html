@@ -2810,13 +2810,14 @@
                 opponent: String(log && log.opponent || '').trim(),
                 durationMinutes: Math.max(0, Number(log && log.durationMinutes) || 0)
             }));
-            // A direct log without an opponent is incomplete. Do not return it as
-            // the final answer; the cross-team recovery below can supply the exact
-            // opponent from the paired team's record.
-            if (directLogs.some(log => log.opponent)) return directLogs;
 
             /*
              * CROSS-TEAM RECOVERY
+             * Always run recovery, not only when the whole direct log set is
+             * missing an opponent. A snapshot can contain one complete row and
+             * one incomplete row; returning the direct set early would preserve
+             * the incomplete row and produce an empty/undefined opponent in the
+             * detail window.
              * A completed Firebase snapshot can contain the paired result on the
              * other team even when this team's own matchHistoryLog is missing.
              * Rebuild the exact row from the other team's paired WIN/LOSS record.
@@ -2895,13 +2896,44 @@
 
             const recoveredDeduped = dedupeMatchHistoryLogs(recovered)
                 .filter(log => log && String(log.opponent || '').trim());
-            if (recoveredDeduped.length) return recoveredDeduped;
 
-            // Final legacy compatibility: if a very old record has only counters,
-            // do NOT fabricate an opponent or duration. Returning empty here makes
-            // the UI correctly say that the historical detail record itself is
-            // missing instead of displaying false `undefined` data.
-            return [];
+            // Merge direct and recovered rows. Prefer a complete direct row when
+            // both represent the same logical match, but let recovery replace an
+            // incomplete direct row. This keeps the exact persisted result while
+            // repairing only the missing opponent metadata.
+            const completeDirect = directLogs.filter(log => String(log.opponent || '').trim());
+            const incompleteDirect = directLogs.filter(log => !String(log.opponent || '').trim());
+            const merged = [...completeDirect];
+            const identity = log => {
+                if (!log) return '';
+                if (String(log.matchId || '').trim()) return `id:${String(log.matchId)}`;
+                const seq = Number(log.seq) || 0;
+                const stamp = normalizeHistoryTimestamp(log.timestamp);
+                if (seq || stamp) return `legacy:${seq}:${stamp}:${String(log.result || '').toUpperCase()}`;
+                return '';
+            };
+            const seenIds = new Set(merged.map(identity).filter(Boolean));
+            recoveredDeduped.forEach(log => {
+                const key = identity(log);
+                if (!key || !seenIds.has(key)) {
+                    merged.push(log);
+                    if (key) seenIds.add(key);
+                }
+            });
+
+            // If an incomplete direct row has no recoverable paired record, keep
+            // the row only when it still has a real result/timestamp. Its opponent
+            // is explicitly blank rather than fabricated, and the UI will show a
+            // clear unavailable-detail message instead of `undefined`.
+            incompleteDirect.forEach(log => {
+                const key = identity(log);
+                if (key && !seenIds.has(key)) {
+                    merged.push(log);
+                    seenIds.add(key);
+                }
+            });
+
+            return sortLatestFirst(merged);
         }
 
         function getCurrentSessionWinCount(team) {
@@ -2921,7 +2953,7 @@
             const losses = Math.max(0, Number(team.losses) || 0);
             const counterPlays = wins + losses;
             const logPlays = getCurrentSessionWinCount(team) + getCurrentSessionLossCount(team);
-            if (logPlays > 0) return Math.max(counterPlays, logPlays);
+            if (logPlays > 0) return logPlays;
             if (counterPlays > 0) return counterPlays;
             // `played` is used only for legacy records with no W/L or log evidence.
             return Math.max(0, Number(team.played) || 0);
