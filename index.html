@@ -598,6 +598,117 @@
         #finish-match-modal-content thead th { color:#fff !important; padding:5px 4px !important; }
         #finish-match-modal-content tbody tr:nth-child(even) { background:rgba(226,236,242,.42); }
 
+
+
+        /* USER REQUESTED ADD-ON OVERRIDES — existing layout/data preserved. */
+        /* End Match: special tag must stay inside the same card width. */
+        #finish-match-modal-content,
+        #finish-match-modal-content * { box-sizing: border-box; }
+        #finish-match-modal-content .finish-name-wrapper,
+        #finish-match-modal-content .finish-name-wrapper > .inline-flex {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            overflow: hidden !important;
+        }
+        #finish-match-modal-content .dangerous-badge {
+            flex: 0 1 auto !important;
+            width: auto !important;
+            max-width: 100% !important;
+        }
+        /* Remove only the top End Match victory animation requested by the user. */
+        #finish-match-modal-content .dance-stage-container { display: none !important; }
+
+        /* Champions: only the ampersand gets a different color; size/measurements untouched. */
+        .champion-ampersand {
+            color: #b77916 !important;
+            font-weight: 900 !important;
+        }
+
+        /* Share: light, unique color while keeping the existing button dimensions. */
+        #current-status-share-button {
+            background: linear-gradient(135deg, #eaf7f5 0%, #dff1ee 52%, #f4e9d8 100%) !important;
+            color: #315f5a !important;
+            border: 1px solid #b8d9d3 !important;
+            box-shadow: 0 0 0 1px rgba(184,217,211,.22), 0 5px 14px rgba(49,95,90,.12) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        #current-status-share-button::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -35%;
+            width: 24%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.78), transparent);
+            transform: skewX(-18deg);
+            animation: wesmaShareColorSweep 2.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes wesmaShareColorSweep {
+            0%, 48% { left: -35%; opacity: 0; }
+            58% { opacity: .9; }
+            78%, 100% { left: 120%; opacity: 0; }
+        }
+        /* Share cards: compact only these four boxes; no global size changes. */
+        #current-status-modal-content .wesma-share-rank-box {
+            padding: 8px 10px !important;
+        }
+        #current-status-modal-content .wesma-share-rank-box .wesma-share-name {
+            margin-top: 2px !important;
+        }
+        #current-status-modal-content .wesma-share-rank-box .wesma-share-score {
+            padding: 5px 9px !important;
+        }
+        #current-status-modal-content .wesma-share-rank-box.wesma-share-winner {
+            background: linear-gradient(135deg, #fffdf5 0%, #f7f0df 100%) !important;
+            border-color: #d9bf78 !important;
+            box-shadow: 0 5px 15px rgba(183,121,22,.14) !important;
+        }
+        #current-status-modal-content .wesma-share-rank-box.wesma-share-second {
+            background: linear-gradient(135deg, #fbfcfd 0%, #eef5f4 100%) !important;
+            border-color: #bfd8d4 !important;
+        }
+        #current-status-modal-content .wesma-share-rank-box.wesma-share-third {
+            background: linear-gradient(135deg, #fcfcfc 0%, #f3f1ee 100%) !important;
+            border-color: #d8d2ca !important;
+        }
+        #current-status-modal-content .wesma-share-rank-box.wesma-share-loser {
+            padding: 7px 9px !important;
+            background: linear-gradient(135deg, #fffafa 0%, #f9eeee 100%) !important;
+        }
+
+        /* Combined Report: special tags stay inside existing boxes; no box growth. */
+        #unified-report-capture,
+        #unified-report-capture * { box-sizing: border-box; }
+        #unified-report-content .combined-team-box,
+        #unified-report-content .combined-team-box * { min-width: 0 !important; max-width: 100% !important; }
+        #unified-report-content .combined-team-name {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+        }
+        #unified-report-content .combined-team-name .dangerous-badge {
+            max-width: 100% !important;
+            flex: 0 1 auto !important;
+        }
+        #unified-report-content .combined-second-place {
+            background: linear-gradient(135deg, #f4fbfa 0%, #eef5f4 100%) !important;
+            border-color: #bfd8d4 !important;
+            box-shadow: 0 3px 10px rgba(49,95,90,.10) !important;
+        }
+        #unified-report-content .combined-match-winner {
+            background: linear-gradient(135deg, #fff7dc 0%, #fffdf5 52%, #f3e3b8 100%) !important;
+            border-color: #d3a23c !important;
+            box-shadow: 0 5px 16px rgba(183,121,22,.16) !important;
+        }
+        #unified-report-content .combined-match-winner .combined-winner-label {
+            color: #9a6511 !important;
+        }
+
     </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -1350,31 +1461,25 @@
         function getDynamicBadgeTitle(team, sessionTeams = teams, historyRows = tournamentHistory) {
             if (!team || !Array.isArray(historyRows) || !historyRows.length) return "";
             const teamKey = String(team.id);
-            let firstPlaceCount = 0;
-            const firstPlaceCounts = new Map();
 
-            // Special tags are based only on the first-place finishers from the
-            // most recent seven saved History records. Older history must not
-            // keep a tag alive indefinitely.
-            const recentHistoryRows = sortLatestFirst(historyRows).slice(0, 7);
+            // Special tag rule: inspect ONLY the latest six History records.
+            // A team must have finished 1st in at least five of those six records.
+            const recentHistoryRows = sortLatestFirst(historyRows).slice(0, 6);
+            if (recentHistoryRows.length < 5) return "";
+
+            let firstPlaceCount = 0;
             recentHistoryRows.forEach(record => {
                 if (!record || !Array.isArray(record.teams)) return;
                 const historicalTeams = record.teams.filter(t => t && !t.isDisabled);
                 if (!historicalTeams.length) return;
                 const firstPlaceGroup = getPodiumGroups(historicalTeams).find(group => group.rank === 1);
                 if (!firstPlaceGroup) return;
-                firstPlaceGroup.teams.forEach(historicalTeam => {
-                    const key = String(historicalTeam.id);
-                    firstPlaceCounts.set(key, (firstPlaceCounts.get(key) || 0) + 1);
-                });
+                if (firstPlaceGroup.teams.some(historicalTeam => String(historicalTeam.id) === teamKey)) {
+                    firstPlaceCount += 1;
+                }
             });
 
-            firstPlaceCount = firstPlaceCounts.get(teamKey) || 0;
-            const highestFirstPlaceCount = Math.max(0, ...Array.from(firstPlaceCounts.values()));
-            // Only teams that actually appear as first-place finishers in the
-            // latest seven History records can receive this tag. Among those,
-            // the stronger historical first-place record is preferred.
-            if (!firstPlaceCount || firstPlaceCount < highestFirstPlaceCount) return "";
+            if (firstPlaceCount < 5) return "";
 
             const phrases = [
                 "HARD TO DEFEAT",
@@ -1387,7 +1492,7 @@
                 "GAME CHANGER"
             ];
             if (!window.wesmaSpecialTagPhraseCache) window.wesmaSpecialTagPhraseCache = {};
-            const cacheKey = `${teamKey}:${firstPlaceCount}`;
+            const cacheKey = `${teamKey}:six-history:${firstPlaceCount}`;
             if (!window.wesmaSpecialTagPhraseCache[cacheKey]) {
                 const previous = Number(window.wesmaSpecialTagPhraseCache.__lastIndex);
                 let next = Math.floor(Math.random() * phrases.length);
@@ -4594,7 +4699,7 @@
                 const rankMap = getStandingRankMap(historicalTeams);
                 const championGroup = getStandingGroups(historicalTeams, true)[0] || { teams: [] };
                 const championIds = new Set((championGroup.teams || []).map(team => String(team.id)));
-                const championNames = (championGroup.teams || []).map(team => escapeHtml(team.name)).join(" &amp; ") || "No champion recorded";
+                const championNames = (championGroup.teams || []).map(team => escapeHtml(team.name)).join(" <span class=\"champion-ampersand\">&amp;</span> ") || "No champion recorded";
                 const rows = sortedHistorical.map(team => {
                     const rank = rankMap.get(standingPositionKey(team)) || 0;
                     const played = getHistoryRecordTeamPlayedCount(team, item);
@@ -4919,46 +5024,46 @@
                     </div>
 
                     <div class="space-y-3 pt-0.5 text-left">
-                        <div class="bg-white border-2 border-emerald-300 rounded-xl p-3 shadow-2xs flex items-center justify-between gap-2">
+                        <div class="wesma-share-rank-box wesma-share-winner bg-white border-2 border-emerald-300 rounded-xl p-3 shadow-2xs flex items-center justify-between gap-2">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-emerald-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-crown text-amber-500"></i> ഒന്നാം സ്ഥാനം / 1st Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${topScorerName}</div>
+                                <div class="wesma-share-name text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${topScorerName}</div>
                             </div>
-                            <div class="bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-1.5 text-center shrink-0">
+                            <div class="wesma-share-score bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-emerald-700 uppercase block font-bold">Wins / ജയങ്ങൾ</span>
                                 <span class="text-sm font-black text-emerald-800">${topScorerWins} 🏆</span>
                             </div>
                         </div>
 
-                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-3 shadow-2xs flex items-center justify-between gap-2">
+                        <div class="wesma-share-rank-box wesma-share-second bg-white border-2 border-[#d7ccc8] rounded-xl p-3 shadow-2xs flex items-center justify-between gap-2">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-[#5c4033] font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-medal text-[#8c6239]"></i> രണ്ടാം സ്ഥാനം / 2nd Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${secondPlaceName}</div>
+                                <div class="wesma-share-name text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${secondPlaceName}</div>
                             </div>
-                            <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-3 py-1.5 text-center shrink-0">
+                            <div class="wesma-share-score bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-3 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-[#5c4033] uppercase block font-bold">Wins / ജയങ്ങൾ</span>
                                 <span class="text-sm font-black text-[#5c4033]">${secondPlaceWins} 🏆</span>
                             </div>
                         </div>
 
-                        <div class="bg-white border-2 border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs flex items-center justify-between gap-2 min-w-0 overflow-hidden">
+                        <div class="wesma-share-rank-box wesma-share-third bg-white border-2 border-[#d7ccc8] rounded-xl p-2.5 shadow-2xs flex items-center justify-between gap-2 min-w-0 overflow-hidden">
                             <div class="min-w-0 flex-1 pr-2">
                                 <div class="text-[9px] text-[#5c4033] font-extrabold uppercase tracking-wider flex items-center gap-1">
                                     <i class="fa-solid fa-award text-[#8c6239]"></i> മൂന്നാം സ്ഥാനം / 3rd Place
                                 </div>
-                                <div class="text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${thirdPlaceName}</div>
+                                <div class="wesma-share-name text-xs sm:text-sm font-black text-slate-900 uppercase mt-1 finish-name-wrapper">${thirdPlaceName}</div>
                             </div>
-                            <div class="bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-2.5 py-1.5 text-center shrink-0">
+                            <div class="wesma-share-score bg-[#f5f0eb] border border-[#d7ccc8] rounded-lg px-2.5 py-1.5 text-center shrink-0">
                                 <span class="text-[8px] text-[#5c4033] uppercase block font-bold">Wins / ജയങ്ങൾ</span>
                                 <span class="text-sm font-black text-[#5c4033]">${thirdPlaceWins} 🏆</span>
                             </div>
                         </div>
 
-                        <div class="bg-rose-50/60 border border-rose-300 rounded-xl p-2.5 shadow-sm space-y-1.5">
+                        <div class="wesma-share-rank-box wesma-share-loser bg-rose-50/60 border border-rose-300 rounded-xl p-2.5 shadow-sm space-y-1.5">
                             <div class="text-[9px] text-rose-700 font-bold uppercase tracking-wider flex items-center gap-1">
                                 <i class="fa-solid fa-shield-halved text-rose-600"></i> ഏറ്റവും കൂടുതൽ തോൽവി ഏറ്റുവാങ്ങിയ ടീം / Max Losses
                             </div>
@@ -5068,8 +5173,8 @@
             const mainCards = active.map(t => {
                 const badge = getDynamicBadgeTitle(t);
                 const isReportWinner = firstPlaceTeams.some(w => String(w.id) === String(t.id));
-                return `<div class="flex items-center justify-between gap-2 border ${isReportWinner?'border-[#d3a23c] bg-gradient-to-r from-[#fff0bd] via-[#fffaf0] to-[#f4dfa8] shadow-md':'border-[#e6decb] bg-[#fcfbf9]'} rounded-md px-1.5 py-1">
-                    <div class="min-w-0"><div class="text-[8px] font-black uppercase ${isReportWinner?'text-[#70430e]':''}">${renderTeamNameWithTagline(t, badge)} ${isReportWinner?'<i class="fa-solid fa-crown text-[#b77916]"></i>':''}</div><div class="text-[7px] text-slate-500">Played ${getTeamPlayedCount(t)} • Time ${formatHoursAndMins(Number(t.totalTimeSpentMinutes)||0)}</div></div>
+                return `<div class="combined-team-box flex items-center justify-between gap-2 border ${isReportWinner?'border-[#d3a23c] bg-gradient-to-r from-[#fff0bd] via-[#fffaf0] to-[#f4dfa8] shadow-md':'border-[#e6decb] bg-[#fcfbf9]'} rounded-md px-1.5 py-1">
+                    <div class="combined-team-name min-w-0"><div class="text-[8px] font-black uppercase ${isReportWinner?'text-[#70430e]':''}">${renderTeamNameWithTagline(t, badge)} ${isReportWinner?'<i class="fa-solid fa-crown text-[#b77916]"></i>':''}</div><div class="text-[7px] text-slate-500">Played ${getTeamPlayedCount(t)} • Time ${formatHoursAndMins(Number(t.totalTimeSpentMinutes)||0)}</div></div>
                     <div class="shrink-0 text-right"><div class="text-sm font-black ${isReportWinner?'text-[#a15c08]':'text-emerald-700'}">${Number(t.wins)||0} W</div><div class="text-[9px] font-bold text-rose-700">${Number(t.losses)||0} L</div></div>
                 </div>`;
             }).join("");
@@ -5084,7 +5189,8 @@
                 : `<div class="text-left">• No losses recorded</div>`;
             const podiumRow = (label, groupedTeams, fallback) => {
                 const names = groupedTeams && groupedTeams.length ? groupedTeams.map(team => escapeHtml(team.name)).join(", ") : fallback;
-                return `<div class="flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="font-black text-right text-[#5c4033]">${names}</span></div>`;
+                const extraClass = label === "2ND PLACE" ? " combined-second-place" : "";
+                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="combined-team-name font-black text-right text-[#5c4033]">${names}</span></div>`;
             };
             content.innerHTML = `
                 <div class="text-center border-b border-[#e6decb] pb-2">
@@ -5098,7 +5204,7 @@
                 <section class="space-y-1.5">
                     <div class="text-[7px] font-bold tracking-widest text-[#8c6239]">MAIN INTERFACE • TEAM SNAPSHOT</div>
                     <div class="grid grid-cols-2 gap-1">${mainCards}</div>
-                    <div class="flex items-center justify-between gap-2 rounded-lg bg-[#f7f5f0] border border-[#e6decb] px-2.5 py-2"><div class="min-w-0"><div class="text-[7px] font-bold tracking-widest text-[#8c6239]">MATCH WINNER</div><div class="text-[11px] font-black text-[#5c4033] break-words">${leadersText}</div></div><div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${leaderWins}</div><div class="text-[7px] font-bold text-slate-500">WINS</div></div></div>
+                    <div class="combined-match-winner flex items-center justify-between gap-2 rounded-lg bg-[#f7f5f0] border border-[#e6decb] px-2.5 py-2"><div class="min-w-0"><div class="combined-winner-label text-[7px] font-bold tracking-widest text-[#8c6239]">MATCH WINNER</div><div class="text-[11px] font-black text-[#5c4033] break-words">${leadersText}</div></div><div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${leaderWins}</div><div class="text-[7px] font-bold text-slate-500">WINS</div></div></div>
                     <div class="grid grid-cols-2 gap-1">${podiumRow("2ND PLACE", secondPlaceTeams, "Not available")}${podiumRow("3RD PLACE", thirdPlaceTeams, "Not available")}</div>
                     <div class="rounded-md border border-rose-100 bg-rose-50/60 px-2 py-1.5 text-[8px] min-w-0"><span class="font-bold text-rose-700">MOST LOSSES:</span> <span class="font-semibold text-rose-800">${mostLossTeams}</span></div>
                     <div class="text-[7px] font-bold tracking-widest text-[#8c6239] pt-1">TEAM STATISTICS</div>
