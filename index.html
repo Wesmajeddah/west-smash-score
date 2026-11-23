@@ -964,9 +964,8 @@
             border-width:1px !important;
         }
         #finish-match-modal-content .wesma-end-second-place-box > div:nth-child(2) {
-            font-size:15px !important;
-            line-height:1.25 !important;
-            font-weight:900 !important;
+            font-size:11px !important;
+            line-height:1.2 !important;
         }
         #finish-match-modal-content .wesma-end-third-place-box {
             padding:6px 8px !important;
@@ -976,9 +975,8 @@
             border-width:1px !important;
         }
         #finish-match-modal-content .wesma-end-third-place-box > div:nth-child(2) {
-            font-size:13px !important;
-            line-height:1.2 !important;
-            font-weight:900 !important;
+            font-size:9px !important;
+            line-height:1.15 !important;
         }
         #finish-match-modal-content .wesma-end-third-place-box > div:last-child {
             font-size:7px !important;
@@ -999,35 +997,68 @@
         }
 
 
-        #finish-match-modal { z-index:200 !important; width:100vw !important; max-width:100vw !important; height:100vh !important; height:100dvh !important; max-height:100dvh !important; }
-        #finish-match-modal:not(.hidden) { display:flex !important; visibility:visible !important; opacity:1 !important; }
-        #finish-match-modal #screenshot-target-card { width:100% !important; max-width:none !important; min-height:0 !important; }
-        @supports (height: 100svh) {
-            #finish-match-modal { height:100svh !important; max-height:100svh !important; }
+        /* Complete End Match interface palette: midnight teal, ice, and warm gold. */
+        #finish-match-modal #screenshot-target-card {
+            background:linear-gradient(155deg,#f3f8fb 0%,#e8f0f4 48%,#fbf5e8 100%) !important;
+            border:2px solid #c5a35b !important;
         }
-
-        /* Full-screen End Match report: fill the device viewport, including safe areas. */
-        #finish-match-modal { height:100vh !important; height:100dvh !important; width:100vw !important; }
-        #finish-match-modal #screenshot-target-card { height:auto !important; flex:1 1 0 !important; min-height:0 !important; max-height:none !important; }
-        #finish-match-modal #finish-match-modal-content { min-height:0 !important; flex:1 1 auto !important; overscroll-behavior:contain; background:linear-gradient(145deg,#edf5f7 0%,#ffffff 46%,#f6f0e2 100%) !important; }
-        #finish-match-modal #finish-match-action-bar { min-height:62px; }
-        #finish-match-modal #screenshot-target-card > .p-3 { background:linear-gradient(110deg,#eaf3f5 0%,#f9f5e9 55%,#e5f0ee 100%) !important; border-color:#b7d2d2 !important; }
-        #finish-match-modal #finish-match-modal-content > div:nth-child(2) { border-radius:16px; }
-        #finish-match-modal #finish-match-modal-content > div:nth-child(3) { border-radius:13px; }
-        #finish-match-modal #finish-match-modal-content > div:nth-child(4) > div:first-child { border-color:#c5d8e8 !important; }
-        #finish-match-modal #finish-match-modal-content > div:nth-child(4) > div:last-child { border-color:#e7b9b6 !important; }
-        #finish-match-modal #finish-match-modal-content > div:nth-child(5) .overflow-x-auto { box-shadow:0 4px 14px rgba(26,66,79,.08) !important; }
-        #finish-match-modal #finish-match-action-bar button { min-height:44px; }
-        #finish-match-modal #screenshot-target-card > .p-3 { background:linear-gradient(110deg,#eaf3f5 0%,#f9f5e9 55%,#e5f0ee 100%) !important; border-color:#b7d2d2 !important; }
-        #finish-match-modal #finish-match-modal-content > div { border-color:#c6d9dc !important; }
-        #finish-match-modal #finish-match-modal-content .wesma-end-second-place-box { background:linear-gradient(120deg,#e8f5f2,#ffffff 52%,#f7f0d9) !important; }
-        #finish-match-modal #finish-match-modal-content .wesma-end-third-place-box { background:linear-gradient(145deg,#eaf0fa,#ffffff 55%,#f8ecd9) !important; }
-        #finish-match-modal #finish-match-modal-content .overflow-x-auto { background:linear-gradient(135deg,#f8fcfd,#e9f4f1) !important; border-color:#9fc7c5 !important; }
-        @media (max-width:480px) {
-            #finish-match-modal #finish-match-modal-content { padding:10px !important; }
-            #finish-match-modal #finish-match-action-bar { min-height:60px; }
+        #finish-match-modal #screenshot-target-card > div:nth-child(2) {
+            background:linear-gradient(105deg,#10283b 0%,#1d5260 58%,#84632e 100%) !important;
+            border-bottom:2px solid #c9a45b !important;
         }
-
+        #finish-match-modal #screenshot-target-card > div:first-of-type * { color:#fff !important; }
+        #finish-match-modal #finish-match-modal-content {
+            background:
+                radial-gradient(ellipse at 8% 0%,rgba(66,139,151,.10),transparent 38%),
+                radial-gradient(ellipse at 96% 92%,rgba(194,151,72,.12),transparent 40%),
+                linear-gradient(160deg,#f5f9fb 0%,#edf3f5 55%,#faf5eb 100%) !important;
+        }
+        #finish-match-modal-content .wesma-match-ended-banner {
+            display:flex !important; flex-direction:column !important; align-items:center !important;
+            justify-content:center !important; gap:2px !important; width:100% !important;
+            padding:9px 10px !important; border:1px solid #c7a65f !important; border-radius:12px !important;
+            color:#fff !important; background:linear-gradient(105deg,#102b40 0%,#1e5961 55%,#84612c 100%) !important;
+            box-shadow:0 4px 14px rgba(16,43,64,.18),inset 0 1px 0 rgba(255,255,255,.18) !important;
+            font-size:14px !important; font-weight:950 !important; letter-spacing:2px !important;
+            text-align:center !important;
+        }
+        #finish-match-modal-content .wesma-match-ended-icon { font-size:18px !important; line-height:1 !important; }
+        #finish-match-modal-content .wesma-match-ended-subtitle {
+            color:#f7e8c2 !important; font-size:9px !important; font-weight:700 !important;
+            letter-spacing:.35px !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box {
+            background:linear-gradient(125deg,#e4f2f0 0%,#ffffff 52%,#f7edd9 100%) !important;
+            border-color:#a9cec8 !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box > div:nth-child(2) {
+            font-size:14px !important; line-height:1.25 !important; font-weight:900 !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box {
+            background:linear-gradient(145deg,#e9f0f8 0%,#ffffff 55%,#f5ead9 100%) !important;
+            border-color:#b8c9dc !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:nth-child(2) {
+            font-size:13px !important; line-height:1.25 !important; font-weight:900 !important;
+        }
+        #finish-match-modal-content > .grid > div:nth-child(2) {
+            background:linear-gradient(145deg,#fff0ef 0%,#fffafa 54%,#f9e4e2 100%) !important;
+            border-color:#e5b8b5 !important;
+        }
+        #finish-match-modal-content .overflow-x-auto thead {
+            background:linear-gradient(100deg,#173b52 0%,#28616a 58%,#87652f 100%) !important;
+        }
+        #finish-match-modal-content .overflow-x-auto thead th { color:#fff !important; }
+        #finish-match-modal-content .overflow-x-auto {
+            background:linear-gradient(135deg,#ffffff 0%,#f0f6f8 100%) !important;
+            border-color:#b9cdd2 !important; box-shadow:0 3px 12px rgba(26,70,82,.08) !important;
+        }
+        #finish-match-modal-content tbody tr { border-color:#d5e0e4 !important; }
+        #finish-match-modal-content tbody tr:nth-child(odd) { background-color:rgba(223,237,240,.42) !important; }
+        #finish-match-modal-content tbody tr:nth-child(even) { background-color:rgba(255,255,255,.86) !important; }
+        #finish-match-modal-content .finish-stat-play { color:#176b73 !important; font-weight:900 !important; }
+        #finish-match-modal-content .finish-stat-win { color:#16724a !important; }
+        #finish-match-modal-content .finish-stat-loss { color:#bd4350 !important; }
 </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -1378,9 +1409,8 @@
     </div>
 
     <!-- End Match Modal Window (Target for Auto Screenshot) -->
-    <div id="finish-match-modal" class="fixed inset-0 bg-[#071b2c] flex flex-col items-stretch justify-start gap-0 p-0 z-[200] hidden" style="width:100vw;height:100vh;height:100dvh;max-width:100vw;max-height:100dvh;">
-        <div id="screenshot-target-card" class="bg-white border-0 w-full max-w-none rounded-none shadow-none overflow-hidden flex flex-col flex-1 min-h-0 text-center relative text-slate-800 html2canvas-container-fix">
-            <div id="match-ended-banner" class="shrink-0 w-full text-center py-2 px-3 bg-gradient-to-r from-[#071b2c] via-[#155e63] to-[#071b2c] text-[#fff2c2] border-b border-[#d4af37]/70 text-xs sm:text-sm font-black tracking-[.18em] shadow-md">🏁 MATCH ENDED • മാച്ച് അവസാനിച്ചു</div>
+    <div id="finish-match-modal" class="fixed inset-0 bg-[#1e1715]/80 backdrop-blur-md flex flex-col items-center justify-center gap-2 p-3 z-50 hidden">
+        <div id="screenshot-target-card" class="bg-white border gold-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[76vh] text-center relative text-slate-800 html2canvas-container-fix">
             <div id="fireworks-container"></div>
             
             <div class="p-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between relative px-4">
@@ -1399,7 +1429,7 @@
             </div>
             <div id="finish-match-modal-content" class="p-3.5 space-y-2.5 overflow-y-auto flex-1 text-xs pb-4"></div>
         </div>
-        <div id="finish-match-action-bar" class="w-full max-w-none grid grid-cols-2 gap-2 shrink-0 px-3 pt-2 pb-[calc(.65rem+env(safe-area-inset-bottom))] bg-gradient-to-r from-[#071b2c] via-[#123d50] to-[#071b2c] border-t border-[#d4af37]/50">
+        <div class="w-full max-w-md grid grid-cols-2 gap-2 shrink-0">
             <button type="button" onclick="openChampionsFromFinish()" class="rounded-xl border border-[#d4af37] bg-[#fff7dc] text-[#5c4033] font-black text-[10px] py-3 shadow">🏆 CHAMPIONS</button>
             <button type="button" onclick="openCombinedFromFinish()" class="rounded-xl border border-[#8c6239] bg-[#8c6239] text-white font-black text-[10px] py-3 shadow">📊 COMBINED REPORT</button>
         </div>
@@ -1684,7 +1714,6 @@
         let matchCorrectionTarget = null;
         let firebaseLastWriteError = null;
         let startGuardActive = false;
-        let sessionEpochRepairPending = "";
         let finishProcessing = false;
         let historyPreviewLiveState = null;
         let undoRedoInProgress = false;
@@ -2207,23 +2236,7 @@
             // Joining an already-running session is a local UI/timer action only.
             // Do NOT saveData() here: that could overwrite newer scores from another phone.
             tournamentStartTimestamp = safeStart;
-            teams.forEach(team => { if (team) { team.sessionId = String(safeStart); team.scoreLocked = false; } });
-            // Repair older LIVE sessions too: previous builds updated only local team
-            // session IDs, leaving Firebase teams on the old epoch and causing Plus taps
-            // to be rejected as a session mismatch even on the same phone.
-            if (dbRef) {
-                runFirebaseTransaction(dbRef.child("teams"), current => {
-                    if (!Array.isArray(current)) return;
-                    return current.map(team => team ? { ...team, sessionId: String(safeStart) } : team);
-                }).then(result => {
-                    if (result.committed && Array.isArray(result.value) && Number(tournamentStartTimestamp) === safeStart && !isMatchEnded) {
-                        teams = result.value;
-                        teamSyncBase = wesmaDeepClone(result.value);
-                        saveLocalBackup();
-                        render();
-                    }
-                }).catch(error => console.error("Active LIVE session team-ID repair failed:", error));
-            }
+            teams.forEach(team => { if (team) team.sessionId = String(safeStart); });
             isMatchEnded = false;
             isTournamentLocked = false;
             isLocalStartGateVisible = false;
@@ -2244,7 +2257,7 @@
             lastActionTimestamp = safeStart;
             // The reset epoch is only provisional. Once START is confirmed, every
             // team's sync epoch must match the active sessionStartGuard sessionId.
-            teams.forEach(team => { if (team) { team.sessionId = String(safeStart); team.scoreLocked = false; } });
+            teams.forEach(team => { if (team) team.sessionId = String(safeStart); });
             isMatchEnded = false;
             isTournamentLocked = false;
             isLocalStartGateVisible = false;
@@ -2307,19 +2320,11 @@
                     if (guard && guard.active === true && sharedStartedAt > 0) {
                         try {
                             const [teamsSnap, namesSnap] = await Promise.all([
-                                runFirebaseTransaction(dbRef.child("teams"), current => {
-                                    if (!Array.isArray(current)) return;
-                                    return current.map(team => team ? { ...team, sessionId: String(sharedStartedAt), scoreLocked: false } : team);
-                                }),
+                                dbRef.child("teams").once("value"),
                                 dbRef.child("teamNameOverrides").once("value")
                             ]);
-                            const remoteTeams = teamsSnap && teamsSnap.committed ? teamsSnap.value : null;
-                            if (Array.isArray(remoteTeams)) {
-                                teams = remoteTeams;
-                                teamSyncBase = wesmaDeepClone(remoteTeams);
-                            } else {
-                                throw new Error("Could not align team session IDs with the active LIVE session");
-                            }
+                            const remoteTeams = teamsSnap.val();
+                            if (Array.isArray(remoteTeams)) teams = remoteTeams;
                             const remoteNames = namesSnap.val();
                             if (remoteNames && typeof remoteNames === "object") teamNameOverrides = remoteNames;
                             adoptSharedRunningSession(sharedStartedAt);
@@ -2335,18 +2340,6 @@
                 }
 
                 try {
-                    // The active session guard is the authoritative session ID. Persist it
-                    // onto every remote team before allowing score transactions; otherwise
-                    // the UI can show LIVE while the Plus transaction rejects stale team IDs.
-                    const alignedTeams = await runFirebaseTransaction(dbRef.child("teams"), current => {
-                        if (!Array.isArray(current)) return;
-                        return current.map(team => team ? { ...team, sessionId: String(sharedStartedAt), scoreLocked: false } : team);
-                    });
-                    if (!alignedTeams.committed || !Array.isArray(alignedTeams.value)) {
-                        throw new Error("Could not align team records with the active LIVE session");
-                    }
-                    teams = wesmaDeepClone(alignedTeams.value);
-                    teamSyncBase = wesmaDeepClone(alignedTeams.value);
                     await dbRef.update({
                         tournamentStartTimestamp: sharedStartedAt,
                         lastActionTimestamp: sharedStartedAt,
@@ -2516,13 +2509,8 @@
                         // Firebase snapshot before advancing the sync base.
                         const loadedSessionEpoch = String(
                             (data.sessionStartGuard && data.sessionStartGuard.sessionId) ||
-                            (data.sessionStartGuard && data.sessionStartGuard.active === true && data.sessionStartGuard.startedAt) ||
                             (data.sessionStartGuard && data.sessionStartGuard.active === true && data.tournamentStartTimestamp) || ""
                         );
-                        // Compare the raw Firebase records before normalizing incomingTeams.
-                        // The previous check inspected normalized copies, so migration never ran.
-                        const remoteTeamsNeedEpochRepair = !!loadedSessionEpoch &&
-                            data.teams.some(team => team && String(team.sessionId || "") !== loadedSessionEpoch);
                         if (data.sessionStartGuard && data.sessionStartGuard.active === true && loadedSessionEpoch) {
                             incomingTeams.forEach(team => { if (team) team.sessionId = loadedSessionEpoch; });
                         } else if (loadedSessionEpoch) {
@@ -2574,25 +2562,6 @@
                             const legacyActive = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
                             dbRef.child("sessionStartGuard").transaction(current => current || { active: legacyActive, startedAt: tournamentStartTimestamp || null }, () => {}, false);
                             startGuardActive = legacyActive;
-                        }
-                        // One-time migration repair for active sessions created by builds
-                        // that changed team.sessionId only locally. Align Firebase team
-                        // records with the authoritative active guard before Plus is used.
-                        if (startGuardActive && loadedSessionEpoch && remoteTeamsNeedEpochRepair &&
-                            sessionEpochRepairPending !== loadedSessionEpoch) {
-                            sessionEpochRepairPending = loadedSessionEpoch;
-                            runFirebaseTransaction(dbRef.child("teams"), current => {
-                                if (!Array.isArray(current)) return;
-                                return current.map(team => team ? { ...team, sessionId: loadedSessionEpoch } : team);
-                            }).then(repair => {
-                                if (!repair.committed) throw new Error("Team session migration was not committed");
-                                teamSyncBase = wesmaDeepClone(repair.value);
-                                sessionEpochRepairPending = "";
-                            }).catch(repairError => {
-                                sessionEpochRepairPending = "";
-                                console.error("Active session epoch migration failed:", repairError);
-                                showToast("⚠️ LIVE session sync ശരിയാക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് Refresh ചെയ്യുക.");
-                            });
                         }
                         // A device that has passed the DEVICE ADMIN approval gate can join
                         // the currently running shared match immediately. Do not leave the
@@ -3192,13 +3161,8 @@
         }
 
         function calculateTotalPlays() {
-            // The immutable finished-session snapshot remains authoritative after End Match.
-            const sourceTeams = (isMatchEnded && lastEndedChampionSnapshot &&
-                Array.isArray(lastEndedChampionSnapshot.teams) && lastEndedChampionSnapshot.teams.length)
-                ? lastEndedChampionSnapshot.teams
-                : teams;
             // Each completed match contributes exactly one play to each participant.
-            return (Array.isArray(sourceTeams) ? sourceTeams : []).reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
+            return (Array.isArray(teams) ? teams : []).reduce((sum, team) => sum + getTeamPlayedCount(team), 0);
         }
 
         function normalizeHistoryTimestamp(value) {
@@ -3677,7 +3641,7 @@
             }
         }
 
-        function captureUndoSnapshot(description) {
+        function captureUndoSnapshot(description, options = {}) {
             const snapshot = {
                 teams: JSON.parse(JSON.stringify(teams)),
                 teamNameOverrides: { ...teamNameOverrides },
@@ -3686,15 +3650,20 @@
                 globalClickSequence,
                 isMatchEnded,
                 isTournamentLocked,
-                tournamentHistory: JSON.parse(JSON.stringify(tournamentHistory || [])),
-                historyDeletedKeys: JSON.parse(JSON.stringify(historyDeletedKeys || [])),
-                sessionHistorySavedId,
-                scheduledMatchStartAt,
-                startGuardActive,
-                isLocalStartGateVisible,
-                lastEndedChampionSnapshot: lastEndedChampionSnapshot ? wesmaDeepClone(lastEndedChampionSnapshot) : null,
                 description: description || "Last score action"
             };
+            // Score-only actions never modify History/session archives. Avoid cloning
+            // the complete tournamentHistory and ended-match snapshot for every point.
+            // Other action types retain the full legacy snapshot shape by default.
+            if (!options.lightweight) {
+                snapshot.tournamentHistory = JSON.parse(JSON.stringify(tournamentHistory || []));
+                snapshot.historyDeletedKeys = JSON.parse(JSON.stringify(historyDeletedKeys || []));
+                snapshot.sessionHistorySavedId = sessionHistorySavedId;
+                snapshot.scheduledMatchStartAt = scheduledMatchStartAt;
+                snapshot.startGuardActive = startGuardActive;
+                snapshot.isLocalStartGateVisible = isLocalStartGateVisible;
+                snapshot.lastEndedChampionSnapshot = lastEndedChampionSnapshot ? wesmaDeepClone(lastEndedChampionSnapshot) : null;
+            }
             undoHistoryStack.push(snapshot);
             redoHistoryStack = [];
             // Keep a practical limit so the shared database does not grow without bound.
@@ -3969,9 +3938,10 @@
                         teams = mergeChangedTeamSnapshot(teamResult.value, localTeamsForWrite, wesmaDeepClone(teams));
                         teamSyncBase = wesmaDeepClone(teamResult.value);
                     }
-                    // Do not replace the immutable End Match snapshot with a later
-                    // Firebase transaction result. It is the source of truth for the
-                    // completed match's main-board PLAY/WIN/LOSS and defeated details.
+                    if (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)) {
+                        lastEndedChampionSnapshot.teams = wesmaDeepClone(teamResult.value);
+                        payload.lastEndedChampionSnapshot = wesmaDeepClone(lastEndedChampionSnapshot);
+                    }
 
                     const namesResult = await runFirebaseTransaction(dbRef.child("teamNameOverrides"), current =>
                         mergeChangedObjectSnapshot(current, baseNamesForWrite, localNamesForWrite));
@@ -5859,14 +5829,6 @@
                 totalMatches: Math.floor(calculateTotalPlays() / 2)
             };
             isMatchEnded = true;
-            // Persist a lightweight lock with the teams themselves. The fast /teams
-            // score transaction checks this, so another device cannot score after End Match.
-            teams.forEach(team => { if (team) team.scoreLocked = true; });
-            // Freeze the exact completed-session values after applying the end lock.
-            // Later listeners/saves must not rewrite this archived display snapshot.
-            if (lastEndedChampionSnapshot) {
-                lastEndedChampionSnapshot.teams = JSON.parse(JSON.stringify(teams));
-            }
             startGuardActive = false;
             if (dbRef) dbRef.child("sessionStartGuard").transaction(current => ({ ...(current || {}), active: false, endedAt: Date.now() }), error => { if (error) console.error("Start guard release failed:", error); }, false);
             updateMatchStatusBadge();
@@ -5939,6 +5901,11 @@
             });
 
             container.innerHTML = `
+                <div class="wesma-match-ended-banner" role="status" aria-live="polite">
+                    <span class="wesma-match-ended-icon">🏁</span>
+                    <span>MATCH ENDED</span>
+                    <span class="wesma-match-ended-subtitle">മത്സരം ഔദ്യോഗികമായി അവസാനിച്ചു</span>
+                </div>
                 <!-- Elegant badminton victory moment: trophy, crossed rackets and shuttlecock -->
                 <div class="dance-stage-container my-1" role="img" aria-label="Realistic badminton court action animation">
                     <div class="dance-floor-glow"></div>
@@ -6025,23 +5992,9 @@
                 </div>
             `;
 
-            // Show the finished-match screen immediately; optional History/share snapshot
-            // generation must never prevent the primary End Match interface from appearing.
+            saveHistorySpecialSnapshots(activeSessionId);
             modal.classList.remove("hidden");
-            modal.style.display = "flex";
-            modal.style.visibility = "visible";
-            modal.style.opacity = "1";
-            modal.style.zIndex = "200";
             finishProcessing = false;
-            try {
-                saveHistorySpecialSnapshots(activeSessionId);
-            } catch (historySnapshotError) {
-                console.error("End Match History snapshot failed; report remains visible:", historySnapshotError);
-                const combinedModal = document.getElementById("unified-report-modal");
-                if (combinedModal) combinedModal.classList.add("hidden");
-                const statusModal = document.getElementById("current-status-modal");
-                if (statusModal) statusModal.classList.add("hidden");
-            }
             updateMainTopLastDefeatedBar();
             updateMatchStatusBadge();
             updateOfficialCombinedSection();
@@ -6071,13 +6024,7 @@
 
         function closeFinishMatchModal() {
             const modal = document.getElementById("finish-match-modal");
-            if (modal) {
-                modal.classList.add("hidden");
-                modal.style.display = "";
-                modal.style.visibility = "";
-                modal.style.opacity = "";
-                modal.style.zIndex = "";
-            }
+            if (modal) modal.classList.add("hidden");
         }
 
         function startCooldownTickers() {
@@ -6108,14 +6055,7 @@
             if(!container) return;
             container.innerHTML = "";
             
-            // After END MATCH, keep the main board bound to the immutable finished-session
-            // snapshot. Firebase listeners or later metadata writes must not blank/replace
-            // the visible PLAY/WIN/LOSS and defeated-team details for the completed match.
-            const boardTeams = (isMatchEnded && lastEndedChampionSnapshot &&
-                Array.isArray(lastEndedChampionSnapshot.teams) && lastEndedChampionSnapshot.teams.length)
-                ? lastEndedChampionSnapshot.teams
-                : teams;
-            let sortedTeams = getInternationalSortedTeams(boardTeams);
+            let sortedTeams = getInternationalSortedTeams(teams);
 
             // Determine highest winning team to award title only to top performer
             let maxWinsOverall = 0;
@@ -6123,7 +6063,7 @@
                 maxWinsOverall = sortedTeams[0].wins;
             }
 
-            let teamsWithTime = boardTeams.filter(t => !t.isDisabled && t.wins > 0 && t.lastMatchTime > 0);
+            let teamsWithTime = teams.filter(t => !t.isDisabled && t.wins > 0 && t.lastMatchTime > 0);
             let fastestTeamId = null;
             if (teamsWithTime.length > 0) {
                 teamsWithTime.sort((a, b) => a.lastMatchTime - b.lastMatchTime);
@@ -6153,9 +6093,17 @@
                 const isThird = (rankPos === 3 && team.wins > 0 && !team.isDisabled);
                 const isFastest = (team.id === fastestTeamId && team.lastMatchTime > 0 && !team.isDisabled);
                 
-                const winsCount = getCurrentSessionWinCount(team);
-                const playedCount = getTeamPlayedCount(team);
-                const lossesCount = getCurrentSessionLossCount(team);
+                // Resolve this team's current-session logs once per render.
+                // The previous three helper calls each rebuilt/filtered the same log
+                // list repeatedly, multiplying work on every score tap.
+                const currentSessionLogs = getCurrentSessionMatchHistory(team);
+                const winsCount = currentSessionLogs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
+                const lossesCount = currentSessionLogs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
+                const counterPlays = Math.max(0, Number(team.wins) || 0) + Math.max(0, Number(team.losses) || 0);
+                const logPlays = winsCount + lossesCount;
+                const playedCount = logPlays > 0
+                    ? Math.max(counterPlays, logPlays)
+                    : (counterPlays > 0 ? counterPlays : Math.max(0, Number(team.played) || 0));
                 
                 let specialBadgeHtml = "";
                 let extraCardClass = "";
@@ -6205,11 +6153,11 @@
                         </div>
                         <div class="flex items-center gap-1 shrink-0 relative">
 
-                            <div class="w-5 h-12 bg-white/90 text-slate-700 rounded-lg flex flex-col items-center justify-center border border-slate-200 relative scale-95 shadow-2xs" title="Total Played & Details">
+                            <div class="w-7 h-12 bg-white/90 text-slate-700 rounded-lg flex flex-col items-center justify-center border border-slate-200 relative scale-95 shadow-2xs" title="Total Played & Details">
                                 <button onclick="showTeamInfoDetail(${team.id}, 'played')" class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-[#5c4033] text-white rounded-full flex items-center justify-center text-[6px] font-bold shadow-2xs cursor-pointer">
                                     <i class="fa-solid fa-circle-info"></i>
                                 </button>
-                                <span class="text-[6px] text-slate-500 font-medium leading-none">Play</span>
+                                <span class="text-[7px] leading-none">🏸</span><span class="text-[6px] text-slate-500 font-medium leading-none">Play</span>
                                 <span class="text-[10px] text-[#5c4033] font-bold">${playedCount}</span>
                             </div>
                             
@@ -6428,7 +6376,7 @@
                         setTimeout(() => {
                             closeDefeatedTeamModal(true);
                             confirmWinAndDefeatedTeam(winningTeamId, t.id);
-                        }, 120);
+                        }, 45);
                     };
                     container.appendChild(btn);
                 }
@@ -6466,56 +6414,40 @@
                 finishPendingWin();
                 return;
             }
-            if (team.scoreLocked === true || defeatedTeam.scoreLocked === true) {
-                showToast("മാച്ച് അവസാനിച്ചു. പുതിയ LIVE session ആരംഭിക്കുക.");
-                finishPendingWin();
-                return;
-            }
 
             if (isTournamentLocked || isMatchEnded || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
                 showToast("LIVE മാച്ച് ആരംഭിച്ചിട്ടില്ല. ആദ്യം START ചെയ്യുക.");
                 finishPendingWin();
                 return;
             }
-            if (sessionEpochRepairPending) {
-                showToast("LIVE session sync ശരിയാക്കുകയാണ്. ഒരു നിമിഷം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.");
-                finishPendingWin();
-                return;
-            }
 
-            // A score action changes only the teams subtree. Keep its authoritative
-            // WIN/LOSS pair in one transaction on /teams instead of transacting the
-            // entire Firebase root (which also contains the full tournament History).
-            // Score undo snapshots intentionally omit tournamentHistory because a
-            // score never changes it; shared Undo preserves the live History instead.
-            const preCommitGlobalSequence = Number(globalClickSequence) || 0;
-            const preCommitLastActionTimestamp = lastActionTimestamp;
-            let scoreCommitted = false;
+            /*
+             * IMPORTANT:
+             * The score is committed as ONE Firebase root transaction.
+             * This is the real duplicate-score protection. Two phones can press
+             * the same + button at almost the same time, but Firebase serializes
+             * the transaction. The second transaction sees the winner's 30-second
+             * cooldown and is rejected without adding another WIN/LOSS pair.
+             *
+             * Do not use random match IDs here. The transaction creates a
+             * deterministic matchId from session + sequence + teams, so the same
+             * logical commit can never be represented by two different IDs.
+             */
+            captureUndoSnapshot(`WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`, { lightweight: true });
+
             const now = Date.now();
             const canonicalSessionKey = value => {
                 const normalized = normalizeHistoryTimestamp(value);
                 return normalized > 0 ? String(normalized) : String(value || "").trim();
             };
             const requestedSessionId = canonicalSessionKey(tournamentStartTimestamp || now);
-            const MIN_MATCH_INTERVAL_MS = 30000;
-            const makeScoreUndoSnapshot = (beforeTeams, description, previousSequence, previousActionTime) => ({
-                teams: wesmaDeepClone(beforeTeams),
-                teamNameOverrides: { ...(teamNameOverrides || {}) },
-                tournamentStartTimestamp,
-                lastActionTimestamp: previousActionTime ?? lastActionTimestamp ?? null,
-                globalClickSequence: Number(previousSequence ?? globalClickSequence) || 0,
-                isMatchEnded: false,
-                isTournamentLocked: false,
-                sessionHistorySavedId: sessionHistorySavedId || null,
-                scheduledMatchStartAt: scheduledMatchStartAt ?? null,
-                startGuardActive,
-                isLocalStartGateVisible,
-                description
-            });
+            const MIN_MATCH_INTERVAL_MS = 30000; // 30-second team cooldown with visible countdown.
 
             try {
                 if (!dbRef) {
-                    // Offline/local fallback retains the same compact Undo behavior.
+                    // Offline/local fallback. This still uses a deterministic ID and
+                    // the same cooldown, while Firebase remains the authoritative path
+                    // whenever the database is available.
                     const localLastClick = Number(team.lastClickTime) || 0;
                     if (localLastClick && (now - localLastClick < MIN_MATCH_INTERVAL_MS)) {
                         showToast("⚠️ Please wait for the 30-second team cooldown to finish.");
@@ -6523,7 +6455,7 @@
                         return;
                     }
 
-                    const localSeq = Math.max(0, Number(globalClickSequence) || 0, ...teams.map(t => Number(t.clickOrder) || 0)) + 1;
+                    const localSeq = Math.max(0, Number(globalClickSequence) || 0) + 1;
                     const localMatchId = `${requestedSessionId}-${localSeq}-${winningTeamId}-${defeatedTeamId}`;
                     const existing = teams.some(t => (t.matchHistoryLog || []).some(m => String(m && m.matchId || '') === localMatchId));
                     if (existing) {
@@ -6531,16 +6463,11 @@
                         finishPendingWin();
                         return;
                     }
-                    const offlineUndo = makeScoreUndoSnapshot(teams, `WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`, preCommitGlobalSequence, preCommitLastActionTimestamp);
-                    undoHistoryStack.push(offlineUndo);
-                    if (undoHistoryStack.length > 100) undoHistoryStack.shift();
-                    redoHistoryStack = [];
-                    lastActionSnapshot = offlineUndo;
-                    lastActionDescription = offlineUndo.description;
 
                     const referenceTime = lastActionTimestamp || tournamentStartTimestamp || now;
                     const intervalMinutes = Math.max(1, Math.round((now - Number(referenceTime)) / 60000));
                     globalClickSequence = localSeq;
+                    const liveSessionId = requestedSessionId;
                     team.matchInterval = intervalMinutes;
                     team.lastMatchTime = intervalMinutes;
                     team.lastClickTime = now;
@@ -6548,11 +6475,11 @@
                     team.totalTimeSpentMinutes = (Number(team.totalTimeSpentMinutes) || 0) + intervalMinutes;
                     defeatedTeam.totalTimeSpentMinutes = (Number(defeatedTeam.totalTimeSpentMinutes) || 0) + intervalMinutes;
                     team.defeatedDetails = Array.isArray(team.defeatedDetails) ? team.defeatedDetails : [];
-                    team.defeatedDetails.push({name:defeatedTeam.name,teamId:defeatedTeam.id,matchId:localMatchId,sessionId:requestedSessionId,seq:localSeq,timestamp:now,durationMinutes:intervalMinutes});
+                    team.defeatedDetails.push({name:defeatedTeam.name,teamId:defeatedTeam.id,matchId:localMatchId,sessionId:liveSessionId,seq:localSeq,timestamp:now,durationMinutes:intervalMinutes});
                     team.matchHistoryLog = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
                     defeatedTeam.matchHistoryLog = Array.isArray(defeatedTeam.matchHistoryLog) ? defeatedTeam.matchHistoryLog : [];
-                    team.matchHistoryLog.push({opponent:defeatedTeam.name,opponentId:defeatedTeam.id,matchId:localMatchId,sessionId:requestedSessionId,seq:localSeq,timestamp:now,result:'WIN',durationMinutes:intervalMinutes});
-                    defeatedTeam.matchHistoryLog.push({opponent:team.name,opponentId:team.id,matchId:localMatchId,sessionId:requestedSessionId,seq:localSeq,timestamp:now,result:'LOSS',durationMinutes:intervalMinutes});
+                    team.matchHistoryLog.push({opponent:defeatedTeam.name,opponentId:defeatedTeam.id,matchId:localMatchId,sessionId:liveSessionId,seq:localSeq,timestamp:now,result:'WIN',durationMinutes:intervalMinutes});
+                    defeatedTeam.matchHistoryLog.push({opponent:team.name,opponentId:team.id,matchId:localMatchId,sessionId:liveSessionId,seq:localSeq,timestamp:now,result:'LOSS',durationMinutes:intervalMinutes});
                     team.wins = getCurrentSessionWinCount(team);
                     defeatedTeam.losses = getCurrentSessionLossCount(defeatedTeam);
                     team.played = getTeamPlayedCount(team);
@@ -6567,25 +6494,26 @@
                 }
 
                 let transactionBlockReason = "";
-                let preScoreTeamSnapshots = null;
-                let preScoreGlobalSequence = preCommitGlobalSequence;
-                let committedSequence = 0;
-                const result = await runFirebaseTransaction(dbRef.child("teams"), current => {
-                    // Firebase supplies a transaction-local value. Mutate that value
-                    // directly and clone only the two affected teams for Undo.
-                    const remoteTeams = Array.isArray(current) ? current : [];
+                let remoteUndoSnapshot = null;
+                let committedSequence = Math.max(0, Number(globalClickSequence) || 0);
+                const result = await runFirebaseTransaction(dbRef.child("teams"), currentTeams => {
+                    const remoteTeams = Array.isArray(currentTeams) ? wesmaDeepClone(currentTeams) : [];
+
+                    // The teams node is the authoritative session fence for score commits.
+                    // Unlike a root transaction, this does not download/rewrite tournament
+                    // History, reports, permissions, and unrelated application data.
+                    const sessionMatches = remoteTeams.some(remoteTeam =>
+                        remoteTeam && canonicalSessionKey(remoteTeam.sessionId) === requestedSessionId
+                    );
+                    if (!sessionMatches) {
+                        transactionBlockReason = "LIVE session mismatch. The teams on Firebase belong to another session. Start/join the LIVE session from Device Admin, then refresh all devices.";
+                        return;
+                    }
+
                     const winner = remoteTeams.find(t => String(t.id) === String(winningTeamId));
                     const loser = remoteTeams.find(t => String(t.id) === String(defeatedTeamId));
                     if (!winner || !loser || winner.isDisabled || loser.isDisabled || String(winner.id) === String(loser.id)) {
                         transactionBlockReason = "Team validation failed. Refresh the page so all devices load the same team list.";
-                        return;
-                    }
-                    if (canonicalSessionKey(winner.sessionId) !== requestedSessionId || canonicalSessionKey(loser.sessionId) !== requestedSessionId) {
-                        transactionBlockReason = "LIVE session mismatch. Start/join the current LIVE session, then refresh all devices.";
-                        return;
-                    }
-                    if (winner.scoreLocked === true || loser.scoreLocked === true || remoteTeams.some(t => t && t.scoreLocked === true)) {
-                        transactionBlockReason = "The match has ended. Start a new LIVE session before recording another score.";
                         return;
                     }
 
@@ -6595,22 +6523,25 @@
                         return;
                     }
 
-                    // clickOrder is assigned from the same transaction to every WIN.
-                    // Its maximum is the current sequence, avoiding a full log scan.
-                    const maxSeq = remoteTeams.reduce((max, t) => Math.max(max, Number(t && t.clickOrder) || 0), Number(globalClickSequence) || 0);
-                    preScoreGlobalSequence = maxSeq;
+                    // Compute the next sequence without allocating a flattened copy of every log.
+                    let maxSeq = Math.max(0, Number(globalClickSequence) || 0);
+                    remoteTeams.forEach(remoteTeam => {
+                        (Array.isArray(remoteTeam.matchHistoryLog) ? remoteTeam.matchHistoryLog : []).forEach(log => {
+                            maxSeq = Math.max(maxSeq, Number(log && log.seq) || 0);
+                        });
+                    });
                     const nextSeq = maxSeq + 1;
+                    committedSequence = nextSeq;
                     const matchId = `${requestedSessionId}-${nextSeq}-${winningTeamId}-${defeatedTeamId}`;
-                    const alreadyRecorded = [winner, loser].some(t => (Array.isArray(t.matchHistoryLog) ? t.matchHistoryLog : []).some(log => String(log && log.matchId || '') === matchId));
-                    if (alreadyRecorded) {
+                    const duplicateMatch = remoteTeams.some(remoteTeam =>
+                        (Array.isArray(remoteTeam.matchHistoryLog) ? remoteTeam.matchHistoryLog : [])
+                            .some(log => String(log && log.matchId || '') === matchId)
+                    );
+                    if (duplicateMatch) {
                         transactionBlockReason = "This match has already been recorded. Refresh the page before another score.";
                         return;
                     }
 
-                    // Save only the two pre-score team records. This avoids cloning
-                    // every team's accumulated match log on every Plus tap.
-                    preScoreTeamSnapshots = [wesmaDeepClone(winner), wesmaDeepClone(loser)];
-                    committedSequence = nextSeq;
                     const previousAction = Number(lastActionTimestamp) || Number(tournamentStartTimestamp) || now;
                     const intervalMinutes = Math.max(1, Math.round((now - previousAction) / 60000));
                     const winnerName = String(winner.name || '');
@@ -6619,9 +6550,22 @@
                     winner.matchHistoryLog = Array.isArray(winner.matchHistoryLog) ? winner.matchHistoryLog : [];
                     loser.matchHistoryLog = Array.isArray(loser.matchHistoryLog) ? loser.matchHistoryLog : [];
                     winner.defeatedDetails = Array.isArray(winner.defeatedDetails) ? winner.defeatedDetails : [];
-                    winner.matchHistoryLog.push({opponent:loserName,opponentId:loser.id,matchId,sessionId:requestedSessionId,seq:nextSeq,timestamp:now,result:'WIN',durationMinutes:intervalMinutes});
-                    loser.matchHistoryLog.push({opponent:winnerName,opponentId:winner.id,matchId,sessionId:requestedSessionId,seq:nextSeq,timestamp:now,result:'LOSS',durationMinutes:intervalMinutes});
-                    winner.defeatedDetails.push({name:loserName,teamId:loser.id,matchId,sessionId:requestedSessionId,seq:nextSeq,timestamp:now,durationMinutes:intervalMinutes});
+
+                    winner.matchHistoryLog.push({
+                        opponent: loserName, opponentId: loser.id, matchId,
+                        sessionId: requestedSessionId, seq: nextSeq, timestamp: now,
+                        result: 'WIN', durationMinutes: intervalMinutes
+                    });
+                    loser.matchHistoryLog.push({
+                        opponent: winnerName, opponentId: winner.id, matchId,
+                        sessionId: requestedSessionId, seq: nextSeq, timestamp: now,
+                        result: 'LOSS', durationMinutes: intervalMinutes
+                    });
+                    winner.defeatedDetails.push({
+                        name: loserName, teamId: loser.id, matchId,
+                        sessionId: requestedSessionId, seq: nextSeq, timestamp: now,
+                        durationMinutes: intervalMinutes
+                    });
 
                     winner.matchInterval = intervalMinutes;
                     winner.lastMatchTime = intervalMinutes;
@@ -6630,19 +6574,36 @@
                     winner.totalTimeSpentMinutes = (Number(winner.totalTimeSpentMinutes) || 0) + intervalMinutes;
                     loser.totalTimeSpentMinutes = (Number(loser.totalTimeSpentMinutes) || 0) + intervalMinutes;
 
-                    // Recalculate only the two affected teams, not every team's entire log.
-                    const winnerLogs = dedupeMatchHistoryLogs(winner.matchHistoryLog).filter(log => log && ['WIN','LOSS'].includes(String(log.result || '').toUpperCase()));
-                    const loserLogs = dedupeMatchHistoryLogs(loser.matchHistoryLog).filter(log => log && ['WIN','LOSS'].includes(String(log.result || '').toUpperCase()));
-                    winner.matchHistoryLog = dedupeMatchHistoryLogs(winner.matchHistoryLog);
-                    loser.matchHistoryLog = dedupeMatchHistoryLogs(loser.matchHistoryLog);
-                    winner.wins = winnerLogs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
-                    winner.losses = winnerLogs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
-                    loser.wins = loserLogs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
-                    loser.losses = loserLogs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
-                    winner.played = winner.wins + winner.losses;
-                    loser.played = loser.wins + loser.losses;
-                    winner.totalTimeSpentMinutes = winnerLogs.reduce((sum, log) => sum + Math.max(0, Number(log.durationMinutes) || 0), 0);
-                    loser.totalTimeSpentMinutes = loserLogs.reduce((sum, log) => sum + Math.max(0, Number(log.durationMinutes) || 0), 0);
+                    // Preserve the existing all-team counter normalization. The only
+                    // optimization is that it now runs inside the smaller /teams
+                    // transaction, without repeatedly downloading the complete Firebase root.
+                    remoteTeams.forEach(remoteTeam => {
+                        const normalizedLogs = dedupeMatchHistoryLogs(
+                            Array.isArray(remoteTeam.matchHistoryLog) ? remoteTeam.matchHistoryLog : []
+                        );
+                        remoteTeam.matchHistoryLog = normalizedLogs;
+                        const resultLogs = normalizedLogs.filter(log =>
+                            log && ['WIN','LOSS'].includes(String(log.result || '').toUpperCase())
+                        );
+                        remoteTeam.wins = resultLogs.filter(log => String(log.result || '').toUpperCase() === 'WIN').length;
+                        remoteTeam.losses = resultLogs.filter(log => String(log.result || '').toUpperCase() === 'LOSS').length;
+                        remoteTeam.played = remoteTeam.wins + remoteTeam.losses;
+                        remoteTeam.totalTimeSpentMinutes = resultLogs.reduce(
+                            (sum, log) => sum + Math.max(0, Number(log.durationMinutes) || 0), 0
+                        );
+                    });
+
+                    // Keep the score's undo snapshot compact: History is unchanged by a point.
+                    remoteUndoSnapshot = {
+                        teams: wesmaDeepClone(Array.isArray(currentTeams) ? currentTeams : []),
+                        teamNameOverrides: { ...(teamNameOverrides || {}) },
+                        tournamentStartTimestamp,
+                        lastActionTimestamp,
+                        globalClickSequence: Math.max(0, Number(globalClickSequence) || 0),
+                        isMatchEnded: false,
+                        isTournamentLocked: false,
+                        description: `WON: ${winnerName} vs DEFEATED: ${loserName}`
+                    };
                     return remoteTeams;
                 });
 
@@ -6652,78 +6613,57 @@
                     return;
                 }
 
-                // The score is now committed. Update the screen immediately; undo
-                // bookkeeping and small root metadata are saved separately below.
+                // The authoritative score is committed at /teams. Render it immediately;
+                // root-wide reads/transactions are deliberately avoided on this hot path.
                 teams = wesmaDeepClone(result.value);
-                scoreCommitted = true;
-                globalClickSequence = committedSequence || globalClickSequence;
+                globalClickSequence = Math.max(Number(globalClickSequence) || 0, committedSequence);
                 lastActionTimestamp = now;
                 teamSyncBase = wesmaDeepClone(teams);
                 teamNameSyncBase = wesmaDeepClone(teamNameOverrides || {});
+                lastActionSnapshot = remoteUndoSnapshot || lastActionSnapshot;
+                lastActionDescription = (remoteUndoSnapshot && remoteUndoSnapshot.description) || lastActionDescription;
                 render();
                 triggerWinCelebration();
+                showToast(`🏆 ${team.name} Won!`);
 
-                const description = `WON: ${team.name} vs DEFEATED: ${defeatedTeam.name}`;
-                const remoteUndoSnapshot = {
-                    scorePatch: true,
-                    teamSnapshots: preScoreTeamSnapshots || [],
-                    teamNameOverrides: { ...(teamNameOverrides || {}) },
-                    tournamentStartTimestamp,
-                    lastActionTimestamp: preCommitLastActionTimestamp ?? null,
-                    globalClickSequence: preScoreGlobalSequence,
-                    isMatchEnded: false,
-                    isTournamentLocked: false,
-                    sessionHistorySavedId: sessionHistorySavedId || null,
-                    scheduledMatchStartAt: scheduledMatchStartAt ?? null,
-                    lastEndedChampionSnapshot: lastEndedChampionSnapshot ? wesmaDeepClone(lastEndedChampionSnapshot) : null,
-                    startGuardActive,
-                    isLocalStartGateVisible,
-                    description
-                };
-                // Keep a local Undo entry immediately; the shared stack is synchronized
-                // on its own child path without waiting for a whole-root transaction.
-                undoHistoryStack = [...(Array.isArray(undoHistoryStack) ? undoHistoryStack : []), remoteUndoSnapshot];
-                if (undoHistoryStack.length > 100) undoHistoryStack.shift();
-                redoHistoryStack = [];
-                lastActionSnapshot = { description, timestamp: now, sequence: committedSequence };
-                lastActionDescription = description;
-                const deferredScoreBackup = () => { try { saveLocalBackup(); } catch (backupError) { console.warn("Deferred local backup failed:", backupError); } };
-                if (typeof window.requestIdleCallback === "function") {
-                    window.requestIdleCallback(deferredScoreBackup, { timeout: 2500 });
-                } else {
-                    setTimeout(deferredScoreBackup, 1500);
-                }
-                // Undo stack has its own small transaction path; tournamentHistory is
-                // not copied into each score snapshot, keeping this payload compact.
-                const undoResult = await runFirebaseTransaction(dbRef.child("undoHistoryStack"), current => {
+                // These are small, field-scoped writes. The undo stack has its own
+                // transaction so two phones do not overwrite one another's entries.
+                const undoSync = runFirebaseTransaction(dbRef.child("undoHistoryStack"), current => {
                     const stack = Array.isArray(current) ? wesmaDeepClone(current) : [];
-                    stack.push(remoteUndoSnapshot);
+                    if (remoteUndoSnapshot) stack.push(remoteUndoSnapshot);
                     if (stack.length > 100) stack.shift();
                     return stack;
+                }).then(undoResult => {
+                    if (undoResult.committed && Array.isArray(undoResult.value)) {
+                        undoHistoryStack = wesmaDeepClone(undoResult.value);
+                    }
+                    return undoResult;
                 });
-                if (!undoResult.committed || !Array.isArray(undoResult.value)) {
-                    throw new Error("Score saved, but shared Undo history could not be updated.");
+                const metadataSync = dbRef.update({
+                    globalClickSequence: committedSequence,
+                    lastActionTimestamp: now,
+                    lastActionSnapshot: remoteUndoSnapshot,
+                    lastActionDescription: lastActionDescription,
+                    redoHistoryStack: []
+                });
+                const [undoSyncResult, metadataSyncResult] = await Promise.allSettled([undoSync, metadataSync]);
+                if (undoSyncResult.status === "rejected" || metadataSyncResult.status === "rejected") {
+                    console.error("Score committed, but a small undo/metadata sync needs retry:", undoSyncResult, metadataSyncResult);
+                    showToast("⚠️ സ്കോർ സേവ് ചെയ്തു; Undo വിവരങ്ങളുടെ sync വീണ്ടും പരിശോധിക്കുക.");
                 }
-                undoHistoryStack = wesmaDeepClone(undoResult.value);
-                const metadataResults = await Promise.all([
-                    runFirebaseTransaction(dbRef.child("globalClickSequence"), current => Math.max(Number(current) || 0, committedSequence)),
-                    runFirebaseTransaction(dbRef.child("lastActionTimestamp"), current => Math.max(Number(current) || 0, now)),
-                    dbRef.update({lastActionSnapshot, lastActionDescription, redoHistoryStack: []})
-                ]);
-                if (!metadataResults[0].committed || !metadataResults[1].committed) {
-                    throw new Error("Score saved, but sequence/timer metadata did not sync.");
+                // Run the full local backup after the immediate render so JSON serialization
+                // of large History/backup data cannot delay the visible score update.
+                if (typeof requestIdleCallback === "function") {
+                    requestIdleCallback(() => saveLocalBackup(), { timeout: 1200 });
+                } else {
+                    setTimeout(() => saveLocalBackup(), 250);
                 }
-                showToast(`🏆 ${team.name} Won!`);
             } catch (error) {
                 console.error("Atomic score commit failed:", error);
                 const firebaseCode = error && error.code ? String(error.code) : "";
                 const firebaseMessage = error && error.message ? String(error.message) : String(error || "Unknown error");
                 console.error("Atomic score commit failed:", firebaseCode, firebaseMessage);
-                if (scoreCommitted) {
-                    showToast("⚠️ സ്കോർ സേവ് ചെയ്തു. Undo/metadata sync-ൽ പ്രശ്നമുണ്ട്; വീണ്ടും പരിശോധിക്കുക.");
-                } else {
-                    showToast("⚠️ Firebase score save failed" + (firebaseCode ? " (" + firebaseCode + ")" : "") + ": " + firebaseMessage);
-                }
+                showToast("⚠️ Firebase score save failed" + (firebaseCode ? " (" + firebaseCode + ")" : "") + ": " + firebaseMessage);
             } finally {
                 finishPendingWin();
             }
@@ -6853,42 +6793,27 @@
                     const destination = direction === "undo" ? redoStack : undoStack;
                     if (!source.length) return;
                     const targetSnapshot = source[source.length - 1];
-                    const hasFullTeamsSnapshot = !!(targetSnapshot && Array.isArray(targetSnapshot.teams));
-                    const hasScorePatchSnapshot = !!(targetSnapshot && targetSnapshot.scorePatch === true && Array.isArray(targetSnapshot.teamSnapshots));
-                    if (!hasFullTeamsSnapshot && !hasScorePatchSnapshot) return;
+                    if (!targetSnapshot || !Array.isArray(targetSnapshot.teams)) return;
                     const currentSnapshot = createUndoSnapshotFromFirebaseRoot(root,
                         direction === "undo" ? "State before Redo" : "State before Undo");
-                    const restoredTeams = hasScorePatchSnapshot
-                        ? (Array.isArray(root.teams) ? root.teams.map(currentTeam => {
-                            const savedTeam = targetSnapshot.teamSnapshots.find(saved => saved && String(saved.id) === String(currentTeam && currentTeam.id));
-                            if (savedTeam) return wesmaDeepClone(savedTeam);
-                            return { ...currentTeam, scoreLocked: !!(targetSnapshot.isMatchEnded || targetSnapshot.isTournamentLocked) };
-                        }) : [])
-                        : wesmaDeepClone(targetSnapshot.teams);
                     source.pop();
                     destination.push(currentSnapshot);
                     if (destination.length > 100) destination.shift();
                     const now = Date.now();
                     return {
                         ...root,
-                        teams: restoredTeams,
+                        teams: wesmaDeepClone(targetSnapshot.teams),
                         teamNameOverrides: { ...(targetSnapshot.teamNameOverrides || {}) },
                         tournamentStartTimestamp: targetSnapshot.tournamentStartTimestamp ?? root.tournamentStartTimestamp ?? null,
                         lastActionTimestamp: now,
                         globalClickSequence: Number(targetSnapshot.globalClickSequence) || 0,
                         isMatchEnded: !!targetSnapshot.isMatchEnded,
                         isTournamentLocked: !!targetSnapshot.isTournamentLocked,
-                        tournamentHistory: Array.isArray(targetSnapshot.tournamentHistory)
-                            ? wesmaDeepClone(targetSnapshot.tournamentHistory)
-                            : wesmaDeepClone(Array.isArray(root.tournamentHistory) ? root.tournamentHistory : []),
-                        historyDeletedKeys: Array.isArray(targetSnapshot.historyDeletedKeys)
-                            ? wesmaDeepClone(targetSnapshot.historyDeletedKeys)
-                            : wesmaDeepClone(Array.isArray(root.historyDeletedKeys) ? root.historyDeletedKeys : []),
-                        sessionHistorySavedId: targetSnapshot.sessionHistorySavedId ?? root.sessionHistorySavedId ?? null,
+                        tournamentHistory: wesmaDeepClone(Array.isArray(targetSnapshot.tournamentHistory) ? targetSnapshot.tournamentHistory : []),
+                        historyDeletedKeys: wesmaDeepClone(Array.isArray(targetSnapshot.historyDeletedKeys) ? targetSnapshot.historyDeletedKeys : []),
+                        sessionHistorySavedId: targetSnapshot.sessionHistorySavedId || null,
                         scheduledMatchStartAt: targetSnapshot.scheduledMatchStartAt ?? null,
-                        lastEndedChampionSnapshot: Object.prototype.hasOwnProperty.call(targetSnapshot, "lastEndedChampionSnapshot")
-                            ? (targetSnapshot.lastEndedChampionSnapshot ? wesmaDeepClone(targetSnapshot.lastEndedChampionSnapshot) : null)
-                            : (root.lastEndedChampionSnapshot ? wesmaDeepClone(root.lastEndedChampionSnapshot) : null),
+                        lastEndedChampionSnapshot: targetSnapshot.lastEndedChampionSnapshot ? wesmaDeepClone(targetSnapshot.lastEndedChampionSnapshot) : null,
                         undoHistoryStack: undoStack,
                         redoHistoryStack: redoStack,
                         lastActionSnapshot: undoStack.length ? undoStack[undoStack.length - 1] : null,
@@ -7278,7 +7203,6 @@
             // from merging old-session counters back after a reset.
             teams.forEach(team => {
                 team.sessionId = newSessionId;
-                team.scoreLocked = false;
                 team.wins = 0;
                 team.losses = 0;
                 team.played = 0;
