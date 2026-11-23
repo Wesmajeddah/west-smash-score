@@ -1677,6 +1677,7 @@
         let matchCorrectionTarget = null;
         let firebaseLastWriteError = null;
         let startGuardActive = false;
+        let sessionEpochRepairPending = "";
         let finishProcessing = false;
         let historyPreviewLiveState = null;
         let undoRedoInProgress = false;
@@ -2200,6 +2201,22 @@
             // Do NOT saveData() here: that could overwrite newer scores from another phone.
             tournamentStartTimestamp = safeStart;
             teams.forEach(team => { if (team) { team.sessionId = String(safeStart); team.scoreLocked = false; } });
+            // Repair older LIVE sessions too: previous builds updated only local team
+            // session IDs, leaving Firebase teams on the old epoch and causing Plus taps
+            // to be rejected as a session mismatch even on the same phone.
+            if (dbRef) {
+                runFirebaseTransaction(dbRef.child("teams"), current => {
+                    if (!Array.isArray(current)) return;
+                    return current.map(team => team ? { ...team, sessionId: String(safeStart) } : team);
+                }).then(result => {
+                    if (result.committed && Array.isArray(result.value) && Number(tournamentStartTimestamp) === safeStart && !isMatchEnded) {
+                        teams = result.value;
+                        teamSyncBase = wesmaDeepClone(result.value);
+                        saveLocalBackup();
+                        render();
+                    }
+                }).catch(error => console.error("Active LIVE session team-ID repair failed:", error));
+            }
             isMatchEnded = false;
             isTournamentLocked = false;
             isLocalStartGateVisible = false;
@@ -2283,11 +2300,19 @@
                     if (guard && guard.active === true && sharedStartedAt > 0) {
                         try {
                             const [teamsSnap, namesSnap] = await Promise.all([
-                                dbRef.child("teams").once("value"),
+                                runFirebaseTransaction(dbRef.child("teams"), current => {
+                                    if (!Array.isArray(current)) return;
+                                    return current.map(team => team ? { ...team, sessionId: String(sharedStartedAt), scoreLocked: false } : team);
+                                }),
                                 dbRef.child("teamNameOverrides").once("value")
                             ]);
-                            const remoteTeams = teamsSnap.val();
-                            if (Array.isArray(remoteTeams)) teams = remoteTeams;
+                            const remoteTeams = teamsSnap && teamsSnap.committed ? teamsSnap.value : null;
+                            if (Array.isArray(remoteTeams)) {
+                                teams = remoteTeams;
+                                teamSyncBase = wesmaDeepClone(remoteTeams);
+                            } else {
+                                throw new Error("Could not align team session IDs with the active LIVE session");
+                            }
                             const remoteNames = namesSnap.val();
                             if (remoteNames && typeof remoteNames === "object") teamNameOverrides = remoteNames;
                             adoptSharedRunningSession(sharedStartedAt);
@@ -2303,6 +2328,18 @@
                 }
 
                 try {
+                    // The active session guard is the authoritative session ID. Persist it
+                    // onto every remote team before allowing score transactions; otherwise
+                    // the UI can show LIVE while the Plus transaction rejects stale team IDs.
+                    const alignedTeams = await runFirebaseTransaction(dbRef.child("teams"), current => {
+                        if (!Array.isArray(current)) return;
+                        return current.map(team => team ? { ...team, sessionId: String(sharedStartedAt), scoreLocked: false } : team);
+                    });
+                    if (!alignedTeams.committed || !Array.isArray(alignedTeams.value)) {
+                        throw new Error("Could not align team records with the active LIVE session");
+                    }
+                    teams = wesmaDeepClone(alignedTeams.value);
+                    teamSyncBase = wesmaDeepClone(alignedTeams.value);
                     await dbRef.update({
                         tournamentStartTimestamp: sharedStartedAt,
                         lastActionTimestamp: sharedStartedAt,
@@ -2525,6 +2562,26 @@
                             const legacyActive = !!tournamentStartTimestamp && !isTournamentLocked && !isMatchEnded;
                             dbRef.child("sessionStartGuard").transaction(current => current || { active: legacyActive, startedAt: tournamentStartTimestamp || null }, () => {}, false);
                             startGuardActive = legacyActive;
+                        }
+                        // One-time migration repair for active sessions created by builds
+                        // that changed team.sessionId only locally. Align Firebase team
+                        // records with the authoritative active guard before Plus is used.
+                        if (startGuardActive && loadedSessionEpoch &&
+                            incomingTeams.some(team => team && String(team.sessionId || "") !== loadedSessionEpoch) &&
+                            sessionEpochRepairPending !== loadedSessionEpoch) {
+                            sessionEpochRepairPending = loadedSessionEpoch;
+                            runFirebaseTransaction(dbRef.child("teams"), current => {
+                                if (!Array.isArray(current)) return;
+                                return current.map(team => team ? { ...team, sessionId: loadedSessionEpoch } : team);
+                            }).then(repair => {
+                                if (!repair.committed) throw new Error("Team session migration was not committed");
+                                teamSyncBase = wesmaDeepClone(repair.value);
+                                sessionEpochRepairPending = "";
+                            }).catch(repairError => {
+                                sessionEpochRepairPending = "";
+                                console.error("Active session epoch migration failed:", repairError);
+                                showToast("⚠️ LIVE session sync ശരിയാക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് Refresh ചെയ്യുക.");
+                            });
                         }
                         // A device that has passed the DEVICE ADMIN approval gate can join
                         // the currently running shared match immediately. Do not leave the
