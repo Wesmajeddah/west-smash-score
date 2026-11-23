@@ -508,6 +508,85 @@
         #match-correction-modal button i { flex:0 0 auto; }
         #match-correction-modal .text-\[9px\], #match-correction-modal .text-\[10px\] { overflow-wrap:anywhere; }
 
+        /* End Match Champions — premium badminton victory theme.
+           Visual-only: does not change ranking or match data. */
+        #finish-match-modal-content .wesma-champions-box {
+            position:relative !important;
+            overflow:hidden !important;
+            isolation:isolate !important;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(255,220,110,.22), transparent 38%),
+                linear-gradient(135deg,#071525 0%,#102c42 46%,#1a1220 100%) !important;
+            border:2px solid #d4af37 !important;
+            box-shadow:0 0 0 2px rgba(212,175,55,.20),0 0 24px rgba(212,175,55,.34),inset 0 0 28px rgba(0,0,0,.38) !important;
+        }
+        #finish-match-modal-content .wesma-champions-box::before {
+            content:"" !important;
+            position:absolute !important;
+            inset:-40% !important;
+            background:
+                linear-gradient(120deg,transparent 35%,rgba(255,255,255,.16) 48%,rgba(255,221,120,.34) 52%,transparent 66%),
+                repeating-linear-gradient(90deg,transparent 0 38px,rgba(255,255,255,.035) 39px 40px) !important;
+            transform:translateX(-55%) rotate(8deg) !important;
+            animation:wesmaChampionsSweep 4.2s ease-in-out infinite !important;
+            pointer-events:none !important;
+            z-index:0 !important;
+        }
+        #finish-match-modal-content .wesma-champions-box::after {
+            content:"✦  🏸  ✦  🏆  ✦  🏸  ✦" !important;
+            position:absolute !important;
+            left:0 !important; right:0 !important; bottom:2px !important;
+            text-align:center !important;
+            font-size:8px !important;
+            letter-spacing:9px !important;
+            color:rgba(255,221,120,.62) !important;
+            animation:wesmaChampionsSpark 2.2s ease-in-out infinite !important;
+            pointer-events:none !important; z-index:0 !important;
+        }
+        #finish-match-modal-content .wesma-champions-box > * { position:relative !important; z-index:1 !important; }
+        #finish-match-modal-content .wesma-champions-title {
+            color:#ffe8a3 !important;
+            text-shadow:0 0 6px rgba(255,214,91,.72),0 0 16px rgba(212,175,55,.52) !important;
+            animation:wesmaChampionsTextGlow 1.8s ease-in-out infinite !important;
+        }
+        #finish-match-modal-content .wesma-champions-name {
+            color:#fff3b0 !important;
+            background:linear-gradient(90deg,#fff7c7,#d4af37,#fff3b0,#f4d36d,#fff7c7) !important;
+            background-size:260% 100% !important;
+            -webkit-background-clip:text !important;
+            background-clip:text !important;
+            -webkit-text-fill-color:transparent !important;
+            text-shadow:0 0 10px rgba(212,175,55,.46) !important;
+            animation:wesmaChampionsGoldFlow 3s linear infinite, wesmaChampionsNamePulse 1.9s ease-in-out infinite !important;
+        }
+        #finish-match-modal-content .wesma-champions-wins {
+            color:#fff7cf !important;
+            background:linear-gradient(90deg,#6d4b0e,#c99a2e,#f4dc83,#c99a2e,#6d4b0e) !important;
+            border-color:#f0d37a !important;
+            box-shadow:0 0 12px rgba(212,175,55,.28) !important;
+        }
+        @keyframes wesmaChampionsSweep {
+            0%,18%{transform:translateX(-55%) rotate(8deg);opacity:0}
+            38%{opacity:.9}
+            68%,100%{transform:translateX(55%) rotate(8deg);opacity:0}
+        }
+        @keyframes wesmaChampionsTextGlow {
+            0%,100%{filter:brightness(.95);text-shadow:0 0 5px rgba(255,214,91,.5),0 0 12px rgba(212,175,55,.35)}
+            50%{filter:brightness(1.22);text-shadow:0 0 9px rgba(255,231,151,.95),0 0 22px rgba(212,175,55,.72)}
+        }
+        @keyframes wesmaChampionsGoldFlow {
+            0%{background-position:0% 50%}
+            100%{background-position:260% 50%}
+        }
+        @keyframes wesmaChampionsNamePulse {
+            0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(212,175,55,.35))}
+            50%{transform:scale(1.018);filter:drop-shadow(0 0 9px rgba(255,219,102,.72))}
+        }
+        @keyframes wesmaChampionsSpark {
+            0%,100%{opacity:.25;transform:translateY(0) scale(.95)}
+            50%{opacity:.95;transform:translateY(-2px) scale(1.08)}
+        }
+
         /* Premium Champions presentation only — no score or ranking logic changed. */
         #champion-status-modal {
             background:
@@ -3617,7 +3696,7 @@
 
         function saveHistoryRecordTransaction(record) {
             const recordDurationMs = Math.max(0, Number(record && record.durationMs) || (Number(record && record.durationMinutes) || 0) * 60000);
-            if (!dbRef || !record || recordDurationMs < 60 * 60 * 1000) return Promise.resolve(false);
+            if (!dbRef || !record) return Promise.resolve(false);
             const historyRef = dbRef.child('tournamentHistory');
             historyWriteQueue = historyWriteQueue.catch(() => false).then(() => new Promise((resolve) => {
                 historyRef.transaction((current) => {
@@ -3627,8 +3706,9 @@
                         const oldKey = String(item.sessionId || item.startTimestamp || item.id || "");
                         return (newKey && oldKey === newKey) || (!oldKey && historyRecordFingerprint(item) === historyRecordFingerprint(record));
                     });
-                    // Do not persist a session shorter than one full hour.
-                    if (recordDurationMs < 60 * 60 * 1000) return list;
+                    // Every completed session is a permanent record. Do not discard
+                    // short sessions: their match logs are required by Last Defeated,
+                    // PLAY details and the Combined Report.
                     return exists ? list : dedupeHistoryRecords([record, ...list]);
                 }, (error, committed, snapshot) => {
                     if (error) {
@@ -3664,10 +3744,9 @@
             const sessionDurationMs = tournamentStartTimestamp ? Math.max(0, Date.now() - Number(tournamentStartTimestamp)) : 0;
             const totalPlays = calculateTotalPlays();
             if (totalPlays === 0 && (!teams.some(t => t.wins > 0 || (t.losses || 0) > 0))) return false;
-            if (sessionDurationMs < 60 * 60 * 1000) {
-                showToast("History saved only after a session reaches 1 hour. This match can still be ended normally.");
-                return false;
-            }
+            // Completed sessions must be archived immediately. End Match is the
+            // authoritative boundary; a short session must never lose its match logs,
+            // Last Defeated details, or per-team PLAY/WIN/LOSS information.
 
             const sessionDurationMins = Math.floor(sessionDurationMs / 60000);
             const dateStr = new Date(tournamentStartTimestamp || Date.now()).toLocaleDateString('en-GB', {
@@ -4611,6 +4690,9 @@
         function saveHistorySpecialSnapshots(sessionId) {
             const record = (tournamentHistory || []).find(item => String(item.sessionId || item.startTimestamp || item.id || "") === String(sessionId));
             const finishContent = document.getElementById("finish-match-modal-content");
+            // The permanent history record is created before this snapshot function.
+            // If a concurrent Firebase listener temporarily has not merged it yet,
+            // never silently drop the snapshot work.
             if (!record || !finishContent) return;
             const mainInterface = document.getElementById("capture-area");
             // Preserve the complete visible main interface and its share-card source
@@ -5284,10 +5366,17 @@
                 ? nonPodiumTeams.filter(t => (Number(t.losses) || 0) > 0).sort((a,b) => (Number(b.losses)||0)-(Number(a.losses)||0)).map(t => `<div class="flex items-start gap-1 text-left"><span class="shrink-0">•</span><span class="min-w-0 break-words">${escapeHtml(t.name)} <b>(${Number(t.losses)||0} L)</b></span></div>`).join("")
                 : `<div class="text-left">• No losses recorded</div>`;
             const podiumRow = (label, groupedTeams, fallback) => {
-                const names = groupedTeams && groupedTeams.length ? groupedTeams.map(team => escapeHtml(team.name)).join(", ") : fallback;
+                const teamsForRow = Array.isArray(groupedTeams) ? groupedTeams : [];
+                const names = teamsForRow.length ? teamsForRow.map(team => escapeHtml(team.name)).join(", ") : fallback;
+                const details = teamsForRow.length
+                    ? teamsForRow.map(team => `${Number(team.wins)||0}W / ${Number(team.losses)||0}L`).join(" • ")
+                    : "—";
                 const extraClass = label === "2ND PLACE" ? " combined-second-place" : "";
-                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239]">${label}</span><span class="combined-team-name font-black text-right text-[#5c4033]">${names}</span></div>`;
+                return `<div class="combined-team-box${extraClass} flex items-center justify-between gap-2 rounded-lg border border-[#e6decb] bg-[#fcfbf9] px-2 py-1.5 text-[9px]"><span class="font-bold text-[#8c6239] shrink-0">${label}</span><span class="combined-team-name font-black text-right text-[#5c4033] min-w-0">${names}<span class="block text-[8px] font-extrabold text-slate-500 mt-0.5">${details}</span></span></div>`;
             };
+            const winnerDetails = leaders.length
+                ? leaders.map(team => `${Number(team.wins)||0}W / ${Number(team.losses)||0}L`).join(" • ")
+                : "0W / 0L";
             content.innerHTML = `
                 <div class="text-center border-b border-[#e6decb] pb-2">
                     <div class="text-2xl font-black tracking-[0.22em] text-[#5c4033]">WESMA</div><div class="text-[10px] font-bold tracking-[0.25em] text-[#8c6239]">BADMINTON CLUB</div><div class="text-[8px] font-bold tracking-[0.2em] text-slate-500 mt-1">OFFICIAL MATCH REPORT • SINCE 2026</div><div class="text-[9px] text-slate-500 mt-2">${dateText}</div>
@@ -5300,7 +5389,7 @@
                 <section class="space-y-1.5">
                     <div class="text-[7px] font-bold tracking-widest text-[#8c6239]">MAIN INTERFACE • TEAM SNAPSHOT</div>
                     <div class="grid grid-cols-2 gap-1">${mainCards}</div>
-                    <div class="combined-match-winner flex items-center justify-between gap-2 rounded-lg bg-[#f7f5f0] border border-[#e6decb] px-2.5 py-2"><div class="min-w-0"><div class="combined-winner-label text-[7px] font-bold tracking-widest text-[#8c6239]">MATCH WINNER</div><div class="text-[11px] font-black text-[#5c4033] break-words">${leadersText}</div></div><div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${leaderWins}</div><div class="text-[7px] font-bold text-slate-500">WINS</div></div></div>
+                    <div class="combined-match-winner flex items-center justify-between gap-2 rounded-lg bg-[#f7f5f0] border border-[#e6decb] px-2.5 py-2"><div class="min-w-0"><div class="combined-winner-label text-[7px] font-bold tracking-widest text-[#8c6239]">1ST PLACE / MATCH WINNER</div><div class="text-[11px] font-black text-[#5c4033] break-words">${leadersText}</div><div class="text-[8px] font-extrabold text-slate-500 mt-0.5">${winnerDetails}</div></div><div class="shrink-0 text-right"><div class="text-sm font-black text-emerald-700">${leaderWins}</div><div class="text-[7px] font-bold text-slate-500">WINS</div></div></div>
                     <div class="grid grid-cols-2 gap-1">${podiumRow("2ND PLACE", secondPlaceTeams, "Not available")}${podiumRow("3RD PLACE", thirdPlaceTeams, "Not available")}</div>
                     <div class="rounded-md border border-rose-100 bg-rose-50/60 px-2 py-1.5 text-[8px] min-w-0"><span class="font-bold text-rose-700">MOST LOSSES:</span> <span class="font-semibold text-rose-800">${mostLossTeams}</span></div>
                     <div class="text-[7px] font-bold tracking-widest text-[#8c6239] pt-1">TEAM STATISTICS</div>
@@ -5522,15 +5611,15 @@
                 </div>
 
                 <!-- Prominent Champions Box -->
-                <div class="bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
-                    <div class="text-[10px] sm:text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-crown text-amber-600 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-sm"></i>
+                <div class="wesma-champions-box border-2 rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
+                    <div class="wesma-champions-title text-[10px] sm:text-[11px] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-crown text-amber-300 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-300 text-sm"></i>
                     </div>
-                    <div class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
+                    <div class="wesma-champions-name text-base sm:text-lg font-black uppercase tracking-wide leading-snug break-words px-1 finish-name-wrapper">
                         ✨ ${championNamesDisplay} ✨
                     </div>
                     <div class="inline-block pt-0.5">
-                        <span class="text-[10px] text-emerald-800 font-extrabold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
+                        <span class="wesma-champions-wins text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border shadow-2xs">
                             🏆 Wins: ${firstWins}
                         </span>
                     </div>
