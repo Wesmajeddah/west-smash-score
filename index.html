@@ -845,18 +845,18 @@
             box-shadow: none !important;
         }
 
-        /* ADD-ON ONLY — Final Score Sheet: every team name stays on exactly one line.
-           The font is reduced where necessary and the existing cell dimensions stay intact. */
+        /* ADD-ON ONLY — Final Score Sheet: one-line team names with automatic fit. */
         #finish-match-modal-content .wesma-final-score-table .finish-score-name {
             flex-direction: row !important;
             align-items: center !important;
             flex-wrap: nowrap !important;
             white-space: nowrap !important;
             overflow: hidden !important;
-            text-overflow: ellipsis !important;
+            text-overflow: clip !important;
             font-size: 8px !important;
             line-height: 1 !important;
-            letter-spacing: -.01em !important;
+            letter-spacing: -.025em !important;
+            transform-origin: left center !important;
         }
         #finish-match-modal-content .wesma-final-score-table .finish-score-name > .inline-flex {
             flex-direction: row !important;
@@ -867,20 +867,23 @@
             width: auto !important;
             overflow: hidden !important;
             white-space: nowrap !important;
-            text-overflow: ellipsis !important;
-            gap: 3px !important;
+            gap: 2px !important;
         }
         #finish-match-modal-content .wesma-final-score-table .finish-score-name .dangerous-badge {
             flex: 0 1 auto !important;
-            max-width: 42% !important;
-            font-size: 6.5px !important;
+            min-width: 0 !important;
+            max-width: 30% !important;
+            font-size: 5.5px !important;
             line-height: 1 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
         #finish-match-modal-content .wesma-final-score-table .finish-winner-row .finish-score-name {
-            font-size: 8.5px !important;
+            font-size: 8.3px !important;
+        }
+        #finish-match-modal-content .wesma-final-score-table .finish-score-name > .inline-flex > .dangerous-badge {
+            display: inline-block !important;
         }
 
     </style>
@@ -3059,94 +3062,131 @@
             ctx.drawImage(overlay, 0, 0);
         }
 
-        /* ADD-ON ONLY — 30 genuinely different badminton-themed vector scenes.
-           These are backgrounds/scenes, not simple color swaps. The original
-           Champions artwork, layout, text and statistics remain untouched. */
+        /* ADD-ON ONLY — 30 genuinely different badminton-themed background scenes.
+           The existing Champions artwork is kept as the foreground; only its dark
+           background pixels are made transparent over each new scene. */
         function applyWesmaChampionBackdrop(ctx, canvas, index) {
             const scenes = [
-                {court:'#10263a', line:'#d9edf7', glow:'#2f83b5', player:'#0a111b', accent:'#f1c76b', mode:0},
-                {court:'#171d2f', line:'#e8e0f4', glow:'#6e63b8', player:'#090c18', accent:'#e5bd73', mode:1},
-                {court:'#211a24', line:'#f1dbe5', glow:'#9b5570', player:'#120a10', accent:'#f2c878', mode:2},
-                {court:'#172923', line:'#d9f0e8', glow:'#4d907c', player:'#08130f', accent:'#e8c77b', mode:3},
-                {court:'#241e16', line:'#f4e5cc', glow:'#b17a3d', player:'#120c06', accent:'#f0c66f', mode:4},
-                {court:'#14242b', line:'#d7eff4', glow:'#4f9aaa', player:'#081116', accent:'#f4cf83', mode:5},
-                {court:'#221b2c', line:'#eadff4', glow:'#8063a8', player:'#100b17', accent:'#efc777', mode:6},
-                {court:'#1d2024', line:'#e4e9ed', glow:'#70828d', player:'#0b0d0f', accent:'#f1ca76', mode:7},
-                {court:'#2a1b1a', line:'#f4dddd', glow:'#a85b57', player:'#120909', accent:'#f4c977', mode:8},
-                {court:'#13252b', line:'#d9edf0', glow:'#3e8791', player:'#081114', accent:'#f0c36d', mode:9},
-                {court:'#201a2b', line:'#e7ddf4', glow:'#7259a2', player:'#0d0916', accent:'#f3ca78', mode:10},
-                {court:'#252016', line:'#f5ead7', glow:'#a9864d', player:'#120d07', accent:'#efc56f', mode:11},
-                {court:'#17252e', line:'#dcecf4', glow:'#4b7f9c', player:'#091116', accent:'#f1c975', mode:12},
-                {court:'#281a22', line:'#f2dce6', glow:'#9b5a73', player:'#120910', accent:'#f1c873', mode:13},
-                {court:'#152724', line:'#d9eee8', glow:'#4f8f83', player:'#08120f', accent:'#f0c36d', mode:14},
-                {court:'#262018', line:'#f3e8d5', glow:'#b08748', player:'#110c07', accent:'#f4cf82', mode:15},
-                {court:'#152733', line:'#d9eef8', glow:'#4d8fb0', player:'#081218', accent:'#f0c66f', mode:16},
-                {court:'#241b2c', line:'#e8def3', glow:'#7d5ea5', player:'#100a15', accent:'#f3ca77', mode:17},
-                {court:'#172720', line:'#dceee5', glow:'#568f6d', player:'#08120c', accent:'#f0c36e', mode:18},
-                {court:'#291b1d', line:'#f3dce0', glow:'#a75d67', player:'#12090b', accent:'#f3ca76', mode:19},
-                {court:'#18252b', line:'#dcebf0', glow:'#5b8797', player:'#091115', accent:'#f2c970', mode:20},
-                {court:'#271f18', line:'#f3e6d3', glow:'#a77b49', player:'#120c07', accent:'#efc36d', mode:21},
-                {court:'#142932', line:'#d9edf2', glow:'#4a92a8', player:'#081218', accent:'#f2c977', mode:22},
-                {court:'#211c2c', line:'#e9e1f2', glow:'#786aa4', player:'#0d0915', accent:'#f3cb7b', mode:23},
-                {court:'#172922', line:'#dceee6', glow:'#5b9676', player:'#08120d', accent:'#f0c46f', mode:24},
-                {court:'#291a20', line:'#f2dde2', glow:'#a8626e', player:'#12090c', accent:'#f3ca78', mode:25},
-                {court:'#192630', line:'#dcebf3', glow:'#5d89a2', player:'#091116', accent:'#f1c875', mode:26},
-                {court:'#282016', line:'#f4e8d6', glow:'#b07f48', player:'#120c07', accent:'#f1c66e', mode:27},
-                {court:'#14282d', line:'#d9eef0', glow:'#4d9aa0', player:'#081215', accent:'#f2ca77', mode:28},
-                {court:'#221b2c', line:'#e8dff1', glow:'#7e6ca5', player:'#0e0915', accent:'#f0c56e', mode:29}
+                {court:'#071d2b', glow:'#175a78', accent:'#f2c76d', line:'#d9edf7', mode:0},
+                {court:'#10152b', glow:'#3c4e91', accent:'#f0c477', line:'#e7e1f4', mode:1},
+                {court:'#21101d', glow:'#7d3f5b', accent:'#f2c979', line:'#f2dce7', mode:2},
+                {court:'#0d211b', glow:'#39755e', accent:'#e9c56e', line:'#d9eee6', mode:3},
+                {court:'#26170c', glow:'#805126', accent:'#f2c66d', line:'#f3e4cf', mode:4},
+                {court:'#0b2029', glow:'#397e91', accent:'#f0ca78', line:'#d9eef2', mode:5},
+                {court:'#191129', glow:'#624b8e', accent:'#f1c878', line:'#e8def3', mode:6},
+                {court:'#171d21', glow:'#506d7b', accent:'#f0c774', line:'#e1e9ee', mode:7},
+                {court:'#2a1415', glow:'#934e51', accent:'#f3c873', line:'#f3dcdf', mode:8},
+                {court:'#09232a', glow:'#347f88', accent:'#efc36b', line:'#d8eef0', mode:9},
+                {court:'#1d132a', glow:'#694f95', accent:'#f2c979', line:'#e9e0f3', mode:10},
+                {court:'#271b0e', glow:'#8d6a36', accent:'#f1c46c', line:'#f3e6d3', mode:11},
+                {court:'#102331', glow:'#3e6f91', accent:'#f0c874', line:'#dcecf5', mode:12},
+                {court:'#29141e', glow:'#914d68', accent:'#f2c978', line:'#f1dce7', mode:13},
+                {court:'#0d2521', glow:'#3f7f70', accent:'#efc36d', line:'#d8eee8', mode:14},
+                {court:'#251b10', glow:'#8a6636', accent:'#f4cc7b', line:'#f3e7d4', mode:15},
+                {court:'#0b2434', glow:'#3f7fa5', accent:'#f0c66e', line:'#d9eef8', mode:16},
+                {court:'#1c122a', glow:'#684d91', accent:'#f2c879', line:'#e8def2', mode:17},
+                {court:'#0f251b', glow:'#43815f', accent:'#f0c36c', line:'#dceee4', mode:18},
+                {court:'#29151a', glow:'#95535f', accent:'#f3c975', line:'#f2dde2', mode:19},
+                {court:'#12242b', glow:'#477d8f', accent:'#f2ca77', line:'#dcebf0', mode:20},
+                {court:'#261a0e', glow:'#896338', accent:'#efc46c', line:'#f3e6d4', mode:21},
+                {court:'#0b2630', glow:'#3c879b', accent:'#f2c979', line:'#d9edf2', mode:22},
+                {court:'#1c162b', glow:'#665a96', accent:'#f2ca7a', line:'#e9e1f2', mode:23},
+                {court:'#10271d', glow:'#478265', accent:'#efc36d', line:'#dceee6', mode:24},
+                {court:'#2a151c', glow:'#985765', accent:'#f3c978', line:'#f2dde2', mode:25},
+                {court:'#122530', glow:'#4c7895', accent:'#f1c875', line:'#dcebf3', mode:26},
+                {court:'#271b0e', glow:'#916a39', accent:'#f1c66e', line:'#f4e8d6', mode:27},
+                {court:'#0c2730', glow:'#438b91', accent:'#f2ca77', line:'#d9eef0', mode:28},
+                {court:'#1d162b', glow:'#695b97', accent:'#f0c56e', line:'#e8dff1', mode:29}
             ];
             const scene = scenes[Math.max(0, Number(index) || 0) % scenes.length];
             const w = canvas.width, h = canvas.height;
-            const base = document.createElement('canvas');
-            base.width = w; base.height = h;
-            const b = base.getContext('2d');
-            const g = b.createLinearGradient(0,0,w,h);
-            g.addColorStop(0, scene.court); g.addColorStop(.5, scene.glow); g.addColorStop(1, '#05080d');
-            b.fillStyle = g; b.fillRect(0,0,w,h);
-            b.globalAlpha = .16;
-            for (let i=0;i<7;i++) {
-                b.beginPath(); b.arc(w*(.12+i*.14), h*(.16+(i%3)*.22), Math.max(w,h)*(.06+(i%2)*.025), 0, Math.PI*2);
-                b.fillStyle = scene.accent; b.fill();
+
+            // Preserve the original Champions artwork before replacing its backdrop.
+            const art = document.createElement('canvas');
+            art.width = w; art.height = h;
+            const a = art.getContext('2d', { willReadFrequently: true });
+            a.drawImage(canvas, 0, 0);
+            const ap = a.getImageData(0, 0, w, h);
+            const ad = ap.data;
+
+            // New full badminton scene background.
+            const bg = document.createElement('canvas');
+            bg.width = w; bg.height = h;
+            const b = bg.getContext('2d');
+            const g = b.createLinearGradient(0, 0, w, h);
+            g.addColorStop(0, scene.court);
+            g.addColorStop(.48, scene.glow);
+            g.addColorStop(1, '#03070b');
+            b.fillStyle = g;
+            b.fillRect(0, 0, w, h);
+
+            // Arena light beams / spotlights — different placement per scene.
+            for (let i = 0; i < 5; i++) {
+                const x = w * (0.08 + ((i * 0.19 + scene.mode * 0.037) % 0.82));
+                const rg = b.createRadialGradient(x, h * .12, 0, x, h * .12, w * .28);
+                rg.addColorStop(0, scene.accent + '45');
+                rg.addColorStop(1, scene.accent + '00');
+                b.fillStyle = rg;
+                b.beginPath(); b.arc(x, h * .12, w * .28, 0, Math.PI * 2); b.fill();
             }
-            b.globalAlpha = .38;
-            b.strokeStyle = scene.line; b.lineWidth = Math.max(2,w*.004);
-            b.strokeRect(w*.08,h*.64,w*.84,h*.25);
-            b.beginPath(); b.moveTo(w*.5,h*.64); b.lineTo(w*.5,h*.89); b.stroke();
-            b.globalAlpha = .22; b.lineWidth = Math.max(2,w*.0025);
-            b.beginPath(); b.moveTo(w*.08,h*.77); b.lineTo(w*.92,h*.77); b.stroke();
-            b.globalAlpha = .5;
-            b.strokeStyle = scene.accent; b.lineWidth = Math.max(3,w*.005);
-            b.beginPath(); b.moveTo(w*.18,h*.58); b.lineTo(w*.82,h*.58); b.stroke();
-            // Distinct men's badminton action silhouette / racket / shuttlecock treatment.
-            b.globalAlpha = .82; b.fillStyle = scene.player;
-            const px = w*(.22 + (scene.mode%5)*.13), py = h*.43;
-            b.beginPath(); b.arc(px,py,w*.025,0,Math.PI*2); b.fill();
-            b.beginPath(); b.moveTo(px-w*.018,py+w*.03); b.lineTo(px+w*.012,py+h*.12); b.lineTo(px-w*.01,py+h*.20); b.lineTo(px-w*.055,py+h*.16); b.lineTo(px-w*.018,py+w*.03); b.fill();
-            b.strokeStyle = scene.player; b.lineWidth = Math.max(5,w*.009); b.lineCap='round';
-            b.beginPath(); b.moveTo(px,py+h*.07); b.lineTo(px+w*.07,py+h*.02); b.lineTo(px+w*.12,py-h*.005); b.stroke();
-            b.beginPath(); b.moveTo(px-w*.005,py+h*.19); b.lineTo(px-w*.055,py+h*.27); b.moveTo(px+w*.005,py+h*.19); b.lineTo(px+w*.06,py+h*.27); b.stroke();
-            b.globalAlpha=.7; b.strokeStyle=scene.accent; b.lineWidth=Math.max(3,w*.004);
-            const rx=px+w*.15, ry=py-h*.06;
-            b.beginPath(); b.ellipse(rx,ry,w*.045,h*.055,.15,0,Math.PI*2); b.stroke();
-            b.beginPath(); b.moveTo(rx-w*.02,ry+h*.045); b.lineTo(rx-w*.07,ry+h*.16); b.stroke();
-            b.globalAlpha=.9; b.fillStyle=scene.line;
-            const sx=w*(.62+(scene.mode%4)*.05), sy=h*(.24+(scene.mode%3)*.07);
-            b.beginPath(); b.arc(sx,sy,w*.012,0,Math.PI*2); b.fill();
+
+            // Badminton court perspective.
+            b.save();
+            b.globalAlpha = .48;
+            b.strokeStyle = scene.line;
+            b.lineWidth = Math.max(2, w * .0035);
+            b.strokeRect(w*.07, h*.61, w*.86, h*.30);
+            b.beginPath(); b.moveTo(w*.50, h*.61); b.lineTo(w*.50, h*.91); b.stroke();
+            b.beginPath(); b.moveTo(w*.07, h*.76); b.lineTo(w*.93, h*.76); b.stroke();
+            b.globalAlpha = .72;
+            b.strokeStyle = scene.accent;
+            b.lineWidth = Math.max(3, w * .0045);
+            b.beginPath(); b.moveTo(w*.14, h*.56); b.lineTo(w*.86, h*.56); b.stroke();
+            b.restore();
+
+            // Men's badminton action silhouette + racket + shuttlecock.
+            const px = w * (.22 + ((scene.mode * 7) % 43) / 100);
+            const py = h * (.40 + (scene.mode % 4) * .025);
+            b.save();
+            b.globalAlpha = .86;
+            b.fillStyle = '#02060a';
+            b.beginPath(); b.arc(px, py, w*.025, 0, Math.PI*2); b.fill();
+            b.beginPath(); b.moveTo(px-w*.018,py+w*.03); b.lineTo(px+w*.015,py+h*.13); b.lineTo(px-w*.012,py+h*.21); b.lineTo(px-w*.06,py+h*.17); b.lineTo(px-w*.018,py+w*.03); b.fill();
+            b.strokeStyle = '#02060a'; b.lineWidth = Math.max(5,w*.009); b.lineCap='round';
+            b.beginPath(); b.moveTo(px,py+h*.07); b.lineTo(px+w*.075,py+h*.015); b.lineTo(px+w*.135,py-h*.035); b.stroke();
+            b.beginPath(); b.moveTo(px-w*.006,py+h*.20); b.lineTo(px-w*.065,py+h*.28); b.moveTo(px+w*.006,py+h*.20); b.lineTo(px+w*.065,py+h*.28); b.stroke();
+            b.strokeStyle = scene.accent; b.lineWidth = Math.max(3,w*.004);
+            const rx=px+w*.17, ry=py-h*.09;
+            b.beginPath(); b.ellipse(rx,ry,w*.045,h*.06,.16,0,Math.PI*2); b.stroke();
+            b.beginPath(); b.moveTo(rx-w*.018,ry+h*.05); b.lineTo(rx-w*.075,ry+h*.17); b.stroke();
+            const sx=w*(.60+((scene.mode%5)*.055)), sy=h*(.20+((scene.mode%3)*.075));
+            b.fillStyle=scene.line; b.beginPath(); b.arc(sx,sy,w*.012,0,Math.PI*2); b.fill();
+            b.strokeStyle=scene.line; b.lineWidth=Math.max(2,w*.002);
             for(let k=0;k<5;k++){ b.beginPath(); b.moveTo(sx-w*.018+k*w*.009,sy+h*.018); b.lineTo(sx-w*.03+k*w*.015,sy+h*.055); b.stroke(); }
-            // Reuse the existing artwork while replacing its dark backdrop with the scene.
-            const art = document.createElement('canvas'); art.width=w; art.height=h;
-            const a=art.getContext('2d',{willReadFrequently:true}); a.drawImage(canvas,0,0);
-            const ap=a.getImageData(0,0,w,h), bp=b.getImageData(0,0,w,h), d=ap.data, bd=bp.data;
-            for(let i=0;i<d.length;i+=4){
-                const bright=Math.max(d[i],d[i+1],d[i+2]);
-                if(bright<125){
-                    const mix=.86-(bright/125)*.18;
-                    d[i]=Math.round(d[i]*(1-mix)+bd[i]*mix);
-                    d[i+1]=Math.round(d[i+1]*(1-mix)+bd[i+1]*mix);
-                    d[i+2]=Math.round(d[i+2]*(1-mix)+bd[i+2]*mix);
+            b.restore();
+
+            // Add the existing Champions artwork back only where it contains bright
+            // foreground graphics/text. This keeps the original content intact while
+            // allowing the new scene to remain visibly different underneath it.
+            const out = b.getImageData(0, 0, w, h);
+            const od = out.data;
+            for (let i=0; i<ad.length; i+=4) {
+                const r=ad[i], gg=ad[i+1], bb=ad[i+2], al=ad[i+3];
+                const brightness=Math.max(r,gg,bb);
+                if (al > 0 && brightness >= 112) {
+                    let alpha = Math.min(255, Math.round(255 * Math.min(1, (brightness-95)/60)));
+                    // Strong foreground graphics remain fully readable.
+                    if (brightness >= 175) alpha = 255;
+                    const srcA=alpha/255;
+                    od[i]   = Math.round(r*srcA + od[i]*(1-srcA));
+                    od[i+1] = Math.round(gg*srcA + od[i+1]*(1-srcA));
+                    od[i+2] = Math.round(bb*srcA + od[i+2]*(1-srcA));
+                    od[i+3] = 255;
                 }
             }
-            a.putImageData(ap,0,0); ctx.clearRect(0,0,w,h); ctx.drawImage(art,0,0);
+            b.putImageData(out,0,0);
+            ctx.clearRect(0,0,w,h);
+            ctx.drawImage(bg,0,0);
         }
 
         function wesmaPosterText(ctx, text, x, y, maxWidth, size, opts = {}) {
@@ -5821,6 +5861,19 @@
                     </div>
                 </div>
             `;
+
+            // ADD-ON ONLY — shrink each End Match team-name row until the complete
+            // name + Special Tag fits on one line without clipping or wrapping.
+            document.querySelectorAll('#finish-match-modal-content .finish-score-name').forEach(el => {
+                let size = el.classList.contains('finish-winner-row') ? 8.3 : 8;
+                el.style.fontSize = `${size}px`;
+                let guard = 0;
+                while (el.scrollWidth > el.clientWidth && size > 5.2 && guard < 20) {
+                    size -= 0.35;
+                    el.style.fontSize = `${size}px`;
+                    guard++;
+                }
+            });
 
             saveHistorySpecialSnapshots(activeSessionId);
             modal.classList.remove("hidden");
