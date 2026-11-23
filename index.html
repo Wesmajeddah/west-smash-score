@@ -812,6 +812,77 @@
         }
         #current-status-modal > div > * { position: relative; z-index: 1; }
 
+        /* ADD-ON ONLY — Current Status: apply the elegant background to the full
+           shareable content area, including the spaces between the information boxes. */
+        #current-status-modal-content {
+            position: relative !important;
+            isolation: isolate !important;
+            background:
+                radial-gradient(circle at 8% 12%, rgba(190,166,214,.24), transparent 30%),
+                radial-gradient(circle at 92% 18%, rgba(215,174,126,.20), transparent 28%),
+                radial-gradient(circle at 78% 82%, rgba(132,157,193,.22), transparent 34%),
+                linear-gradient(135deg, #f8f5f1 0%, #f3f1f6 46%, #f8f4ee 100%) !important;
+            border-radius: 18px !important;
+            overflow: hidden !important;
+        }
+        #current-status-modal-content::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: .085;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000'%3E%3Cg fill='none' stroke='%23715b78' stroke-width='3'%3E%3Cellipse cx='635' cy='220' rx='82' ry='112' transform='rotate(30 635 220)'/%3E%3Cpath d='M585 315L512 492M568 305L496 480M604 320L530 505'/%3E%3Cpath d='M512 492L465 820' stroke-width='8'/%3E%3Cpath d='M120 770Q400 625 680 770'/%3E%3Cpath d='M105 790Q400 650 695 790'/%3E%3Ccircle cx='165' cy='180' r='8'/%3E%3Ccircle cx='210' cy='135' r='5'/%3E%3Ccircle cx='250' cy='205' r='6'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 78% auto;
+            background-position: right 2% bottom 2%;
+            background-repeat: no-repeat;
+        }
+        /* The outer information shell becomes transparent so the new background
+           remains visible in the spaces between all inner boxes. */
+        #current-status-modal-content > div:first-child {
+            background: transparent !important;
+            border-color: rgba(177,157,180,.48) !important;
+            box-shadow: none !important;
+        }
+
+        /* ADD-ON ONLY — Final Score Sheet: every team name stays on exactly one line.
+           The font is reduced where necessary and the existing cell dimensions stay intact. */
+        #finish-match-modal-content .wesma-final-score-table .finish-score-name {
+            flex-direction: row !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            font-size: 8px !important;
+            line-height: 1 !important;
+            letter-spacing: -.01em !important;
+        }
+        #finish-match-modal-content .wesma-final-score-table .finish-score-name > .inline-flex {
+            flex-direction: row !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: auto !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            gap: 3px !important;
+        }
+        #finish-match-modal-content .wesma-final-score-table .finish-score-name .dangerous-badge {
+            flex: 0 1 auto !important;
+            max-width: 42% !important;
+            font-size: 6.5px !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        #finish-match-modal-content .wesma-final-score-table .finish-winner-row .finish-score-name {
+            font-size: 8.5px !important;
+        }
+
     </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -2986,6 +3057,96 @@
             octx.putImageData(pixels, 0, 0);
             ctx.clearRect(0, 0, w, h);
             ctx.drawImage(overlay, 0, 0);
+        }
+
+        /* ADD-ON ONLY — 30 genuinely different badminton-themed vector scenes.
+           These are backgrounds/scenes, not simple color swaps. The original
+           Champions artwork, layout, text and statistics remain untouched. */
+        function applyWesmaChampionBackdrop(ctx, canvas, index) {
+            const scenes = [
+                {court:'#10263a', line:'#d9edf7', glow:'#2f83b5', player:'#0a111b', accent:'#f1c76b', mode:0},
+                {court:'#171d2f', line:'#e8e0f4', glow:'#6e63b8', player:'#090c18', accent:'#e5bd73', mode:1},
+                {court:'#211a24', line:'#f1dbe5', glow:'#9b5570', player:'#120a10', accent:'#f2c878', mode:2},
+                {court:'#172923', line:'#d9f0e8', glow:'#4d907c', player:'#08130f', accent:'#e8c77b', mode:3},
+                {court:'#241e16', line:'#f4e5cc', glow:'#b17a3d', player:'#120c06', accent:'#f0c66f', mode:4},
+                {court:'#14242b', line:'#d7eff4', glow:'#4f9aaa', player:'#081116', accent:'#f4cf83', mode:5},
+                {court:'#221b2c', line:'#eadff4', glow:'#8063a8', player:'#100b17', accent:'#efc777', mode:6},
+                {court:'#1d2024', line:'#e4e9ed', glow:'#70828d', player:'#0b0d0f', accent:'#f1ca76', mode:7},
+                {court:'#2a1b1a', line:'#f4dddd', glow:'#a85b57', player:'#120909', accent:'#f4c977', mode:8},
+                {court:'#13252b', line:'#d9edf0', glow:'#3e8791', player:'#081114', accent:'#f0c36d', mode:9},
+                {court:'#201a2b', line:'#e7ddf4', glow:'#7259a2', player:'#0d0916', accent:'#f3ca78', mode:10},
+                {court:'#252016', line:'#f5ead7', glow:'#a9864d', player:'#120d07', accent:'#efc56f', mode:11},
+                {court:'#17252e', line:'#dcecf4', glow:'#4b7f9c', player:'#091116', accent:'#f1c975', mode:12},
+                {court:'#281a22', line:'#f2dce6', glow:'#9b5a73', player:'#120910', accent:'#f1c873', mode:13},
+                {court:'#152724', line:'#d9eee8', glow:'#4f8f83', player:'#08120f', accent:'#f0c36d', mode:14},
+                {court:'#262018', line:'#f3e8d5', glow:'#b08748', player:'#110c07', accent:'#f4cf82', mode:15},
+                {court:'#152733', line:'#d9eef8', glow:'#4d8fb0', player:'#081218', accent:'#f0c66f', mode:16},
+                {court:'#241b2c', line:'#e8def3', glow:'#7d5ea5', player:'#100a15', accent:'#f3ca77', mode:17},
+                {court:'#172720', line:'#dceee5', glow:'#568f6d', player:'#08120c', accent:'#f0c36e', mode:18},
+                {court:'#291b1d', line:'#f3dce0', glow:'#a75d67', player:'#12090b', accent:'#f3ca76', mode:19},
+                {court:'#18252b', line:'#dcebf0', glow:'#5b8797', player:'#091115', accent:'#f2c970', mode:20},
+                {court:'#271f18', line:'#f3e6d3', glow:'#a77b49', player:'#120c07', accent:'#efc36d', mode:21},
+                {court:'#142932', line:'#d9edf2', glow:'#4a92a8', player:'#081218', accent:'#f2c977', mode:22},
+                {court:'#211c2c', line:'#e9e1f2', glow:'#786aa4', player:'#0d0915', accent:'#f3cb7b', mode:23},
+                {court:'#172922', line:'#dceee6', glow:'#5b9676', player:'#08120d', accent:'#f0c46f', mode:24},
+                {court:'#291a20', line:'#f2dde2', glow:'#a8626e', player:'#12090c', accent:'#f3ca78', mode:25},
+                {court:'#192630', line:'#dcebf3', glow:'#5d89a2', player:'#091116', accent:'#f1c875', mode:26},
+                {court:'#282016', line:'#f4e8d6', glow:'#b07f48', player:'#120c07', accent:'#f1c66e', mode:27},
+                {court:'#14282d', line:'#d9eef0', glow:'#4d9aa0', player:'#081215', accent:'#f2ca77', mode:28},
+                {court:'#221b2c', line:'#e8dff1', glow:'#7e6ca5', player:'#0e0915', accent:'#f0c56e', mode:29}
+            ];
+            const scene = scenes[Math.max(0, Number(index) || 0) % scenes.length];
+            const w = canvas.width, h = canvas.height;
+            const base = document.createElement('canvas');
+            base.width = w; base.height = h;
+            const b = base.getContext('2d');
+            const g = b.createLinearGradient(0,0,w,h);
+            g.addColorStop(0, scene.court); g.addColorStop(.5, scene.glow); g.addColorStop(1, '#05080d');
+            b.fillStyle = g; b.fillRect(0,0,w,h);
+            b.globalAlpha = .16;
+            for (let i=0;i<7;i++) {
+                b.beginPath(); b.arc(w*(.12+i*.14), h*(.16+(i%3)*.22), Math.max(w,h)*(.06+(i%2)*.025), 0, Math.PI*2);
+                b.fillStyle = scene.accent; b.fill();
+            }
+            b.globalAlpha = .38;
+            b.strokeStyle = scene.line; b.lineWidth = Math.max(2,w*.004);
+            b.strokeRect(w*.08,h*.64,w*.84,h*.25);
+            b.beginPath(); b.moveTo(w*.5,h*.64); b.lineTo(w*.5,h*.89); b.stroke();
+            b.globalAlpha = .22; b.lineWidth = Math.max(2,w*.0025);
+            b.beginPath(); b.moveTo(w*.08,h*.77); b.lineTo(w*.92,h*.77); b.stroke();
+            b.globalAlpha = .5;
+            b.strokeStyle = scene.accent; b.lineWidth = Math.max(3,w*.005);
+            b.beginPath(); b.moveTo(w*.18,h*.58); b.lineTo(w*.82,h*.58); b.stroke();
+            // Distinct men's badminton action silhouette / racket / shuttlecock treatment.
+            b.globalAlpha = .82; b.fillStyle = scene.player;
+            const px = w*(.22 + (scene.mode%5)*.13), py = h*.43;
+            b.beginPath(); b.arc(px,py,w*.025,0,Math.PI*2); b.fill();
+            b.beginPath(); b.moveTo(px-w*.018,py+w*.03); b.lineTo(px+w*.012,py+h*.12); b.lineTo(px-w*.01,py+h*.20); b.lineTo(px-w*.055,py+h*.16); b.lineTo(px-w*.018,py+w*.03); b.fill();
+            b.strokeStyle = scene.player; b.lineWidth = Math.max(5,w*.009); b.lineCap='round';
+            b.beginPath(); b.moveTo(px,py+h*.07); b.lineTo(px+w*.07,py+h*.02); b.lineTo(px+w*.12,py-h*.005); b.stroke();
+            b.beginPath(); b.moveTo(px-w*.005,py+h*.19); b.lineTo(px-w*.055,py+h*.27); b.moveTo(px+w*.005,py+h*.19); b.lineTo(px+w*.06,py+h*.27); b.stroke();
+            b.globalAlpha=.7; b.strokeStyle=scene.accent; b.lineWidth=Math.max(3,w*.004);
+            const rx=px+w*.15, ry=py-h*.06;
+            b.beginPath(); b.ellipse(rx,ry,w*.045,h*.055,.15,0,Math.PI*2); b.stroke();
+            b.beginPath(); b.moveTo(rx-w*.02,ry+h*.045); b.lineTo(rx-w*.07,ry+h*.16); b.stroke();
+            b.globalAlpha=.9; b.fillStyle=scene.line;
+            const sx=w*(.62+(scene.mode%4)*.05), sy=h*(.24+(scene.mode%3)*.07);
+            b.beginPath(); b.arc(sx,sy,w*.012,0,Math.PI*2); b.fill();
+            for(let k=0;k<5;k++){ b.beginPath(); b.moveTo(sx-w*.018+k*w*.009,sy+h*.018); b.lineTo(sx-w*.03+k*w*.015,sy+h*.055); b.stroke(); }
+            // Reuse the existing artwork while replacing its dark backdrop with the scene.
+            const art = document.createElement('canvas'); art.width=w; art.height=h;
+            const a=art.getContext('2d',{willReadFrequently:true}); a.drawImage(canvas,0,0);
+            const ap=a.getImageData(0,0,w,h), bp=b.getImageData(0,0,w,h), d=ap.data, bd=bp.data;
+            for(let i=0;i<d.length;i+=4){
+                const bright=Math.max(d[i],d[i+1],d[i+2]);
+                if(bright<125){
+                    const mix=.86-(bright/125)*.18;
+                    d[i]=Math.round(d[i]*(1-mix)+bd[i]*mix);
+                    d[i+1]=Math.round(d[i+1]*(1-mix)+bd[i+1]*mix);
+                    d[i+2]=Math.round(d[i+2]*(1-mix)+bd[i+2]*mix);
+                }
+            }
+            a.putImageData(ap,0,0); ctx.clearRect(0,0,w,h); ctx.drawImage(art,0,0);
         }
 
         function wesmaPosterText(ctx, text, x, y, maxWidth, size, opts = {}) {
