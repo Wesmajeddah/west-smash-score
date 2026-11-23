@@ -2559,84 +2559,123 @@
         }
 
         function getCurrentSessionLastDefeatedEvents() {
-            // Build the list from each winner's defeat records, but validate each
-            // record against BOTH sides of the current-session match logs.
-            // Important: sequence numbers alone are not globally unique across
-            // devices/teams, so they must never be used as a de-duplication key.
+            /*
+             * END-MATCH SAFE LAST-DEFEATED RECOVERY
+             * ----------------------------------
+             * The old implementation required BOTH sides of a match (WIN + LOSS)
+             * to be present before showing the event. That is too strict for a
+             * completed-session snapshot because Firebase/listener merges can leave
+             * one side available while the other side is temporarily absent.
+             *
+             * The completed End Match snapshot is authoritative. We therefore build
+             * events from every reliable source available in that snapshot:
+             *   1) winner.matchHistoryLog WIN rows
+             *   2) loser.matchHistoryLog LOSS rows
+             *   3) winner.defeatedDetails rows
+             * and then pair/dedupe them by matchId, sequence/timestamp, and team IDs.
+             * A missing opposite-side log must NEVER erase an otherwise valid match.
+             */
             const sessionStart = getCurrentSessionStartTimestamp();
-            if (!sessionStart || !Array.isArray(teams)) return [];
-            const currentSessionId = String(sessionStart);
-            const sessionTeams = isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)
+            const sessionTeams = (lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
                 ? lastEndedChampionSnapshot.teams
-                : teams;
+                : (Array.isArray(teams) ? teams : []);
+            if (!sessionStart || !sessionTeams.length) return [];
+
+            const currentSessionId = String(sessionStart);
             const events = [];
+            const teamById = new Map(sessionTeams.map(team => [String(team.id), team]));
+            const teamByName = new Map(sessionTeams.map(team => [String(team.name || '').trim(), team]));
 
-            sessionTeams.forEach(winner => {
-                if (!winner || !Array.isArray(winner.defeatedDetails)) return;
-                const winnerLogs = getCurrentSessionMatchHistory(winner);
+            const inSession = record => {
+                if (!record) return false;
+                const sid = normalizeHistoryTimestamp(record.sessionId);
+                const stamp = normalizeHistoryTimestamp(record.timestamp);
+                if (sid) return sid === sessionStart;
+                // Ended snapshot rows belong to this exact snapshot even when an
+                // older build omitted sessionId/timestamp on individual rows.
+                if (lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)) return true;
+                return !!stamp && stamp >= sessionStart;
+            };
 
-                winner.defeatedDetails.forEach(defeat => {
-                    if (!defeat || !defeat.name) return;
-                    const defeatSessionId = String(defeat.sessionId || '');
-                    const timestamp = normalizeHistoryTimestamp(defeat.timestamp);
-                    if (defeatSessionId) {
-                        if (defeatSessionId !== currentSessionId) return;
-                    } else if (!timestamp || timestamp < sessionStart) {
-                        return;
-                    }
-                    if (!timestamp) return;
+            const resolveOpponent = (sourceTeam, record) => {
+                if (!record) return null;
+                if (record.opponentId != null) {
+                    const byId = teamById.get(String(record.opponentId));
+                    if (byId && String(byId.id) !== String(sourceTeam.id)) return byId;
+                }
+                const name = String(record.opponent || '').trim();
+                if (name) {
+                    const byName = teamByName.get(name);
+                    if (byName && String(byName.id) !== String(sourceTeam.id)) return byName;
+                    return { id: record.opponentId, name };
+                }
+                return null;
+            };
 
-                    const seq = Number(defeat.seq) || 0;
-                    const matchId = String(defeat.matchId || '');
-                    const loser = sessionTeams.find(team => team && (
-                        (defeat.teamId != null && String(team.id) === String(defeat.teamId)) ||
-                        (defeat.teamId == null && team.name === defeat.name) ||
-                        (defeat.teamId == null && winnerLogs.some(log => log && String(log.result || '').toUpperCase() === 'WIN' &&
-                            (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) &&
-                            log.opponentId != null && String(log.opponentId) === String(team.id)))
-                    ));
-                    if (!loser || String(loser.id) === String(winner.id)) return;
+            const addEvent = (winner, loser, record) => {
+                if (!winner || !loser || String(winner.id) === String(loser.id) || !record) return;
+                const timestamp = normalizeHistoryTimestamp(record.timestamp) || sessionStart;
+                events.push({
+                    winner: String(winner.name || '').trim(),
+                    loser: String(loser.name || '').trim(),
+                    winnerId: winner.id,
+                    loserId: loser.id,
+                    matchId: String(record.matchId || '').trim(),
+                    seq: Number(record.seq) || 0,
+                    timestamp,
+                    durationMinutes: Math.max(0, Number(record.durationMinutes) || 0)
+                });
+            };
 
-                    const matchesOpponent = (log, opponent) => {
-                        if (!log || !opponent) return false;
-                        const idMatches = log.opponentId != null && String(log.opponentId) === String(opponent.id);
-                        const nameMatches = String(log.opponent || '') === String(opponent.name || '');
-                        return idMatches || nameMatches;
-                    };
-                    const hasWin = winnerLogs.some(log =>
-                        String(log.result || '').toUpperCase() === 'WIN' &&
-                        (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) && matchesOpponent(log, loser)
-                    );
-                    const hasLoss = getCurrentSessionMatchHistory(loser).some(log =>
-                        String(log.result || '').toUpperCase() === 'LOSS' &&
-                        (matchId ? String(log.matchId || '') === matchId : ((!seq || Number(log.seq) === seq) && normalizeHistoryTimestamp(log.timestamp) === timestamp)) && matchesOpponent(log, winner)
-                    );
-                    if (!hasWin || !hasLoss) return;
+            sessionTeams.forEach(team => {
+                if (!team) return;
 
-                    events.push({
-                        winner: winner.name,
-                        loser: loser.name,
-                        winnerId: winner.id,
-                        loserId: loser.id,
-                        matchId,
-                        seq,
-                        timestamp,
-                        durationMinutes: Number(defeat.durationMinutes) || 0
-                    });
+                // A WIN record directly identifies the winner and its opponent.
+                const logs = Array.isArray(team.matchHistoryLog) ? team.matchHistoryLog : [];
+                logs.filter(log => inSession(log)).forEach(log => {
+                    const result = String(log.result || '').toUpperCase();
+                    if (result !== 'WIN' && result !== 'LOSS') return;
+                    const opponent = resolveOpponent(team, log);
+                    if (!opponent || !String(opponent.name || '').trim()) return;
+                    if (result === 'WIN') addEvent(team, opponent, log);
+                    else addEvent(opponent, team, log);
+                });
+
+                // defeatedDetails is an additional durable source for WIN rows.
+                // This is especially important for older snapshots where the
+                // matchHistoryLog was not persisted completely.
+                const details = Array.isArray(team.defeatedDetails) ? team.defeatedDetails : [];
+                details.filter(detail => inSession(detail)).forEach(detail => {
+                    const opponent = resolveOpponent(team, detail) ||
+                        (String(detail.name || '').trim() ? { id: detail.teamId, name: String(detail.name).trim() } : null);
+                    if (!opponent || !String(opponent.name || '').trim()) return;
+                    addEvent(team, opponent, detail);
                 });
             });
 
-            events.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
-            // Distinct matches remain distinct even if different devices produced
-            // the same sequence number. Only duplicate copies of the SAME pairing
-            // and sequence are collapsed.
+            // If a row contains only an opponent name and the corresponding team
+            // exists in the snapshot, normalize its ID/name for stable dedupe.
+            const normalized = events.map(event => {
+                const winner = teamById.get(String(event.winnerId)) || teamByName.get(event.winner);
+                const loser = teamById.get(String(event.loserId)) || teamByName.get(event.loser);
+                return {
+                    ...event,
+                    winner: winner ? String(winner.name || event.winner).trim() : event.winner,
+                    loser: loser ? String(loser.name || event.loser).trim() : event.loser,
+                    winnerId: winner ? winner.id : event.winnerId,
+                    loserId: loser ? loser.id : event.loserId
+                };
+            }).filter(event => event.winner && event.loser);
+
+            normalized.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
+
+            // Collapse duplicate copies of the same logical match, but do NOT use
+            // sequence alone because different phones can reuse a sequence value.
             const seen = new Set();
-            return events.filter(event => {
+            return normalized.filter(event => {
                 const key = event.matchId
-                    ? `match-id:${event.matchId}`
-                    : (event.seq > 0
-                        ? `match:${event.seq}:${event.winnerId}:${event.loserId}`
-                        : `legacy:${event.timestamp}:${event.winnerId}:${event.loserId}`);
+                    ? `id:${event.matchId}`
+                    : `pair:${event.winnerId}:${event.loserId}:${event.seq || 0}:${event.timestamp || 0}`;
                 if (seen.has(key)) return false;
                 seen.add(key);
                 return true;
