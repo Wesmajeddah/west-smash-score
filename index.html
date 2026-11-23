@@ -709,89 +709,96 @@
             color: #9a6511 !important;
         }
 
-        /* USER REQUESTED ADD-ON — End Match Champions compact/fixed presentation. */
-        #finish-match-modal-content .finish-champions-box {
-            width:100% !important;
-            max-width:100% !important;
-            min-width:0 !important;
-            box-sizing:border-box !important;
-            padding:8px 10px !important;
-            border:2px solid #8c6239 !important;
-            box-shadow:0 0 0 2px #fff, inset 0 0 0 1px rgba(183,121,22,.55), 0 5px 16px rgba(92,64,51,.14) !important;
-        }
-        #finish-match-modal-content .finish-champions-box .finish-name-wrapper {
-            min-width:0 !important; max-width:100% !important; width:100% !important;
-            overflow:hidden !important; overflow-wrap:anywhere !important; word-break:break-word !important;
-            white-space:normal !important;
-        }
 
-        /* USER REQUESTED ADD-ON — Final Score Sheet fixed/equal columns and safe wrapping. */
-        #finish-match-modal-content table {
-            width:100% !important;
-            table-layout:fixed !important;
+        /* Final Score Sheet — compact single-sheet presentation.
+           Existing data/logic/layout are preserved; only visual sizing is reduced. */
+        #finish-match-modal #screenshot-target-card {
+            max-height: 84vh !important;
         }
-        #finish-match-modal-content table th:nth-child(1),
-        #finish-match-modal-content table td:nth-child(1) { width:46% !important; }
-        #finish-match-modal-content table th:nth-child(2),
-        #finish-match-modal-content table td:nth-child(2),
-        #finish-match-modal-content table th:nth-child(3),
-        #finish-match-modal-content table td:nth-child(3),
-        #finish-match-modal-content table th:nth-child(4),
-        #finish-match-modal-content table td:nth-child(4) { width:18% !important; }
+        #finish-match-modal #finish-match-modal-content {
+            padding: .45rem !important;
+            gap: .35rem !important;
+            overflow: hidden !important;
+            font-size: 10px !important;
+        }
+        #finish-match-modal-content table {
+            width: 100% !important;
+            table-layout: fixed !important;
+            font-size: 9px !important;
+        }
         #finish-match-modal-content table th,
         #finish-match-modal-content table td {
-            min-width:0 !important; max-width:100% !important;
-            box-sizing:border-box !important; overflow:hidden !important;
-            vertical-align:middle !important;
+            padding: 3px 2px !important;
+            line-height: 1.05 !important;
+            vertical-align: middle !important;
+        }
+        #finish-match-modal-content table th:first-child,
+        #finish-match-modal-content table td:first-child {
+            width: 46% !important;
+            text-align: left !important;
+        }
+        #finish-match-modal-content table th:not(:first-child),
+        #finish-match-modal-content table td:not(:first-child) {
+            width: 13.5% !important;
+            text-align: center !important;
         }
         #finish-match-modal-content table td:first-child {
-            white-space:normal !important; overflow-wrap:anywhere !important; word-break:break-word !important;
-            text-overflow:clip !important;
+            font-size: 9px !important;
+            font-weight: 800 !important;
         }
-        #finish-match-modal-content table td:first-child .finish-name-wrapper,
-        #finish-match-modal-content table td:first-child .name-wrapper {
-            width:100% !important; min-width:0 !important; max-width:100% !important;
-            overflow:hidden !important; overflow-wrap:anywhere !important; word-break:break-word !important;
-            white-space:normal !important;
+        #finish-match-modal-content table td:first-child .finish-name-wrapper {
+            font-size: 9px !important;
+            line-height: 1.05 !important;
+            max-height: 2.15em !important;
+            overflow: hidden !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
         }
         #finish-match-modal-content table td:first-child .dangerous-badge {
-            display:inline-block !important; max-width:100% !important;
-            white-space:normal !important; overflow-wrap:anywhere !important; word-break:break-word !important;
-            overflow:hidden !important; text-overflow:clip !important;
+            font-size: 5px !important;
+            height: 10px !important;
+            padding: 0 2px !important;
+            margin: 1px 0 !important;
+            line-height: 1 !important;
+            max-width: 100% !important;
         }
         #finish-match-modal-content table td:not(:first-child) {
-            white-space:nowrap !important; text-align:center !important;
+            font-size: 8px !important;
+            font-weight: 800 !important;
+            white-space: nowrap !important;
         }
-        #finish-match-modal-content table td:first-child { font-weight:800 !important; }
+        #finish-match-modal-content table td:not(:first-child) i {
+            font-size: 7px !important;
+        }
+        #finish-match-modal-content table tbody tr {
+            height: 25px !important;
+        }
+        #finish-match-modal-content > div {
+            margin-bottom: 0 !important;
+        }
+        @media (max-width: 420px) {
+            #finish-match-modal #screenshot-target-card {
+                max-height: 88vh !important;
+            }
+            #finish-match-modal-content {
+                padding: .35rem !important;
+            }
+            #finish-match-modal-content table {
+                font-size: 8px !important;
+            }
+            #finish-match-modal-content table th,
+            #finish-match-modal-content table td {
+                padding: 2px 1.5px !important;
+            }
+            #finish-match-modal-content table td:first-child,
+            #finish-match-modal-content table td:first-child .finish-name-wrapper {
+                font-size: 8px !important;
+            }
+            #finish-match-modal-content table td:not(:first-child) {
+                font-size: 7px !important;
+            }
+        }
 
-        /* USER REQUESTED ADD-ON — Status Share: light, subtle colorful backdrop with the preserved image. */
-        #current-status-modal {
-            background:rgba(246,249,252,.74) !important;
-            backdrop-filter:blur(10px) !important;
-            -webkit-backdrop-filter:blur(10px) !important;
-        }
-        #current-status-modal > div {
-            background:linear-gradient(135deg,rgba(255,255,255,.96) 0%,rgba(246,251,250,.95) 48%,rgba(255,248,238,.95) 100%) !important;
-            border-color:#c9ddd8 !important;
-        }
-        #current-status-modal-content {
-            position:relative !important;
-            isolation:isolate !important;
-            background-image:linear-gradient(135deg,rgba(255,255,255,.91),rgba(242,249,247,.88),rgba(255,247,235,.90)),var(--wesma-status-bg-image) !important;
-            background-size:cover !important;
-            background-position:center !important;
-            background-repeat:no-repeat !important;
-        }
-        #current-status-modal-content::before {
-            content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
-            background:radial-gradient(circle at 12% 12%,rgba(112,190,180,.12),transparent 34%),radial-gradient(circle at 88% 18%,rgba(224,177,92,.11),transparent 32%),radial-gradient(circle at 50% 90%,rgba(123,164,206,.09),transparent 38%);
-        }
-        #current-status-modal-content > * { position:relative; z-index:1; }
-        #current-status-modal-content .wesma-share-name {
-            min-width:0 !important; max-width:100% !important;
-            overflow:hidden !important; overflow-wrap:anywhere !important; word-break:break-word !important;
-            white-space:normal !important; text-overflow:clip !important;
-        }
     </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -5024,11 +5031,6 @@
             const dateHeader = document.getElementById("current-status-date");
             if (!modal || !container) return;
 
-            const preservedStatusBg = document.getElementById("champion-status-original-background-preserved");
-            if (preservedStatusBg && preservedStatusBg.src) {
-                container.style.setProperty("--wesma-status-bg-image", `url("${preservedStatusBg.src}")`);
-            }
-
             if (dateHeader) {
                 dateHeader.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             }
@@ -5492,9 +5494,9 @@
                 teamsTableHtml += `
                     <tr class="border-b border-[#e6decb] text-center text-slate-800 ${rowBg}">
                         <td class="py-1 px-1 text-left font-semibold ${rowTextColor} finish-name-wrapper">${t.rank}. ${renderTeamNameWithTagline(t)} ${isWinnerRow ? '<i class="fa-solid fa-crown text-[9px] text-amber-600"></i>' : (isSecondRow ? '<i class="fa-solid fa-medal text-[9px] text-[#8c6239]"></i>' : (isThirdRow ? '<i class="fa-solid fa-award text-[9px] text-[#5c4033]"></i>' : ''))}</td>
-                        <td class="py-1 px-1">${played} <span aria-label="Play">🏸</span></td>
-                        <td class="py-1 px-1 font-bold text-emerald-600">${t.wins} <span aria-label="Win">🏆</span></td>
-                        <td class="py-1 px-1 font-bold text-rose-600">${t.losses || 0} <span aria-label="Loss">❌</span></td>
+                        <td class="py-1 px-1">${played}</td>
+                        <td class="py-1 px-1 font-bold text-emerald-600">${t.wins} <i class="fa-solid fa-trophy text-[9px]"></i></td>
+                        <td class="py-1 px-1 font-bold text-rose-600">${t.losses || 0} <i class="fa-solid fa-shield text-[9px]"></i></td>
                     </tr>
                 `;
             });
@@ -5514,7 +5516,7 @@
                 </div>
 
                 <!-- Prominent Champions Box -->
-                <div class="finish-champions-box bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
+                <div class="bg-gradient-to-r from-[#8c6239]/10 via-[#8c6239]/20 to-[#8c6239]/10 border-2 border-[#8c6239] rounded-2xl p-3 sm:p-4 shadow-md text-center space-y-1.5 relative overflow-hidden">
                     <div class="text-[10px] sm:text-[11px] text-[#5c4033] uppercase tracking-widest font-extrabold flex items-center justify-center gap-1">
                         <i class="fa-solid fa-crown text-amber-600 text-sm"></i> WESMA CHAMPIONS <i class="fa-solid fa-crown text-amber-600 text-sm"></i>
                     </div>
