@@ -16,6 +16,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <!-- GIF encoder for animated End Match sharing -->
+    <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js"></script>
     <!-- html2canvas for Auto Screenshot -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -1535,6 +1537,12 @@
         <div class="w-full max-w-md grid grid-cols-2 gap-2 shrink-0">
             <button type="button" onclick="openChampionsFromFinish()" class="rounded-xl border border-[#d4af37] bg-[#fff7dc] text-[#5c4033] font-black text-[10px] py-3 shadow">🏆 CHAMPIONS</button>
             <button type="button" onclick="openCombinedFromFinish()" class="rounded-xl border border-[#8c6239] bg-[#8c6239] text-white font-black text-[10px] py-3 shadow">📊 COMBINED REPORT</button>
+        </div>
+        <div class="w-full max-w-md shrink-0 space-y-1">
+            <button id="finish-match-gif-share-button" type="button" onclick="shareFinishMatchGif()" class="w-full rounded-xl border border-emerald-700 bg-gradient-to-r from-emerald-700 to-teal-700 text-white font-black text-[11px] py-3 shadow-lg flex items-center justify-center gap-2">
+                <i class="fa-solid fa-film"></i> 🎞️ SHARE LIVE MATCH GIF
+            </button>
+            <div id="finish-match-gif-share-status" class="text-center text-[9px] text-white/90" aria-live="polite">ലൈവ് സ്മാഷ് ആനിമേഷൻ GIF ആയി WhatsApp-ൽ പങ്കിടാം.</div>
         </div>
     </div>
 
@@ -7827,6 +7835,134 @@
         function escapeHtml(str) {
             return (str || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
+
+        // Create an animated GIF of the complete End Match card.
+        // This is an export-only feature: it does not touch scores, teams, history or Firebase.
+        let finishMatchGifBusy = false;
+        async function shareFinishMatchGif() {
+            const button = document.getElementById("finish-match-gif-share-button");
+            const status = document.getElementById("finish-match-gif-share-status");
+            const target = document.getElementById("screenshot-target-card");
+            if (finishMatchGifBusy) return;
+            if (!target || !document.getElementById("finish-match-modal") ||
+                document.getElementById("finish-match-modal").classList.contains("hidden")) {
+                if (status) status.textContent = "ആദ്യം End Match സ്ക്രീൻ തുറക്കുക.";
+                return;
+            }
+            if (typeof html2canvas === "undefined" || !window.gifshot || typeof window.gifshot.createGIF !== "function") {
+                if (status) status.textContent = "GIF സൗകര്യം ലോഡ് ആയിട്ടില്ല. ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.";
+                return;
+            }
+
+            finishMatchGifBusy = true;
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GIF തയ്യാറാക്കുന്നു...';
+                button.classList.add("opacity-70");
+            }
+
+            try {
+                const frames = [];
+                const frameCount = 8;
+                const originalScrollTop = target.scrollTop;
+                if (status) status.textContent = "ലൈവ് ബാഡ്മിന്റൺ ആനിമേഷൻ റെക്കോർഡ് ചെയ്യുന്നു...";
+
+                // Capture successive animation states from the existing End Match display.
+                for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+                    const frameCanvas = await html2canvas(target, {
+                        backgroundColor: "#ffffff",
+                        scale: 0.8,
+                        useCORS: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        width: target.scrollWidth,
+                        height: target.scrollHeight,
+                        windowWidth: target.scrollWidth,
+                        windowHeight: target.scrollHeight,
+                        onclone: clonedDocument => {
+                            const clonedCard = clonedDocument.getElementById("screenshot-target-card");
+                            const clonedContent = clonedDocument.getElementById("finish-match-modal-content");
+                            if (clonedCard) {
+                                clonedCard.style.maxHeight = "none";
+                                clonedCard.style.height = "auto";
+                                clonedCard.style.overflow = "visible";
+                            }
+                            if (clonedContent) {
+                                clonedContent.style.maxHeight = "none";
+                                clonedContent.style.height = "auto";
+                                clonedContent.style.overflow = "visible";
+                            }
+                        }
+                    });
+                    frames.push(frameCanvas.toDataURL("image/png"));
+                    await new Promise(resolve => setTimeout(resolve, 160));
+                }
+                target.scrollTop = originalScrollTop;
+
+                if (status) status.textContent = "GIF ഫയൽ തയ്യാറാക്കുന്നു...";
+                const firstFrame = await new Promise(resolve => {
+                    const image = new Image();
+                    image.onload = () => resolve(image);
+                    image.onerror = () => resolve(null);
+                    image.src = frames[0];
+                });
+                if (!firstFrame) throw new Error("GIF frame could not be read");
+
+                const gifResult = await new Promise((resolve, reject) => {
+                    window.gifshot.createGIF({
+                        images: frames,
+                        gifWidth: firstFrame.naturalWidth,
+                        gifHeight: firstFrame.naturalHeight,
+                        interval: 0.16,
+                        sampleInterval: 10,
+                        numWorkers: 2
+                    }, result => {
+                        if (!result || result.error || !result.image) {
+                            reject(new Error(result && result.errorMsg ? result.errorMsg : "GIF encoding failed"));
+                        } else resolve(result);
+                    });
+                });
+
+                const response = await fetch(gifResult.image);
+                const blob = await response.blob();
+                if (!blob || !blob.size) throw new Error("Empty GIF file");
+                const file = new File([blob], `WESMA-End-Match-${Date.now()}.gif`, { type: "image/gif" });
+
+                if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+                    await navigator.share({
+                        files: [file],
+                        title: "WESMA BADMINTON CLUB - End Match",
+                        text: "WESMA BADMINTON CLUB • Animated Match Result"
+                    });
+                    if (status) status.textContent = "GIF Share മെനു തുറന്നു. WhatsApp തിരഞ്ഞെടുക്കാം.";
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = file.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 30000);
+                    if (status) status.textContent = "GIF ഡൗൺലോഡ് ചെയ്തു. Gallery / Downloads-ൽ നിന്ന് WhatsApp-ൽ പങ്കിടാം.";
+                }
+            } catch (error) {
+                if (error && error.name === "AbortError") {
+                    if (status) status.textContent = "Share റദ്ദാക്കി.";
+                } else {
+                    console.error("End Match GIF share failed:", error);
+                    if (status) status.textContent = "GIF തയ്യാറാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.";
+                }
+            } finally {
+                finishMatchGifBusy = false;
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa-solid fa-film"></i> 🎞️ SHARE LIVE MATCH GIF';
+                    button.classList.remove("opacity-70");
+                }
+            }
+        }
+
     </script>
 </body>
 </html>
