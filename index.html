@@ -6343,12 +6343,16 @@
                 <!-- Cinematic film export: one user soundtrack, trim the desired portion. -->
                 <section id="wesma-film-studio" class="my-3 rounded-xl border border-amber-300/70 bg-slate-950 p-2 text-white shadow-lg">
                     <div class="text-center text-[11px] font-black tracking-[.18em] text-amber-200">WESMA • CINEMATIC AWARD FILM</div>
-                    <div class="text-center text-[9px] text-slate-300 mb-2">Champion-only cinematic reveal • Slow-motion name assembly • Stadium lights & celebrating crowd</div>
+                    <div class="text-center text-[9px] text-slate-300 mb-2">Champion-name reveal in extended slow motion • Three shorter podium reveals</div>
                     <canvas id="wesma-film-canvas" width="1280" height="720" class="block w-full rounded-lg border border-amber-200/40" style="aspect-ratio:16/9;background:#07131d"></canvas>
                     <div class="grid grid-cols-2 gap-2 mt-2">
                         <label class="col-span-2 text-[9px] font-bold text-slate-200">Add your own music file (no built-in music)
                             <input id="wesma-film-audio" type="file" accept="audio/*" class="block w-full mt-1 rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
+                        <label class="col-span-2 text-[9px] font-bold text-amber-100">Real human dance footage (MP4 / WebM) — upload a real stadium crowd/dance clip
+                            <input id="wesma-film-dancers" type="file" accept="video/mp4,video/webm,video/*" class="block w-full mt-1 rounded bg-white p-1.5 text-[10px] text-slate-900">
+                        </label>
+                        <video id="wesma-film-dance-source" muted playsinline loop preload="metadata" class="hidden"></video>
                         <label class="text-[9px] font-bold text-slate-200">Music start (seconds)
                             <input id="wesma-film-start" type="number" min="0" step="0.1" value="0" class="w-full rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
@@ -6361,7 +6365,7 @@
                         <button id="wesma-film-create" type="button" class="rounded-lg bg-amber-300 px-3 py-2 text-[10px] font-black text-slate-950">● CREATE VIDEO</button>
                         <button id="wesma-film-stop" type="button" class="rounded-lg bg-rose-700 px-3 py-2 text-[10px] font-black text-white">STOP</button>
                     </div>
-                    <div id="wesma-film-status" class="mt-2 min-h-[14px] text-[9px] text-slate-300" aria-live="polite">Upload your music, choose the required portion, then preview or create your film.</div>
+                    <div id="wesma-film-status" class="mt-2 min-h-[14px] text-[9px] text-slate-300" aria-live="polite">Upload your music and a real human-dance video (MP4/WebM), choose the music portion, then preview or create your champion film.</div>
                 </section>
 
                 <!-- Full Summary Table -->
@@ -6388,9 +6392,7 @@
             // Film-only snapshot. The source scoring/history objects are read-only here.
             window.wesmaFilmRankings = {
                 first: firstPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)})),
-                second: secondPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)})),
-                third: thirdPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)})),
-                last: loserTeamsList.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)}))
+                second: [], third: [], last: []
             };
             initWesmaFilmStudio();
 
@@ -6429,6 +6431,8 @@
         let wesmaFilmAudioBuffer = null, wesmaFilmAudioContext = null, wesmaFilmRecorder = null;
         let wesmaFilmFrame = 0, wesmaFilmSource = null, wesmaFilmStopFlag = false, wesmaFilmChunks = [];
         let wesmaFilmBg = null;
+        let wesmaFilmDanceVideo = null;
+        let wesmaFilmDanceObjectUrl = null;
 
         function initWesmaFilmStudio() {
             const canvas=document.getElementById('wesma-film-canvas'); if(!canvas) return;
@@ -6439,6 +6443,22 @@
             const ctx=canvas.getContext('2d');
             wesmaFilmDraw(ctx,0,0);
             if(file.dataset.bound==='1') return; file.dataset.bound='1';
+            const danceFile=document.getElementById('wesma-film-dancers');
+            wesmaFilmDanceVideo=document.getElementById('wesma-film-dance-source');
+            if(danceFile && danceFile.dataset.bound!=='1'){
+                danceFile.dataset.bound='1';
+                danceFile.addEventListener('change',()=>{
+                    const chosen=danceFile.files&&danceFile.files[0];
+                    if(wesmaFilmDanceObjectUrl){URL.revokeObjectURL(wesmaFilmDanceObjectUrl);wesmaFilmDanceObjectUrl=null;}
+                    if(!chosen){if(wesmaFilmDanceVideo){wesmaFilmDanceVideo.removeAttribute('src');wesmaFilmDanceVideo.load();}status.textContent='No real dancer footage selected. Upload an MP4/WebM clip to show actual human dancers in the stadium.';return;}
+                    if(!chosen.type.startsWith('video/')){status.textContent='Please choose a valid video file.';danceFile.value='';return;}
+                    wesmaFilmDanceObjectUrl=URL.createObjectURL(chosen);
+                    wesmaFilmDanceVideo.src=wesmaFilmDanceObjectUrl;
+                    wesmaFilmDanceVideo.load();
+                    wesmaFilmDanceVideo.onloadedmetadata=()=>{status.textContent='Real dance footage loaded: '+chosen.name+' • '+wesmaFilmDanceVideo.videoWidth+'×'+wesmaFilmDanceVideo.videoHeight+'. The video will appear behind the champion reveal.';};
+                    wesmaFilmDanceVideo.onerror=()=>{status.textContent='Could not read this video. Please use MP4 (H.264) or WebM.';};
+                });
+            }
             file.addEventListener('change',async()=>{
                 const selected=file.files&&file.files[0]; wesmaFilmAudioBuffer=null;
                 if(!selected){status.textContent='No music selected. The film will remain silent until you add your own track.';return;}
@@ -6454,117 +6474,62 @@
             if(!wesmaFilmAudioBuffer)throw new Error('Please add your own music file first.');
             const a=Math.max(0,Number(document.getElementById('wesma-film-start').value)||0),b=Math.min(wesmaFilmAudioBuffer.duration,Number(document.getElementById('wesma-film-end').value)||0);
             if(b<=a+.2)throw new Error('Music end time must be later than its start time.');
-            if(b-a<10)throw new Error('For the full slow-motion champion reveal, select at least 10 seconds of music.');
+            if(b-a<10)throw new Error('Select at least 10 seconds of music for the slow-motion champion reveal.');
             return {start:a,duration:b-a};
         }
 
         function wesmaFilmDraw(ctx,scene,local){
             const W=1280,H=720,sets=window.wesmaFilmRankings||{first:[]};
-            const names=(sets.first||[]).map(t=>String(t.name||'')).filter(Boolean).slice(0,4);
             ctx.clearRect(0,0,W,H);
-            if(wesmaFilmBg&&wesmaFilmBg.complete&&wesmaFilmBg.naturalWidth){
-                ctx.drawImage(wesmaFilmBg,0,0,W,H);
-            }else{
-                const g=ctx.createLinearGradient(0,0,W,H);
-                g.addColorStop(0,'#102b3c');g.addColorStop(1,'#201c20');
-                ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+            // Real uploaded footage is the actual human crowd/dance layer. The still stadium image remains the fallback.
+            let drewVideo=false;
+            if(wesmaFilmDanceVideo&&wesmaFilmDanceVideo.readyState>=2&&wesmaFilmDanceVideo.videoWidth){
+                const vw=wesmaFilmDanceVideo.videoWidth,vh=wesmaFilmDanceVideo.videoHeight,scale=Math.max(W/vw,H/vh),dw=vw*scale,dh=vh*scale;
+                ctx.drawImage(wesmaFilmDanceVideo,(W-dw)/2,(H-dh)/2,dw,dh);drewVideo=true;
+            }else if(wesmaFilmBg&&wesmaFilmBg.complete&&wesmaFilmBg.naturalWidth){ctx.drawImage(wesmaFilmBg,0,0,W,H);}
+            else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#102b3c');g.addColorStop(1,'#201c20');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+            const lights=Math.max(0,Math.min(1,(local-2.4)/2.2));
+            // Before the reveal, keep the stadium and people muted; lights rise with the music.
+            ctx.fillStyle='rgba(2,10,17,'+(drewVideo?(0.64-lights*.28):.58)+')';ctx.fillRect(0,0,W,H);
+            // Stadium lamps switch on progressively and cast moving beams.
+            for(let i=0;i<9;i++){
+                const x=70+i*142, pulse=Math.max(0,Math.min(1,(local-2.25-i*.075)/1.35));
+                ctx.save();ctx.globalAlpha=.08+pulse*.82;
+                const beam=ctx.createLinearGradient(x,35,x+(i-4)*35,600);beam.addColorStop(0,'rgba(255,239,184,.72)');beam.addColorStop(1,'rgba(255,239,184,0)');
+                ctx.fillStyle=beam;ctx.beginPath();ctx.moveTo(x-9,45);ctx.lineTo(x+9,45);ctx.lineTo(x+(i-4)*72+95,640);ctx.lineTo(x+(i-4)*72-95,640);ctx.closePath();ctx.fill();
+                ctx.fillStyle='rgba(255,248,218,'+(.18+pulse*.82)+')';ctx.shadowColor='#fff1b5';ctx.shadowBlur=10+pulse*22;ctx.beginPath();ctx.arc(x,42,5+pulse*4,0,Math.PI*2);ctx.fill();ctx.restore();
             }
-
-            // Preserve the existing court image/theme while creating a cinematic arena.
-            ctx.fillStyle='rgba(2,10,17,.50)';ctx.fillRect(0,0,W,H);
-            const pulse=.72+.28*Math.sin(local*1.15);
-            const beams=[[110,30,390,520],[1170,25,890,520]];
-            beams.forEach((b,i)=>{
-                ctx.save();ctx.globalAlpha=(.10+.10*pulse)*(i?1:.9);
-                const beam=ctx.createLinearGradient(b[0],b[1],b[2],b[3]);
-                beam.addColorStop(0,'rgba(255,245,205,.58)');
-                beam.addColorStop(1,'rgba(255,245,205,0)');
-                ctx.fillStyle=beam;ctx.beginPath();ctx.moveTo(b[0]-65,b[1]);ctx.lineTo(b[0]+65,b[1]);ctx.lineTo(b[2]+145,b[3]);ctx.lineTo(b[2]-145,b[3]);ctx.closePath();ctx.fill();ctx.restore();
-            });
-
-            // Animated crowd silhouettes dancing/celebrating along the arena boundary.
-            for(let i=0;i<34;i++){
-                const x=18+i*38, base=625+(i%3)*7, sway=Math.sin(local*2.4+i*.83)*7;
-                const lift=Math.max(0,Math.sin(local*3.0+i*1.17))*12;
-                ctx.save();ctx.globalAlpha=.50+(i%4)*.07;ctx.fillStyle=i%5===0?'#17202a':'#080d13';
-                ctx.beginPath();ctx.arc(x+sway,base-32-lift,8+(i%3),0,Math.PI*2);ctx.fill();
-                ctx.fillRect(x-8+sway,base-23-lift,17,48);
-                ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=6;ctx.lineCap='round';
-                const arm=Math.sin(local*3.1+i)*.9;
-                ctx.beginPath();ctx.moveTo(x+sway,base-16-lift);ctx.lineTo(x-18+Math.sin(arm)*12,base-42-lift);ctx.moveTo(x+sway,base-16-lift);ctx.lineTo(x+18+Math.cos(arm)*12,base-42-lift);ctx.stroke();
-                ctx.restore();
-            }
-
-            // Low-glare arena floor and subtle floating particles.
-            const floor=ctx.createLinearGradient(0,570,0,H);
-            floor.addColorStop(0,'rgba(4,15,23,0)');floor.addColorStop(1,'rgba(2,7,12,.82)');
-            ctx.fillStyle=floor;ctx.fillRect(0,560,W,160);
-            for(let i=0;i<38;i++){
-                const x=(i*137+local*18)%W,y=(i*83+Math.sin(local+i)*26)%570;
-                ctx.globalAlpha=.10+.12*Math.sin(local*1.4+i);
-                ctx.fillStyle='#f2d18b';ctx.beginPath();ctx.arc(x,y,1.2+(i%3),0,Math.PI*2);ctx.fill();
-            }
-            ctx.globalAlpha=1;
-
-            // Letters arrive in controlled slow motion, rotate into place, then lock together.
-            const reveal=Math.max(0,Math.min(1,(local-1.0)/5.4));
-            const title='CHAMPIONS';
-            ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-            let titleSize=104;
-            ctx.font='900 '+titleSize+'px Impact,Arial Black,sans-serif';
-            if(ctx.measureText(title).width>1100){titleSize*=1100/ctx.measureText(title).width;ctx.font='900 '+titleSize+'px Impact,Arial Black,sans-serif';}
-            const titleWidth=ctx.measureText(title).width;
-            let cursor=(W-titleWidth)/2;
-            Array.from(title).forEach((ch,i)=>{
-                const cw=ctx.measureText(ch).width;
-                const p=Math.max(0,Math.min(1,(local-.8-i*.12)/4.9));
-                const ease=1-Math.pow(1-p,3);
-                const tx=cursor+cw/2,ty=245;
-                const sx=(i%2?W+180:-180)+(i%4-1.5)*35,sy=70+(i%5)*80;
-                ctx.save();ctx.translate(sx+(tx-sx)*ease,sy+(ty-sy)*ease);
-                ctx.rotate((1-ease)*(i%2?2.4:-2.4));
-                ctx.globalAlpha=.12+.88*ease;
-                ctx.font='900 '+titleSize+'px Impact,Arial Black,sans-serif';
-                ctx.lineWidth=2;ctx.strokeStyle='rgba(35,26,12,.8)';ctx.strokeText(ch,0,0);
-                const metal=ctx.createLinearGradient(-25,-55,25,55);
-                metal.addColorStop(0,'#fff7d1');metal.addColorStop(.25,'#b98a35');metal.addColorStop(.48,'#fff0b0');metal.addColorStop(.72,'#8e6727');metal.addColorStop(1,'#fff4c5');
-                ctx.fillStyle=metal;ctx.shadowColor='rgba(226,185,91,.34)';ctx.shadowBlur=7;ctx.fillText(ch,0,0);
-                ctx.restore();cursor+=cw;
-            });
-            ctx.restore();
-
-            // A single metallic sword-like light sweep cuts across the title after assembly.
-            const swordProgress=Math.max(0,Math.min(1,(local-6.0)/1.45));
-            if(swordProgress>0&&swordProgress<1){
-                const x=-180+swordProgress*1640,y=165-swordProgress*12;
-                ctx.save();ctx.translate(x,y);ctx.rotate(-.22);
-                const blade=ctx.createLinearGradient(-100,0,100,0);
-                blade.addColorStop(0,'rgba(255,255,255,0)');blade.addColorStop(.42,'rgba(255,255,255,.12)');blade.addColorStop(.5,'rgba(255,248,205,.95)');blade.addColorStop(.58,'rgba(214,174,91,.45)');blade.addColorStop(1,'rgba(255,255,255,0)');
-                ctx.fillStyle=blade;ctx.shadowColor='#f8df9a';ctx.shadowBlur=15;ctx.fillRect(-120,-2,240,4);
-                ctx.fillStyle='rgba(255,247,214,.9)';ctx.fillRect(-14,-3,28,6);ctx.restore();
-            }
-
-            // Winner names only: no runner-up, third-place, defeated-team or score panels.
-            const nameStart=local-7.25;
-            if(nameStart>0&&names.length){
-                names.forEach((name,i)=>{
-                    const p=Math.max(0,Math.min(1,(nameStart-i*.38)/1.8));
-                    if(!p)return;
-                    const fs=name.length>25?42:name.length>18?52:64;
-                    ctx.save();ctx.globalAlpha=p;ctx.textAlign='center';ctx.textBaseline='middle';
-                    ctx.font='900 '+fs+'px Arial Black,Arial,sans-serif';
-                    const y=365+i*70+(1-p)*55;
-                    const maxWidth=1080;
-                    ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=12;
-                    ctx.lineWidth=3;ctx.strokeStyle='rgba(5,12,18,.9)';ctx.strokeText(name,640,y,maxWidth);
-                    const gold=ctx.createLinearGradient(120,y-30,1160,y+25);
-                    gold.addColorStop(0,'#fff4c5');gold.addColorStop(.25,'#c99a42');gold.addColorStop(.5,'#fff0b0');gold.addColorStop(.75,'#a9792d');gold.addColorStop(1,'#fff2c0');
-                    ctx.fillStyle=gold;ctx.fillText(name,640,y,maxWidth);ctx.restore();
+            const vignette=ctx.createRadialGradient(640,340,180,640,340,760);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.48)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
+            // Actual dancers come from the uploaded MP4/WebM footage; no cartoon people are substituted.
+            const names=(sets.first||[]).map(t=>String(t.name||'CHAMPIONS')).filter(Boolean);
+            const champions=names.length?names:['WINNERS'];
+            const titleP=Math.max(0,Math.min(1,(local-.7)/1.5));
+            ctx.save();ctx.textAlign='center';ctx.font='900 62px Impact,Arial Black,sans-serif';ctx.globalAlpha=titleP;ctx.fillStyle='#f8e7b2';ctx.shadowColor='#f5c75e';ctx.shadowBlur=18;ctx.fillText('CHAMPIONS',640,150);ctx.restore();
+            // Names enter as individual shards, rotate and slash into their final position in extended slow motion.
+            const showNames=champions.slice(0,3), gap=showNames.length>1?90:0;
+            showNames.forEach((name,line)=>{
+                let fs=name.length>25?52:name.length>18?64:82;ctx.font='900 '+fs+'px Impact,Arial Black,sans-serif';
+                const measure=ctx.measureText(name).width;if(measure>1130){fs*=1130/measure;ctx.font='900 '+fs+'px Impact,Arial Black,sans-serif';}
+                const chars=Array.from(name), widths=chars.map(ch=>ctx.measureText(ch).width), total=widths.reduce((a,b)=>a+b,0);let cursor=(W-total)/2;
+                const baseline=showNames.length>1?300+line*gap:330;
+                chars.forEach((ch,i)=>{
+                    const w=widths[i],p=Math.max(0,Math.min(1,(local-1.75-i*.025)/4.7));
+                    const sx=(i%2?W+180:-180)+(i%5-2)*52,sy=80+(i%7)*72;
+                    const px=sx+(cursor+w/2-sx)*p,py=sy+(baseline-sy)*p;
+                    ctx.save();ctx.translate(px,py);ctx.rotate((1-p)*(i%2?3.1:-3.1));ctx.globalAlpha=.08+.92*p;
+                    const hue=(i*31+Math.floor(local*28))%360;ctx.fillStyle='hsl('+hue+' 82% '+(58+p*18)+'%)';ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.1;ctx.shadowColor='rgba(255,221,130,.95)';ctx.shadowBlur=4+p*18;
+                    ctx.fillText(ch,0,0);ctx.strokeText(ch,0,0);ctx.restore();cursor+=w;
                 });
-            }else if(nameStart>0&&!names.length){
-                ctx.save();ctx.globalAlpha=Math.min(1,(nameStart)/1.5);ctx.textAlign='center';ctx.font='bold 34px Arial';ctx.fillStyle='#fff0b0';ctx.fillText('CHAMPIONS',640,385);ctx.restore();
-            }
-            ctx.textAlign='center';ctx.font='bold 14px Arial';ctx.fillStyle='rgba(255,255,255,.62)';ctx.fillText('WESMA BADMINTON',640,690);
+            });
+            // Metallic blade-like slash sweeps across the name as the letters lock together.
+            const slashP=Math.max(0,Math.min(1,(local-5.6)/.9));
+            if(slashP>0&&slashP<1){const x=-150+slashP*1580,y=220+Math.sin(slashP*Math.PI)*100;ctx.save();ctx.translate(x,y);ctx.rotate(-.34);ctx.globalAlpha=.95;ctx.shadowColor='#fff';ctx.shadowBlur=22;ctx.fillStyle='rgba(235,249,255,.95)';ctx.fillRect(-120,-2,240,4);ctx.fillStyle='rgba(255,205,91,.9)';ctx.fillRect(-120,3,240,1.5);ctx.restore();}
+            // Flash / shuttle impact, then a clean readable champion title and names.
+            const impact=Math.max(0,1-Math.abs(local-6.6)*1.3);if(impact){ctx.fillStyle='rgba(255,244,205,'+(impact*.2)+')';ctx.fillRect(0,0,W,H);}
+            ctx.textAlign='center';ctx.globalAlpha=Math.max(0,Math.min(1,(local-6.8)/1.1));ctx.font='bold 24px Arial,sans-serif';ctx.fillStyle='#fff8df';ctx.shadowColor='#ffdf91';ctx.shadowBlur=10;ctx.fillText('WESMA • FIRST PLACE',640,500);ctx.globalAlpha=1;ctx.shadowBlur=0;
+            // A final stadium-wide light bloom signals the reveal; audience video remains visible underneath.
+            const finale=Math.max(0,Math.min(1,(local-7.2)/1.6));if(finale){const glow=ctx.createRadialGradient(640,360,40,640,360,520);glow.addColorStop(0,'rgba(255,224,145,'+(finale*.18)+')');glow.addColorStop(1,'rgba(255,224,145,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);}
+            ctx.textAlign='center';ctx.font='bold 14px Arial';ctx.fillStyle='rgba(255,255,255,.72)';ctx.fillText('WESMA BADMINTON',640,680);
         }
 
         function wesmaFilmDrawTeamRows(ctx,teams,accent,progress,top,gap){
@@ -6578,11 +6543,12 @@
                 const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error('Audio is not supported in this browser.');if(!wesmaFilmAudioContext)wesmaFilmAudioContext=new AC();await wesmaFilmAudioContext.resume();
                 const source=wesmaFilmAudioContext.createBufferSource();source.buffer=wesmaFilmAudioBuffer;const gain=wesmaFilmAudioContext.createGain();gain.gain.value=.78;source.connect(gain);
                 let stream=null;if(record){const dest=wesmaFilmAudioContext.createMediaStreamDestination();gain.connect(dest);const video=canvas.captureStream(30);stream=new MediaStream([...video.getVideoTracks(),...dest.stream.getAudioTracks()]);const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';wesmaFilmChunks=[];wesmaFilmRecorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);wesmaFilmRecorder.ondataavailable=e=>{if(e.data&&e.data.size)wesmaFilmChunks.push(e.data);};wesmaFilmRecorder.onstop=()=>{if(!wesmaFilmChunks.length)return;const blob=new Blob(wesmaFilmChunks,{type:wesmaFilmRecorder.mimeType||'video/webm'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='WESMA-Cinematic-Awards.webm';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);status.textContent='Video created with your selected music portion.';};wesmaFilmRecorder.start(250);}else gain.connect(wesmaFilmAudioContext.destination);
-                wesmaFilmSource=source;source.start(0,clip.start,clip.duration);const total=clip.duration;const start=performance.now();wesmaFilmStopFlag=false;status.textContent=record?'Creating your slow-motion cinematic video…':'Playing cinematic preview…';
-                const tick=now=>{if(wesmaFilmStopFlag)return;const elapsed=Math.min(total,(now-start)/1000);wesmaFilmDraw(ctx,0,elapsed);if(elapsed<total)wesmaFilmFrame=requestAnimationFrame(tick);else{wesmaFilmFrame=0;try{source.stop();}catch(e){}if(wesmaFilmRecorder&&wesmaFilmRecorder.state!=='inactive')wesmaFilmRecorder.stop();else status.textContent='Preview finished.';}};wesmaFilmFrame=requestAnimationFrame(tick);
+                wesmaFilmSource=source;source.start(0,clip.start,clip.duration);const total=clip.duration;const start=performance.now();wesmaFilmStopFlag=false;status.textContent=record?'Creating champion-only cinematic video…':'Playing champion-only cinematic preview…';
+                if(wesmaFilmDanceVideo&&wesmaFilmDanceVideo.readyState>=2){wesmaFilmDanceVideo.currentTime=0;wesmaFilmDanceVideo.play().catch(()=>{});}
+                const tick=now=>{if(wesmaFilmStopFlag)return;const elapsed=Math.min(total,(now-start)/1000);wesmaFilmDraw(ctx,0,elapsed);if(elapsed<total)wesmaFilmFrame=requestAnimationFrame(tick);else{wesmaFilmFrame=0;try{source.stop();}catch(e){}if(wesmaFilmDanceVideo){try{wesmaFilmDanceVideo.pause();}catch(e){}}if(wesmaFilmRecorder&&wesmaFilmRecorder.state!=='inactive')wesmaFilmRecorder.stop();else status.textContent='Preview finished.';}};wesmaFilmFrame=requestAnimationFrame(tick);
             }catch(e){status.textContent=e.message||String(e);}
         }
-        function wesmaFilmStop(){wesmaFilmStopFlag=true;if(wesmaFilmFrame){cancelAnimationFrame(wesmaFilmFrame);wesmaFilmFrame=0;}if(wesmaFilmSource){try{wesmaFilmSource.stop();}catch(e){}wesmaFilmSource=null;}if(wesmaFilmRecorder&&wesmaFilmRecorder.state!=='inactive'){try{wesmaFilmRecorder.stop();}catch(e){}}const status=document.getElementById('wesma-film-status');if(status)status.textContent='Film stopped.';}
+        function wesmaFilmStop(){wesmaFilmStopFlag=true;if(wesmaFilmDanceVideo){try{wesmaFilmDanceVideo.pause();}catch(e){}}if(wesmaFilmFrame){cancelAnimationFrame(wesmaFilmFrame);wesmaFilmFrame=0;}if(wesmaFilmSource){try{wesmaFilmSource.stop();}catch(e){}wesmaFilmSource=null;}if(wesmaFilmRecorder&&wesmaFilmRecorder.state!=='inactive'){try{wesmaFilmRecorder.stop();}catch(e){}}const status=document.getElementById('wesma-film-status');if(status)status.textContent='Film stopped.';}
 
         function closeFinishMatchModal() {
             const modal = document.getElementById("finish-match-modal");
@@ -6929,19 +6895,11 @@
                         <div class="defeated-hold-progress hidden h-1 w-full rounded-full bg-slate-100 overflow-hidden"><div class="h-full w-0 bg-emerald-500 rounded-full"></div></div>
                     `;
                     
-                    btn.dataset.teamId = String(t.id);
                     let isSelectionProcessed = false;
                     btn.onclick = function(e) {
                         e.stopPropagation();
                         if (isSelectionProcessed) return;
                         isSelectionProcessed = true;
-                        const selectedWinnerId = String(winningTeamId);
-                        const selectedLoserId = String(btn.dataset.teamId || '');
-                        if (!selectedLoserId || selectedLoserId === selectedWinnerId || String(pendingWinningTeamId) !== selectedWinnerId) {
-                            showToast('⚠️ ടീം തിരഞ്ഞെടുപ്പ് മാറിയിരിക്കുന്നു. വീണ്ടും തിരഞ്ഞെടുക്കുക.');
-                            closeDefeatedTeamModal();
-                            return;
-                        }
 
                         const allButtons = container.querySelectorAll('button');
                         allButtons.forEach(b => {
@@ -6968,8 +6926,13 @@
                         // One-second visual confirmation of the selected losing team.
                         // Commit begins immediately when that one-second hold completes.
                         setTimeout(() => {
+                            if (!pendingWinActionInProgress || String(pendingWinningTeamId) !== String(winningTeamId)) {
+                                closeDefeatedTeamModal(false);
+                                showToast("⚠️ ടീം തിരഞ്ഞെടുപ്പ് കാലഹരണപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക.");
+                                return;
+                            }
                             closeDefeatedTeamModal(true);
-                            confirmWinAndDefeatedTeam(selectedWinnerId, selectedLoserId);
+                            confirmWinAndDefeatedTeam(winningTeamId, t.id);
                         }, 1000);
                     };
                     container.appendChild(btn);
@@ -7002,11 +6965,13 @@
                 pendingWinningTeamId = null;
             };
 
-            const winnerMatches = teams.filter(t => String(t.id) === String(winningTeamId));
-            const loserMatches = teams.filter(t => String(t.id) === String(defeatedTeamId));
+            const winnerMatches = Array.isArray(teams) ? teams.filter(t => t && String(t.id) === String(winningTeamId)) : [];
+            const loserMatches = Array.isArray(teams) ? teams.filter(t => t && String(t.id) === String(defeatedTeamId)) : [];
             const team = winnerMatches.length === 1 ? winnerMatches[0] : null;
             const defeatedTeam = loserMatches.length === 1 ? loserMatches[0] : null;
-            if (String(pendingWinningTeamId) !== String(winningTeamId) || !team || !defeatedTeam || team.isDisabled || defeatedTeam.isDisabled || String(winningTeamId) === String(defeatedTeamId)) {
+            const pendingWinnerMatches = pendingWinningTeamId != null && String(pendingWinningTeamId) === String(winningTeamId);
+            if (!pendingWinnerMatches || winnerMatches.length !== 1 || loserMatches.length !== 1 || !team || !defeatedTeam || team.isDisabled || defeatedTeam.isDisabled || String(winningTeamId) === String(defeatedTeamId)) {
+                showToast("⚠️ ടീം തിരിച്ചറിയൽ പൊരുത്തപ്പെടുന്നില്ല. സ്കോർ ചേർത്തിട്ടില്ല; Refresh ചെയ്ത് വീണ്ടും ശ്രമിക്കുക.");
                 finishPendingWin();
                 return;
             }
@@ -7124,11 +7089,11 @@
                         return;
                     }
 
-                    const winnerMatches = remoteTeams.filter(t => String(t.id) === String(winningTeamId));
-                    const loserMatches = remoteTeams.filter(t => String(t.id) === String(defeatedTeamId));
-                    const winner = winnerMatches.length === 1 ? winnerMatches[0] : null;
-                    const loser = loserMatches.length === 1 ? loserMatches[0] : null;
-                    if (!winner || !loser || winner.isDisabled || loser.isDisabled || String(winner.id) === String(loser.id)) {
+                    const winnerMatchesRemote = remoteTeams.filter(t => t && String(t.id) === String(winningTeamId));
+                    const loserMatchesRemote = remoteTeams.filter(t => t && String(t.id) === String(defeatedTeamId));
+                    const winner = winnerMatchesRemote.length === 1 ? winnerMatchesRemote[0] : null;
+                    const loser = loserMatchesRemote.length === 1 ? loserMatchesRemote[0] : null;
+                    if (winnerMatchesRemote.length !== 1 || loserMatchesRemote.length !== 1 || !winner || !loser || winner.isDisabled || loser.isDisabled || String(winner.id) === String(loser.id)) {
                         transactionBlockReason = "Team validation failed. Refresh the page so all devices load the same team list.";
                         return;
                     }
