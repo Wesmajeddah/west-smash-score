@@ -1127,6 +1127,36 @@
         #finish-match-modal-content .finish-stat-play { color:#176b73 !important; font-weight:900 !important; }
         #finish-match-modal-content .finish-stat-win { color:#16724a !important; }
         #finish-match-modal-content .finish-stat-loss { color:#bd4350 !important; }
+
+        /* Requested End Match podium refinement: smaller 2nd/3rd cards with larger names. */
+        #finish-match-modal-content .wesma-end-second-place-box {
+            padding:4px 7px !important;
+            gap:2px !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box > div:nth-child(2) {
+            font-size:16px !important;
+            line-height:1.15 !important;
+            padding-left:2px !important;
+            padding-right:2px !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box > div:first-child {
+            font-size:8px !important;
+            line-height:1.1 !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box {
+            padding:4px 6px !important;
+            gap:2px !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:nth-child(2) {
+            font-size:15px !important;
+            line-height:1.15 !important;
+            padding-left:2px !important;
+            padding-right:2px !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:first-child {
+            font-size:7px !important;
+            line-height:1.1 !important;
+        }
 </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -2452,49 +2482,71 @@
         }
 
         function playBestSound() {
-            // Short badminton shuttle smash: sharp impact followed by a brief airy tail.
+            // Longer, layered badminton smash: crisp cork/racket contact followed by
+            // the airy shuttle-flight tail. Synthesized locally; no external asset.
             initAudioContext();
             if (!audioContext) return;
             try {
                 const ctx = audioContext;
                 const now = ctx.currentTime;
-                const duration = 0.22;
-                const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+                const duration = 0.72;
+                const frameCount = Math.floor(ctx.sampleRate * duration);
+                const buffer = ctx.createBuffer(1, frameCount, ctx.sampleRate);
                 const data = buffer.getChannelData(0);
-                for (let i = 0; i < data.length; i++) {
-                    const t = i / data.length;
-                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3.2);
+                for (let i = 0; i < frameCount; i++) {
+                    const t = i / ctx.sampleRate;
+                    const envelope = Math.exp(-t * 6.2) * (0.72 + 0.28 * Math.sin(Math.min(1, t / duration) * Math.PI));
+                    // A short broadband attack with a softer, longer feather-like hiss.
+                    data[i] = (Math.random() * 2 - 1) * envelope * (t < 0.055 ? 1 : 0.42);
                 }
 
-                const noise = ctx.createBufferSource();
-                noise.buffer = buffer;
-                const highPass = ctx.createBiquadFilter();
-                highPass.type = "highpass";
-                highPass.frequency.setValueAtTime(850, now);
-                const noiseGain = ctx.createGain();
-                noiseGain.gain.setValueAtTime(0.0001, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.34, now + 0.004);
-                noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-                noise.connect(highPass);
-                highPass.connect(noiseGain);
-                noiseGain.connect(ctx.destination);
-                noise.start(now);
-                noise.stop(now + duration);
+                const air = ctx.createBufferSource();
+                air.buffer = buffer;
+                const airHighPass = ctx.createBiquadFilter();
+                airHighPass.type = 'highpass';
+                airHighPass.frequency.setValueAtTime(720, now);
+                const airLowPass = ctx.createBiquadFilter();
+                airLowPass.type = 'lowpass';
+                airLowPass.frequency.setValueAtTime(6800, now);
+                const airGain = ctx.createGain();
+                airGain.gain.setValueAtTime(0.0001, now);
+                airGain.gain.exponentialRampToValueAtTime(0.24, now + 0.006);
+                airGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+                air.connect(airHighPass);
+                airHighPass.connect(airLowPass);
+                airLowPass.connect(airGain);
+                airGain.connect(ctx.destination);
+                air.start(now);
+                air.stop(now + duration);
 
-                const impact = ctx.createOscillator();
-                const impactGain = ctx.createGain();
-                impact.type = "triangle";
-                impact.frequency.setValueAtTime(190, now);
-                impact.frequency.exponentialRampToValueAtTime(58, now + 0.085);
-                impactGain.gain.setValueAtTime(0.0001, now);
-                impactGain.gain.exponentialRampToValueAtTime(0.28, now + 0.003);
-                impactGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
-                impact.connect(impactGain);
-                impactGain.connect(ctx.destination);
-                impact.start(now);
-                impact.stop(now + 0.12);
+                // Dense cork impact: a low body thump plus a bright racket click.
+                const body = ctx.createOscillator();
+                const bodyGain = ctx.createGain();
+                body.type = 'triangle';
+                body.frequency.setValueAtTime(178, now);
+                body.frequency.exponentialRampToValueAtTime(64, now + 0.105);
+                bodyGain.gain.setValueAtTime(0.0001, now);
+                bodyGain.gain.exponentialRampToValueAtTime(0.22, now + 0.003);
+                bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+                body.connect(bodyGain);
+                bodyGain.connect(ctx.destination);
+                body.start(now);
+                body.stop(now + 0.15);
+
+                const click = ctx.createOscillator();
+                const clickGain = ctx.createGain();
+                click.type = 'sine';
+                click.frequency.setValueAtTime(1450, now + 0.002);
+                click.frequency.exponentialRampToValueAtTime(520, now + 0.038);
+                clickGain.gain.setValueAtTime(0.0001, now);
+                clickGain.gain.exponentialRampToValueAtTime(0.085, now + 0.003);
+                clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.052);
+                click.connect(clickGain);
+                clickGain.connect(ctx.destination);
+                click.start(now);
+                click.stop(now + 0.06);
             } catch(e) {
-                console.log("Audio error", e);
+                console.log('Audio error', e);
             }
         }
 
@@ -2815,7 +2867,7 @@
         }
         function getLatestDefeatedByRecord(team) {
             if (!team || !Array.isArray(team.defeatedDetails) || !team.defeatedDetails.length) return null;
-            const sessionStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
+            const sessionStart = getCurrentSessionStartTimestamp();
             if (!sessionStart) return null;
             const currentDetails = team.defeatedDetails.filter(detail => {
                 if (!detail) return false;
@@ -2828,11 +2880,27 @@
 
         function getCurrentSessionStartTimestamp() {
             const activeStart = normalizeHistoryTimestamp(tournamentStartTimestamp);
-            if (activeStart) return activeStart;
-
             const endedStart = normalizeHistoryTimestamp(
                 lastEndedChampionSnapshot && (lastEndedChampionSnapshot.startedAt || lastEndedChampionSnapshot.sessionId)
             );
+
+            // When START opens the next live session, keep the just-completed
+            // tournament's details visible until the new session records its first
+            // match. This is a read-only display fallback: it does not copy, reset,
+            // re-tag, or otherwise modify any team score/history data.
+            if (activeStart && endedStart && activeStart > endedStart && !isMatchEnded) {
+                const hasNewSessionMatch = (Array.isArray(teams) ? teams : []).some(team =>
+                    (Array.isArray(team && team.matchHistoryLog) ? team.matchHistoryLog : []).some(log => {
+                        if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
+                        const logSession = normalizeHistoryTimestamp(log.sessionId);
+                        const stamp = normalizeHistoryTimestamp(log.timestamp);
+                        return logSession === activeStart || (!logSession && stamp >= activeStart);
+                    })
+                );
+                if (!hasNewSessionMatch) return endedStart;
+            }
+            if (activeStart) return activeStart;
+
             if (endedStart) return endedStart;
 
             const endedTeamSessionStart = (lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams)
