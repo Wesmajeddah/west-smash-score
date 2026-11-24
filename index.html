@@ -1577,8 +1577,14 @@
         <div class="w-full max-w-md grid grid-cols-3 gap-2 shrink-0 end-match-gif-actions">
             <button type="button" onclick="openChampionsFromFinish()" class="border border-[#d4af37] bg-gradient-to-br from-[#fff7dc] to-[#f4d98a] text-[#5c4033]">🏆 CHAMPIONS</button>
             <button type="button" onclick="openCombinedFromFinish()" class="border border-[#2b7180] bg-gradient-to-br from-[#236477] to-[#12384c] text-white">📊 REPORT</button>
-            <button type="button" id="end-match-gif-button" onclick="createAndShareCinematicIntroVideo()" class="border border-[#f5d36f] bg-gradient-to-br from-[#b7791f] via-[#f5d36f] to-[#fff1b8] text-[#241707]">🎬 CINEMATIC INTRO VIDEO</button>
+            <button type="button" id="end-match-gif-button" onclick="createAndShareCinematicIntroVideo()" class="border border-[#f5d36f] bg-gradient-to-br from-[#b7791f] via-[#f5d36f] to-[#fff1b8] text-[#241707]">🎬 CINEMATIC VIDEO</button>
         </div>
+        <div class="w-full max-w-md grid grid-cols-2 gap-2 shrink-0">
+            <button type="button" onclick="openCinematicMusicPicker()" class="rounded-lg border border-cyan-200/70 bg-slate-900/80 text-cyan-100 py-2 text-[10px] font-black tracking-wide">🎵 ADD MUSIC</button>
+            <button type="button" onclick="clearCinematicMusic()" class="rounded-lg border border-white/20 bg-slate-800/80 text-white/80 py-2 text-[10px] font-bold tracking-wide">✕ REMOVE MUSIC</button>
+        </div>
+        <input id="cinematic-custom-music-file" type="file" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac" class="hidden" onchange="handleCinematicMusicSelection(this)">
+        <div id="cinematic-custom-music-status" class="w-full max-w-md text-center text-[9px] font-semibold text-cyan-100/90 shrink-0" aria-live="polite">Default cinematic soundtrack selected</div>
         <div id="end-match-gif-status" class="w-full max-w-md text-center text-[9px] font-bold text-white/90 shrink-0" aria-live="polite"></div>
     </div>
 
@@ -6458,6 +6464,34 @@
             return new Blob([new Uint8Array(bytes)], { type: "image/gif" });
         }
 
+        let wesmaCinematicCustomMusicFile = null;
+
+        function openCinematicMusicPicker() {
+            const picker = document.getElementById("cinematic-custom-music-file");
+            if (picker) picker.click();
+        }
+
+        function handleCinematicMusicSelection(input) {
+            const file = input && input.files && input.files[0];
+            const label = document.getElementById("cinematic-custom-music-status");
+            if (!file) return;
+            if (!file.type.startsWith("audio/") && !/\.(mp3|m4a|wav|ogg|aac|flac)$/i.test(file.name)) {
+                if (label) label.textContent = "Please choose an audio file.";
+                input.value = "";
+                return;
+            }
+            wesmaCinematicCustomMusicFile = file;
+            if (label) label.textContent = "🎵 Selected: " + file.name + " — this will be used as the video soundtrack.";
+        }
+
+        function clearCinematicMusic() {
+            wesmaCinematicCustomMusicFile = null;
+            const picker = document.getElementById("cinematic-custom-music-file");
+            const label = document.getElementById("cinematic-custom-music-status");
+            if (picker) picker.value = "";
+            if (label) label.textContent = "Default cinematic soundtrack selected";
+        }
+
         async function createAndShareCinematicIntroVideo() {
             const button = document.getElementById("end-match-gif-button");
             const status = document.getElementById("end-match-gif-status");
@@ -6511,12 +6545,37 @@
                     ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
                     ctx.fillStyle=fill; ctx.fill(); if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}
                 };
-                const teamNames = (items, max=3) => {
-                    const names=(items||[]).map(t=>String(t.name||"TEAM"));
+                const teamNames = (items, max=3, maxWidth=W-112, baseSize=24) => {
+                    const names=(items||[]).map(t=>String(t.name||"TEAM").trim()).filter(Boolean);
                     if(!names.length) return ["NOT AWARDED"];
-                    const lines=[]; let line="";
-                    names.forEach(name=>{ const candidate=line?line+"  •  "+name:name; ctx.font="800 24px Arial"; if(line && ctx.measureText(candidate).width>W-100 && lines.length<max-1){lines.push(line);line=name;}else line=candidate; });
-                    if(line) lines.push(line); return lines.slice(0,max);
+                    const shrinkToFit = value => {
+                        let out=value, size=baseSize;
+                        ctx.font=`800 ${size}px Arial,sans-serif`;
+                        while(ctx.measureText(out).width>maxWidth && size>14){size--;ctx.font=`800 ${size}px Arial,sans-serif`;}
+                        if(ctx.measureText(out).width>maxWidth){
+                            while(out.length>1 && ctx.measureText(out+"…").width>maxWidth) out=out.slice(0,-1);
+                            out=out+"…";
+                        }
+                        return out;
+                    };
+                    const lines=[]; let line="", hidden=0;
+                    names.forEach(raw=>{
+                        const name=shrinkToFit(raw);
+                        const candidate=line?line+"  •  "+name:name;
+                        ctx.font=`800 ${baseSize}px Arial,sans-serif`;
+                        if(!line || ctx.measureText(candidate).width<=maxWidth) line=candidate;
+                        else if(lines.length<max-1){lines.push(line);line=name;}
+                        else hidden++;
+                    });
+                    if(line) lines.push(line);
+                    if(hidden>0 && lines.length){
+                        const suffix=`  •  +${hidden} MORE`;
+                        let last=lines[lines.length-1];
+                        ctx.font=`800 ${baseSize}px Arial,sans-serif`;
+                        while(last.length>1 && ctx.measureText(last+suffix).width>maxWidth) last=last.slice(0,-1);
+                        lines[lines.length-1]=last+suffix;
+                    }
+                    return lines.slice(0,max);
                 };
                 const particles=(time, color, count=90, spread=1) => {
                     for(let i=0;i<count;i++){
@@ -6585,16 +6644,16 @@
                 };
                 const brand=(sub="CHAMPIONSHIP INTRO")=>{text("WESMA",W/2,58,25,"#fff0c4",900,"center","#d9a73b");text(sub,W/2,88,10,"#e9eaf5",700);};
                 const revealCard=(label,items,color,time,hero=false,smallLabel="")=>{
-                    const rise=1-ease(clamp(time/1.05));const y=H*.69+rise*260;
+                    const rise=1-ease(clamp(time/(hero?2.25:1.65)));const y=H*.68+rise*(hero?390:235);
                     portal(W/2,405,time,color,hero?1.45:1.12);
                     if(hero)trophy(W/2,315+Math.sin(time*4)*9,1.12+Math.sin(time*3)*.035);
                     ctx.save();ctx.globalAlpha=ease(time/.6);
-                    const boxY=y-(hero?30:0), boxH=hero?238:220;
+                    const boxY=y-(hero?24:0), boxH=hero?250:230;
                     const fill=hero?"rgba(39,23,4,.82)":"rgba(5,13,25,.84)";
                     rounded(34,boxY,W-68,boxH,30,fill,color,hero?4:2);
                     text(label,W/2,boxY+43,hero?31:26,color,900,"center",color);
-                    const names=teamNames(items,hero?3:3);names.forEach((name,i)=>{const fs=fit(name,W-112,hero?34:27,15,900);text(name,W/2,boxY+(hero?105:94)+i*(hero?39:32),fs,"#ffffff",900,"center",hero?"#ffd65c":color);});
-                    const sample=items&&items[0];if(sample){const detail=`${Number(sample.wins)||0} WINS   •   ${Number(sample.losses)||0} LOSSES   •   ${getTeamPlayedCount(sample)} PLAYS`;text(detail,W/2,boxY+boxH-(hero?28:20),11,"#e9edf7",700);}
+                    const names=teamNames(items,3,W-112,hero?25:22);names.forEach((name,i)=>{const fs=fit(name,W-112,hero?25:22,14,900);text(name,W/2,boxY+(hero?104:94)+i*(hero?31:29),fs,"#ffffff",900,"center",hero?"#ffd65c":color);});
+                    const sample=items&&items[0];if(sample){const detail=`${Number(sample.wins)||0} WINS   •   ${Number(sample.losses)||0} LOSSES   •   ${getTeamPlayedCount(sample)} PLAYS`;const detailSize=fit(detail,W-100,11,8,700);text(detail,W/2,boxY+boxH-19,detailSize,"#e9edf7",700);}
                     if(smallLabel)text(smallLabel,W/2,boxY+boxH+34,11,"#ffffff",700);
                     ctx.restore();
                 };
@@ -6610,22 +6669,40 @@
                     if(time>2.4){ctx.globalAlpha=clamp((time-2.4)/1);text("THE LEGEND BEGINS",W/2,820,27,"#ffe6a1",900,"center","#f6bd43");ctx.globalAlpha=1;}
                 };
                 const drawChampion=time=>{
-                    background(time,"gold");brand("THE GOLDEN REALM");
-                    // Giant sun gate and rising champion reveal.
-                    ctx.save();ctx.strokeStyle="#ffe28a88";ctx.lineWidth=8;ctx.shadowColor="#ffcf53";ctx.shadowBlur=40;
-                    for(let i=0;i<4;i++){ctx.beginPath();ctx.ellipse(W/2,400,130+i*36,220+i*30,0,Math.PI,Math.PI*2);ctx.stroke();}ctx.restore();
-                    beam(270,0,850,80,"#ffd65a",.34);portal(W/2,440,time,"#ffd45b",1.6);
-                    for(let i=0;i<12;i++){const a=i*Math.PI/6+time*.8;const x=270+Math.cos(a)*190,y=430+Math.sin(a)*280;ctx.fillStyle="#fff0a4";ctx.shadowColor="#ffd34f";ctx.shadowBlur=18;ctx.beginPath();ctx.arc(x,y,3+Math.sin(time*5+i)*2,0,Math.PI*2);ctx.fill();}
-                    text("THE MOMENT OF GLORY",W/2,165,15,"#fff3ca",800,"center","#e9a82f");
-                    revealCard("FIRST PLACE  •  THE CHAMPIONS",first,"#ffd65b",time,true,"RISE ABOVE. CLAIM THE CROWN.");
+                    background(time,"gold");brand("THE EARTH-SPLIT ARENA");
+                    // Slow-motion emergence: the court fractures and the champions rise from beneath it.
+                    const groundY=645, emergence=ease(clamp(time/2.25));
+                    const crackAlpha=clamp(time/0.55);
+                    ctx.save();
+                    const earth=ctx.createLinearGradient(0,groundY,0,H);earth.addColorStop(0,"#76502b");earth.addColorStop(.22,"#3d2818");earth.addColorStop(1,"#090605");
+                    ctx.fillStyle=earth;ctx.beginPath();ctx.moveTo(0,groundY+8);ctx.lineTo(95,groundY-8);ctx.lineTo(180,groundY+12);ctx.lineTo(270,groundY-18);ctx.lineTo(360,groundY+10);ctx.lineTo(445,groundY-6);ctx.lineTo(W,groundY+12);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+                    ctx.globalAlpha=crackAlpha;ctx.strokeStyle="#ffd76a";ctx.shadowColor="#ffb52e";ctx.shadowBlur=22;ctx.lineWidth=4;
+                    [[270,groundY-18,230,groundY-105],[270,groundY-18,315,groundY-120],[270,groundY-18,205,groundY-165],[270,groundY-18,355,groundY-190],[270,groundY-18,270,groundY-240],[270,groundY-18,115,groundY-105],[270,groundY-18,425,groundY-95]].forEach(a=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(a[2],a[3]);ctx.stroke();});
+                    ctx.restore();
+                    // Suspended soil fragments move in exaggerated slow motion.
+                    for(let n=0;n<28;n++){const seed=n*12.71;const x=270+Math.sin(seed)* (45+emergence*175);const y=groundY-25-((time*24+n*31)%210);ctx.save();ctx.globalAlpha=.2+.65*emergence;ctx.translate(x,y);ctx.rotate(time*.18+n);ctx.fillStyle=n%3===0?"#f5c66a":"#9c7040";ctx.fillRect(-4,-4,8+(n%4),7+(n%3));ctx.restore();}
+                    beam(270,0,groundY+40,95,"#ffd65a",.32);
+                    portal(W/2,455,time,"#ffd45b",1.45);
+                    for(let n=0;n<12;n++){const a=n*Math.PI/6+time*.28;const x=270+Math.cos(a)*190,y=430+Math.sin(a)*220;ctx.fillStyle="#fff0a4";ctx.shadowColor="#ffd34f";ctx.shadowBlur=18;ctx.beginPath();ctx.arc(x,y,3+Math.sin(time*2+n)*2,0,Math.PI*2);ctx.fill();}
+                    text("THE COURT BREAKS. LEGENDS RISE.",W/2,165,15,"#fff3ca",800,"center","#e9a82f");
+                    drawCourt(time,"#ffd65b");
+                    revealCard("FIRST PLACE  •  THE CHAMPIONS",first,"#ffd65b",time,true,"RISE FROM THE EARTH. CLAIM THE CROWN.");
                     if(time>3.5){player(100,830,.7,0,time);player(445,830,.7,1,time+1);}
                 };
                 const drawSilver=time=>{
-                    background(time,"silver");brand("THE SILVER SANCTUARY");
-                    // Frozen crystal hall, moving aurora ribbons.
-                    for(let i=0;i<6;i++){ctx.save();ctx.strokeStyle=`rgba(191,239,255,${.16+i*.035})`;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(i*105-20,0);ctx.lineTo(270+(i-2.5)*32,610);ctx.stroke();ctx.restore();}
-                    ctx.save();ctx.strokeStyle="#d8f7ff88";ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(270,430,100+i*42,180+i*30,0,0,Math.PI*2);ctx.stroke();}ctx.restore();
-                    revealCard("SECOND PLACE  •  SILVER",second,"#c8f2ff",time,false,"HONOUR IN EVERY BATTLE.");
+                    background(time,"silver");brand("THE SKYFALL SANCTUARY");
+                    // A floating waterfall pours upward into a crystal sky-island; silver finalists arrive on a rising platform.
+                    for(let i=0;i<9;i++){
+                        const x=38+i*58, drift=Math.sin(time*1.15+i*.8)*22;
+                        const grad=ctx.createLinearGradient(x,90,x+drift,690);grad.addColorStop(0,"#d8f8ff00");grad.addColorStop(.45,"#b8edff66");grad.addColorStop(1,"#ffffff00");
+                        ctx.strokeStyle=grad;ctx.lineWidth=8+(i%3)*3;ctx.beginPath();ctx.moveTo(x,690);ctx.bezierCurveTo(x+drift,520,x-drift,260,x+drift,80);ctx.stroke();
+                    }
+                    ctx.save();ctx.shadowColor="#a8eaff";ctx.shadowBlur=30;ctx.fillStyle="#b8edff22";ctx.strokeStyle="#d8f7ff";ctx.lineWidth=3;
+                    ctx.beginPath();ctx.moveTo(75,650);ctx.lineTo(140,590);ctx.lineTo(400,590);ctx.lineTo(465,650);ctx.lineTo(410,690);ctx.lineTo(130,690);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+                    for(let n=0;n<22;n++){const x=(n*83+time*17)%W,y=180+(n*47)%420;ctx.fillStyle="#e5fbff";ctx.globalAlpha=.25+.5*Math.abs(Math.sin(time+n));ctx.beginPath();ctx.arc(x,y,1.5+(n%3),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+                    ctx.save();ctx.strokeStyle="#d8f7ff88";ctx.lineWidth=4;for(let n=0;n<4;n++){ctx.beginPath();ctx.ellipse(270,430,105+n*48,145+n*32,0,0,Math.PI*2);ctx.stroke();}ctx.restore();
+                    text("ABOVE THE CLOUDS, HONOUR SHINES",W/2,165,14,"#e8fbff",800,"center","#9be7ff");
+                    revealCard("SECOND PLACE  •  SILVER",second,"#c8f2ff",time,false,"A DIFFERENT HEIGHT. THE SAME HEART.");
                 };
                 const drawDarkArena=(time,which)=>{
                     background(time,"dark");brand("THE SHADOW ARENA");
@@ -6641,7 +6718,7 @@
                     background(time,"gold");brand("WESMA BADMINTON CLUB");trophy(270,205,1.12);
                     text("THE LEGACY",270,350,32,"#fff1bf",900,"center","#edb63e");
                     const entries=[{label:"01  CHAMPIONS",items:first,color:"#ffd65b"},{label:"02  SILVER",items:second,color:"#c8f2ff"},{label:"03  BRONZE",items:third,color:"#d99a69"},{label:"04  LAST PLACE",items:last,color:"#ff786b"}];
-                    entries.forEach((e,i)=>{const y=430+i*105;const h=86;rounded(30,y,W-60,h,18,"rgba(4,8,17,.78)",e.color,i===0?4:2);text(e.label,52,y+25,14,e.color,900,"left");const names=(e.items||[]).map(t=>String(t.name||"TEAM")).join("  •  ")||"NOT AWARDED";const fs=fit(names,W-120,21,12,900);text(names,52,y+58,fs,"#fff",900,"left");});
+                    entries.forEach((e,i)=>{const y=430+i*105;const h=86;rounded(30,y,W-60,h,18,"rgba(4,8,17,.78)",e.color,i===0?4:2);text(e.label,52,y+22,13,e.color,900,"left");const names=teamNames(e.items,2,W-120,16);names.forEach((name,j)=>{const fs=fit(name,W-120,16,10,900);text(name,52,y+49+j*19,fs,"#fff",900,"left");});});
                     text(`${dateLabel}   •   ${totalMatches} MATCHES`,270,895,13,"#fff0c5",700);
                 };
                 const drawFrame=elapsed=>{
@@ -6661,11 +6738,19 @@
                 await audioContext.resume();
                 const destination=audioContext.createMediaStreamDestination();
                 const master=audioContext.createGain();master.gain.value=.62;master.connect(destination);master.connect(audioContext.destination);
+                const scoreBus=audioContext.createGain();scoreBus.gain.value=wesmaCinematicCustomMusicFile?0:0.78;scoreBus.connect(master);
                 const startAt=audioContext.currentTime+.18;
+                if(wesmaCinematicCustomMusicFile){
+                    const audioBytes=await wesmaCinematicCustomMusicFile.arrayBuffer();
+                    const decodedMusic=await audioContext.decodeAudioData(audioBytes);
+                    const customMusic=audioContext.createBufferSource();
+                    customMusic.buffer=decodedMusic;customMusic.loop=true;customMusic.connect(master);
+                    customMusic.start(startAt);customMusic.stop(startAt+DURATION+.25);
+                }
                 const tone=(freq,at,dur,vol,wave="sine",endFreq=null)=>{
                     const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type=wave;osc.frequency.setValueAtTime(freq,at);if(endFreq)osc.frequency.exponentialRampToValueAtTime(Math.max(1,endFreq),at+dur);
                     gain.gain.setValueAtTime(.0001,at);gain.gain.linearRampToValueAtTime(vol,at+.035);gain.gain.exponentialRampToValueAtTime(.0001,at+dur);
-                    osc.connect(gain);gain.connect(master);osc.start(at);osc.stop(at+dur+.03);
+                    osc.connect(gain);gain.connect(scoreBus);osc.start(at);osc.stop(at+dur+.03);
                 };
                 const noiseHit=(at,dur,vol,highpass=1000)=>{
                     const length=Math.ceil(audioContext.sampleRate*dur),buffer=audioContext.createBuffer(1,length,audioContext.sampleRate),data=buffer.getChannelData(0);
@@ -6696,7 +6781,9 @@
                 const chunks=[];
                 const finished=new Promise((resolve,reject)=>{recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};recorder.onerror=e=>reject(e.error||new Error("Recorder failed"));recorder.onstop=()=>resolve(new Blob(chunks,{type:recorder.mimeType||mimeType}));});
                 recorder.start(1000);
-                setStatus(mimeType.includes("mp4")?"🎬 Recording cinematic MP4 with original soundtrack…":"🎬 Recording cinematic video with original soundtrack…");
+                setStatus(wesmaCinematicCustomMusicFile
+                    ? (mimeType.includes("mp4")?"🎬 Recording MP4 with your selected music…":"🎬 Recording video with your selected music…")
+                    : (mimeType.includes("mp4")?"🎬 Recording cinematic MP4 with original soundtrack…":"🎬 Recording cinematic video with original soundtrack…"));
                 const startClock=performance.now();
                 for(let frame=0;frame<=DURATION*FPS;frame++){
                     const elapsed=Math.min(DURATION,frame/FPS);drawFrame(elapsed);
@@ -6730,7 +6817,7 @@
                 if(recorder&&recorder.state!=="inactive"){try{recorder.stop();}catch(_){}}
                 if(canvasStream)canvasStream.getTracks().forEach(track=>track.stop());
                 if(audioContext&&audioContext.state!=="closed"){try{await audioContext.close();}catch(_){}}
-                if(button){button.disabled=false;button.textContent="🎬 CINEMATIC INTRO VIDEO";}
+                if(button){button.disabled=false;button.textContent="🎬 CINEMATIC VIDEO";}
             }
         }
 
