@@ -6846,11 +6846,15 @@ const WESMA_FILM_FRAMES=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
             }
             sparks(46,520,.42);
 
-            const gap=Math.max(62,Math.min(112,390/Math.max(1,names.length)));
+            const singleChampion=names.length===1;
+            const gap=Math.max(72,Math.min(132,450/Math.max(1,names.length)));
             const startY=365-(names.length-1)*gap/2;
             names.forEach((rawName,index)=>{
                 const n=String(rawName||'').toUpperCase();
-                const size=Math.max(38,Math.min(96,980/Math.max(9,n.length)));
+                // Champion names are intentionally larger. A single champion gets the strongest hero treatment.
+                const size=singleChampion
+                    ? Math.max(58,Math.min(142,1380/Math.max(8,n.length)))
+                    : Math.max(48,Math.min(112,1120/Math.max(8,n.length)));
                 const entry=Math.min(1,Math.max(0,(reveal*1.15-index*.11)));
                 const fallY=(1-entry)*(-180- index*24);
                 const y=startY+index*gap+fallY;
@@ -6858,11 +6862,58 @@ const WESMA_FILM_FRAMES=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
                 ctx.translate(W/2+Math.sin(t*.45+index)*9,y+Math.cos(t*.4+index)*3);
                 ctx.rotate((1-entry)*-.035+Math.sin(t*.25+index)*.008);
                 ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=entry;
-                ctx.font=`900 ${size}px Arial Black,Arial,sans-serif`;
-                ctx.lineWidth=5;ctx.strokeStyle='rgba(18,10,3,.95)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=36;ctx.strokeText(n,0,0,1160);
-                const gold=ctx.createLinearGradient(0,-size,0,size);
-                gold.addColorStop(0,'#fff9dc');gold.addColorStop(.42,'#f9d477');gold.addColorStop(1,'#b66b1d');
-                ctx.fillStyle=gold;ctx.shadowColor='#ffc45d';ctx.shadowBlur=28;ctx.fillText(n,0,0,1160);
+                ctx.font=`900 ${size}px Georgia, 'Times New Roman', serif`;
+
+                if(singleChampion){
+                    // A unique single-champion treatment: the name is visually split by a descending sword.
+                    const cutProgress=Math.min(1,Math.max(0,(reveal-.18)/.62));
+                    const cutX=0;
+                    const cutGap=Math.max(8,size*.075);
+                    ctx.save();
+                    ctx.translate(-cutGap/2,0);
+                    ctx.lineWidth=7;ctx.strokeStyle='rgba(18,10,3,.98)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=38;
+                    ctx.strokeText(n,0,0,1180);
+                    const goldL=ctx.createLinearGradient(0,-size,0,size);
+                    goldL.addColorStop(0,'#fffdf0');goldL.addColorStop(.45,'#f9d477');goldL.addColorStop(1,'#a85f18');
+                    ctx.fillStyle=goldL;ctx.shadowColor='#ffc45d';ctx.shadowBlur=30;ctx.fillText(n,0,0,1180);
+                    ctx.restore();
+
+                    // Dark cut seam through the exact center of the champion name.
+                    ctx.save();
+                    ctx.globalAlpha=entry*cutProgress;
+                    ctx.beginPath();ctx.moveTo(cutX-2,-size*.62);ctx.lineTo(cutX+2,size*.62);
+                    ctx.strokeStyle='rgba(20,8,2,.92)';ctx.lineWidth=Math.max(4,size*.045);ctx.shadowColor='#050505';ctx.shadowBlur=8;ctx.stroke();
+                    ctx.restore();
+
+                    // Sword: blade, guard and hilt sweep diagonally across the name as it lands.
+                    ctx.save();
+                    const swordP=Math.min(1,Math.max(0,(reveal-.34)/.48));
+                    ctx.globalAlpha=entry*swordP;
+                    const swordAngle=-0.42;
+                    ctx.translate(cutX,0);ctx.rotate(swordAngle);
+                    const bladeLen=size*1.65;
+                    const bladeW=Math.max(7,size*.085);
+                    ctx.beginPath();
+                    ctx.moveTo(-bladeLen*.50,0);ctx.lineTo(bladeLen*.50,0);
+                    ctx.lineWidth=bladeW+5;ctx.strokeStyle='rgba(30,18,10,.92)';ctx.shadowColor='#fff0b0';ctx.shadowBlur=18;ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(-bladeLen*.50,0);ctx.lineTo(bladeLen*.50,0);
+                    const blade=ctx.createLinearGradient(0,-bladeW,0,bladeW);
+                    blade.addColorStop(0,'#fffdf5');blade.addColorStop(.45,'#d8dde2');blade.addColorStop(.72,'#8f979f');blade.addColorStop(1,'#fff4c7');
+                    ctx.lineWidth=bladeW;ctx.strokeStyle=blade;ctx.shadowColor='#ffffff';ctx.shadowBlur=12;ctx.stroke();
+                    ctx.beginPath();ctx.moveTo(-bladeLen*.02,-bladeW*1.9);ctx.lineTo(-bladeLen*.02,bladeW*1.9);
+                    ctx.strokeStyle='#d7a84f';ctx.lineWidth=Math.max(5,size*.055);ctx.shadowBlur=10;ctx.stroke();
+                    ctx.beginPath();ctx.moveTo(-bladeLen*.16,0);ctx.lineTo(-bladeLen*.30,0);
+                    ctx.strokeStyle='#7b4a16';ctx.lineWidth=Math.max(9,size*.12);ctx.shadowBlur=6;ctx.stroke();
+                    ctx.beginPath();ctx.arc(-bladeLen*.38,0,Math.max(8,size*.13),0,Math.PI*2);
+                    ctx.fillStyle='#d6ad56';ctx.shadowColor='#ffd978';ctx.shadowBlur=14;ctx.fill();
+                    ctx.restore();
+                }else{
+                    ctx.lineWidth=6;ctx.strokeStyle='rgba(18,10,3,.95)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=38;ctx.strokeText(n,0,0,1160);
+                    const gold=ctx.createLinearGradient(0,-size,0,size);
+                    gold.addColorStop(0,'#fff9dc');gold.addColorStop(.42,'#f9d477');gold.addColorStop(1,'#b66b1d');
+                    ctx.fillStyle=gold;ctx.shadowColor='#ffc45d';ctx.shadowBlur=30;ctx.fillText(n,0,0,1160);
+                }
                 ctx.restore();
                 // Each name gets a small feather burst at the moment it lands.
                 if(entry>.55 && entry<.98){
