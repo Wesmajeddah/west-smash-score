@@ -1102,36 +1102,42 @@
         #finish-match-modal-content .finish-stat-win { color:#16724a !important; }
         #finish-match-modal-content .finish-stat-loss { color:#bd4350 !important; }
 
-        /* End Match podium: distinct silver-teal 2nd place and cool-blue 3rd place tones. */
+
+        /* End Match: compact runner-up and third-place cards only. */
         #finish-match-modal-content .wesma-end-second-place-box {
-            background: linear-gradient(135deg, #eaf4f3 0%, #f7fbfa 52%, #dcebe8 100%) !important;
-            border-color: #9fc8c1 !important;
-            box-shadow: 0 4px 12px rgba(49,95,90,.14) !important;
+            padding: 6px 8px !important;
+            gap: 3px !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box > div:nth-child(2) {
+            font-size: 11px !important;
+            line-height: 1.15 !important;
+            padding-left: 2px !important;
+            padding-right: 2px !important;
         }
         #finish-match-modal-content .wesma-end-second-place-box > div:first-child {
-            color: #315f5a !important;
+            font-size: 8px !important;
+            line-height: 1.1 !important;
         }
-        #finish-match-modal-content .wesma-end-second-place-box > div:first-child i {
-            color: #4f8c83 !important;
-        }
-        #finish-match-modal-content .wesma-end-second-place-box span {
-            color: #315f5a !important;
-            border-color: #b8d9d3 !important;
-            background: #f8fcfb !important;
+        #finish-match-modal-content .wesma-end-second-place-box > div:last-child span {
+            padding: 1px 7px !important;
+            font-size: 8px !important;
         }
         #finish-match-modal-content .wesma-end-third-place-box {
-            background: linear-gradient(135deg, #eaf1fb 0%, #f8faff 52%, #dce7f6 100%) !important;
-            border-color: #a9bfdc !important;
-            box-shadow: 0 4px 12px rgba(55,86,130,.14) !important;
+            padding: 6px 6px !important;
+            gap: 3px !important;
         }
-        #finish-match-modal-content .wesma-end-third-place-box > div:first-child,
+        #finish-match-modal-content .wesma-end-third-place-box > div:first-child {
+            font-size: 7px !important;
+            line-height: 1.1 !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:nth-child(2) {
+            font-size: 9px !important;
+            line-height: 1.15 !important;
+        }
         #finish-match-modal-content .wesma-end-third-place-box > div:last-child {
-            color: #405d86 !important;
+            font-size: 7px !important;
+            line-height: 1.1 !important;
         }
-        #finish-match-modal-content .wesma-end-third-place-box > div:first-child i {
-            color: #6487b5 !important;
-        }
-
 </style>
 </head>
 <body id="master-body-container" class="min-h-screen flex flex-col justify-between items-center p-2 select-none bg-[#fcfbf9] text-[#2c221e]">
@@ -2479,47 +2485,63 @@
             }
         }
 
-        function playShuttleSmashSound() {
+        function playPowerSmashSound() {
             initAudioContext();
             if (!audioContext) return;
             try {
-                const now = audioContext.currentTime;
+                const ctx = audioContext;
+                const now = ctx.currentTime;
+                // Sharp racket contact: a very short broadband impact followed by
+                // a low, tight body and a fast high-frequency shuttle "zip".
                 const duration = 0.16;
-                const sampleCount = Math.max(1, Math.floor(audioContext.sampleRate * duration));
-                const buffer = audioContext.createBuffer(1, sampleCount, audioContext.sampleRate);
+                const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
                 const data = buffer.getChannelData(0);
-                for (let i = 0; i < sampleCount; i++) {
-                    const fade = Math.pow(1 - i / sampleCount, 3.2);
-                    data[i] = (Math.random() * 2 - 1) * fade;
+                for (let i = 0; i < data.length; i++) {
+                    const t = i / data.length;
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 5);
                 }
-                const noise = audioContext.createBufferSource();
+                const noise = ctx.createBufferSource();
                 noise.buffer = buffer;
-                const filter = audioContext.createBiquadFilter();
-                filter.type = 'highpass';
-                filter.frequency.setValueAtTime(850, now);
-                const noiseGain = audioContext.createGain();
+                const noiseFilter = ctx.createBiquadFilter();
+                noiseFilter.type = "highpass";
+                noiseFilter.frequency.setValueAtTime(850, now);
+                const noiseGain = ctx.createGain();
                 noiseGain.gain.setValueAtTime(0.0001, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.42, now + 0.006);
+                noiseGain.gain.exponentialRampToValueAtTime(0.72, now + 0.006);
                 noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-                noise.connect(filter);
-                filter.connect(noiseGain);
-                noiseGain.connect(audioContext.destination);
+                noise.connect(noiseFilter);
+                noiseFilter.connect(noiseGain);
+                noiseGain.connect(ctx.destination);
                 noise.start(now);
                 noise.stop(now + duration);
 
-                const thump = audioContext.createOscillator();
-                const thumpGain = audioContext.createGain();
-                thump.type = 'triangle';
-                thump.frequency.setValueAtTime(190, now);
-                thump.frequency.exponentialRampToValueAtTime(58, now + 0.095);
-                thumpGain.gain.setValueAtTime(0.34, now);
-                thumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
-                thump.connect(thumpGain);
-                thumpGain.connect(audioContext.destination);
-                thump.start(now);
-                thump.stop(now + 0.12);
+                const body = ctx.createOscillator();
+                const bodyGain = ctx.createGain();
+                body.type = "sine";
+                body.frequency.setValueAtTime(185, now);
+                body.frequency.exponentialRampToValueAtTime(58, now + 0.11);
+                bodyGain.gain.setValueAtTime(0.0001, now);
+                bodyGain.gain.exponentialRampToValueAtTime(0.48, now + 0.004);
+                bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+                body.connect(bodyGain);
+                bodyGain.connect(ctx.destination);
+                body.start(now);
+                body.stop(now + 0.14);
+
+                const snap = ctx.createOscillator();
+                const snapGain = ctx.createGain();
+                snap.type = "triangle";
+                snap.frequency.setValueAtTime(1450, now + 0.008);
+                snap.frequency.exponentialRampToValueAtTime(520, now + 0.055);
+                snapGain.gain.setValueAtTime(0.0001, now);
+                snapGain.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
+                snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+                snap.connect(snapGain);
+                snapGain.connect(ctx.destination);
+                snap.start(now + 0.006);
+                snap.stop(now + 0.075);
             } catch (e) {
-                console.log("Shuttle smash audio error", e);
+                console.log("Power smash sound error", e);
             }
         }
 
@@ -2940,6 +2962,53 @@
                 });
             });
 
+            // Recovery path: the paired WIN/LOSS logs are the authoritative match
+            // records. Older sessions or interrupted syncs may have a missing
+            // defeatedDetails entry even though both score logs were saved.
+            sessionTeams.forEach(winner => {
+                if (!winner) return;
+                getCurrentSessionMatchHistory(winner).forEach(winLog => {
+                    if (!winLog || String(winLog.result || "").toUpperCase() !== "WIN") return;
+                    const stamp = normalizeHistoryTimestamp(winLog.timestamp);
+                    if (!stamp || stamp < sessionStart) return;
+                    const matchId = String(winLog.matchId || "");
+                    const seq = Number(winLog.seq) || 0;
+                    const loser = sessionTeams.find(candidate => {
+                        if (!candidate || String(candidate.id) === String(winner.id)) return false;
+                        const opponentMatches =
+                            (winLog.opponentId != null && String(candidate.id) === String(winLog.opponentId)) ||
+                            (winLog.opponentId == null && String(candidate.name || "") === String(winLog.opponent || ""));
+                        if (!opponentMatches) return false;
+                        return getCurrentSessionMatchHistory(candidate).some(lossLog => {
+                            if (!lossLog || String(lossLog.result || "").toUpperCase() !== "LOSS") return false;
+                            const pointsBackToWinner =
+                                (lossLog.opponentId != null && String(lossLog.opponentId) === String(winner.id)) ||
+                                (lossLog.opponentId == null && String(lossLog.opponent || "") === String(winner.name || ""));
+                            if (!pointsBackToWinner) return false;
+                            if (matchId && lossLog.matchId) return String(lossLog.matchId) === matchId;
+                            return normalizeHistoryTimestamp(lossLog.timestamp) === stamp &&
+                                (!seq || !Number(lossLog.seq) || Number(lossLog.seq) === seq);
+                        });
+                    });
+                    if (!loser) return;
+                    const duplicate = events.some(event =>
+                        (matchId && event.matchId === matchId) ||
+                        (!matchId && event.winnerId != null && event.loserId != null &&
+                         String(event.winnerId) === String(winner.id) &&
+                         String(event.loserId) === String(loser.id) &&
+                         normalizeHistoryTimestamp(event.timestamp) === stamp)
+                    );
+                    if (!duplicate) {
+                        events.push({
+                            winner: winner.name, loser: loser.name,
+                            winnerId: winner.id, loserId: loser.id,
+                            matchId, seq, timestamp: stamp,
+                            durationMinutes: Number(winLog.durationMinutes) || 0
+                        });
+                    }
+                });
+            });
+
             events.sort((a, b) => (b.timestamp - a.timestamp) || (b.seq - a.seq));
             // Distinct matches remain distinct even if different devices produced
             // the same sequence number. Only duplicate copies of the SAME pairing
@@ -3236,37 +3305,6 @@
             const recoveredDeduped = dedupeMatchHistoryLogs(recovered)
                 .filter(log => log && String(log.opponent || '').trim());
             if (recoveredDeduped.length) return recoveredDeduped;
-
-            // When START opens a fresh session, team counters remain visible but
-            // the current session has no match rows yet. In that brief state, keep
-            // the last completed session's real detail rows available to the INFO
-            // windows instead of showing an empty detail panel.
-            if (!isMatchEnded && lastEndedChampionSnapshot &&
-                Array.isArray(lastEndedChampionSnapshot.teams)) {
-                const previousSessionStart = normalizeHistoryTimestamp(
-                    lastEndedChampionSnapshot.startedAt || lastEndedChampionSnapshot.sessionId
-                );
-                const previousTeam = lastEndedChampionSnapshot.teams.find(item =>
-                    item && String(item.id) === String(team.id)
-                );
-                if (previousTeam && previousSessionStart) {
-                    const previousLogs = (Array.isArray(previousTeam.matchHistoryLog) ? previousTeam.matchHistoryLog : [])
-                        .filter(log => {
-                            if (!log || !['WIN', 'LOSS', 'VOID'].includes(String(log.result || '').toUpperCase())) return false;
-                            const logSession = normalizeHistoryTimestamp(log.sessionId);
-                            const stamp = normalizeHistoryTimestamp(log.timestamp);
-                            return logSession ? logSession === previousSessionStart : (!!stamp && stamp >= previousSessionStart);
-                        })
-                        .map(log => ({
-                            ...log,
-                            opponent: String(log.opponent || '').trim(),
-                            durationMinutes: Math.max(0, Number(log.durationMinutes) || 0)
-                        }));
-                    const validPreviousLogs = dedupeMatchHistoryLogs(previousLogs)
-                        .filter(log => log && log.opponent);
-                    if (validPreviousLogs.length) return validPreviousLogs;
-                }
-            }
 
             // Final legacy compatibility: if a very old record has only counters,
             // do NOT fabricate an opponent or duration. Returning empty here makes
@@ -6626,6 +6664,7 @@
                         });
 
                         triggerHapticFeedback([45, 35, 65]);
+                        playPowerSmashSound();
                         btn.classList.add('defeated-option-selected');
                         const selectLabel = btn.querySelector('.defeated-select-label');
                         const selectedMark = btn.querySelector('.defeated-selected-mark');
@@ -6756,8 +6795,7 @@
                     lastActionTimestamp = now;
                     saveLocalBackup();
                     render();
-                    playShuttleSmashSound();
-                    triggerHapticFeedback([60, 40, 80]);
+                    triggerWinCelebration();
                     showToast(`🏆 ${team.name} Won!`);
                     finishPendingWin();
                     return;
@@ -6907,8 +6945,7 @@
                 lastActionSnapshot = remoteUndoSnapshot || lastActionSnapshot;
                 lastActionDescription = (remoteUndoSnapshot && remoteUndoSnapshot.description) || lastActionDescription;
                 render();
-                playShuttleSmashSound();
-                triggerHapticFeedback([60, 40, 80]);
+                triggerWinCelebration();
                 showToast(`🏆 ${team.name} Won!`);
 
                 // These are small, field-scoped writes. The undo stack has its own
