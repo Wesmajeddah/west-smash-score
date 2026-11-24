@@ -1240,11 +1240,6 @@
             </div>
         </div>
 
-        <div id="main-match-ended-banner" class="hidden w-full rounded-lg border border-amber-400 bg-gradient-to-r from-[#102b40] via-[#1e5961] to-[#84612c] px-3 py-2 text-center text-white shadow-md" role="status" aria-live="polite">
-            <div class="flex items-center justify-center gap-2 text-[10px] font-black tracking-[0.18em]"><span aria-hidden="true">🏁</span><span>MATCH ENDED</span><span aria-hidden="true">🏸</span></div>
-            <div class="mt-0.5 text-[8px] font-semibold text-white/85">മത്സരം ഔദ്യോഗികമായി അവസാനിച്ചു</div>
-        </div>
-
         <!-- Header Banner with Badminton Club Subtext -->
         <div id="share-header-banner" class="text-center py-0.5 px-1.5 bg-[#fcfbf9] border gold-border rounded-xl shadow-sm relative overflow-hidden space-y-0">
             <div class="py-0">
@@ -2909,8 +2904,6 @@
             const dot = document.getElementById("match-status-dot");
             const text = document.getElementById("match-status-text");
             const championsOption = document.getElementById("official-combined-section");
-            const mainEndedBanner = document.getElementById("main-match-ended-banner");
-            if (mainEndedBanner) mainEndedBanner.classList.toggle("hidden", !isMatchEnded);
             if (championsOption) {
                 championsOption.disabled = !isMatchEnded;
                 championsOption.setAttribute("aria-disabled", String(!isMatchEnded));
@@ -3874,15 +3867,22 @@
 
             // Winner name: slightly larger and distinctly heavier for the first-place champion.
             if(headlineTeams.length>1){
-                // Keep each co-champion name at the exact same nominal size as a single champion.
-                // Separate lines prevent the combined text from shrinking to fit one long line.
-                const coChampionOne=String(headlineTeams[0].name||'').toUpperCase();
-                const coChampionTwo=String(headlineTeams[1].name||'').toUpperCase();
-                // Double-layer lettering gives both tied champions equal, prominent visibility.
-                wesmaPosterText(ctx,coChampionOne,720,430,680,170,{color:'#7d4c16',italic:true,strokeScale:0.16,font:'Georgia, Times New Roman, serif'});
-                wesmaPosterText(ctx,coChampionOne,720,421,680,170,{color:'gold',italic:true,strokeScale:0.075,font:'Georgia, Times New Roman, serif'});
-                wesmaPosterText(ctx,coChampionTwo,720,570,680,170,{color:'#7d4c16',italic:true,strokeScale:0.16,font:'Georgia, Times New Roman, serif'});
-                wesmaPosterText(ctx,coChampionTwo,720,561,680,170,{color:'gold',italic:true,strokeScale:0.075,font:'Georgia, Times New Roman, serif'});
+                // Render every tied first-place team. Never truncate the champion list
+                // to two names. The layout automatically becomes more compact as the
+                // number of co-champions grows, while keeping all names visible.
+                const maxNames = Math.min(headlineTeams.length, 8);
+                const lineH = Math.max(58, Math.min(112, 360 / maxNames));
+                const startY = 435 - ((maxNames - 1) * lineH / 2);
+                headlineTeams.slice(0, maxNames).forEach((champion, index) => {
+                    const championName = String(champion.name || '').toUpperCase();
+                    const size = Math.max(52, Math.min(150, 1020 / Math.max(8, championName.length)));
+                    const y = startY + index * lineH;
+                    wesmaPosterText(ctx,championName,720,y,680,size,{color:'#7d4c16',italic:true,strokeScale:0.15,font:'Georgia, Times New Roman, serif'});
+                    wesmaPosterText(ctx,championName,720,y-5,680,size,{color:'gold',italic:true,strokeScale:0.07,font:'Georgia, Times New Roman, serif'});
+                });
+                if(headlineTeams.length>maxNames){
+                    wesmaPosterText(ctx,`+${headlineTeams.length-maxNames} MORE`,720,startY+maxNames*lineH,680,42,{color:'#fff0b6',italic:true,strokeScale:0.05,font:'Georgia, Times New Roman, serif'});
+                }
             } else if(parts.length>=2){
                 wesmaPosterText(ctx,parts[0],720,440,680,126,{color:'silver',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
                 wesmaPosterText(ctx,'& '+parts.slice(1).join(' & '),720,550,680,126,{color:'gold',italic:true,strokeScale:0.105,font:'Georgia, Times New Roman, serif'});
@@ -3929,15 +3929,15 @@
                     ctx.beginPath(); ctx.moveTo(92,y-rowGap*.48); ctx.lineTo(1050,y-rowGap*.48); ctx.stroke(); ctx.restore();
                 }
                 const rowFont=Math.max(13,Math.min(i===0?35:30,rowGap*.58));
-                const valueFont=Math.max(12,Math.min(i===0?34:30,rowGap*.56));
+                const valueFont=Math.max(14,Math.min(i===0?38:34,rowGap*.62));
                 wesmaPosterText(ctx,String(rank)+'.',130,y,78,Math.max(13,Math.min(34,rowGap*.62)),{color:rank===1?'gold':'silver'});
                 wesmaPosterText(ctx,String(team.name||'').toUpperCase(),390,y,390,rowFont,{color:rank===2?'#9bdcff':(rank===1?'gold':'#e6e8ed'),font:'Georgia, Times New Roman, serif'});
                 drawChampionTableIcon(ctx,'play',690,y);
-                wesmaPosterText(ctx,String(getTeamPlayedCount(team)),724,y,62,valueFont,{color:'silver'});
+                wesmaPosterText(ctx,String(getTeamPlayedCount(team)),724,y,62,valueFont,{color:'silver',font:'Arial Black, Arial, sans-serif'});
                 drawChampionTableIcon(ctx,'win',814,y);
-                wesmaPosterText(ctx,String(Number(team.wins)||0),849,y,62,valueFont,{color:'gold',font:'Georgia, Times New Roman, serif'});
+                wesmaPosterText(ctx,String(Number(team.wins)||0),849,y,62,valueFont,{color:'gold',font:'Arial Black, Arial, sans-serif'});
                 drawChampionTableIcon(ctx,'loss',958,y);
-                wesmaPosterText(ctx,String(Number(team.losses)||0),993,y,54,valueFont,{color:'#ff8b91'});
+                wesmaPosterText(ctx,String(Number(team.losses)||0),993,y,54,valueFont,{color:'#ff8b91',font:'Arial Black, Arial, sans-serif'});
             });
 
             // Keep the footer compact: date plus the actual session start/end time range.
@@ -6441,17 +6441,12 @@
                             <input id="wesma-film-end" type="number" min="0" step="0.1" value="0" class="w-full rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
                     </div>
-                    <div class="mt-2 rounded-lg border border-sky-200/30 bg-white/5 p-2 space-y-1">
-                        <div class="text-[9px] font-black text-sky-100">SHARED MUSIC • ALL PHONES</div>
-                        <div class="text-[8px] text-slate-300">Select a track once. It is automatically shared and loaded on the other connected phones.</div>
-                        <div id="wesma-film-shared-status" class="text-[8px] text-emerald-200">Waiting for shared music…</div>
-                    </div>
                     <div class="flex flex-wrap gap-2 mt-2">
                         <button id="wesma-film-preview" type="button" class="rounded-lg bg-sky-100 px-3 py-2 text-[10px] font-black text-slate-900">▶ PREVIEW FILM</button>
                         <button id="wesma-film-create" type="button" class="rounded-lg bg-amber-300 px-3 py-2 text-[10px] font-black text-slate-950">● CREATE VIDEO</button>
                         <button id="wesma-film-stop" type="button" class="rounded-lg bg-rose-700 px-3 py-2 text-[10px] font-black text-white">STOP</button>
                     </div>
-                    <div id="wesma-film-status" class="mt-2 min-h-[14px] text-[9px] text-slate-300" aria-live="polite">Choose music once; it will be shared with connected phones automatically.</div>
+                    <div id="wesma-film-status" class="mt-2 min-h-[14px] text-[9px] text-slate-300" aria-live="polite">Choose music. The same track is synced to connected phones for Preview / Create Video.</div>
                 </section>
 
                 <!-- Full Summary Table -->
@@ -6653,6 +6648,7 @@
             const t=Math.max(0,Number(elapsed)||0);
             ctx.clearRect(0,0,W,H);
             const img=wesmaChampionStoryboardImage;
+
             const drawFrame=(frame,zoom=1,panX=0,panY=0)=>{
                 if(img&&img.complete&&img.naturalWidth){
                     const iw=img.naturalWidth,ih=img.naturalHeight;
@@ -6662,7 +6658,11 @@
                     const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#071525');g.addColorStop(1,'#24140d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
                 }
             };
-            const sparks=(count,spread,alpha)=>{
+            const letterbox=(a=.82)=>{
+                ctx.fillStyle=`rgba(0,0,0,${a})`;
+                ctx.fillRect(0,0,W,34);ctx.fillRect(0,H-34,W,34);
+            };
+            const sparks=(count,spread,alpha=.8)=>{
                 for(let i=0;i<count;i++){
                     const seed=i*91.73+2.4,angle=seed%6.283,rad=((i*37)%100)/100*spread;
                     const x=W/2+Math.cos(angle)*rad,y=H/2+Math.sin(angle)*rad;
@@ -6673,65 +6673,93 @@
             };
             const feather=(x,y,rot,scale,alpha)=>{
                 ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(scale,scale);ctx.globalAlpha=alpha;
-                ctx.fillStyle='#f7eee0';ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.4;
+                ctx.fillStyle='#f7eee0';ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.4;
                 ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(18,-25,42,-34);ctx.quadraticCurveTo(36,-7,0,0);ctx.closePath();ctx.fill();
                 ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(42,-34);ctx.stroke();
                 for(let k=1;k<5;k++){ctx.beginPath();ctx.moveTo(k*7,-k*5.4);ctx.lineTo(k*9+3,-k*1.7);ctx.stroke();}
                 ctx.restore();
             };
-            const overlay=(a)=>{ctx.fillStyle=`rgba(3,8,16,${a})`;ctx.fillRect(0,0,W,H);};
+            const impactFlash=(strength)=>{
+                ctx.save();ctx.globalAlpha=strength;ctx.fillStyle='#fff4d5';ctx.fillRect(0,0,W,H);ctx.restore();
+            };
 
-            // 0–6 seconds: the badminton rally, jump smash, and shuttle rush toward lens.
-            if(t<6.2){
-                const frame=Math.min(15,Math.floor(t/0.39));
-                const p=(t%0.39)/0.39;
-                const zoom=1.02+frame*.012+p*.018;
-                const panX=Math.sin(t*1.8)*10,panY=Math.cos(t*1.3)*6;
-                drawFrame(frame,zoom,panX,panY);
-                overlay(.08);
-                if(frame>=4&&frame<=10)sparks(26,150,.7);
-                if(frame>=11){ctx.save();ctx.globalAlpha=Math.min(1,(frame-10)/2);ctx.fillStyle='#fff0c2';ctx.shadowColor='#ff9d32';ctx.shadowBlur=34;ctx.beginPath();ctx.arc(W/2,H/2,70+(frame-11)*28,0,Math.PI*2);ctx.fill();ctx.restore();}
+            // 0–4.4 s — real-time rally: stable court camera, then subtle handheld drift.
+            if(t<4.4){
+                const p=t/4.4;
+                drawFrame(Math.min(10,Math.floor(p*11)),1.01+p*.045,Math.sin(t*1.6)*7,Math.cos(t*1.15)*4);
+                letterbox(.76);
+                if(t>2.1)sparks(18,110,.36);
                 return;
             }
 
-            // 6.2–9.2 seconds: extreme close-up impact, slow-motion blast and feathers.
+            // 4.4–6.2 s — the opponent loads the racket, then the smash accelerates.
+            if(t<6.2){
+                const p=(t-4.4)/1.8;
+                const ease=p<.72 ? p/0.72 : 1-(p-.72)/.28;
+                const zoom=1.06+ease*.22;
+                drawFrame(11+Math.floor(Math.max(0,ease)*4),zoom,Math.sin(t*3.5)*9,-Math.cos(t*2.7)*5);
+                letterbox(.78);
+                sparks(24,150,.55);
+                // Speed-ramp streaks emphasize the racket-to-shuttle transition.
+                ctx.save();ctx.globalAlpha=.18+ease*.3;ctx.strokeStyle='#fff1c2';ctx.lineWidth=2;
+                for(let i=0;i<7;i++){const y=250+i*38;ctx.beginPath();ctx.moveTo(250,y);ctx.lineTo(980,y-90);ctx.stroke();}
+                ctx.restore();
+                return;
+            }
+
+            // 6.2–9.2 s — extreme macro shot: shuttle races into lens, freezes, then explodes.
             if(t<9.2){
                 const p=(t-6.2)/3;
-                drawFrame(15,1.15+p*.48,Math.sin(t*9)*8,Math.cos(t*7)*6);
-                overlay(.18+p*.25);
-                const flash=Math.max(0,1-Math.abs(p-.25)*4.2);
-                if(flash){ctx.fillStyle=`rgba(255,225,164,${flash*.42})`;ctx.fillRect(0,0,W,H);}
-                sparks(90,120+220*p,.85);
-                for(let i=0;i<24;i++){
-                    const a=i*2.399,dist=30+p*440+((i*19)%80);
-                    feather(W/2+Math.cos(a)*dist,H/2+Math.sin(a)*dist,a+.7,0.45+((i*7)%8)/10,Math.max(.12,1-p*.55));
+                const rush=Math.min(1,p/.48);
+                const zoom=1.28+rush*.72;
+                drawFrame(15,zoom,Math.sin(t*10)*10,Math.cos(t*8)*7);
+                letterbox(.86);
+                // The shuttle is represented as a bright lens-centered projectile.
+                ctx.save();
+                const sx=W/2+(1-rush)*240, sy=H/2+(1-rush)*80;
+                const trail=ctx.createLinearGradient(sx-180,sy-60,sx,sy);
+                trail.addColorStop(0,'rgba(255,245,210,0)');trail.addColorStop(1,'rgba(255,245,210,.72)');
+                ctx.strokeStyle=trail;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(sx-180,sy-60);ctx.lineTo(sx,sy);ctx.stroke();
+                ctx.fillStyle='#fffdf1';ctx.shadowColor='#ffb347';ctx.shadowBlur=28;ctx.beginPath();ctx.arc(sx,sy,10+18*rush,0,Math.PI*2);ctx.fill();ctx.restore();
+                if(p>.42 && p<.58) impactFlash(Math.max(0,1-Math.abs(p-.5)/.08)*.72);
+                if(p>.5){
+                    const blast=Math.min(1,(p-.5)/.5);
+                    sparks(120,150+360*blast,.92);
+                    for(let i=0;i<34;i++){
+                        const a=i*2.399,dist=35+blast*470+((i*19)%80);
+                        feather(W/2+Math.cos(a)*dist,H/2+Math.sin(a)*dist,a+.7,.45+((i*7)%8)/10,Math.max(.12,1-blast*.55));
+                    }
+                    ctx.save();ctx.globalAlpha=.22*(1-blast);ctx.fillStyle='#111';ctx.beginPath();ctx.arc(W/2,H/2,120+blast*250,0,Math.PI*2);ctx.fill();ctx.restore();
                 }
                 return;
             }
 
-            // 9.2–12 seconds: smoke clears; CHAMPIONS forms one letter at a time.
+            // 9.2–12 s — debris settles in slow motion; WESMA CHAMPIONS forms from feathers.
             if(t<12){
                 const p=(t-9.2)/2.8;
-                drawFrame(15,1.6+Math.sin(t*.5)*.04,Math.sin(t*.8)*8,Math.cos(t*.7)*4);
-                overlay(.58);
-                sparks(50,430,.5);
-                const word='CHAMPIONS';const shown=Math.min(word.length,Math.floor(p*(word.length+2)));
-                ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 76px Arial Black,Arial,sans-serif';
+                drawFrame(15,1.42+Math.sin(t*.5)*.03,Math.sin(t*.8)*8,Math.cos(t*.7)*4);
+                letterbox(.9);
+                sparks(52,440,.52);
+                for(let i=0;i<30;i++){
+                    const x=(i*181+t*14)%W,y=(i*97+t*(8+(i%3)*4))%H;
+                    feather(x,y,Math.sin(t+i)*.8,.28+((i*3)%7)/10,.18+.42*Math.sin(t*.7+i*.4)**2);
+                }
+                const word='WESMA CHAMPIONS';const shown=Math.min(word.length,Math.floor(p*(word.length+2)));
+                ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 70px Arial Black,Arial,sans-serif';
                 for(let i=0;i<shown;i++){
-                    const x=W/2+(i-(word.length-1)/2)*70;
+                    const total=word.length, x=W/2+(i-(total-1)/2)*44;
                     const letterProgress=Math.min(1,Math.max(0,p*(word.length+2)-i));
-                    ctx.save();ctx.globalAlpha=letterProgress;ctx.translate(x,410+(1-letterProgress)*75);ctx.rotate((1-letterProgress)*-.24);
+                    ctx.save();ctx.globalAlpha=letterProgress;ctx.translate(x,405+(1-letterProgress)*60);ctx.rotate((1-letterProgress)*-.18);
                     ctx.fillStyle='#f7d78c';ctx.shadowColor='#ff9c31';ctx.shadowBlur=24;ctx.fillText(word[i],0,0);ctx.restore();
                 }
                 return;
             }
 
-            // 12 seconds onward: winner's name emerges from drifting shuttle feathers.
+            // 12 s onward — final hero reveal. Every co-champion is shown, not only two.
             const reveal=Math.min(1,(t-12)/3.2);
             const stageGlow=ctx.createRadialGradient(640,330,40,640,330,760);
             stageGlow.addColorStop(0,'#263443');stageGlow.addColorStop(.55,'#101b2a');stageGlow.addColorStop(1,'#03070d');
-            ctx.fillStyle=stageGlow;ctx.fillRect(0,0,W,H);
-            // Moving stadium spotlights create a slow orbiting-camera feeling without showing other teams.
+            ctx.fillStyle=stageGlow;ctx.fillRect(0,0,W,H);letterbox(.9);
             for(let beam=0;beam<5;beam++){
                 const bx=180+beam*235+Math.sin(t*.32+beam)*42;
                 ctx.save();ctx.translate(bx,0);ctx.rotate(Math.sin(t*.28+beam)*.13);
@@ -6743,17 +6771,20 @@
                 const x=(i*173+t*24)%W,y=(i*89+t*(18+(i%4)*7))%H;
                 feather(x,y,Math.sin(t+i)*.9,.35+((i*3)%8)/10,.22+.45*Math.sin(t*.7+i*.4)**2);
             }
-            // Slow orbit-like camera drift and subtle parallax glow around the winner.
-            const orbit=Math.sin(t*.45)*14;
-            const nameSize=Math.max(38,Math.min(100,1050/Math.max(10,championName.length)));
-            ctx.save();ctx.translate(W/2+orbit,H/2-22+Math.cos(t*.4)*7);ctx.rotate(Math.sin(t*.3)*.012);
-            ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=reveal;
-            ctx.font=`900 ${nameSize}px Arial Black,Arial,sans-serif`;
-            ctx.lineWidth=5;ctx.strokeStyle='rgba(24,13,4,.92)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=42;ctx.strokeText(championName,0,-18,1160);
-            const gold=ctx.createLinearGradient(0,-90,0,60);gold.addColorStop(0,'#fff9dc');gold.addColorStop(.42,'#f9d477');gold.addColorStop(1,'#b66b1d');
-            ctx.fillStyle=gold;ctx.shadowColor='#ffc45d';ctx.shadowBlur=30;ctx.fillText(championName,0,-18,1160);
-            ctx.font='900 43px Arial,sans-serif';ctx.letterSpacing='12px';ctx.fillStyle='#fff0c6';ctx.shadowBlur=20;ctx.fillText('CHAMPIONS',0,90,1000);
-            ctx.restore();
+            const names=winners.length?winners: ['CHAMPIONS'];
+            const gap=Math.max(58,Math.min(108,360/Math.max(1,names.length)));
+            const startY=360-(names.length-1)*gap/2;
+            names.forEach((rawName,index)=>{
+                const n=String(rawName||'').toUpperCase();
+                const size=Math.max(38,Math.min(96,980/Math.max(9,n.length)));
+                const y=startY+index*gap;
+                ctx.save();ctx.translate(W/2+Math.sin(t*.45)*12,y+Math.cos(t*.4+index)*5);ctx.rotate(Math.sin(t*.3+index)*.012);
+                ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=reveal;
+                ctx.font=`900 ${size}px Arial Black,Arial,sans-serif`;ctx.lineWidth=5;ctx.strokeStyle='rgba(24,13,4,.92)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=38;ctx.strokeText(n,0,0,1160);
+                const gold=ctx.createLinearGradient(0,-size,0,size);gold.addColorStop(0,'#fff9dc');gold.addColorStop(.42,'#f9d477');gold.addColorStop(1,'#b66b1d');
+                ctx.fillStyle=gold;ctx.shadowColor='#ffc45d';ctx.shadowBlur=28;ctx.fillText(n,0,0,1160);ctx.restore();
+            });
+            ctx.save();ctx.textAlign='center';ctx.font='900 40px Arial Black,Arial,sans-serif';ctx.fillStyle='#fff0c6';ctx.shadowColor='#ffb94f';ctx.shadowBlur=20;ctx.globalAlpha=reveal;ctx.fillText('WESMA CHAMPIONS',W/2,620,1100);ctx.restore();
         }
 
         function wesmaFilmDrawTeamRows(ctx,teams,accent,progress,top,gap){
@@ -6979,13 +7010,17 @@
 
         function handleScoreChange(id, delta) {
             if (historyPreviewLiveState) { showToast("History Special View വായനയ്ക്കു മാത്രമാണ്. RETURN TO LIVE അമർത്തുക."); return; }
-            // Ignore rapid/repeated taps while the winner/loser selection is open.
+            // One score action at a time. The + flow must always resolve to exactly
+            // one WIN + one LOSS record for the selected pair.
             if (pendingWinActionInProgress || pendingWinCommitInProgress) return;
             if (isTournamentLocked || !normalizeHistoryTimestamp(tournamentStartTimestamp)) {
                 showToast("സ്കോർ രേഖപ്പെടുത്താൻ ആദ്യം START അമർത്തുക.");
                 return;
             }
-            if (isMatchEnded) showToast("Completed match correction: selected WIN/LOSS will be saved to the same match record.");
+            // END MATCH freezes the report, not the underlying session record. A later
+            // deliberate +/− correction continues the SAME session and updates the
+            // same History snapshot; it never starts a second session.
+            if (isMatchEnded) showToast("Post-End-Match correction: the selected result will be saved to the same session.");
             const team = teams.find(t => String(t.id) === String(id));
             if (!team || team.isDisabled) return;
             const now = Date.now();
@@ -7257,8 +7292,8 @@
              * The score is committed as ONE Firebase root transaction.
              * This is the real duplicate-score protection. Two phones can press
              * the same + button at almost the same time, but Firebase serializes
-             * the transaction. The second transaction sees the winner's 30-second
-             * cooldown and is rejected without adding another WIN/LOSS pair.
+             * the transaction. Firebase serializes concurrent writes, and the deterministic
+             * matchId prevents the same committed match record from being duplicated.
              *
              * Do not use random match IDs here. The transaction creates a
              * deterministic matchId from session + sequence + teams, so the same
@@ -7275,9 +7310,8 @@
 
             try {
                 if (!dbRef) {
-                    // Offline/local fallback. This still uses a deterministic ID and
-                    // the same cooldown, while Firebase remains the authoritative path
-                    // whenever the database is available.
+                    // Offline/local fallback. This still uses a deterministic ID while
+                    // Firebase remains the authoritative path whenever the database is available.
                     const localSeq = Math.max(0, Number(globalClickSequence) || 0) + 1;
                     const localMatchId = `${requestedSessionId}-${localSeq}-${winningTeamId}-${defeatedTeamId}`;
                     const existing = teams.some(t => (t.matchHistoryLog || []).some(m => String(m && m.matchId || '') === localMatchId));
@@ -7457,7 +7491,9 @@
                         tournamentStartTimestamp,
                         lastActionTimestamp,
                         globalClickSequence: Math.max(0, Number(globalClickSequence) || 0),
-                        isMatchEnded: false,
+                        // Preserve the ended-session state when this is a deliberate
+                        // post-End-Match correction; Undo must not silently reopen LIVE.
+                        isMatchEnded: scoringEndedSession,
                         isTournamentLocked: false,
                         description: `WON: ${winnerName} vs DEFEATED: ${loserName}`
                     };
@@ -8088,6 +8124,8 @@
             // from merging old-session counters back after a reset.
             teams.forEach(team => {
                 team.sessionId = newSessionId;
+                // Active session = completely clean. History is stored separately in
+                // tournamentHistory and is intentionally NOT touched here.
                 team.wins = 0;
                 team.losses = 0;
                 team.played = 0;
@@ -8098,6 +8136,7 @@
                 team.lastClickTime = 0;
                 team.clickOrder = 0;
                 team.matchInterval = 0;
+                team.lastMatchId = null;
             });
             // A reset must clear the active-session timestamp. Keeping resetAt here
             // makes other devices mistake the reset state for a running match.
