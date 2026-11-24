@@ -18,6 +18,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <!-- html2canvas for Auto Screenshot -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- GIF encoder for animated End Match sharing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
     
     <style>
         body {
@@ -768,6 +770,34 @@
             #finish-match-modal-content .dance-stage-photo, #finish-match-modal-content .animated-shuttle,
             #finish-match-modal-content .rally-glint { animation:none !important; }
         }
+
+
+        /* End Match podium cards: smaller footprint with vivid, distinct finishes. */
+        #finish-match-modal-content .wesma-end-second-place-box {
+            padding: 6px 8px !important;
+            gap: 3px !important;
+            background: linear-gradient(120deg,#dff8f2 0%,#c5eee5 48%,#f0fffb 100%) !important;
+            border: 1.5px solid #63b7a6 !important;
+            box-shadow: 0 3px 11px rgba(18,130,112,.16), inset 0 1px 0 rgba(255,255,255,.85) !important;
+        }
+        #finish-match-modal-content .wesma-end-second-place-box > div:first-child { font-size:8px !important; }
+        #finish-match-modal-content .wesma-end-second-place-box > div:nth-child(2) { font-size:11px !important; line-height:1.15 !important; }
+        #finish-match-modal-content .wesma-end-second-place-box > div:last-child span { padding:2px 7px !important; font-size:8px !important; }
+        #finish-match-modal-content .wesma-end-third-place-box {
+            padding:6px 7px !important;
+            gap:3px !important;
+            background:linear-gradient(125deg,#e8eaff 0%,#d8ddff 52%,#f7f5ff 100%) !important;
+            border:1.5px solid #9298df !important;
+            box-shadow:0 3px 11px rgba(82,87,180,.15), inset 0 1px 0 rgba(255,255,255,.85) !important;
+        }
+        #finish-match-modal-content .wesma-end-third-place-box > div:first-child { font-size:7px !important; }
+        #finish-match-modal-content .wesma-end-third-place-box > div:nth-child(2) { font-size:9px !important; line-height:1.15 !important; }
+        #finish-match-modal-content .wesma-end-third-place-box > div:last-child { font-size:8px !important; }
+        #finish-match-modal .end-match-gif-actions button {
+            min-height:38px; border-radius:11px; font-size:10px; font-weight:900;
+            box-shadow:0 4px 12px rgba(0,0,0,.12); transition:transform .15s ease,filter .15s ease;
+        }
+        #finish-match-modal .end-match-gif-actions button:active { transform:scale(.97); filter:brightness(.96); }
 
         /* Champions: only the ampersand gets a different color; size/measurements untouched. */
         .champion-ampersand {
@@ -1532,10 +1562,12 @@
             </div>
             <div id="finish-match-modal-content" class="p-3.5 space-y-2.5 overflow-y-auto flex-1 text-xs pb-4"></div>
         </div>
-        <div class="w-full max-w-md grid grid-cols-2 gap-2 shrink-0">
-            <button type="button" onclick="openChampionsFromFinish()" class="rounded-xl border border-[#d4af37] bg-[#fff7dc] text-[#5c4033] font-black text-[10px] py-3 shadow">🏆 CHAMPIONS</button>
-            <button type="button" onclick="openCombinedFromFinish()" class="rounded-xl border border-[#8c6239] bg-[#8c6239] text-white font-black text-[10px] py-3 shadow">📊 COMBINED REPORT</button>
+        <div class="w-full max-w-md grid grid-cols-3 gap-2 shrink-0 end-match-gif-actions">
+            <button type="button" onclick="openChampionsFromFinish()" class="border border-[#d4af37] bg-gradient-to-br from-[#fff7dc] to-[#f4d98a] text-[#5c4033]">🏆 CHAMPIONS</button>
+            <button type="button" onclick="openCombinedFromFinish()" class="border border-[#2b7180] bg-gradient-to-br from-[#236477] to-[#12384c] text-white">📊 REPORT</button>
+            <button type="button" id="end-match-gif-button" onclick="createAndShareEndMatchGif()" class="border border-[#8b5cf6] bg-gradient-to-br from-[#a78bfa] via-[#ec4899] to-[#f97316] text-white">🎞️ SHARE GIF</button>
         </div>
+        <div id="end-match-gif-status" class="w-full max-w-md text-center text-[9px] font-bold text-white/90 shrink-0" aria-live="polite"></div>
     </div>
 
     <!-- Combined Main Interface + Current Status + End Match shareable report -->
@@ -6318,6 +6350,131 @@
             }, 1500);
         }
 
+        async function createAndShareEndMatchGif() {
+            const button = document.getElementById("end-match-gif-button");
+            const status = document.getElementById("end-match-gif-status");
+            const target = document.getElementById("screenshot-target-card");
+            const modal = document.getElementById("finish-match-modal");
+            const setStatus = message => { if (status) status.textContent = message; };
+            if (!target || !modal || modal.classList.contains("hidden")) {
+                setStatus("End Match report is not ready.");
+                return;
+            }
+            if (typeof html2canvas === "undefined" || typeof GIF === "undefined") {
+                setStatus("GIF generator is unavailable. Check internet connection and retry.");
+                showToast("GIF generator ലഭ്യമല്ല. Internet connection പരിശോധിക്കുക.");
+                return;
+            }
+            if (button) { button.disabled = true; button.textContent = "⏳ CREATING GIF"; }
+            setStatus("🎞️ Animated report തയ്യാറാക്കുന്നു…");
+            const previousScrollTop = target.scrollTop;
+            const content = document.getElementById("finish-match-modal-content");
+            const savedLayout = {
+                overflow: target.style.overflow,
+                maxHeight: target.style.getPropertyValue("max-height"),
+                maxHeightPriority: target.style.getPropertyPriority("max-height"),
+                height: target.style.height,
+                contentOverflow: content ? content.style.overflow : "",
+                contentFlex: content ? content.style.flex : "",
+                contentMaxHeight: content ? content.style.maxHeight : "",
+                contentHeight: content ? content.style.height : ""
+            };
+            try {
+                // Expand the report temporarily so the GIF includes every table row,
+                // even when the on-screen modal normally uses an inner scroll area.
+                target.scrollTop = 0;
+                target.style.overflow = "visible";
+                target.style.setProperty("max-height", "none", "important");
+                target.style.height = "auto";
+                if (content) {
+                    content.style.overflow = "visible";
+                    content.style.flex = "none";
+                    content.style.maxHeight = "none";
+                    content.style.height = "auto";
+                }
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+                const frameCount = 9;
+                const frames = [];
+                for (let i = 0; i < frameCount; i++) {
+                    const canvas = await html2canvas(target, {
+                        backgroundColor: "#ffffff", scale: 1, useCORS: true,
+                        scrollX: 0, scrollY: 0,
+                        windowWidth: Math.max(target.scrollWidth, target.clientWidth),
+                        windowHeight: Math.max(target.scrollHeight, target.clientHeight)
+                    });
+                    frames.push(canvas);
+                    setStatus(`🎞️ GIF frames ${i + 1}/${frameCount}…`);
+                    await new Promise(resolve => setTimeout(resolve, 230));
+                }
+                target.style.overflow = savedLayout.overflow;
+                if (savedLayout.maxHeight) target.style.setProperty("max-height", savedLayout.maxHeight, savedLayout.maxHeightPriority);
+                else target.style.removeProperty("max-height");
+                target.style.height = savedLayout.height;
+                if (content) {
+                    content.style.overflow = savedLayout.contentOverflow;
+                    content.style.flex = savedLayout.contentFlex;
+                    content.style.maxHeight = savedLayout.contentMaxHeight;
+                    content.style.height = savedLayout.contentHeight;
+                }
+                target.scrollTop = previousScrollTop;
+
+                const gif = new GIF({
+                    workers: 2,
+                    quality: 10,
+                    width: frames[0].width,
+                    height: frames[0].height,
+                    workerScript: "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js",
+                    repeat: 0,
+                    background: "#ffffff"
+                });
+                frames.forEach((frame, index) => gif.addFrame(frame, { delay: 230, copy: true }));
+                const blob = await new Promise((resolve, reject) => {
+                    gif.on("finished", resolve);
+                    gif.on("abort", () => reject(new Error("GIF encoding was aborted")));
+                    gif.render();
+                });
+                if (!blob || !blob.size) throw new Error("GIF file is empty");
+                const file = new File([blob], `WESMA-End-Match-${Date.now()}.gif`, { type: "image/gif" });
+                if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+                    setStatus("WhatsApp / Share sheet തുറക്കുന്നു…");
+                    await navigator.share({ files: [file], title: "WESMA End Match Report" });
+                    setStatus("✅ GIF share ചെയ്യാൻ തയ്യാറായി.");
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = file.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 30000);
+                    setStatus("✅ GIF save ചെയ്തു. WhatsApp group-ൽ attach ചെയ്യാം.");
+                    showToast("GIF തയ്യാറായി. WhatsApp ഗ്രൂപ്പിൽ attach ചെയ്ത് share ചെയ്യാം.");
+                }
+            } catch (error) {
+                console.error("End Match GIF creation failed:", error);
+                if (error && error.name === "AbortError") {
+                    setStatus("Share cancelled.");
+                } else {
+                    setStatus("GIF തയ്യാറാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.");
+                    showToast("End Match GIF സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. Internet / memory പരിശോധിക്കുക.");
+                }
+            } finally {
+                target.style.overflow = savedLayout.overflow;
+                if (savedLayout.maxHeight) target.style.setProperty("max-height", savedLayout.maxHeight, savedLayout.maxHeightPriority);
+                else target.style.removeProperty("max-height");
+                target.style.height = savedLayout.height;
+                if (content) {
+                    content.style.overflow = savedLayout.contentOverflow;
+                    content.style.flex = savedLayout.contentFlex;
+                    content.style.maxHeight = savedLayout.contentMaxHeight;
+                    content.style.height = savedLayout.contentHeight;
+                }
+                target.scrollTop = previousScrollTop;
+                if (button) { button.disabled = false; button.textContent = "🎞️ SHARE GIF"; }
+            }
+        }
+
         function closeFinishMatchModal() {
             const modal = document.getElementById("finish-match-modal");
             if (modal) modal.classList.add("hidden");
@@ -6681,12 +6838,10 @@
                                 requestAnimationFrame(() => { fill.style.width = '100%'; });
                             }
                         }
-                        // One-second visual confirmation of the selected losing team.
-                        // Commit begins immediately when that one-second hold completes.
-                        setTimeout(() => {
-                            closeDefeatedTeamModal(true);
-                            confirmWinAndDefeatedTeam(winningTeamId, t.id);
-                        }, 1000);
+                        // Commit immediately after selection; do not add a one-second
+                        // confirmation delay before the scoreboard starts updating.
+                        closeDefeatedTeamModal(true);
+                        confirmWinAndDefeatedTeam(winningTeamId, t.id);
                     };
                     container.appendChild(btn);
                 }
@@ -7537,6 +7692,18 @@
                 team.lastClickTime = 0;
                 team.clickOrder = 0;
                 team.matchInterval = 0;
+                // Reassert every active-session counter/log as a clean slate.
+                team.wins = 0;
+                team.losses = 0;
+                team.played = 0;
+                team.totalTimeSpentMinutes = 0;
+                team.defeatedDetails = [];
+                team.matchHistoryLog = [];
+                // Clear optional/legacy score caches so old totals cannot reappear.
+                team.totalPlays = 0;
+                team.totalWins = 0;
+                team.totalLosses = 0;
+                team.currentScore = 0;
             });
             // A reset must clear the active-session timestamp. Keeping resetAt here
             // makes other devices mistake the reset state for a running match.
@@ -7553,6 +7720,15 @@
             sessionHistorySavedId = null;
             startGuardActive = false;
             finishProcessing = false;
+            scheduledMatchStartAt = null;
+            lastEndedChampionSnapshot = null;
+            pendingWinningTeamId = null;
+            pendingWinActionInProgress = false;
+            pendingWinCommitInProgress = false;
+            autoWinTimeout = null;
+            // Refresh the local merge base with the fresh zero-score session.
+            teamSyncBase = wesmaDeepClone(teams);
+            remoteTeamsSessionEpoch = "";
 
             // Paint the cleared state immediately, then wait for the shared Firebase write.
             saveLocalBackup();
