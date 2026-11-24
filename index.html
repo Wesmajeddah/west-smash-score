@@ -19,7 +19,6 @@
     <!-- html2canvas for Auto Screenshot -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- GIF encoder for animated End Match sharing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
     
     <style>
         body {
@@ -260,6 +259,19 @@
         .defeated-option-selected {
             animation: none !important;
         }
+
+        #defeated-selection-feedback {
+            position: fixed; left: 50%; top: max(14px, env(safe-area-inset-top));
+            transform: translate(-50%, -10px) scale(.96); opacity: 0; pointer-events: none;
+            z-index: 120; max-width: calc(100vw - 24px); width: max-content;
+            padding: 10px 16px; border: 1px solid rgba(255,255,255,.55);
+            border-radius: 16px; color: #fff; text-align: center; font-size: 12px;
+            font-weight: 900; letter-spacing: .03em;
+            background: linear-gradient(120deg,#064e3b,#047857,#0f766e);
+            box-shadow: 0 12px 35px rgba(0,0,0,.32);
+            transition: opacity .14s ease, transform .14s ease;
+        }
+        #defeated-selection-feedback.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
         @keyframes startButtonPop {
             0%, 100% { transform: scale(1); box-shadow: 0 0 0px rgba(140, 98, 57, 0); }
@@ -1565,7 +1577,7 @@
         <div class="w-full max-w-md grid grid-cols-3 gap-2 shrink-0 end-match-gif-actions">
             <button type="button" onclick="openChampionsFromFinish()" class="border border-[#d4af37] bg-gradient-to-br from-[#fff7dc] to-[#f4d98a] text-[#5c4033]">🏆 CHAMPIONS</button>
             <button type="button" onclick="openCombinedFromFinish()" class="border border-[#2b7180] bg-gradient-to-br from-[#236477] to-[#12384c] text-white">📊 REPORT</button>
-            <button type="button" id="end-match-gif-button" onclick="createAndShareEndMatchGif()" class="border border-[#8b5cf6] bg-gradient-to-br from-[#a78bfa] via-[#ec4899] to-[#f97316] text-white">🎞️ SHARE GIF</button>
+            <button type="button" id="end-match-gif-button" onclick="createAndShareEndMatchGif()" class="border border-[#f5d36f] bg-gradient-to-br from-[#b7791f] via-[#f5d36f] to-[#fff1b8] text-[#241707]">🎬 CINEMATIC GIF</button>
         </div>
         <div id="end-match-gif-status" class="w-full max-w-md text-center text-[9px] font-bold text-white/90 shrink-0" aria-live="polite"></div>
     </div>
@@ -1788,6 +1800,7 @@
     <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/95 text-[#2c221e] border-2 border-[#8c6239] font-bold px-5 py-3 rounded-2xl text-xs shadow-xl opacity-0 transition-all duration-200 pointer-events-none z-50 text-center max-w-xs leading-relaxed backdrop-blur-lg scale-90">
         <div id="toast-text">സ്കോർ അപ്ഡേറ്റ് ചെയ്തു! / Score updated!</div>
     </div>
+    <div id="defeated-selection-feedback" role="status" aria-live="polite"></div>
 
     <script>
         const ADMIN_PIN = "1234";
@@ -2706,7 +2719,23 @@
                         const loadedSessionEpoch = activeEpochNumber > 0
                             ? String(activeEpochNumber)
                             : String((incomingGuard && incomingGuard.sessionId) || "");
-                        if (incomingGuard && incomingGuard.active === true && loadedSessionEpoch) {
+                        const isAuthoritativeResetSnapshot = !!(incomingGuard && incomingGuard.active !== true &&
+                            Number(incomingGuard.resetAt) > 0 &&
+                            String(incomingGuard.sessionId || "") === String(incomingGuard.resetAt) &&
+                            !data.tournamentStartTimestamp && data.isMatchEnded !== true && data.isTournamentLocked === true);
+                        if (isAuthoritativeResetSnapshot && loadedSessionEpoch) {
+                            // Never merge a stale phone's previous-session scores back into a reset.
+                            incomingTeams.forEach(team => {
+                                if (!team) return;
+                                team.sessionId = loadedSessionEpoch;
+                                team.wins = 0; team.losses = 0; team.played = 0;
+                                team.totalTimeSpentMinutes = 0; team.lastMatchTime = 0;
+                                team.lastClickTime = 0; team.clickOrder = 0; team.matchInterval = 0;
+                                team.defeatedDetails = []; team.matchHistoryLog = [];
+                                team.totalPlays = 0; team.totalWins = 0; team.totalLosses = 0; team.currentScore = 0;
+                            });
+                            remoteTeamsSessionEpoch = loadedSessionEpoch;
+                        } else if (incomingGuard && incomingGuard.active === true && loadedSessionEpoch) {
                             incomingTeams.forEach(team => { if (team) team.sessionId = loadedSessionEpoch; });
                             // Mark already-correct Firebase team nodes as synced. If the
                             // remote node is stale, the score path performs one guarded
@@ -2720,9 +2749,11 @@
                         } else {
                             remoteTeamsSessionEpoch = "";
                         }
-                        const mergedIncomingTeams = teamSyncBase
-                            ? mergeChangedTeamSnapshot(incomingTeams, teamSyncBase, wesmaDeepClone(teams))
-                            : wesmaDeepClone(incomingTeams);
+                        const mergedIncomingTeams = isAuthoritativeResetSnapshot
+                            ? wesmaDeepClone(incomingTeams)
+                            : (teamSyncBase
+                                ? mergeChangedTeamSnapshot(incomingTeams, teamSyncBase, wesmaDeepClone(teams))
+                                : wesmaDeepClone(incomingTeams));
                         teamSyncBase = wesmaDeepClone(incomingTeams);
                         teams = mergedIncomingTeams;
 
@@ -2753,7 +2784,10 @@
                         undoHistoryStack = Array.isArray(data.undoHistoryStack) ? data.undoHistoryStack : (lastActionSnapshot ? [lastActionSnapshot] : []);
                         redoHistoryStack = Array.isArray(data.redoHistoryStack) ? data.redoHistoryStack : [];
                         sessionHistorySavedId = data.sessionHistorySavedId || null;
-                        lastEndedChampionSnapshot = data.lastEndedChampionSnapshot && Array.isArray(data.lastEndedChampionSnapshot.teams) ? data.lastEndedChampionSnapshot : lastEndedChampionSnapshot;
+                        lastEndedChampionSnapshot = isAuthoritativeResetSnapshot
+                            ? null
+                            : (data.lastEndedChampionSnapshot && Array.isArray(data.lastEndedChampionSnapshot.teams)
+                                ? data.lastEndedChampionSnapshot : lastEndedChampionSnapshot);
                         scheduledMatchStartAt = Number(data.scheduledMatchStartAt) || null;
                         if (data.sessionStartGuard && typeof data.sessionStartGuard === "object") {
                             startGuardActive = data.sessionStartGuard.active === true;
@@ -6350,128 +6384,360 @@
             }, 1500);
         }
 
+        function encodeWesmaGifFrames(canvases, delayMs = 180) {
+            if (!Array.isArray(canvases) || !canvases.length) throw new Error("No GIF frames");
+            const width = canvases[0].width;
+            const height = canvases[0].height;
+            if (!width || !height || width > 65535 || height > 65535) throw new Error("GIF dimensions are invalid");
+            const bytes = [];
+            const push = (...values) => values.forEach(value => bytes.push(value & 255));
+            const word = value => push(value & 255, (value >> 8) & 255);
+            const ascii = value => { for (let i = 0; i < value.length; i++) push(value.charCodeAt(i)); };
+            ascii("GIF89a"); word(width); word(height); push(0xF7, 0, 0);
+            // Balanced 6x7x6 global palette (252 colors + 4 reserved entries)
+            // gives smoother cinematic gradients than the old 3-3-2 palette.
+            for (let r = 0; r < 6; r++) for (let g = 0; g < 7; g++) for (let b = 0; b < 6; b++) {
+                push(Math.round(r * 255 / 5), Math.round(g * 255 / 6), Math.round(b * 255 / 5));
+            }
+            for (let i = 252; i < 256; i++) push(0, 0, 0);
+            // Infinite loop, supported by WhatsApp and standard GIF viewers.
+            push(0x21, 0xFF, 0x0B); ascii("NETSCAPE2.0"); push(0x03, 0x01, 0x00, 0x00, 0x00);
+
+            const makeIndexedPixels = canvas => {
+                const ctx = canvas.getContext("2d", { willReadFrequently: true });
+                const rgba = ctx.getImageData(0, 0, width, height).data;
+                const indexed = new Uint8Array(width * height);
+                for (let src = 0, dst = 0; dst < indexed.length; src += 4, dst++) {
+                    const r = Math.min(5, Math.round(rgba[src] * 5 / 255));
+                    const g = Math.min(6, Math.round(rgba[src + 1] * 6 / 255));
+                    const b = Math.min(5, Math.round(rgba[src + 2] * 5 / 255));
+                    indexed[dst] = (r * 7 + g) * 6 + b;
+                }
+                return indexed;
+            };
+            const lzw = pixels => {
+                // Literal-code LZW with periodic CLEAR codes. This deliberately
+                // trades a little compression for a tiny, predictable encoder
+                // that stays at 9-bit codes and avoids worker/browser differences.
+                const CLEAR = 256, END = 257;
+                const out = [];
+                let accumulator = 0, bitCount = 0;
+                const emit9 = code => {
+                    accumulator |= code << bitCount;
+                    bitCount += 9;
+                    while (bitCount >= 8) { out.push(accumulator & 255); accumulator >>>= 8; bitCount -= 8; }
+                };
+                for (let offset = 0; offset < pixels.length; offset += 200) {
+                    emit9(CLEAR);
+                    const limit = Math.min(pixels.length, offset + 200);
+                    for (let i = offset; i < limit; i++) emit9(pixels[i]);
+                }
+                if (!pixels.length) emit9(CLEAR);
+                emit9(END);
+                if (bitCount > 0) out.push(accumulator & 255);
+                return out;
+            };
+            const appendSubBlocks = data => {
+                for (let i = 0; i < data.length; i += 255) {
+                    const chunk = data.slice(i, i + 255);
+                    push(chunk.length);
+                    chunk.forEach(value => push(value));
+                }
+                push(0);
+            };
+
+            const delay = Math.max(2, Math.min(65535, Math.round(delayMs / 10)));
+            canvases.forEach(canvas => {
+                if (canvas.width !== width || canvas.height !== height) throw new Error("GIF frame sizes do not match");
+                push(0x21, 0xF9, 0x04, 0x00); word(delay); push(0x00, 0x00);
+                push(0x2C); word(0); word(0); word(width); word(height); push(0x00);
+                push(0x08); // LZW minimum code size
+                appendSubBlocks(lzw(makeIndexedPixels(canvas)));
+            });
+            push(0x3B);
+            return new Blob([new Uint8Array(bytes)], { type: "image/gif" });
+        }
+
         async function createAndShareEndMatchGif() {
             const button = document.getElementById("end-match-gif-button");
             const status = document.getElementById("end-match-gif-status");
-            const target = document.getElementById("screenshot-target-card");
             const modal = document.getElementById("finish-match-modal");
             const setStatus = message => { if (status) status.textContent = message; };
-            if (!target || !modal || modal.classList.contains("hidden")) {
-                setStatus("End Match report is not ready.");
+            if (!modal || modal.classList.contains("hidden")) {
+                setStatus("End Match തുറന്ന ശേഷം Cinematic GIF അമർത്തുക.");
                 return;
             }
-            if (typeof html2canvas === "undefined" || typeof GIF === "undefined") {
-                setStatus("GIF generator is unavailable. Check internet connection and retry.");
-                showToast("GIF generator ലഭ്യമല്ല. Internet connection പരിശോധിക്കുക.");
+            if (typeof encodeWesmaGifFrames !== "function") {
+                setStatus("GIF encoder ലഭ്യമല്ല. പേജ് വീണ്ടും തുറന്ന് ശ്രമിക്കുക.");
                 return;
             }
-            if (button) { button.disabled = true; button.textContent = "⏳ CREATING GIF"; }
-            setStatus("🎞️ Animated report തയ്യാറാക്കുന്നു…");
-            const previousScrollTop = target.scrollTop;
-            const content = document.getElementById("finish-match-modal-content");
-            const savedLayout = {
-                overflow: target.style.overflow,
-                maxHeight: target.style.getPropertyValue("max-height"),
-                maxHeightPriority: target.style.getPropertyPriority("max-height"),
-                height: target.style.height,
-                contentOverflow: content ? content.style.overflow : "",
-                contentFlex: content ? content.style.flex : "",
-                contentMaxHeight: content ? content.style.maxHeight : "",
-                contentHeight: content ? content.style.height : ""
-            };
-            try {
-                // Expand the report temporarily so the GIF includes every table row,
-                // even when the on-screen modal normally uses an inner scroll area.
-                target.scrollTop = 0;
-                target.style.overflow = "visible";
-                target.style.setProperty("max-height", "none", "important");
-                target.style.height = "auto";
-                if (content) {
-                    content.style.overflow = "visible";
-                    content.style.flex = "none";
-                    content.style.maxHeight = "none";
-                    content.style.height = "auto";
-                }
-                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-                const frameCount = 9;
-                const frames = [];
-                for (let i = 0; i < frameCount; i++) {
-                    const canvas = await html2canvas(target, {
-                        backgroundColor: "#ffffff", scale: 1, useCORS: true,
-                        scrollX: 0, scrollY: 0,
-                        windowWidth: Math.max(target.scrollWidth, target.clientWidth),
-                        windowHeight: Math.max(target.scrollHeight, target.clientHeight)
-                    });
-                    frames.push(canvas);
-                    setStatus(`🎞️ GIF frames ${i + 1}/${frameCount}…`);
-                    await new Promise(resolve => setTimeout(resolve, 230));
-                }
-                target.style.overflow = savedLayout.overflow;
-                if (savedLayout.maxHeight) target.style.setProperty("max-height", savedLayout.maxHeight, savedLayout.maxHeightPriority);
-                else target.style.removeProperty("max-height");
-                target.style.height = savedLayout.height;
-                if (content) {
-                    content.style.overflow = savedLayout.contentOverflow;
-                    content.style.flex = savedLayout.contentFlex;
-                    content.style.maxHeight = savedLayout.contentMaxHeight;
-                    content.style.height = savedLayout.contentHeight;
-                }
-                target.scrollTop = previousScrollTop;
 
-                const gif = new GIF({
-                    workers: 2,
-                    quality: 10,
-                    width: frames[0].width,
-                    height: frames[0].height,
-                    workerScript: "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js",
-                    repeat: 0,
-                    background: "#ffffff"
-                });
-                frames.forEach((frame, index) => gif.addFrame(frame, { delay: 230, copy: true }));
-                const blob = await new Promise((resolve, reject) => {
-                    gif.on("finished", resolve);
-                    gif.on("abort", () => reject(new Error("GIF encoding was aborted")));
-                    gif.render();
-                });
-                if (!blob || !blob.size) throw new Error("GIF file is empty");
-                const file = new File([blob], `WESMA-End-Match-${Date.now()}.gif`, { type: "image/gif" });
-                if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-                    setStatus("WhatsApp / Share sheet തുറക്കുന്നു…");
-                    await navigator.share({ files: [file], title: "WESMA End Match Report" });
-                    setStatus("✅ GIF share ചെയ്യാൻ തയ്യാറായി.");
-                } else {
+            if (button) { button.disabled = true; button.textContent = "⏳ CREATING CINEMA"; }
+            let frames = [];
+            try {
+                // Use the frozen End Match snapshot so the film always reflects the
+                // exact standings at the moment the match ended, not later live edits.
+                const sourceTeams = (isMatchEnded && lastEndedChampionSnapshot && Array.isArray(lastEndedChampionSnapshot.teams))
+                    ? wesmaDeepClone(lastEndedChampionSnapshot.teams)
+                    : wesmaDeepClone(teams || []);
+                const active = sourceTeams.filter(team => team && !team.isDisabled);
+                const sorted = getInternationalSortedTeams(active);
+                const podium = getPodiumGroups(active);
+                const podiumFor = rank => (podium.find(group => group.rank === rank) || { teams: [] }).teams;
+                const first = podiumFor(1);
+                const second = podiumFor(2);
+                const third = podiumFor(3);
+                const lastStanding = sorted.length ? sorted[sorted.length - 1] : null;
+                const last = lastStanding ? sorted.filter(team => standingPositionKey(team) === standingPositionKey(lastStanding)) : [];
+                const totalMatches = Number((lastEndedChampionSnapshot && lastEndedChampionSnapshot.totalMatches) || Math.floor((lastEndedChampionSnapshot && lastEndedChampionSnapshot.totalPlays || calculateTotalPlays()) / 2)) || 0;
+                const dateLabel = new Date((lastEndedChampionSnapshot && lastEndedChampionSnapshot.endedAt) || Date.now())
+                    .toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
+
+                const W = 432, H = 768, FRAME_COUNT = 29, FRAME_DELAY = 520;
+                const canvas = document.createElement("canvas");
+                canvas.width = W; canvas.height = H;
+                const ctx = canvas.getContext("2d", { alpha: false, willReadFrequently: true });
+                if (!ctx) throw new Error("Canvas is not supported on this device");
+
+                const fitText = (text, maxWidth, startSize, minSize = 15, weight = 900) => {
+                    let size = startSize;
+                    do { ctx.font = `${weight} ${size}px Arial, sans-serif`; if (ctx.measureText(text).width <= maxWidth) break; size -= 1; } while (size >= minSize);
+                    return size;
+                };
+                const wrapNames = (items, maxWidth, size, maxLines = 3) => {
+                    const names = (items || []).map(team => String(team.name || "TEAM"));
+                    const lines = [];
+                    let line = "";
+                    names.forEach(name => {
+                        const candidate = line ? `${line}  •  ${name}` : name;
+                        ctx.font = `800 ${size}px Arial, sans-serif`;
+                        if (line && ctx.measureText(candidate).width > maxWidth && lines.length < maxLines - 1) { lines.push(line); line = name; }
+                        else line = candidate;
+                    });
+                    if (line) lines.push(line);
+                    if (lines.length > maxLines) lines.length = maxLines;
+                    return lines;
+                };
+                const roundedRect = (x, y, w, h, r, fill, stroke, lineWidth = 1) => {
+                    ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+                    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+                    if (stroke) { ctx.lineWidth = lineWidth; ctx.strokeStyle = stroke; ctx.stroke(); }
+                };
+                const glowText = (text, x, y, color, size, glow, weight = 900) => {
+                    ctx.save(); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    ctx.font = `${weight} ${size}px Arial, sans-serif`;
+                    ctx.shadowColor = glow; ctx.shadowBlur = 24; ctx.fillStyle = color; ctx.fillText(text, x, y); ctx.restore();
+                };
+                const drawBackground = (frame, accent) => {
+                    const g = ctx.createLinearGradient(0, 0, W, H);
+                    g.addColorStop(0, "#050812"); g.addColorStop(.48, "#10182b"); g.addColorStop(1, "#03050b");
+                    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+                    // Stadium roof and tiered audience lights.
+                    for (let row = 0; row < 7; row++) {
+                        const y = 250 + row * 43;
+                        ctx.strokeStyle = `rgba(130,170,220,${.035 + row * .009})`;
+                        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, y); ctx.quadraticCurveTo(W / 2, y - 55, W, y); ctx.stroke();
+                        for (let j = 0; j < 22; j++) {
+                            const x = (j * 23 + row * 11 + frame * (row % 2 ? 1 : -1) * .7) % W;
+                            ctx.fillStyle = `rgba(210,225,255,${.12 + ((j + row + frame) % 5) * .035})`;
+                            ctx.fillRect(x, y + 7 + (j % 3) * 3, 2, 2);
+                        }
+                    }
+                    // Moving overhead spotlights.
+                    for (let k = 0; k < 4; k++) {
+                        const x = 35 + k * 122 + Math.sin(frame * .22 + k) * 48;
+                        const beam = ctx.createLinearGradient(x, 0, x + (k - 1.5) * 90, 590);
+                        beam.addColorStop(0, accent + "55"); beam.addColorStop(1, accent + "00");
+                        ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(x - 10, 0); ctx.lineTo(x + 10, 0); ctx.lineTo(x + (k - 1.5) * 105, 590); ctx.lineTo(x + (k - 1.5) * 55, 590); ctx.closePath(); ctx.fill();
+                    }
+                    const floor = ctx.createLinearGradient(0, 545, 0, H);
+                    floor.addColorStop(0, "#111a2b"); floor.addColorStop(1, "#02040a");
+                    ctx.fillStyle = floor; ctx.fillRect(0, 545, W, H - 545);
+                    // Badminton court lines.
+                    ctx.save(); ctx.strokeStyle = "rgba(160,205,235,.35)"; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(26, 620); ctx.lineTo(406, 620); ctx.moveTo(52, 570); ctx.lineTo(52, 730); ctx.moveTo(380, 570); ctx.lineTo(380, 730); ctx.moveTo(216, 570); ctx.lineTo(216, 730); ctx.moveTo(52, 690); ctx.lineTo(380, 690); ctx.stroke(); ctx.restore();
+                    // Floating dust / sparks.
+                    for (let n = 0; n < 46; n++) {
+                        const x = (n * 97 + frame * (1 + n % 3) * 2.3) % W;
+                        const y = (n * 61 + Math.sin(frame * .16 + n) * 22 + frame * (n % 4 + 1) * .8) % H;
+                        const alpha = .12 + ((n + frame) % 6) * .08;
+                        ctx.fillStyle = accent + Math.round(Math.min(1, alpha) * 255).toString(16).padStart(2, "0");
+                        ctx.beginPath(); ctx.arc(x, y, n % 7 === 0 ? 2.2 : 1, 0, Math.PI * 2); ctx.fill();
+                    }
+                };
+                const drawBrand = () => {
+                    ctx.save(); ctx.textAlign = "center";
+                    ctx.font = "900 17px Arial, sans-serif"; ctx.fillStyle = "#f6e7b5"; ctx.fillText("WESMA", W / 2, 39);
+                    ctx.font = "700 8px Arial, sans-serif"; ctx.fillStyle = "rgba(238,243,255,.75)"; ctx.fillText("BADMINTON CLUB  •  CHAMPIONSHIP NIGHT", W / 2, 56);
+                    ctx.strokeStyle = "rgba(228,190,104,.55)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(70, 70); ctx.lineTo(W - 70, 70); ctx.stroke();
+                    ctx.restore();
+                };
+                const drawShuttle = (x, y, angle, scale = 1) => {
+                    ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
+                    ctx.shadowColor = "rgba(255,255,255,.8)"; ctx.shadowBlur = 12;
+                    ctx.fillStyle = "#fff7df"; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-9, -24); ctx.lineTo(9, -24); ctx.closePath(); ctx.fill();
+                    ctx.strokeStyle = "#d9d1bd"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-9, -24); ctx.lineTo(0, 0); ctx.lineTo(9, -24); ctx.stroke();
+                    ctx.fillStyle = "#c9a65a"; ctx.beginPath(); ctx.ellipse(0, 2, 4, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                };
+                const drawPlayer = (frame, x, y, scale = 1) => {
+                    ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
+                    ctx.strokeStyle = "#07101d"; ctx.lineCap = "round"; ctx.lineJoin = "round";
+                    ctx.lineWidth = 18; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-14, 56); ctx.lineTo(-42, 90); ctx.moveTo(-14, 56); ctx.lineTo(20, 93); ctx.stroke();
+                    ctx.fillStyle = "#07101d"; ctx.beginPath(); ctx.ellipse(0, -26, 20, 25, -.2, 0, Math.PI * 2); ctx.fill();
+                    ctx.lineWidth = 15; ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(27, -24); ctx.lineTo(58, -54 + Math.sin(frame * .3) * 5); ctx.stroke();
+                    ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(58, -54); ctx.lineTo(91, -92); ctx.stroke();
+                    ctx.strokeStyle = "rgba(245,220,160,.75)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(98, -101, 13, 21, .55, 0, Math.PI * 2); ctx.stroke();
+                    ctx.restore();
+                };
+                const drawTrophy = (cx, cy, scale, color) => {
+                    ctx.save(); ctx.translate(cx, cy); ctx.scale(scale, scale);
+                    ctx.shadowColor = color; ctx.shadowBlur = 28;
+                    const gold = ctx.createLinearGradient(-40, -50, 45, 75);
+                    gold.addColorStop(0, "#fff7c5"); gold.addColorStop(.35, color); gold.addColorStop(1, "#8a5416");
+                    ctx.fillStyle = gold; ctx.beginPath(); ctx.moveTo(-31, -49); ctx.lineTo(31, -49); ctx.lineTo(24, 2); ctx.quadraticCurveTo(0, 40, -24, 2); ctx.closePath(); ctx.fill();
+                    ctx.lineWidth = 10; ctx.strokeStyle = color; ctx.beginPath(); ctx.arc(-30, -28, 22, Math.PI * .45, Math.PI * 1.48); ctx.stroke(); ctx.beginPath(); ctx.arc(30, -28, 22, -Math.PI * .48, Math.PI * .55); ctx.stroke();
+                    ctx.fillRect(-7, 5, 14, 32); ctx.fillRect(-27, 36, 54, 10); ctx.fillRect(-36, 47, 72, 12);
+                    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.font = "900 17px Arial"; ctx.textAlign = "center"; ctx.fillText("★", 0, -13);
+                    ctx.restore();
+                };
+                const drawPlaceScene = (frame, place, teamsAtPlace, accent, label, index, hero = false) => {
+                    const progress = Math.min(1, Math.max(0, (frame - index + 1) / 3));
+                    const slide = (1 - progress) * 55;
+                    drawBackground(frame, accent); drawBrand();
+                    ctx.save(); ctx.globalAlpha = .9;
+                    glowText(hero ? "THE CHAMPIONS" : "FINAL STANDINGS", W / 2, 112, "#ffffff", 12, accent);
+                    ctx.restore();
+                    if (hero) {
+                        // A dramatic smash silhouette and shuttle trail behind the champion reveal.
+                        drawPlayer(frame, 85, 485, 1.18);
+                        const sx = 305 + Math.sin(frame * .38) * 34;
+                        const sy = 245 + Math.cos(frame * .31) * 22;
+                        ctx.save(); ctx.strokeStyle = "rgba(255,226,143,.75)"; ctx.lineWidth = 3; ctx.shadowColor = accent; ctx.shadowBlur = 18;
+                        ctx.beginPath(); ctx.moveTo(sx - 85, sy + 95); ctx.quadraticCurveTo(sx - 22, sy + 30, sx, sy); ctx.stroke(); ctx.restore();
+                        drawShuttle(sx, sy, -.45 + Math.sin(frame * .2) * .1, 1.25);
+                        drawTrophy(W / 2, 300, 1.18 + Math.sin(frame * .28) * .035, "#f5cf66");
+                    }
+                    const panelY = hero ? 405 : 275;
+                    const panelH = hero ? 222 : 248;
+                    const fill = hero ? "rgba(36,27,10,.88)" : "rgba(7,14,27,.88)";
+                    roundedRect(24, panelY + slide, W - 48, panelH, 25, fill, accent, hero ? 3 : 2);
+                    ctx.save(); ctx.globalAlpha = progress;
+                    glowText(label, W / 2, panelY + 35 + slide, accent, hero ? 25 : 21, accent);
+                    ctx.font = `900 ${hero ? 36 : 31}px Arial, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    const names = teamsAtPlace && teamsAtPlace.length
+                        ? wrapNames(teamsAtPlace, W - 92, hero ? 29 : 25, hero ? 3 : 4)
+                        : ["NOT AWARDED"];
+                    names.forEach((name, i) => {
+                        const size = fitText(name, W - 86, hero ? 29 : 25, 16, 900);
+                        ctx.font = `900 ${size}px Arial, sans-serif`;
+                        ctx.shadowColor = accent; ctx.shadowBlur = hero ? 20 : 10;
+                        ctx.fillStyle = hero ? "#fff3c2" : "#ffffff";
+                        ctx.fillText(name, W / 2, panelY + (hero ? 100 : 100) + slide + i * (hero ? 38 : 34));
+                    });
+                    const sample = teamsAtPlace[0];
+                    if (sample) {
+                        const detailY = panelY + panelH - 43 + slide;
+                        ctx.shadowBlur = 0; ctx.font = "700 13px Arial, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.82)";
+                        const plays = getTeamPlayedCount(sample);
+                        ctx.fillText(`${Number(sample.wins) || 0} WINS   •   ${Number(sample.losses) || 0} LOSSES   •   ${plays} PLAYS`, W / 2, detailY);
+                    }
+                    ctx.restore();
+                    if (hero) {
+                        glowText("🏆", W / 2, 672, "#ffe49a", 34, "#e5a928");
+                        ctx.save(); ctx.textAlign = "center"; ctx.font = "800 10px Arial"; ctx.fillStyle = "rgba(255,245,214,.8)"; ctx.fillText("THE MOMENT. THE GLORY. THE CHAMPIONS.", W / 2, 714); ctx.restore();
+                    } else {
+                        ctx.save(); ctx.textAlign = "center"; ctx.font = "700 11px Arial"; ctx.fillStyle = "rgba(255,255,255,.65)"; ctx.fillText("WESMA  •  OFFICIAL TOURNAMENT RESULT", W / 2, 704); ctx.restore();
+                    }
+                };
+                const drawOpening = frame => {
+                    drawBackground(frame, "#71c9ff"); drawBrand();
+                    ctx.save(); ctx.textAlign = "center";
+                    glowText("THE FINAL", W / 2, 175, "#ffffff", 33, "#6abfff");
+                    glowText("SHOWDOWN", W / 2, 220, "#f6d989", 38, "#e8a934");
+                    ctx.font = "700 11px Arial"; ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillText("ONE COURT  •  ONE CHAMPION  •  PURE GLORY", W / 2, 262);
+                    ctx.restore();
+                    drawPlayer(frame, 110, 515, 1.65);
+                    const x = 300 + Math.sin(frame * .55) * 60, y = 375 - frame * 8;
+                    ctx.save(); ctx.strokeStyle = "rgba(160,220,255,.85)"; ctx.lineWidth = 4; ctx.shadowColor = "#67c9ff"; ctx.shadowBlur = 22;
+                    ctx.beginPath(); ctx.moveTo(x - 110, y + 115); ctx.quadraticCurveTo(x - 35, y + 30, x, y); ctx.stroke(); ctx.restore();
+                    drawShuttle(x, y, -.65, 1.6);
+                    glowText("🏸", W / 2, 660, "#ffffff", 36, "#68caff");
+                };
+                const drawFinale = frame => {
+                    drawBackground(frame, "#f1c75b"); drawBrand();
+                    glowText("THE FINAL PODIUM", W / 2, 112, "#fff0bf", 24, "#e7ad37");
+                    drawTrophy(W / 2, 218, .72, "#f1c75b");
+                    const entries = [
+                        { label: "1ST  •  CHAMPIONS", teams: first, color: "#f4cf63" },
+                        { label: "2ND  •  SILVER", teams: second, color: "#cbd5e1" },
+                        { label: "3RD  •  BRONZE", teams: third, color: "#d99a69" },
+                        { label: "LAST PLACE", teams: last, color: "#fb7185" }
+                    ];
+                    entries.forEach((entry, i) => {
+                        const y = 310 + i * 91;
+                        roundedRect(24, y, W - 48, 76, 15, i === 0 ? "rgba(86,59,13,.88)" : "rgba(7,14,27,.88)", entry.color, i === 0 ? 3 : 1.5);
+                        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+                        ctx.font = "900 12px Arial"; ctx.fillStyle = entry.color; ctx.fillText(entry.label, 42, y + 22);
+                        const names = entry.teams.length ? entry.teams.map(t => String(t.name || "TEAM")).join(" • ") : "NOT AWARDED";
+                        const size = fitText(names, W - 90, i === 0 ? 20 : 17, 11, 900);
+                        ctx.font = `900 ${size}px Arial`; ctx.fillStyle = "#ffffff"; ctx.fillText(names, 42, y + 51);
+                    });
+                    ctx.textAlign = "center"; ctx.font = "700 10px Arial"; ctx.fillStyle = "rgba(255,255,255,.7)";
+                    ctx.fillText(`${dateLabel}   •   ${totalMatches} MATCHES`, W / 2, 704);
+                    glowText("WESMA BADMINTON CLUB", W / 2, 738, "#f6d989", 14, "#d69b32");
+                };
+
+                for (let frame = 0; frame < FRAME_COUNT; frame++) {
+                    if (frame === 0) setStatus("🎬 Cinematic Championship തയ്യാറാക്കുന്നു…");
+                    if (frame === 4) setStatus("🥇 Champion reveal & stadium animation…");
+                    if (frame === 13) setStatus("🥈🥉 Podium scenes തയ്യാറാക്കുന്നു…");
+                    if (frame === 24) setStatus("🏁 Final standings & closing scene…");
+                    if (frame < 4) drawOpening(frame);
+                    else if (frame < 13) drawPlaceScene(frame, 1, first, "#f5d36f", "🥇  FIRST PLACE  🥇", 4, true);
+                    else if (frame < 17) drawPlaceScene(frame, 2, second, "#d7e2f0", "🥈  SECOND PLACE  🥈", 13, false);
+                    else if (frame < 21) drawPlaceScene(frame, 3, third, "#d99a69", "🥉  THIRD PLACE  🥉", 17, false);
+                    else if (frame < 24) drawPlaceScene(frame, 4, last, "#fb7185", "LAST PLACE", 21, false);
+                    else drawFinale(frame);
+                    const frameCopy = document.createElement("canvas");
+                    frameCopy.width = W; frameCopy.height = H;
+                    frameCopy.getContext("2d").drawImage(canvas, 0, 0);
+                    frames.push(frameCopy);
+                    // Yield between frames to keep the mobile browser responsive.
+                    if (frame % 3 === 2) await new Promise(resolve => setTimeout(resolve, 0));
+                }
+
+                setStatus("🎞️ High-quality GIF encode ചെയ്യുന്നു…");
+                const blob = encodeWesmaGifFrames(frames, FRAME_DELAY);
+                frames = [];
+                if (!blob || blob.size < 1000) throw new Error("GIF encoding returned an empty file");
+                const file = new File([blob], `WESMA-Cinematic-Championship-${Date.now()}.gif`, { type: "image/gif" });
+                const downloadGifFile = () => {
                     const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.download = file.name;
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    setTimeout(() => URL.revokeObjectURL(url), 30000);
-                    setStatus("✅ GIF save ചെയ്തു. WhatsApp group-ൽ attach ചെയ്യാം.");
-                    showToast("GIF തയ്യാറായി. WhatsApp ഗ്രൂപ്പിൽ attach ചെയ്ത് share ചെയ്യാം.");
+                    const link = document.createElement("a"); link.href = url; link.download = file.name;
+                    document.body.appendChild(link); link.click(); link.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                };
+                const canNativeShare = typeof navigator.share === "function" &&
+                    (!navigator.canShare || navigator.canShare({ files: [file] }));
+                if (canNativeShare) {
+                    try {
+                        await navigator.share({ files: [file], title: "WESMA Cinematic Championship", text: "WESMA BADMINTON CLUB — The Final Podium" });
+                        setStatus(`✅ Cinematic GIF share ചെയ്തു (${(file.size / 1024 / 1024).toFixed(1)} MB). WhatsApp തിരഞ്ഞെടുക്കാം.`);
+                    } catch (shareError) {
+                        if (shareError && shareError.name === "AbortError") setStatus("GIF തയ്യാറാണ്. Share നിങ്ങൾ റദ്ദാക്കി; വീണ്ടും ശ്രമിക്കാം.");
+                        else { downloadGifFile(); setStatus("✅ Cinematic GIF save ചെയ്തു. WhatsApp-ൽ attach ചെയ്യാം."); }
+                    }
+                } else {
+                    downloadGifFile(); setStatus("✅ Cinematic GIF save ചെയ്തു. WhatsApp group-ൽ attach ചെയ്യാം.");
+                    showToast("Cinematic GIF save ചെയ്തു. WhatsApp-ൽ attach ചെയ്ത് share ചെയ്യാം.");
                 }
             } catch (error) {
-                console.error("End Match GIF creation failed:", error);
-                if (error && error.name === "AbortError") {
-                    setStatus("Share cancelled.");
-                } else {
-                    setStatus("GIF തയ്യാറാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.");
-                    showToast("End Match GIF സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. Internet / memory പരിശോധിക്കുക.");
-                }
+                console.error("WESMA cinematic GIF creation failed:", error);
+                setStatus("GIF തയ്യാറാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.");
+                showToast("Cinematic GIF സൃഷ്ടിക്കുന്നതിൽ പിഴവ്. Browser memory പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.");
             } finally {
-                target.style.overflow = savedLayout.overflow;
-                if (savedLayout.maxHeight) target.style.setProperty("max-height", savedLayout.maxHeight, savedLayout.maxHeightPriority);
-                else target.style.removeProperty("max-height");
-                target.style.height = savedLayout.height;
-                if (content) {
-                    content.style.overflow = savedLayout.contentOverflow;
-                    content.style.flex = savedLayout.contentFlex;
-                    content.style.maxHeight = savedLayout.contentMaxHeight;
-                    content.style.height = savedLayout.contentHeight;
-                }
-                target.scrollTop = previousScrollTop;
-                if (button) { button.disabled = false; button.textContent = "🎞️ SHARE GIF"; }
+                frames = [];
+                if (button) { button.disabled = false; button.textContent = "🎬 CINEMATIC GIF"; }
             }
         }
 
@@ -6757,6 +7023,19 @@
             }
         }
 
+        let defeatedSelectionFeedbackTimer = null;
+        function showDefeatedSelectionFeedback(winnerName, defeatedName) {
+            const el = document.getElementById("defeated-selection-feedback");
+            if (!el) return;
+            if (defeatedSelectionFeedbackTimer) clearTimeout(defeatedSelectionFeedbackTimer);
+            el.textContent = `✓ SELECTED: ${defeatedName}  |  WIN: ${winnerName}`;
+            el.classList.add("show");
+            defeatedSelectionFeedbackTimer = setTimeout(() => {
+                el.classList.remove("show");
+                defeatedSelectionFeedbackTimer = null;
+            }, 1000);
+        }
+
         function openDefeatedTeamModal(winningTeamId) {
             if (autoWinTimeout) {
                 clearTimeout(autoWinTimeout);
@@ -6838,8 +7117,10 @@
                                 requestAnimationFrame(() => { fill.style.width = '100%'; });
                             }
                         }
-                        // Commit immediately after selection; do not add a one-second
-                        // confirmation delay before the scoreboard starts updating.
+                        // Show the selected pair for one second on the main screen,
+                        // while committing the score immediately (no one-second delay).
+                        const winnerForFeedback = teams.find(team => String(team.id) === String(winningTeamId));
+                        showDefeatedSelectionFeedback(winnerForFeedback ? winnerForFeedback.name : "Winner", t.name);
                         closeDefeatedTeamModal(true);
                         confirmWinAndDefeatedTeam(winningTeamId, t.id);
                     };
@@ -7728,6 +8009,7 @@
             autoWinTimeout = null;
             // Refresh the local merge base with the fresh zero-score session.
             teamSyncBase = wesmaDeepClone(teams);
+            teamNameSyncBase = wesmaDeepClone(teamNameOverrides);
             remoteTeamsSessionEpoch = "";
 
             // Paint the cleared state immediately, then wait for the shared Firebase write.
@@ -7760,12 +8042,15 @@
                         redoHistoryStack: [],
                         sessionHistorySavedId: null,
                         scheduledMatchStartAt: null,
+                        lastEndedChampionSnapshot: null,
                         sessionStartGuard: resetGuard
                     }));
                     firebaseSaved = !!resetResult.committed;
                     if (firebaseSaved && Array.isArray(resetResult.value && resetResult.value.teams)) {
+                        teams = wesmaDeepClone(resetResult.value.teams);
                         teamSyncBase = wesmaDeepClone(resetResult.value.teams);
                         teamNameSyncBase = wesmaDeepClone(resetResult.value.teamNameOverrides || teamNameOverrides);
+                        lastEndedChampionSnapshot = null;
                     }
                 } catch (resetError) {
                     console.error("Atomic new-session reset failed:", resetError);
