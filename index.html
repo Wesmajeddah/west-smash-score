@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter & Great Vibes -->
+    <!-- Google Fonts: Inter & Cinzel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -93,7 +93,7 @@
         }
 
         .special-w {
-            font-family: 'Great Vibes', cursive;
+            font-family: 'Cinzel', Georgia, serif;
             font-size: 1.35em;
             display: inline-block;
             transform: translateY(3px);
@@ -6683,7 +6683,6 @@
                 }
                 const iw=img.naturalWidth,ih=img.naturalHeight;
                 ctx.save();ctx.globalAlpha=alpha;
-                // Cinematic blurred fill keeps the entire original photograph visible in front.
                 const cover=Math.max(W/iw,H/ih)*1.08,bw=iw*cover,bh=ih*cover;
                 ctx.save();ctx.filter='blur(26px) brightness(.42) saturate(1.12)';
                 ctx.drawImage(img,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();
@@ -6710,7 +6709,6 @@
                     const fade=1-local/.16;
                     drawScene(index-1,fade,1.045);
                 }
-                // Subtle cinematic light sweep; no detail is painted over the players.
                 ctx.save();
                 const sweep=(t*95)%(W+260)-130;
                 const beam=ctx.createLinearGradient(sweep-100,0,sweep+100,0);
@@ -6721,131 +6719,201 @@
                 return;
             }
 
-            // Full-screen champion reveal over the final supplied badminton scene.
-            const reveal=Math.min(1,(t-sceneEnd)/2.4);
+            // FINAL CHAMPION REVEAL — visually follows the supplied reference:
+            // black stage, huge Roman/serif capitals, antique-gold 3-D metal,
+            // deep extrusion, bright bevel, floor reflection and restrained glow.
+            const reveal=Math.min(1,(t-sceneEnd)/2.8);
+            const revealEase=1-Math.pow(1-Math.max(0,reveal),3);
             drawScene(3,1,1.045);
             ctx.save();
-            ctx.fillStyle='rgba(1,7,17,.68)';ctx.fillRect(0,0,W,H);
-            const glow=ctx.createRadialGradient(W/2,H*.48,30,W/2,H*.48,560);
-            glow.addColorStop(0,'rgba(20,85,145,.34)');
-            glow.addColorStop(.55,'rgba(3,20,39,.18)');
-            glow.addColorStop(1,'rgba(0,0,0,.42)');
-            ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+            ctx.fillStyle='rgba(0,0,0,.86)';ctx.fillRect(0,0,W,H);
+            const stageGlow=ctx.createRadialGradient(W/2,H*.48,20,W/2,H*.48,620);
+            stageGlow.addColorStop(0,'rgba(255,196,76,.10)');
+            stageGlow.addColorStop(.38,'rgba(120,70,10,.055)');
+            stageGlow.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=stageGlow;ctx.fillRect(0,0,W,H);
 
-            // Gold light beams and restrained sparks frame the champion without obscuring the name.
-            for(let i=0;i<5;i++){
-                const x=55+i*155+Math.sin(t*.35+i)*18;
-                const beam=ctx.createLinearGradient(x,0,x+90,H);
-                beam.addColorStop(0,'rgba(255,226,151,.16)');
-                beam.addColorStop(1,'rgba(255,226,151,0)');
-                ctx.fillStyle=beam;ctx.beginPath();ctx.moveTo(x-20,0);ctx.lineTo(x+20,0);
-                ctx.lineTo(x+180,H);ctx.lineTo(x+80,H);ctx.closePath();ctx.fill();
+            // Fine cinematic gold dust.
+            for(let i=0;i<76;i++){
+                const x=(i*137+t*10)%W;
+                const y=(i*83+t*(4+(i%5)))%H;
+                const a=.10+.30*Math.abs(Math.sin(t*1.2+i));
+                ctx.globalAlpha=a;
+                ctx.fillStyle=i%4===0?'#fff2bd':'#d9a63b';
+                ctx.beginPath();ctx.arc(x,y,0.65+(i%3)*.45,0,Math.PI*2);ctx.fill();
             }
-            for(let i=0;i<54;i++){
-                const x=(i*137+t*18)%W,y=(i*83+t*(10+(i%4)*5))%H;
-                ctx.globalAlpha=.22+.5*Math.abs(Math.sin(t*1.5+i));
-                ctx.fillStyle=i%3?'#ffe3a0':'#ffffff';
-                ctx.beginPath();ctx.arc(x,y,1.2+(i%3)*.7,0,Math.PI*2);ctx.fill();
-            }
-            ctx.globalAlpha=1;
+            ctx.globalAlpha=revealEase;
 
-            const titleY=H*.31;
-            ctx.textAlign='center';ctx.textBaseline='middle';
-            ctx.globalAlpha=reveal;
-            ctx.font='900 30px Inter, Arial, sans-serif';
-            ctx.fillStyle='#ffe9ad';ctx.shadowColor='#f2bd55';ctx.shadowBlur=18;
-            ctx.fillText('THE CHAMPION',W/2,titleY-104);
-            ctx.font='700 17px Inter, Arial, sans-serif';
-            ctx.fillStyle='rgba(255,255,255,.86)';ctx.shadowBlur=8;
-            ctx.fillText('WESMA BADMINTON CLUB',W/2,titleY-68);
-
-            const lineGap=names.length>2?104:126;
-            const fontSize=Math.min(154,Math.floor(510/Math.max(1,Math.max(...names.map(n=>n.length))*.58)));
-            const totalHeight=(names.length-1)*lineGap;
-            names.forEach((rawName,index)=>{
-                const name=String(rawName||'CHAMPION').toUpperCase();
-                ctx.save();
-                ctx.translate(W/2,H*.46-totalHeight/2+index*lineGap);
-                const pop=.94+.06*reveal;
-                ctx.scale(pop,pop);
-                ctx.font=`bold ${fontSize}px "Great Vibes", Georgia, serif`;
-                let fitted=fontSize;
-                while(ctx.measureText(name).width>660&&fitted>48){
-                    fitted-=3;ctx.font=`bold ${fitted}px "Great Vibes", Georgia, serif`;
+            // Reference-style name layout: preserve the actual champion/team name,
+            // but split naturally into two lines when it contains multiple names.
+            const splitName=(raw)=>{
+                const clean=String(raw||'CHAMPION').trim().replace(/\s+/g,' ');
+                if(clean.includes('&')){
+                    const parts=clean.split(/\s*&\s*/).filter(Boolean);
+                    if(parts.length===2)return [parts[0],parts[1]];
                 }
-                ctx.lineWidth=5;ctx.strokeStyle='rgba(1,8,18,.9)';
-                ctx.shadowColor='#ffc65c';ctx.shadowBlur=34;
-                ctx.globalAlpha=reveal;
-                ctx.strokeText(name,0,0,670);
-                const gold=ctx.createLinearGradient(0,-fitted,0,fitted);
-                gold.addColorStop(0,'#fffbe4');gold.addColorStop(.48,'#f5d16d');gold.addColorStop(1,'#fff0b5');
-                ctx.fillStyle=gold;ctx.shadowColor='#ffbd45';ctx.shadowBlur=28;
-                ctx.fillText(name,0,0,670);
+                const words=clean.split(' ');
+                if(words.length===2 && clean.length>10)return [words[0],words[1]];
+                if(words.length>2){
+                    let best=[clean],bestDiff=Infinity;
+                    for(let i=1;i<words.length;i++){
+                        const a=words.slice(0,i).join(' '),b=words.slice(i).join(' ');
+                        const diff=Math.abs(a.length-b.length);
+                        if(diff<bestDiff){best=[a,b];bestDiff=diff;}
+                    }
+                    return best;
+                }
+                return [clean];
+            };
+
+            const drawMetalText=(text,y,size)=>{
+                let fitted=size;
+                ctx.font=`900 ${fitted}px "Cinzel", Georgia, "Times New Roman", serif`;
+                while(ctx.measureText(text).width>650&&fitted>46){
+                    fitted-=2;
+                    ctx.font=`900 ${fitted}px "Cinzel", Georgia, "Times New Roman", serif`;
+                }
+                ctx.textAlign='center';ctx.textBaseline='middle';
+
+                // Deep black extrusion.
+                for(let d=18;d>=5;d-=2){
+                    ctx.globalAlpha=revealEase;
+                    ctx.lineWidth=9;
+                    ctx.strokeStyle='rgba(37,20,5,.95)';
+                    ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=5;
+                    ctx.strokeText(text,W/2+d*.32,y+d,660);
+                }
+                // Dark outer rim.
+                ctx.lineWidth=10;
+                ctx.strokeStyle='#5b350d';
+                ctx.shadowColor='rgba(255,183,55,.40)';ctx.shadowBlur=22;
+                ctx.strokeText(text,W/2,y,660);
+
+                // Multi-stop antique-gold metal face.
+                const gold=ctx.createLinearGradient(0,y-fitted*.58,0,y+fitted*.58);
+                gold.addColorStop(0,'#fff4c5');
+                gold.addColorStop(.12,'#d9a441');
+                gold.addColorStop(.30,'#8c5a17');
+                gold.addColorStop(.48,'#f7d36e');
+                gold.addColorStop(.66,'#a86d1d');
+                gold.addColorStop(.84,'#ffe69a');
+                gold.addColorStop(1,'#8b5918');
+                ctx.fillStyle=gold;
+                ctx.shadowColor='#f7bd4e';ctx.shadowBlur=16;
+                ctx.fillText(text,W/2,y,660);
+
+                // Inner highlight / engraved edge.
+                ctx.lineWidth=1.8;
+                ctx.strokeStyle='rgba(255,248,207,.92)';
+                ctx.shadowBlur=0;
+                ctx.strokeText(text,W/2-0.5,y-0.8,660);
+
+                // Fine horizontal metal sheen.
+                ctx.save();
+                ctx.globalCompositeOperation='source-atop';
+                const sheenX=((t*180)%900)-90;
+                const sheen=ctx.createLinearGradient(sheenX-55,0,sheenX+55,0);
+                sheen.addColorStop(0,'rgba(255,255,255,0)');
+                sheen.addColorStop(.5,'rgba(255,255,255,.48)');
+                sheen.addColorStop(1,'rgba(255,255,255,0)');
+                ctx.fillStyle=sheen;ctx.fillRect(0,y-fitted*.65,W,fitted*1.3);
                 ctx.restore();
+                return fitted;
+            };
+
+            const allLines=[];
+            names.forEach(n=>splitName(n).forEach(line=>allLines.push(line.toUpperCase())));
+            const lineCount=allLines.length;
+            const fontSize=lineCount<=2?142:(lineCount<=4?112:88);
+            const lineGap=lineCount<=2?142:112;
+            const firstY=lineCount===1?420:350;
+            allLines.forEach((line,i)=>drawMetalText(line,firstY+i*lineGap,fontSize));
+
+            // Floor reflection directly beneath the lettering, matching the reference.
+            ctx.save();
+            ctx.globalAlpha=.25*revealEase;
+            ctx.translate(0,firstY+(lineCount-1)*lineGap+70);
+            ctx.scale(1,-.18);
+            ctx.filter='blur(3px)';
+            allLines.forEach((line,i)=>{
+                const y=-(i*lineGap);
+                let fs=fontSize;
+                ctx.font=`900 ${fs}px "Cinzel", Georgia, "Times New Roman", serif`;
+                while(ctx.measureText(line).width>650&&fs>46){fs-=2;ctx.font=`900 ${fs}px "Cinzel", Georgia, "Times New Roman", serif`;}
+                ctx.textAlign='center';ctx.textBaseline='middle';
+                ctx.fillStyle='#d7a13b';ctx.fillText(line,W/2,y,660);
             });
+            ctx.restore();
 
-            /*
-             * REAL CHAMPION MATCH DETAILS
-             * These rows come directly from the frozen match-history snapshot
-             * captured for the cinematic film. No score/history values are invented.
-             */
-            const detailSource=champions.length?champions[0]:null;
-            const details=detailSource&&Array.isArray(detailSource.matchDetails)
-                ? detailSource.matchDetails.slice().sort((a,b)=>(Number(b.seq)||0)-(Number(a.seq)||0) || (Number(b.timestamp)||0)-(Number(a.timestamp)||0))
-                : [];
-            const panelTop=H*.615;
-            const panelH=Math.min(330,Math.max(150,112+details.slice(0,4).length*48));
-            const panelW=624,panelX=(W-panelW)/2;
-            ctx.globalAlpha=reveal;
-            ctx.fillStyle='rgba(0,0,0,.58)';
-            ctx.strokeStyle='rgba(244,211,109,.72)';
-            ctx.lineWidth=1.5;
-            ctx.shadowColor='rgba(212,175,55,.28)';ctx.shadowBlur=18;
-            ctx.beginPath();
-            ctx.roundRect(panelX,panelTop,panelW,panelH,18);
-            ctx.fill();ctx.stroke();
-            ctx.shadowBlur=0;
-
-            ctx.font='900 24px Inter, Arial, sans-serif';
-            ctx.fillStyle='#ffe8a3';
-            ctx.textAlign='left';
-            ctx.fillText('CHAMPION MATCH DETAILS',panelX+24,panelTop+34);
-            ctx.font='800 16px Inter, Arial, sans-serif';
-            ctx.fillStyle='rgba(255,255,255,.68)';
-            ctx.textAlign='right';
-            ctx.fillText(`${detailSource?detailSource.played:0} PLAY  •  ${detailSource?detailSource.wins:0} WIN  •  ${detailSource?detailSource.losses:0} LOSS`,panelX+panelW-24,panelTop+34);
-
-            const rows=details.slice(0,4);
-            if(rows.length){
-                rows.forEach((row,i)=>{
-                    const y=panelTop+76+i*48;
-                    ctx.fillStyle=i%2?'rgba(255,255,255,.045)':'rgba(255,220,140,.075)';
-                    ctx.fillRect(panelX+14,y-22,panelW-28,42);
-                    ctx.textAlign='left';
-                    ctx.font='900 15px Inter, Arial, sans-serif';
-                    ctx.fillStyle='#fff';
-                    ctx.fillText(String(row.opponent||'Opponent').toUpperCase(),panelX+28,y+2,300);
-                    ctx.textAlign='center';
-                    ctx.font='900 15px Inter, Arial, sans-serif';
-                    ctx.fillStyle=String(row.result||'').toUpperCase()==='WIN'?'#ffe08a':'#ff9b9b';
-                    ctx.fillText(String(row.result||'').toUpperCase(),panelX+390,y);
-                    ctx.textAlign='right';
-                    ctx.font='800 13px Inter, Arial, sans-serif';
-                    ctx.fillStyle='rgba(255,255,255,.72)';
-                    const mins=Number(row.durationMinutes)||0;
-                    ctx.fillText(mins>0?`${mins} MIN`:'MATCH',panelX+panelW-28,y+2);
-                });
-            }else{
-                ctx.textAlign='center';
-                ctx.font='800 16px Inter, Arial, sans-serif';
-                ctx.fillStyle='rgba(255,255,255,.62)';
-                ctx.fillText('MATCH HISTORY DETAILS UNAVAILABLE',W/2,panelTop+64);
-            }
+            // Match-details area — kept below the name artwork so the reference name
+            // design remains dominant and visually unchanged.
+            const panelTop=Math.min(790,firstY+lineCount*lineGap+65);
+            const panelW=650,panelX=(W-panelW)/2;
+            const maxRows=3;
+            const detailGroups=champions.slice(0,2).map(ch=>({
+                name:String(ch.name||'CHAMPION'),
+                played:Number(ch.played)||0,
+                wins:Number(ch.wins)||0,
+                losses:Number(ch.losses)||0,
+                rows:(Array.isArray(ch.matchDetails)?ch.matchDetails:[])
+                    .slice().sort((a,b)=>(Number(b.seq)||0)-(Number(a.seq)||0)||(Number(b.timestamp)||0)-(Number(a.timestamp)||0))
+                    .slice(0,maxRows)
+            }));
+            const totalRows=detailGroups.reduce((n,g)=>n+Math.max(1,g.rows.length),0);
+            const panelH=Math.min(340,108+totalRows*38+detailGroups.length*8);
+            ctx.globalAlpha=revealEase;
+            ctx.fillStyle='rgba(0,0,0,.68)';
+            ctx.strokeStyle='rgba(224,174,65,.78)';
+            ctx.lineWidth=1.4;
+            ctx.shadowColor='rgba(218,164,52,.24)';ctx.shadowBlur=20;
+            ctx.beginPath();ctx.roundRect(panelX,panelTop,panelW,panelH,8);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
 
             ctx.textAlign='center';
-            ctx.font='900 20px Inter, Arial, sans-serif';
-            ctx.fillStyle='#fff0c6';ctx.shadowColor='#ffbd45';ctx.shadowBlur=18;
-            ctx.fillText('🏆  WESMA CHAMPIONS  🏆',W/2,H*.865);
+            ctx.font='900 13px Inter, Arial, sans-serif';
+            ctx.fillStyle='#f7d77e';
+            ctx.fillText('CHAMPIONS • MATCH DETAILS',W/2,panelTop+25);
+
+            let cursor=panelTop+52;
+            if(!detailGroups.length){
+                ctx.font='700 10px Inter, Arial, sans-serif';ctx.fillStyle='rgba(255,255,255,.62)';
+                ctx.fillText('MATCH HISTORY DETAILS UNAVAILABLE',W/2,cursor+18);
+            }else{
+                detailGroups.forEach((group,gi)=>{
+                    ctx.textAlign='left';
+                    ctx.font='900 11px Inter, Arial, sans-serif';ctx.fillStyle='#fff0bc';
+                    ctx.fillText(group.name.toUpperCase(),panelX+22,cursor);
+                    ctx.textAlign='right';ctx.font='800 9px Inter, Arial, sans-serif';ctx.fillStyle='rgba(255,255,255,.72)';
+                    ctx.fillText(`PLAY ${group.played}  •  WIN ${group.wins}  •  LOSS ${group.losses}`,panelX+panelW-22,cursor);
+                    cursor+=19;
+                    const rows=group.rows;
+                    if(!rows.length){
+                        ctx.textAlign='left';ctx.font='700 9px Inter, Arial, sans-serif';ctx.fillStyle='rgba(255,255,255,.55)';
+                        ctx.fillText('No match-detail row available',panelX+30,cursor);
+                        cursor+=24;
+                    }else{
+                        rows.forEach((row,ri)=>{
+                            ctx.fillStyle=ri%2?'rgba(255,255,255,.035)':'rgba(255,211,105,.065)';
+                            ctx.fillRect(panelX+16,cursor-12,panelW-32,28);
+                            ctx.textAlign='left';ctx.font='800 9px Inter, Arial, sans-serif';ctx.fillStyle='#fff';
+                            ctx.fillText(String(row.opponent||'Opponent').toUpperCase(),panelX+27,cursor+2,300);
+                            ctx.textAlign='center';ctx.font='900 9px Inter, Arial, sans-serif';
+                            ctx.fillStyle=String(row.result||'').toUpperCase()==='WIN'?'#f4d16f':'#ff9d9d';
+                            ctx.fillText(String(row.result||'').toUpperCase(),W/2,cursor+2);
+                            ctx.textAlign='right';ctx.font='700 8px Inter, Arial, sans-serif';ctx.fillStyle='rgba(255,255,255,.68)';
+                            const mins=Number(row.durationMinutes)||0;
+                            ctx.fillText(mins>0?`${mins} MIN`:'MATCH',panelX+panelW-27,cursor+2);
+                            cursor+=31;
+                        });
+                    }
+                    cursor+=8;
+                });
+            }
+
+            // Small gold footer; it does not compete with the reference-style name.
+            ctx.textAlign='center';
+            ctx.font='900 11px Inter, Arial, sans-serif';
+            ctx.fillStyle='#d9aa4b';ctx.shadowColor='#d9aa4b';ctx.shadowBlur=8;
+            ctx.fillText('WESMA BADMINTON CLUB • CHAMPIONS',W/2,1235);
             ctx.restore();
         }
 
@@ -6863,7 +6931,7 @@
                     img.addEventListener('load',resolve,{once:true});
                     img.addEventListener('error',resolve,{once:true});
                 })));
-                if(document.fonts&&document.fonts.load)await document.fonts.load('bold 120px "Great Vibes"');
+                if(document.fonts&&document.fonts.load)await document.fonts.load('900 120px "Cinzel"');
                 const ctx=canvas.getContext('2d');
                 if(record&&(!canvas.captureStream||!window.MediaRecorder))throw new Error('Video export is not supported in this browser. Try Chrome.');
                 const AC=window.AudioContext||window.webkitAudioContext;
