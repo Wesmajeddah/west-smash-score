@@ -6515,8 +6515,6 @@
         let wesmaChampionStoryboardImage = null;
         let wesmaSharedMusicLatest = null;
         let wesmaSharedMusicUploadInProgress = false;
-        let wesmaFilmMusicLoadPromise = null;
-        let wesmaFilmMusicLoadGeneration = 0;
 
         function initWesmaFilmStudio() {
             const canvas=document.getElementById('wesma-film-canvas'); if(!canvas) return;
@@ -6607,7 +6605,6 @@
                 if(start)start.value='0';
                 if(end){end.value=wesmaFilmAudioBuffer.duration.toFixed(1);end.max=end.value;}
                 if(file){file.value='';file.disabled=true;}
-                try{localStorage.setItem('wesma_cinematic_music_fixed_cache',JSON.stringify(track));}catch(cacheError){}
                 if(sharedStatus)sharedStatus.textContent='FIXED MUSIC • available on all connected phones • '+(track.name||'Music');
                 if(status)status.textContent='Fixed soundtrack ready: '+(track.name||'Music')+'. The same song will be reused automatically for every future End Match film.';
                 return true;
@@ -6618,58 +6615,6 @@
             }
         }
 
-        async function wesmaFilmEnsureSharedMusicLoaded(){
-            /*
-             * IMPORTANT: End Match creates the film modal again. The old code relied only on
-             * the realtime listener, which could race with the Preview/Create button. This
-             * explicit readiness gate makes the shared soundtrack authoritative before the
-             * film starts, so the user is never asked to add the same song again merely
-             * because the modal was recreated.
-             */
-            if(wesmaFilmAudioBuffer) return true;
-            if(wesmaFilmMusicLoadPromise) return await wesmaFilmMusicLoadPromise;
-
-            const generation=++wesmaFilmMusicLoadGeneration;
-            wesmaFilmMusicLoadPromise=(async()=>{
-                const status=document.getElementById('wesma-film-status');
-                const sharedStatus=document.getElementById('wesma-film-shared-status');
-                for(let i=0;i<50 && !dbRef;i++){ await new Promise(r=>setTimeout(r,100)); }
-                if(!dbRef) return false;
-                try{
-                    const fixedSnap=await dbRef.child('sharedCinematicMusic/fixed').once('value');
-                    const fixed=fixedSnap.val();
-                    if(fixed&&fixed.downloadURL){
-                        const ok=await wesmaFilmLoadSharedMusicTrack(fixed);
-                        if(ok) return true;
-                    }
-                    const legacySnap=await dbRef.child('sharedCinematicMusic/latest').once('value');
-                    const legacy=legacySnap.val();
-                    if(legacy&&legacy.downloadURL){
-                        try{ await dbRef.child('sharedCinematicMusic/fixed').transaction(current=>current||legacy); }catch(e){ console.warn('Fixed music promotion skipped:',e); }
-                        const ok=await wesmaFilmLoadSharedMusicTrack(legacy);
-                        if(ok) return true;
-                    }
-                }catch(error){
-                    console.warn('Shared music readiness read failed:',error);
-                    /* Same-device recovery cache; Firebase remains the source for cross-device sync. */
-                    try{
-                        const cached=JSON.parse(localStorage.getItem('wesma_cinematic_music_fixed_cache')||'null');
-                        if(cached&&cached.downloadURL){
-                            const ok=await wesmaFilmLoadSharedMusicTrack(cached);
-                            if(ok) return true;
-                        }
-                    }catch(cacheError){}
-                    if(sharedStatus) sharedStatus.textContent='Fixed music sync unavailable right now. Please wait for Firebase connection.';
-                }
-                if(generation===wesmaFilmMusicLoadGeneration && !wesmaFilmAudioBuffer){
-                    if(status) status.textContent='No permanent soundtrack found yet. Add the music once; it will then be fixed for every future End Match film.';
-                }
-                return false;
-            })();
-            try{return await wesmaFilmMusicLoadPromise;}
-            finally{wesmaFilmMusicLoadPromise=null;}
-        }
-
         function wesmaFilmAttachSharedMusicListener(){
             if(wesmaSharedMusicListenerAttached||!dbRef)return;
             wesmaSharedMusicListenerAttached=true;
@@ -6677,48 +6622,24 @@
             dbRef.child('sharedCinematicMusic/fixed').on('value',async snap=>{
                 const track=snap.val();
                 if(track&&track.downloadURL){await wesmaFilmLoadSharedMusicTrack(track);return;}
-                /* Compatibility path: latest is also treated as permanent if the fixed node is unavailable/empty. */
+                /* Backward compatibility: promote an already-uploaded legacy track once. */
                 try{
                     const legacy=await dbRef.child('sharedCinematicMusic/latest').once('value');
                     const oldTrack=legacy.val();
                     if(oldTrack&&oldTrack.downloadURL){
-                        try{
-                            await dbRef.child('sharedCinematicMusic/fixed').transaction(current=>current||oldTrack);
-                        }catch(promoteError){
-                            console.warn('Fixed node unavailable; using permanent latest soundtrack:',promoteError);
-                        }
-                        await wesmaFilmLoadSharedMusicTrack(oldTrack);
+                        const promoted=await dbRef.child('sharedCinematicMusic/fixed').transaction(current=>current||oldTrack);
+                        const fixedTrack=promoted.snapshot.val()||oldTrack;
+                        await wesmaFilmLoadSharedMusicTrack(fixedTrack);
                     }else{
                         const sharedStatus=document.getElementById('wesma-film-shared-status');
                         if(sharedStatus)sharedStatus.textContent='No fixed soundtrack yet. Add the music once; it will then remain fixed for all future End Match films.';
                     }
                 }catch(error){
-                    console.error('Fixed music read failed; trying permanent latest fallback:',error);
-                    try{
-                        const legacy=await dbRef.child('sharedCinematicMusic/latest').once('value');
-                        const oldTrack=legacy.val();
-                        if(oldTrack&&oldTrack.downloadURL) await wesmaFilmLoadSharedMusicTrack(oldTrack);
-                        else throw error;
-                    }catch(fallbackError){
-                        const el=document.getElementById('wesma-film-shared-status');
-                        if(el)el.textContent='Fixed music sync unavailable. Check Firebase permissions.';
-                    }
+                    console.error('Fixed music migration failed:',error);
                 }
-            },async error=>{
-                console.error('Fixed shared music listener failed; falling back to permanent latest:',error);
-                try{
-                    const legacy=await dbRef.child('sharedCinematicMusic/latest').once('value');
-                    const oldTrack=legacy.val();
-                    if(oldTrack&&oldTrack.downloadURL){
-                        await wesmaFilmLoadSharedMusicTrack(oldTrack);
-                        const el=document.getElementById('wesma-film-shared-status');
-                        if(el)el.textContent='FIXED MUSIC • permanent shared soundtrack • '+(oldTrack.name||'Music');
-                    }else{
-                        const el=document.getElementById('wesma-film-shared-status');if(el)el.textContent='No fixed soundtrack yet. Add the music once; it will then remain fixed for all future End Match films.';
-                    }
-                }catch(fallbackError){
-                    const el=document.getElementById('wesma-film-shared-status');if(el)el.textContent='Music sync unavailable. Check Firebase permissions.';
-                }
+            },error=>{
+                console.error('Fixed shared music listener failed:',error);
+                const el=document.getElementById('wesma-film-shared-status');if(el)el.textContent='Fixed music sync unavailable. Check Firebase permissions.';
             });
         }
 
@@ -6747,27 +6668,13 @@
                 },reject,resolve));
                 const downloadURL=await storageRef.getDownloadURL();
                 const track={name:file.name||'Shared music',downloadURL,storagePath:path,contentType:file.type||'audio/mpeg',size:file.size,createdAt:Date.now(),createdBy:(wesmaAuth&&wesmaAuth.currentUser&&wesmaAuth.currentUser.uid)||'approved-device'};
-                /* Publish once in both paths. The legacy/latest path is the compatibility fallback and is itself protected by transaction, so a second phone cannot replace the first song. */
-                let fixedTrack=null;
-                try{
-                    const fixedResult=await dbRef.child('sharedCinematicMusic/fixed').transaction(current=>current||track);
-                    fixedTrack=fixedResult.snapshot.val()||track;
-                }catch(fixedError){
-                    console.warn('Fixed soundtrack node write unavailable; using permanent latest fallback:',fixedError);
+                /* Publish only once. Firebase transaction prevents a second phone from replacing the fixed soundtrack. */
+                const fixedResult=await dbRef.child('sharedCinematicMusic/fixed').transaction(current=>current||track);
+                const fixedTrack=fixedResult.snapshot.val()||track;
+                if(fixedTrack.storagePath!==track.storagePath){
+                    try{await storageRef.delete();}catch(cleanupError){console.warn('Unused replacement music cleanup failed:',cleanupError);}
                 }
-                try{
-                    const latestResult=await dbRef.child('sharedCinematicMusic/latest').transaction(current=>current||track);
-                    const latestTrack=latestResult.snapshot.val()||track;
-                    fixedTrack=fixedTrack||latestTrack;
-                    if(fixedTrack.storagePath!==track.storagePath && latestTrack.storagePath!==track.storagePath){
-                        try{await storageRef.delete();}catch(cleanupError){console.warn('Unused replacement music cleanup failed:',cleanupError);}
-                    }
-                }catch(latestError){
-                    console.warn('Permanent latest soundtrack write unavailable:',latestError);
-                }
-                fixedTrack=fixedTrack||track;
                 wesmaSharedMusicLatest=fixedTrack;
-                try{localStorage.setItem('wesma_cinematic_music_fixed_cache',JSON.stringify(fixedTrack));}catch(cacheError){}
                 if(sharedStatus)sharedStatus.textContent='FIXED MUSIC • saved once • available on all connected phones.';
                 if(status)status.textContent='Permanent soundtrack saved: '+(fixedTrack.name||'Music')+'. Future End Match films will reuse it automatically.';
                 const input=document.getElementById('wesma-film-audio');
@@ -6779,9 +6686,8 @@
             }finally{wesmaSharedMusicUploadInProgress=false;}
         }
 
-        async function wesmaFilmClip(){
-            if(!wesmaFilmAudioBuffer) await wesmaFilmEnsureSharedMusicLoaded();
-            if(!wesmaFilmAudioBuffer)throw new Error('No permanent WESMA soundtrack is available yet. Add the music once; after that it will be reused automatically for every future End Match film.');
+        function wesmaFilmClip(){
+            if(!wesmaFilmAudioBuffer)throw new Error('Please add your own music file first.');
             const a=Math.max(0,Number(document.getElementById('wesma-film-start').value)||0),b=Math.min(wesmaFilmAudioBuffer.duration,Number(document.getElementById('wesma-film-end').value)||0);
             if(b<=a+.2)throw new Error('Music end time must be later than its start time.');
             if(b-a<16)throw new Error('Select at least 16 seconds of music so the full slow-motion champion reveal can finish.');
@@ -6940,15 +6846,11 @@ const WESMA_FILM_FRAMES=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
             }
             sparks(46,520,.42);
 
-            const singleChampion=names.length===1;
-            const gap=Math.max(72,Math.min(132,450/Math.max(1,names.length)));
+            const gap=Math.max(62,Math.min(112,390/Math.max(1,names.length)));
             const startY=365-(names.length-1)*gap/2;
             names.forEach((rawName,index)=>{
                 const n=String(rawName||'').toUpperCase();
-                // Champion names are intentionally larger. A single champion gets the strongest hero treatment.
-                const size=singleChampion
-                    ? Math.max(58,Math.min(142,1380/Math.max(8,n.length)))
-                    : Math.max(48,Math.min(112,1120/Math.max(8,n.length)));
+                const size=Math.max(38,Math.min(96,980/Math.max(9,n.length)));
                 const entry=Math.min(1,Math.max(0,(reveal*1.15-index*.11)));
                 const fallY=(1-entry)*(-180- index*24);
                 const y=startY+index*gap+fallY;
@@ -6956,131 +6858,11 @@ const WESMA_FILM_FRAMES=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
                 ctx.translate(W/2+Math.sin(t*.45+index)*9,y+Math.cos(t*.4+index)*3);
                 ctx.rotate((1-entry)*-.035+Math.sin(t*.25+index)*.008);
                 ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=entry;
-                ctx.font=`900 ${size}px Georgia, 'Times New Roman', serif`;
-
-                if(singleChampion){
-                    // PHOENIX RETURN HERO — the whole word is born, split at its center,
-                    // turns into ember/feather energy, then reunites. Each letter carries a
-                    // distinct victory mark so the title feels like a story, not a plain font.
-                    const heroSize=Math.max(76,Math.min(194,1760/Math.max(7,n.length)));
-                    const heroEntry=Math.min(1,Math.max(0,reveal*1.22));
-                    const assemble=Math.min(1,Math.max(0,(heroEntry-.34)/.42));
-                    const ease=assemble*assemble*(3-2*assemble);
-                    const splitP=Math.min(1,Math.max(0,(reveal-.48)/.28));
-                    const returnP=Math.min(1,Math.max(0,(reveal-.69)/.27));
-                    const returnEase=returnP*returnP*(3-2*returnP);
-                    const seamX=W/2;
-                    const total=n.length;
-                    const letterGap=heroSize*.64;
-                    const baseY=y;
-                    const seedFor=i=>((i+1)*37.17)%100/100;
-                    const victoryStory=[
-                        {mark:'I',rot:-.05,glow:'#ff6b3d'},
-                        {mark:'II',rot:.04,glow:'#ffd15c'},
-                        {mark:'✦',rot:-.02,glow:'#ff8d4d'},
-                        {mark:'⌁',rot:.06,glow:'#f5c96a'},
-                        {mark:'•',rot:-.07,glow:'#ff7043'},
-                        {mark:'✧',rot:.03,glow:'#ffe09a'},
-                        {mark:'V',rot:-.04,glow:'#ff784d'},
-                        {mark:'+',rot:.05,glow:'#f7ca62'}
-                    ];
-                    ctx.save();
-                    ctx.globalAlpha=entry;
-                    // Blood-red / molten-gold phoenix atmosphere — dramatic, but non-gory.
-                    const aura=ctx.createRadialGradient(seamX,baseY,10,seamX,baseY,610);
-                    aura.addColorStop(0,'rgba(255,94,45,.20)');
-                    aura.addColorStop(.36,'rgba(145,18,28,.16)');
-                    aura.addColorStop(1,'rgba(3,7,12,0)');
-                    ctx.fillStyle=aura;ctx.fillRect(0,0,W,H);
-                    // Phoenix-wing arcs behind the word: the title rises from ash and returns.
-                    ctx.save();ctx.globalAlpha=.34*(.3+.7*returnEase);ctx.strokeStyle='#e94d35';ctx.lineWidth=3;ctx.shadowColor='#ff5c3b';ctx.shadowBlur=20;
-                    ctx.beginPath();ctx.ellipse(seamX,baseY+18,430,125,0,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
-                    ctx.beginPath();ctx.ellipse(seamX,baseY+18,350,98,0,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
-                    ctx.restore();
-
-                    // Dark cinematic title plate keeps the giant word readable on the reel.
-                    const plateW=Math.min(1180,Math.max(760,total*heroSize*.70));
-                    const plateH=heroSize*1.48;
-                    const pg=ctx.createLinearGradient(seamX-plateW/2,0,seamX+plateW/2,0);
-                    pg.addColorStop(0,'rgba(4,7,11,0)');pg.addColorStop(.16,'rgba(31,8,14,.68)');pg.addColorStop(.5,'rgba(52,11,19,.92)');pg.addColorStop(.84,'rgba(31,8,14,.68)');pg.addColorStop(1,'rgba(4,7,11,0)');
-                    ctx.fillStyle=pg;ctx.fillRect(seamX-plateW/2,baseY-plateH/2,plateW,plateH);
-                    ctx.strokeStyle=`rgba(255,126,72,${.16+.20*returnEase})`;ctx.lineWidth=2;ctx.strokeRect(seamX-plateW/2+18,baseY-plateH/2+18,plateW-36,plateH-36);
-
-                    // Every character has its own "victory story": a different scar/mark,
-                    // highlight and ember trail. These are decorative storytelling details.
-                    for(let li=0;li<total;li++){
-                        const ch=n[li];
-                        const finalX=(li-(total-1)/2)*letterGap;
-                        const side=finalX<0?-1:1;
-                        const centerDistance=Math.max(1,Math.abs(finalX));
-                        // Before the reunion, letters breathe away from the center; after it, they lock together.
-                        const splitOffset=(1-splitP)*side*(42+Math.min(76,centerDistance*.18));
-                        const phoenixLift=(1-returnEase)*(-18*Math.sin((li+1)*1.37));
-                        const emberReturn=(1-returnEase)*side*55;
-                        const x=finalX+splitOffset+emberReturn;
-                        const floatY=(1-heroEntry)*(-145-20*Math.sin(li*1.7))+phoenixLift+Math.sin(t*2.1+li)*1.2;
-                        const charRot=(1-ease)*(li-(total-1)/2)*.038 + victoryStory[li%victoryStory.length].rot*(1-returnEase);
-                        const story=victoryStory[li%victoryStory.length];
-                        ctx.save();
-                        ctx.translate(seamX+x,baseY+floatY);ctx.rotate(charRot);
-                        ctx.textAlign='center';ctx.textBaseline='middle';
-                        const charAlpha=entry*(.35+.65*ease);
-                        ctx.globalAlpha=charAlpha;
-                        ctx.font=`900 ${heroSize}px Arial Black, Impact, sans-serif`;
-                        // Deep outline + crimson body + molten-gold edge = premium reel typography.
-                        ctx.lineWidth=Math.max(7,heroSize*.055);ctx.strokeStyle='rgba(18,3,5,.98)';ctx.shadowColor='#ff3f2f';ctx.shadowBlur=28;ctx.strokeText(ch,0,0);
-                        const body=ctx.createLinearGradient(0,-heroSize*.58,0,heroSize*.58);
-                        body.addColorStop(0,'#fff5d0');body.addColorStop(.18,'#ffcb70');body.addColorStop(.40,'#d94834');body.addColorStop(.68,'#8d1825');body.addColorStop(1,'#3c0812');
-                        ctx.fillStyle=body;ctx.shadowColor='#ff5538';ctx.shadowBlur=24;ctx.fillText(ch,0,0);
-                        // Individual letter "story" mark: a unique victory scar / tally / spark.
-                        ctx.save();ctx.globalAlpha*=.9;ctx.strokeStyle=story.glow;ctx.fillStyle=story.glow;ctx.shadowColor=story.glow;ctx.shadowBlur=12;
-                        const mw=heroSize*.22, mh=heroSize*.38;
-                        if(li%3===0){ctx.lineWidth=Math.max(3,heroSize*.018);ctx.beginPath();ctx.moveTo(-mw,-mh*.25);ctx.lineTo(mw,mh*.25);ctx.stroke();ctx.beginPath();ctx.moveTo(-mw*.55,mh*.05);ctx.lineTo(mw*.55,-mh*.55);ctx.stroke();}
-                        else if(li%3===1){ctx.lineWidth=Math.max(3,heroSize*.016);for(let q=-1;q<=1;q++){ctx.beginPath();ctx.moveTo(q*mw*.45,-mh*.22);ctx.lineTo(q*mw*.45,mh*.28);ctx.stroke();}}
-                        else{ctx.beginPath();ctx.arc(0,0,mw*.72,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(-mw*.52,0);ctx.lineTo(mw*.52,0);ctx.stroke();}
-                        ctx.restore();
-                        // A tiny ember trail unique to each character.
-                        for(let e=0;e<3;e++){
-                            const ex=-side*(heroSize*.25+e*heroSize*.11);const ey=-heroSize*.35+e*heroSize*.18;
-                            ctx.save();ctx.globalAlpha=charAlpha*.38*(1-returnEase);ctx.fillStyle=story.glow;ctx.shadowColor=story.glow;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(ex,ey,1.5+e*.8,0,Math.PI*2);ctx.fill();ctx.restore();
-                        }
-                        ctx.restore();
-                    }
-
-                    // The central "cut" is not a sword: the whole lettering splits at its center,
-                    // becomes two phoenix-wing halves, then magnetically reunites.
-                    ctx.save();
-                    ctx.globalAlpha=entry;
-                    const cutW=heroSize*.025;
-                    ctx.beginPath();ctx.moveTo(seamX,baseY-heroSize*.78);ctx.lineTo(seamX,baseY+heroSize*.78);
-                    ctx.strokeStyle=`rgba(255,225,164,${.10+.38*splitP})`;ctx.lineWidth=Math.max(2,cutW);ctx.shadowColor='#ff4e35';ctx.shadowBlur=22;ctx.stroke();
-                    // Rejoin pulse: a thin vertical flame-like seam collapses into a point.
-                    const pulse=returnEase*(1-returnEase);
-                    ctx.beginPath();ctx.arc(seamX,baseY,heroSize*.10+heroSize*.28*pulse,0,Math.PI*2);
-                    ctx.fillStyle=`rgba(255,111,61,${.12+.30*pulse})`;ctx.shadowColor='#ff603d';ctx.shadowBlur=30;ctx.fill();
-                    ctx.restore();
-
-                    // Phoenix feathers / ember wings sweep in from both sides and disappear into the letters.
-                    for(let f=0;f<22;f++){
-                        const q=f/21,sideF=f%2?-1:1;
-                        const fx=seamX+sideF*(260+q*330)-sideF*(returnEase*330*q);
-                        const fy=baseY-35-Math.sin(q*Math.PI)*135 + Math.sin(t*2+f)*8;
-                        feather(fx,fy,sideF*(.55+q*.25),.12+.11*q,(.15+.55*(1-returnEase))*.55);
-                    }
-
-                    // Final reunion flash: the two halves click together, then the title breathes once.
-                    if(returnEase>.82){
-                        const rr=(returnEase-.82)/.18;
-                        ctx.save();ctx.globalAlpha=.28*(1-rr);ctx.strokeStyle='#ffe7b0';ctx.shadowColor='#ff5738';ctx.shadowBlur=25;ctx.lineWidth=3;
-                        ctx.beginPath();ctx.arc(seamX,baseY,heroSize*(.45+rr*.65),0,Math.PI*2);ctx.stroke();ctx.restore();
-                    }
-                    ctx.restore();
-                }else{
-                    ctx.lineWidth=6;ctx.strokeStyle='rgba(18,10,3,.95)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=38;ctx.strokeText(n,0,0,1160);
-                    const gold=ctx.createLinearGradient(0,-size,0,size);
-                    gold.addColorStop(0,'#fff9dc');gold.addColorStop(.42,'#f9d477');gold.addColorStop(1,'#b66b1d');
-                    ctx.fillStyle=gold;ctx.shadowColor='#ffc45d';ctx.shadowBlur=30;ctx.fillText(n,0,0,1160);
-                }
+                ctx.font=`900 ${size}px Arial Black,Arial,sans-serif`;
+                ctx.lineWidth=5;ctx.strokeStyle='rgba(18,10,3,.95)';ctx.shadowColor='#ffb94f';ctx.shadowBlur=36;ctx.strokeText(n,0,0,1160);
+                const gold=ctx.createLinearGradient(0,-size,0,size);
+                gold.addColorStop(0,'#fff9dc');gold.addColorStop(.42,'#f9d477');gold.addColorStop(1,'#b66b1d');
+                ctx.fillStyle=gold;ctx.shadowColor='#ffc45d';ctx.shadowBlur=28;ctx.fillText(n,0,0,1160);
                 ctx.restore();
                 // Each name gets a small feather burst at the moment it lands.
                 if(entry>.55 && entry<.98){
@@ -7088,7 +6870,7 @@ const WESMA_FILM_FRAMES=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
                 }
             });
 
-            ctx.save();ctx.textAlign='center';ctx.font='900 30px Arial Black,Arial,sans-serif';ctx.fillStyle='#fff0c6';ctx.shadowColor='#ffb94f';ctx.shadowBlur=18;ctx.globalAlpha=reveal*.82;ctx.fillText('WESMA CHAMPIONS',W/2,625,1100);ctx.restore();
+            ctx.save();ctx.textAlign='center';ctx.font='900 40px Arial Black,Arial,sans-serif';ctx.fillStyle='#fff0c6';ctx.shadowColor='#ffb94f';ctx.shadowBlur=20;ctx.globalAlpha=reveal;ctx.fillText('WESMA CHAMPIONS',W/2,620,1100);ctx.restore();
         }
 
         function wesmaFilmDrawTeamRows(ctx,teams,accent,progress,top,gap){
@@ -7099,7 +6881,7 @@ const WESMA_FILM_FRAMES=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
             const status=document.getElementById('wesma-film-status');
             try{
                 wesmaFilmStop();
-                const clip=await wesmaFilmClip();
+                const clip=wesmaFilmClip();
                 // Preload every storyboard frame before capture so the exported film never starts with blank frames.
                 if(!window.wesmaFilmFrameImages){
                     window.wesmaFilmFrameImages=WESMA_FILM_FRAMES.map(src=>{const im=new Image();im.src=src;return im;});
