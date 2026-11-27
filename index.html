@@ -6428,7 +6428,7 @@
                 <!-- Cinematic film export: one user soundtrack, trim the desired portion. -->
                 <section id="wesma-film-studio" class="my-3 rounded-xl border border-amber-300/70 bg-slate-950 p-2 text-white shadow-lg">
                     <div class="text-center text-[11px] font-black tracking-[.18em] text-amber-200">WESMA • CINEMATIC AWARD FILM</div>
-                    <div class="text-center text-[9px] text-slate-300 mb-2">FOUR-PART WINNER FILM • SLOW-MOTION NAME REVEAL • RED LIGHTNING</div>
+                    <div class="text-center text-[9px] text-slate-300 mb-2">FOUR-PART WINNER FILM • THUNDER-FORGED NAME REVEAL • TOTAL WINS & TOTAL MATCHES</div>
                     <canvas id="wesma-film-canvas" width="720" height="1280" class="block w-full rounded-lg border border-amber-200/40" style="aspect-ratio:9/16;background:#07131d"></canvas>
                     <div class="grid grid-cols-2 gap-2 mt-2">
                         <label class="col-span-2 text-[9px] font-bold text-slate-200">Add your own music file (no built-in music)
@@ -6656,7 +6656,7 @@
             const names=champions.map(t=>String(t.name||'').trim());
             const first=champions[0]||{name:'CHAMPION',wins:0,losses:0,played:0};
             const totalWins=Math.max(0,Number(first.wins)||0);
-            const totalMatches=Math.max(0,Number(first.played)||0);
+            const totalMatches=Math.max(0,Math.floor((Number(calculateTotalPlays())||0)/2));
             const t=Math.max(0,Number(elapsed)||0);
             const duration=Math.max(16,Number(window.wesmaFilmDuration)||30);
             const cuts=[0,.16,.32,.68,1];
@@ -6668,7 +6668,9 @@
             ctx.clearRect(0,0,W,H);
 
             const drawPanel=(index,alpha=1,zoom=1)=>{
-                const img=wesmaCinematicImages[index];
+                // Scene four reuses the approved total-wins/total-matches artwork; no previous-history panel.
+                const visualIndex=index===3?2:index;
+                const img=wesmaCinematicImages[visualIndex];
                 if(!img||!img.complete||!img.naturalWidth){
                     const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#061018');g.addColorStop(1,'#07131d');
                     ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.restore();return null;
@@ -6728,11 +6730,47 @@
                 }
                 ctx.restore();
             };
+            const thunderName=(text,x,y,maxWidth,size,progress,shake)=>{
+                text=String(text||'').toUpperCase();if(!text)return;
+                ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+                let fs=size;ctx.font=`900 ${fs}px Georgia, "Times New Roman", serif`;
+                while(ctx.measureText(text).width>maxWidth&&fs>24){fs-=2;ctx.font=`900 ${fs}px Georgia, "Times New Roman", serif`;}
+                const widths=[...text].map(ch=>ctx.measureText(ch).width),total=widths.reduce((a,b)=>a+b,0);let cursor=-total/2;
+                const ease=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
+                for(let i=0;i<text.length;i++){
+                    const ch=text[i],cw=widths[i];if(ch===' '){cursor+=cw;continue;}
+                    const p=ease((progress-i*.035)/(1-.035*Math.max(0,text.length-1)));
+                    if(p<=0){cursor+=cw;continue;}
+                    const seed=(i+1)*17.31;
+                    const startRot=((i%2)?1:-1)*(1.05*(1-p));
+                    const lift=(1-p)*(-58-Math.sin(seed)*18);
+                    const scaleX=.16+.84*p,scaleY=1.35-.35*p;
+                    ctx.save();ctx.translate(x+cursor+cw/2,y+lift);ctx.rotate(startRot);ctx.scale(scaleX,scaleY);ctx.globalAlpha=p;
+                    // Deep, heavier extrusion matching the WESMA CHAMPIONS title's bold serif style.
+                    for(let d=13;d>=2;d-=2){ctx.fillStyle=`rgb(${40+Math.round((13-d)*2.4)},${21+Math.round((13-d)*1.5)},7)`;ctx.fillText(ch,d*.72,d*.72);}
+                    ctx.lineWidth=8.5;ctx.strokeStyle='rgba(24,10,2,.98)';ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=19;ctx.strokeText(ch,0,0);ctx.shadowBlur=0;
+                    const gg=ctx.createLinearGradient(0,-fs*.62,0,fs*.62);gg.addColorStop(0,'#fff8d7');gg.addColorStop(.12,'#f7d981');gg.addColorStop(.30,'#c58b2d');gg.addColorStop(.50,'#ffe9a5');gg.addColorStop(.72,'#a16a1d');gg.addColorStop(1,'#60370b');
+                    ctx.fillStyle=gg;ctx.shadowColor='rgba(255,176,36,.9)';ctx.shadowBlur=22;ctx.fillText(ch,0,0);ctx.shadowBlur=0;
+                    ctx.lineWidth=2.2;ctx.strokeStyle='rgba(255,249,220,.95)';ctx.strokeText(ch,-.8,-1.2);
+                    // Brief electric gold edge crackle as each letter locks into place.
+                    if(p>.52&&p<.98){
+                        ctx.globalAlpha=(1-p)*1.7;ctx.strokeStyle='#fff5c5';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-cw*.42,-fs*.48);ctx.lineTo(-cw*.08,-fs*.18);ctx.lineTo(cw*.14,-fs*.32);ctx.lineTo(cw*.4,fs*.05);ctx.stroke();
+                        // Tiny warm sparks jump from the lightning-formed character edges.
+                        const sparkSeed=(i+1)*31+Math.floor(p*100);for(let q=0;q<3;q++){const sx=Math.sin(sparkSeed+q*2.3)*cw*.55,sy=Math.cos(sparkSeed+q*1.7)*fs*.42;ctx.beginPath();ctx.arc(sx,sy,1.2+q*.45,0,Math.PI*2);ctx.fillStyle=q===0?'#fff4c4':'#ffbd43';ctx.fill();}
+                    }
+                    ctx.restore();cursor+=cw;
+                }
+                ctx.restore();
+            };
             const drawLightning=(r,localTime)=>{
                 if(!r||localTime<.45||localTime>6.5)return;
-                const pulse=clamp((Math.sin(localTime*7.5)+.35)*.65)*clamp((6.5-localTime)/1.2);
-                if(pulse<.08)return;
-                ctx.save();ctx.translate(r.x,r.y);ctx.scale(r.scale,r.scale);ctx.beginPath();ctx.rect(0,70,r.iw,165);ctx.clip();
+                const pulse=clamp((Math.sin(localTime*8.8)+.22)*.72)*clamp((6.8-localTime)/1.15);
+                if(pulse<.06)return;
+                ctx.save();ctx.translate(r.x,r.y);ctx.scale(r.scale,r.scale);ctx.beginPath();ctx.rect(0,35,r.iw,255);ctx.clip();
+                // Thunderstorm flashes stay behind the winner lettering and do not recolor the gold artwork.
+                const flash=ctx.createRadialGradient(r.iw*.5,155,15,r.iw*.5,155,r.iw*.68);
+                flash.addColorStop(0,`rgba(255,8,42,${.18*pulse})`);flash.addColorStop(1,'rgba(255,0,30,0)');
+                ctx.fillStyle=flash;ctx.fillRect(0,35,r.iw,255);
                 const bolt=(seed,x0,y0,x1,y1)=>{
                     let state=seed;const rnd=()=>{state=(state*1664525+1013904223)>>>0;return state/4294967296;};
                     const pts=[[x0,y0]];const steps=15;
@@ -6746,62 +6784,53 @@
                     for(let j of [5,9,12]){const p=pts[j];ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(p[0]+(rnd()-.5)*130,p[1]+35+rnd()*70);ctx.strokeStyle='#ff1538';ctx.lineWidth=4;ctx.shadowBlur=15;ctx.stroke();}
                 };
                 bolt(91+Math.floor(localTime*30),30,82,r.iw*.42,218);bolt(411+Math.floor(localTime*30),r.iw-30,88,r.iw*.58,220);
+                // Main impact bolt: it converges toward the center, then branches as the winner letters form.
+                const hit=Math.max(0,1-Math.abs(localTime-0.58)/0.62);
+                if(hit>.04){
+                    ctx.globalAlpha=hit;ctx.beginPath();ctx.moveTo(r.iw*.5,18);ctx.lineTo(r.iw*.46,66);ctx.lineTo(r.iw*.53,104);ctx.lineTo(r.iw*.48,142);ctx.lineTo(r.iw*.5,188);
+                    ctx.strokeStyle='#ff001e';ctx.lineWidth=15;ctx.shadowColor='#ff001e';ctx.shadowBlur=38;ctx.stroke();
+                    ctx.strokeStyle='#fff0f3';ctx.lineWidth=2.5;ctx.shadowBlur=14;ctx.stroke();
+                    const burst=ctx.createRadialGradient(r.iw*.5,188,3,r.iw*.5,188,115);burst.addColorStop(0,`rgba(255,28,58,${.65*hit})`);burst.addColorStop(1,'rgba(255,0,25,0)');ctx.fillStyle=burst;ctx.fillRect(r.iw*.5-120,68,240,240);
+                }
                 ctx.restore();
             };
 
             if(scene===2&&rect&&local>=.12){
                 const localTime=t-sceneStart;
-                // Replace only the baked sample-name/value areas with a softened version of the same artwork.
+                // Name-reveal scene: remove the baked sample name and the stats strip from this scene only.
                 drawInpaintedBand(rect,8,82,rect.iw-16,145,.88);
-                drawInpaintedBand(rect,120,310,260,125,.86);
-                drawInpaintedBand(rect,475,310,300,125,.86);
+                drawInpaintedBand(rect,0,230,rect.iw,229,.88);
                 drawLightning(rect,localTime);
                 const shakeActive=localTime>=3.4&&localTime<5.4;
                 const shakeX=shakeActive?Math.sin(localTime*38)*4.8:0;
                 const shakeY=shakeActive?Math.sin(localTime*31)*3.2:0;
                 const shakeRot=shakeActive?Math.sin(localTime*27)*.018:0;
-                const reveal=clamp((localTime-.55)/2.8);
+                const reveal=clamp((localTime-.42)/3.1);
                 const nameText=names.length?names.slice(0,3).join('  •  '):'CHAMPION';
                 ctx.save();ctx.translate(rect.x,rect.y);ctx.scale(rect.scale,rect.scale);
-                // Short slow-motion rotational lettering reveal, followed by a two-second impact shake.
-                goldText(nameText,rect.iw/2,155,rect.iw-70,Math.min(76,Math.floor(820/Math.max(8,nameText.length*.58))),reveal,shakeX,shakeY,shakeRot);
-                goldText(String(totalWins).padStart(2,'0'),rect.iw*.29,374,220,100,clamp((localTime-1.2)/1.4));
-                goldText(String(totalMatches).padStart(2,'0'),rect.iw*.72,374,220,100,clamp((localTime-1.45)/1.4));
-                // Gold glint across the winner name; red remains confined to the lightning behind it.
-                const shineX=(localTime*210)%(rect.iw+180)-90;
-                ctx.save();ctx.globalAlpha=.38*reveal;const shine=ctx.createLinearGradient(shineX-60,100,shineX+60,210);shine.addColorStop(0,'rgba(255,255,255,0)');shine.addColorStop(.5,'rgba(255,249,210,.8)');shine.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=shine;ctx.fillRect(0,80,rect.iw,150);ctx.restore();
+                // Slow-motion, letter-by-letter thunder formation. Letters share the bold serif champion-title style,
+                // with heavier gold extrusion and a short impact shake only after the name has formed.
+                const flipProgress=clamp((localTime-.22)/2.55);
+                const flipScale=.04+.96*(flipProgress*flipProgress*(3-2*flipProgress));
+                ctx.save();ctx.translate(rect.iw/2+shakeX,155+shakeY);ctx.rotate((1-flipProgress)*.12+shakeRot);ctx.scale(flipScale,1);ctx.translate(-rect.iw/2,-155);
+                thunderName(nameText,rect.iw/2,155,rect.iw-54,Math.min(82,Math.floor(900/Math.max(8,nameText.length*.58))),reveal,shakeActive);
+                ctx.restore();
+                // Gold glint across the formed winner name; red lightning remains behind the gold lettering.
+                const shineX=(localTime*245)%(rect.iw+180)-90;
+                ctx.save();ctx.globalAlpha=.46*reveal;const shine=ctx.createLinearGradient(shineX-70,90,shineX+70,220);shine.addColorStop(0,'rgba(255,255,255,0)');shine.addColorStop(.5,'rgba(255,249,210,.92)');shine.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=shine;ctx.fillRect(0,75,rect.iw,165);ctx.restore();
                 ctx.restore();
             }
 
             if(scene===3&&rect&&local>=.12){
-                // Aggregate saved match-history wins/losses for the current champion(s), excluding this active session.
-                let historyWins=0,historyLosses=0;
-                const normalized=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' ');
-                const wanted=new Set(names.map(normalized));
-                const skipKeys=new Set([activeSessionId,sessionHistorySavedId,tournamentStartTimestamp].filter(v=>v!=null&&String(v)!=='').map(String));
-                const records=Array.isArray(tournamentHistory)?tournamentHistory:[];
-                records.forEach(record=>{
-                    if(!record)return;
-                    const key=String(record.sessionId||record.startTimestamp||record.id||'');
-                    if(key&&skipKeys.has(key))return;
-                    (Array.isArray(record.teams)?record.teams:[]).forEach(team=>{
-                        if(!team||!wanted.has(normalized(team.name)))return;
-                        let logs=[];
-                        try{logs=typeof getHistoryRecordMatchLogs==='function'?getHistoryRecordMatchLogs(team,record):(Array.isArray(team.matchHistoryLog)?team.matchHistoryLog:[]);}catch(e){logs=Array.isArray(team.matchHistoryLog)?team.matchHistoryLog:[];}
-                        if(logs&&logs.length){logs.forEach(log=>{const result=String(log&&log.result||'').toUpperCase();if(result==='WIN')historyWins++;else if(result==='LOSS')historyLosses++;});}
-                        else{historyWins+=Math.max(0,Number(team.wins)||0);historyLosses+=Math.max(0,Number(team.losses)||0);}
-                    });
-                });
-                const positiveHistory=historyWins>historyLosses;
-                // Hide the baked sample record; reveal previous record only when prior wins exceed losses.
-                drawInpaintedBand(rect,15,105,rect.iw-30,210,.90);
+                // Fourth part: current winner totals only. Previous history is intentionally omitted.
+                const statsProgress=clamp((local-.08)/.55);
+                // Clear baked sample name and numbers in the original image coordinates before applying the panel transform.
+                drawInpaintedBand(rect,8,82,rect.iw-16,145,.88);
+                drawInpaintedBand(rect,120,310,260,125,.88);
+                drawInpaintedBand(rect,475,310,300,125,.88);
                 ctx.save();ctx.translate(rect.x,rect.y);ctx.scale(rect.scale,rect.scale);
-                if(positiveHistory){
-                    goldText('PREVIOUS WINS',rect.iw*.27,154,330,34,clamp((local-.12)/.28));
-                    goldText(String(historyWins).padStart(2,'0'),rect.iw*.27,246,220,90,clamp((local-.2)/.3));
-                    goldText('PREVIOUS HISTORY',rect.iw*.72,154,350,32,clamp((local-.18)/.28));
-                    goldText(`W / L : ${historyWins} / ${historyLosses}`,rect.iw*.72,246,360,54,clamp((local-.28)/.3));
-                }
+                goldText(String(totalWins).padStart(2,'0'),rect.iw*.29,374,220,100,statsProgress);
+                goldText(String(totalMatches).padStart(2,'0'),rect.iw*.72,374,220,100,clamp((statsProgress-.12)/.72));
                 ctx.restore();
             }
         }
