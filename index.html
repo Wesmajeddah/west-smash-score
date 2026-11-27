@@ -6428,7 +6428,7 @@
                 <!-- Cinematic film export: one user soundtrack, trim the desired portion. -->
                 <section id="wesma-film-studio" class="my-3 rounded-xl border border-amber-300/70 bg-slate-950 p-2 text-white shadow-lg">
                     <div class="text-center text-[11px] font-black tracking-[.18em] text-amber-200">WESMA • 30-SECOND STAR-STYLE WINNER FILM</div>
-                    <div class="text-center text-[9px] text-slate-300 mb-2">30-SECOND CINEMATIC WINNER NAME REVEAL • LIGHTNING IMPACT • WINNER PROFILE</div>
+                    <div class="text-center text-[9px] text-slate-300 mb-2">30-SECOND GOLDEN BLADE WINNER REVEAL • SOLID 3D LETTER BLOCKS • WINNER PROFILE</div>
                     <canvas id="wesma-film-canvas" width="720" height="1280" class="block w-full rounded-lg border border-amber-200/40" style="aspect-ratio:9/16;background:#07131d"></canvas>
                     <div class="grid grid-cols-2 gap-2 mt-2">
                         <label class="col-span-2 text-[9px] font-bold text-slate-200">Add your own music file (no built-in music)
@@ -6680,23 +6680,62 @@
                 if(local>.95&&local<3.25){const ba=Math.min(1,(local-.95)/.35)*Math.min(1,(3.25-local)/.5);ctx.save();ctx.globalAlpha=ba;for(let b=0;b<8;b++){const startX=40+b*92,side=b%2?1:-1,pts=[[startX,0]];let x=startX,y=0;for(let k=0;k<9;k++){x+=(W/2-x)*.18+Math.sin(local*11+b*2+k*3)*52*side;y+=78;pts.push([x,y]);}ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));ctx.strokeStyle='rgba(255,150,20,.72)';ctx.lineWidth=13;ctx.shadowColor='#ffb326';ctx.shadowBlur=32;ctx.stroke();ctx.strokeStyle='rgba(255,236,174,.98)';ctx.lineWidth=3;ctx.shadowColor='#fff2b7';ctx.shadowBlur=16;ctx.stroke();}ctx.restore();}
                 if(impact>.02){ctx.save();ctx.globalAlpha=impact*.7;const radius=70+(1-impact)*260;ctx.beginPath();ctx.arc(W/2,H*.48,radius,0,Math.PI*2);ctx.strokeStyle='#ffe5a0';ctx.lineWidth=8*(1-impact)+2;ctx.shadowColor='#ffb21c';ctx.shadowBlur=28;ctx.stroke();ctx.globalAlpha=impact*.16;const burst=ctx.createRadialGradient(W/2,H*.48,10,W/2,H*.48,560);burst.addColorStop(0,'rgba(255,236,173,.95)');burst.addColorStop(.28,'rgba(255,169,29,.5)');burst.addColorStop(1,'rgba(255,130,0,0)');ctx.fillStyle=burst;ctx.fillRect(0,0,W,H);ctx.restore();}
                 const display=titleNames.slice(0,3),lineGap=display.length===1?0:(display.length===2?145:112),baseSize=display.length===1?130:(display.length===2?112:82),totalH=(display.length-1)*lineGap,centerY=H*.49;
-                // Each glyph arrives as a heavy, beveled gold 3D letter, rotating into place.
+                // GOLDEN BLADE: each character is a separate massive, letter-shaped solid block.
                 display.forEach((rawName,index)=>{
-                    const name=String(rawName||'CHAMPION'),lineReveal=Math.max(0,Math.min(1,(eased-index*.16)/(1-.16*Math.max(0,display.length-1)))),smooth=1-Math.pow(1-lineReveal,3),y=centerY-totalH/2+index*lineGap+(1-smooth)*70;
-                    let size=baseSize;ctx.font=`900 ${size}px Impact, "Arial Black", sans-serif`;
-                    while(ctx.measureText(name).width>650&&size>44){size-=3;ctx.font=`900 ${size}px Impact, "Arial Black", sans-serif`;}
-                    const chars=[...name],widths=chars.map(ch=>Math.max(2,ctx.measureText(ch).width)),spacing=2,total=widths.reduce((a,b)=>a+b,0)+spacing*(chars.length-1);let cursor=-total/2;
+                    const name=String(rawName||'CHAMPION');
+                    const lineReveal=Math.max(0,Math.min(1,(eased-index*.12)/(1-.12*Math.max(0,display.length-1))));
+                    const smooth=1-Math.pow(1-lineReveal,3);
+                    let size=display.length===1?132:(display.length===2?104:78);
+                    ctx.font=`900 ${size}px Impact, "Arial Black", sans-serif`;
+                    while(ctx.measureText(name).width>650&&size>40){size-=2;ctx.font=`900 ${size}px Impact, "Arial Black", sans-serif`;}
+                    const chars=[...name],spacing=3,widths=chars.map(ch=>Math.max(2,ctx.measureText(ch).width));
+                    const total=widths.reduce((a,b)=>a+b,0)+spacing*(chars.length-1);let cursor=-total/2;
+                    const y=H*.48+(index-(display.length-1)/2)*112+(1-smooth)*100;
                     chars.forEach((ch,ci)=>{
-                        const cw=widths[ci],stagger=ci*.055,lp=Math.max(0,Math.min(1,(local-1.12-stagger)/.72)),turn=1-Math.pow(1-lp,3),angle=(1-turn)*(Math.PI*2.35+Math.PI*.35*Math.sin(ci*1.7)),settle=1+Math.sin(Math.max(0,local-2.05)*8+ci)*.045*Math.max(0,1-(local-2.05));
-                        ctx.save();const flight=1-turn,depthOffset=(ci%2?1:-1)*flight*(58+ci%5*13),rise=flight*(42+(ci%4)*11);ctx.translate(W/2+cursor+cw/2+depthOffset,y+rise);ctx.scale(Math.max(.055,Math.abs(Math.cos(angle)))*settle,.78+.22*turn);ctx.globalAlpha=lineReveal*lp;
-                        // Short extrusion gives a solid, massive face without cube/block props.
-                        for(let depth=30;depth>=2;depth-=2){ctx.fillStyle=depth>20?'#241104':depth>10?'#5a3008':'#9a5b12';ctx.fillText(ch,depth*.52,depth*.68);}
-                        ctx.lineWidth=8;ctx.strokeStyle='#1b0d02';ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=24;ctx.strokeText(ch,0,0);ctx.shadowBlur=0;
-                        const gold=ctx.createLinearGradient(0,-size*.62,0,size*.62);gold.addColorStop(0,'#fffbe8');gold.addColorStop(.13,'#ffe49a');gold.addColorStop(.30,'#b97818');gold.addColorStop(.48,'#fff1b8');gold.addColorStop(.66,'#d28e22');gold.addColorStop(.84,'#87500d');gold.addColorStop(1,'#ffcf5a');ctx.fillStyle=gold;ctx.shadowColor='rgba(255,178,33,.85)';ctx.shadowBlur=24;ctx.fillText(ch,0,0);ctx.shadowBlur=0;ctx.lineWidth=1.8;ctx.strokeStyle='rgba(255,250,222,.92)';ctx.strokeText(ch,-.8,-1.2);
-                        // Traveling specular highlight across each finished letter.
-                        const sx=((local*230)%(size*1.5+150))-size*.75,shine=ctx.createLinearGradient(sx-45,0,sx+45,0);shine.addColorStop(0,'rgba(255,255,255,0)');shine.addColorStop(.5,'rgba(255,255,245,.8)');shine.addColorStop(1,'rgba(255,255,255,0)');ctx.globalCompositeOperation='source-atop';ctx.fillStyle=shine;ctx.fillText(ch,0,0);ctx.globalCompositeOperation='source-over';ctx.restore();cursor+=cw+spacing;
+                        const cw=widths[ci],stagger=ci*.075,lp=Math.max(0,Math.min(1,(local-.72-stagger)/1.28));
+                        const travel=1-Math.pow(1-lp,3),phase=1-travel;
+                        // Each block flies in from its own 3D direction, tumbles, then locks with weight.
+                        const spin=(1-travel)*(Math.PI*2.15+(ci%3)*.72)+(1-travel)*Math.sin(ci*1.91)*.5;
+                        const yaw=(1-travel)*(Math.PI*1.05+(ci%2)*.7);
+                        const zScale=Math.max(.075,Math.abs(Math.cos(yaw)));
+                        const side=(ci%2?1:-1),startX=side*(260+(ci%4)*78),startY=(ci%3-1)*(170+(ci%2)*55);
+                        const bx=W/2+cursor+cw/2+startX*phase,by=y+startY*phase;
+                        const settleT=Math.max(0,Math.min(1,(local-2.15)/.72));
+                        const settleKick=Math.sin((local-2.15)*17+ci*.6)*Math.exp(-Math.max(0,local-2.15)*5.8)*(local>2.15?1:0);
+                        ctx.save();ctx.translate(bx,by);ctx.rotate(spin);ctx.scale(zScale*(1+settleKick*.035),1+settleKick*.018);ctx.globalAlpha=lineReveal*Math.min(1,lp*1.8);
+                        // Deep extruded letter-shaped side walls, built as a stack of solid faces.
+                        const depth=34+(ci%3)*7;
+                        for(let d=depth;d>=2;d-=2){
+                            const shade=d>depth*.72?'#241006':d>depth*.42?'#56300b':d>depth*.18?'#956018':'#c18427';
+                            ctx.fillStyle=shade;ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=d===depth?18:0;
+                            ctx.fillText(ch,d*.62,d*.78);
+                        }
+                        // A beveled block edge catches a hard warm rim light.
+                        ctx.lineWidth=13;ctx.strokeStyle='#241204';ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=24;ctx.strokeText(ch,0,0);ctx.shadowBlur=0;
+                        const face=ctx.createLinearGradient(0,-size*.72,0,size*.72);
+                        face.addColorStop(0,'#fff9df');face.addColorStop(.10,'#f8d77d');face.addColorStop(.24,'#a96512');face.addColorStop(.39,'#ffe7a0');face.addColorStop(.53,'#fff4cf');face.addColorStop(.68,'#bd791c');face.addColorStop(.86,'#75400a');face.addColorStop(1,'#f5c75a');
+                        ctx.fillStyle=face;ctx.shadowColor='rgba(255,178,34,.62)';ctx.shadowBlur=18;ctx.fillText(ch,0,0);ctx.shadowBlur=0;
+                        ctx.lineWidth=2.3;ctx.strokeStyle='rgba(255,250,222,.95)';ctx.strokeText(ch,-.8,-1.3);
+                        // Chipped sparks/fragments burst from the block on its landing frame.
+                        const burst=Math.max(0,1-Math.abs(local-(1.95+ci*.075))/.24);
+                        if(burst>.02){for(let p=0;p<5;p++){const a=p*1.256+ci*.91+local*2.5,dist=(18+p*13)*burst;ctx.fillStyle=p%2?'#ffcf62':'#fff1c2';ctx.globalAlpha=burst*.9;ctx.beginPath();ctx.moveTo(Math.cos(a)*dist,Math.sin(a)*dist);ctx.lineTo(Math.cos(a+.25)* (dist+7),Math.sin(a+.25)*(dist+7));ctx.lineTo(Math.cos(a+.55)*dist,Math.sin(a+.55)*dist);ctx.closePath();ctx.fill();}}
+                        // Moving blade-like specular glint over the finished face.
+                        const glint=((local*270+ci*53)%(size*1.7+170))-size*.85;
+                        const shine=ctx.createLinearGradient(glint-38,0,glint+38,0);shine.addColorStop(0,'rgba(255,255,255,0)');shine.addColorStop(.5,'rgba(255,255,245,.92)');shine.addColorStop(1,'rgba(255,255,255,0)');
+                        ctx.globalCompositeOperation='source-atop';ctx.fillStyle=shine;ctx.fillText(ch,0,0);ctx.globalCompositeOperation='source-over';ctx.restore();cursor+=cw+spacing;
                     });
                 });
+                // A single sweeping golden blade of light wraps around the assembled winner name.
+                if(local>.95&&local<4.15){
+                    const p=Math.max(0,Math.min(1,(local-.95)/2.8)),fade=Math.min(1,(local-.95)/.22)*Math.min(1,(4.15-local)/.5);
+                    const cx=W/2,cy=H*.48,rx=390,ry=185;
+                    ctx.save();ctx.globalAlpha=fade*.95;ctx.beginPath();
+                    for(let q=0;q<=90;q++){const a=(-2.5+p* Math.PI*2.9)+q/90*.9;const x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry;if(q===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+                    ctx.strokeStyle='rgba(255,190,58,.42)';ctx.lineWidth=25;ctx.shadowColor='#ffb21c';ctx.shadowBlur=38;ctx.stroke();
+                    ctx.strokeStyle='rgba(255,248,213,.95)';ctx.lineWidth=3.5;ctx.shadowColor='#fff0b2';ctx.shadowBlur=24;ctx.stroke();
+                    const tipA=-2.5+p*Math.PI*2.9+.9,tx=cx+Math.cos(tipA)*rx,ty=cy+Math.sin(tipA)*ry;
+                    const flare=ctx.createRadialGradient(tx,ty,1,tx,ty,55);flare.addColorStop(0,'rgba(255,255,245,.98)');flare.addColorStop(.18,'rgba(255,211,107,.82)');flare.addColorStop(1,'rgba(255,160,25,0)');ctx.fillStyle=flare;ctx.fillRect(tx-55,ty-55,110,110);ctx.restore();
+                }
                 ctx.globalAlpha=Math.min(1,Math.max(0,(reveal-.2)/.8));ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='800 22px Inter,Arial,sans-serif';ctx.fillStyle='#ffe5a2';ctx.shadowColor='#ffb52b';ctx.shadowBlur=12;ctx.fillText('WESMA CHAMPIONS',W/2,H*.72);ctx.restore();
             }else{
                 // Separate readable profile shot: champion names and recorded team stats.
