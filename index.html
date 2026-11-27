@@ -6437,7 +6437,7 @@
                         <label class="text-[9px] font-bold text-slate-200">Music start (seconds)
                             <input id="wesma-film-start" type="number" min="0" step="0.1" value="0" class="w-full rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
-                        <label class="text-[9px] font-bold text-slate-200">Music end (seconds • 40 sec minimum)
+                        <label class="text-[9px] font-bold text-slate-200">Music end (seconds)
                             <input id="wesma-film-end" type="number" min="0" step="0.1" value="0" class="w-full rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
                     </div>
@@ -6599,7 +6599,7 @@
                     if(end){end.value=wesmaFilmAudioBuffer.duration.toFixed(1);end.max=end.value;}
                     if(sharedStatus)sharedStatus.textContent='Ready for everyone: '+(track.name||'Shared music');
                     const status=document.getElementById('wesma-film-status');
-                    if(status)status.textContent='Shared music ready: '+(track.name||'Music')+'. Select at least 40 seconds, preview, or create the film.';
+                    if(status)status.textContent='Shared music ready: '+(track.name||'Music')+'. Choose the portion, preview, or create the film.';
                 }catch(error){
                     console.error('Shared music auto-load failed:',error);
                     if(sharedStatus)sharedStatus.textContent='Shared music could not load: '+(error.message||error);
@@ -6650,46 +6650,99 @@
             if(!wesmaFilmAudioBuffer)throw new Error('Please add your own music file first.');
             const a=Math.max(0,Number(document.getElementById('wesma-film-start').value)||0);
             const b=Math.min(wesmaFilmAudioBuffer.duration,Number(document.getElementById('wesma-film-end').value)||0);
-            if(b-a<40)throw new Error('Select at least 40 seconds of music for the complete synchronized film.');
-            return {start:a,duration:40};
+            if(b-a<29.97)throw new Error('Select at least 30 seconds of music for the complete synchronized film.');
+            return {start:a,duration:29.97};
         }
 
         function wesmaFilmDraw(ctx,elapsed){
-            const W=720,H=1280,total=40;
-            const t=Math.max(0,Math.min(total,Number(elapsed)||0));
-            const frames=(wesmaSyncedFilmImages[0]||[]).filter(im=>im&&im.complete&&im.naturalWidth);
+            const W=720,H=1280;
+            const t=Math.max(0,Math.min(29.97,Number(elapsed)||0));
+            const framePos=Math.min(8,t/29.97*8);
+            const frame=Math.floor(framePos),next=Math.min(8,frame+1),blend=framePos-frame;
+            const portrait=wesmaSyncedFilmImages[0]&&wesmaSyncedFilmImages[0][frame];
+            const portraitNext=wesmaSyncedFilmImages[0]&&wesmaSyncedFilmImages[0][next];
             ctx.clearRect(0,0,W,H);
             ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
-            // Keep the original upper/portrait film only. Cross-fade adjacent source
-            // frames continuously so the exported 30fps video does not jump every few seconds.
-            if(frames.length){
-                const position=(t/total)*frames.length;
-                const index=Math.min(frames.length-1,Math.floor(position));
-                const next=Math.min(frames.length-1,index+1);
-                const blend=index===frames.length-1?0:position-index;
-                const maxW=680,maxH=1120;
-                const drawFrame=(im,alpha)=>{
-                    if(!im||!im.naturalWidth||alpha<=0)return;
-                    const scale=Math.min(maxW/im.naturalWidth,maxH/im.naturalHeight);
-                    const w=im.naturalWidth*scale,h=im.naturalHeight*scale;
-                    ctx.globalAlpha=alpha;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);
-                };
-                drawFrame(frames[index],1-blend);
-                if(next!==index)drawFrame(frames[next],blend);
+            // Keep the original upper/portrait film only; the lower landscape portion is omitted.
+            if(portrait&&portrait.complete&&portrait.naturalWidth){
+                const scale=Math.min(720/portrait.naturalWidth,980/portrait.naturalHeight);
+                const w=portrait.naturalWidth*scale,h=portrait.naturalHeight*scale;
+                ctx.globalAlpha=1-blend;
+                ctx.drawImage(portrait,(W-w)/2,0,w,h);
+                if(portraitNext&&portraitNext.complete&&portraitNext.naturalWidth&&next!==frame){
+                    const s2=Math.min(720/portraitNext.naturalWidth,980/portraitNext.naturalHeight);
+                    const w2=portraitNext.naturalWidth*s2,h2=portraitNext.naturalHeight*s2;
+                    ctx.globalAlpha=blend;
+                    ctx.drawImage(portraitNext,(W-w2)/2,0,w2,h2);
+                }
                 ctx.globalAlpha=1;
             }
-            // Restore the winner name dynamically from the current match's film snapshot.
-            const names=(window.wesmaFilmRankings&&Array.isArray(window.wesmaFilmRankings.first))
-                ?window.wesmaFilmRankings.first.map(t=>String(t.name||'').trim()).filter(Boolean):[];
-            if(names.length){
-                const winnerName=names.join('  •  ');
-                ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-                ctx.font='900 54px Arial, sans-serif';ctx.lineWidth=5;
-                ctx.strokeStyle='rgba(0,0,0,.88)';ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=18;
-                ctx.strokeText(winnerName,W/2,H-105,660);
-                ctx.fillStyle='#f8d56b';ctx.fillText(winnerName,W/2,H-105,660);
+            // The champion name is rendered directly into this existing film canvas.
+            // No extra HTML name panel, popup, or duplicate title area is created.
+            let championNames=[];
+            try{
+                const active=(Array.isArray(teams)?teams:[]).filter(team=>!team.isDisabled);
+                const groups=typeof getPodiumGroups==='function'?getPodiumGroups(active):[];
+                const first=(groups.find(group=>group.rank===1)||{teams:[]}).teams||[];
+                championNames=first.map(team=>String(team.name||'').trim()).filter(Boolean);
+            }catch(e){championNames=[];}
+            const name=championNames.join('  •  ')||'CHAMPION';
+            const reveal=Math.max(0,Math.min(1,(t-7.2)/2.1));
+            const fade=Math.max(0,Math.min(1,(29.97-t)/2.2));
+            const alpha=reveal*fade;
+            if(alpha>0){
+                ctx.save();ctx.globalAlpha=alpha;
+                // Subtle dark cinematic fade over the same lower portion of the film image.
+                const shade=ctx.createLinearGradient(0,820,0,1180);
+                shade.addColorStop(0,'rgba(0,0,0,0)');shade.addColorStop(.45,'rgba(0,0,0,.38)');shade.addColorStop(1,'rgba(0,0,0,.9)');
+                ctx.fillStyle=shade;ctx.fillRect(0,820,W,460);
+                const lines=[];
+                let words=name.split(/\s+/),line='';
+                for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>610&&line){lines.push(line);line=word;}else line=test;}
+                if(line)lines.push(line);
+                const textLines=lines.slice(0,2);
+                let fontSize=textLines.length>1?66:84;
+                ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.miterLimit=2;
+                const joined=textLines.join(' ');
+                while(fontSize>38){ctx.font=`900 ${fontSize}px Inter, Arial Black, sans-serif`;if(ctx.measureText(joined).width<=620)break;fontSize-=3;}
+                const pop=0.82+0.18*Math.min(1,(t-7.2)/1.2);
+                ctx.translate(W/2,1045);ctx.scale(pop,pop);
+                // Electric gold edge accents, kept behind the lettering.
+                const pulse=.65+.35*Math.sin(t*8.5);
+                ctx.save();ctx.strokeStyle=`rgba(255,210,92,${.45*pulse})`;ctx.lineWidth=2.5;ctx.shadowColor='#ffbf38';ctx.shadowBlur=18;
+                for(let side of [-1,1]){ctx.beginPath();ctx.moveTo(side*255,-105);ctx.lineTo(side*220,-78);ctx.lineTo(side*244,-45);ctx.lineTo(side*190,-18);ctx.stroke();}
+                ctx.restore();
+                const yStart=textLines.length>1?-35:0;
+                textLines.forEach((line,i)=>{
+                    const y=yStart+(i-(textLines.length-1)/2)*fontSize*.92;
+                    ctx.font=`900 ${fontSize}px Inter, Arial Black, sans-serif`;
+                    // Heavy dimensional shadow and dark bevel edge.
+                    ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=28;ctx.shadowOffsetY=12;
+                    ctx.lineWidth=14;ctx.strokeStyle='#241004';ctx.strokeText(line,0,y,640);
+                    ctx.shadowBlur=0;ctx.shadowOffsetY=5;ctx.lineWidth=8;ctx.strokeStyle='#8b4b08';ctx.strokeText(line,0,y,640);
+                    // Metallic gold gradient matching the existing WESMA gold champion treatment.
+                    const gold=ctx.createLinearGradient(0,y-fontSize*.62,0,y+fontSize*.58);
+                    gold.addColorStop(0,'#fff8cf');gold.addColorStop(.16,'#ffe78a');gold.addColorStop(.34,'#d99a20');gold.addColorStop(.52,'#fff4b0');gold.addColorStop(.72,'#b86b08');gold.addColorStop(.88,'#f7d56c');gold.addColorStop(1,'#6d3504');
+                    ctx.shadowColor='rgba(255,181,36,.78)';ctx.shadowBlur=20;ctx.shadowOffsetY=0;
+                    ctx.fillStyle=gold;ctx.fillText(line,0,y,640);
+                    ctx.shadowBlur=0;ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,250,215,.92)';ctx.strokeText(line,0,y,640);
+                    // Fine engraved diagonal texture, clipped to the lettering itself.
+                    ctx.save();ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.24;ctx.strokeStyle='#fff1b0';ctx.lineWidth=1;
+                    for(let hatch=-360;hatch<360;hatch+=13){ctx.beginPath();ctx.moveTo(hatch,y-fontSize*.62);ctx.lineTo(hatch+fontSize*.34,y+fontSize*.62);ctx.stroke();}
+                    ctx.restore();
+                    // Fine highlight sweep across the face of the lettering.
+                    const shine=(t*95)%760-380;
+                    ctx.save();ctx.beginPath();ctx.rect(-325,y-fontSize*.55,650,fontSize*1.05);ctx.clip();
+                    const glint=ctx.createLinearGradient(shine-45,0,shine+45,0);glint.addColorStop(0,'rgba(255,255,255,0)');glint.addColorStop(.5,'rgba(255,255,255,.52)');glint.addColorStop(1,'rgba(255,255,255,0)');
+                    ctx.globalAlpha=.6;ctx.fillStyle=glint;ctx.fillRect(-330,y-fontSize,660,fontSize*2);ctx.restore();
+                });
+                // A restrained lightning filament and gold sparks around the reveal.
+                ctx.save();ctx.globalAlpha=.7*pulse;ctx.strokeStyle='#ffd86a';ctx.lineWidth=2;ctx.shadowColor='#ffb52e';ctx.shadowBlur=12;
+                ctx.beginPath();ctx.moveTo(-300,72);ctx.lineTo(-262,48);ctx.lineTo(-279,20);ctx.lineTo(-225,-8);ctx.stroke();
+                ctx.beginPath();ctx.moveTo(300,72);ctx.lineTo(262,48);ctx.lineTo(279,20);ctx.lineTo(225,-8);ctx.stroke();ctx.restore();
                 ctx.restore();
             }
+            ctx.globalAlpha=1;
         }
 
         function wesmaFilmDrawTeamRows(ctx,teams,accent,progress,top,gap){
@@ -6733,11 +6786,11 @@
                         if(status)status.textContent='Champion-only film created with the shared music portion.';
                         stream.getTracks().forEach(track=>track.stop());
                     };
-                    wesmaFilmRecorder.start();
+                    wesmaFilmRecorder.start(250);
                 }else gain.connect(wesmaFilmAudioContext.destination);
                 wesmaFilmSource=source;
                 source.start(0,clip.start,clip.duration);
-                const total=40,startTime=performance.now();
+                const total=clip.duration,startTime=performance.now();
                 wesmaFilmStopFlag=false;
                 if(status)status.textContent=record?'Creating champion-only cinematic film…':'Playing champion-only cinematic preview…';
                 const tick=now=>{
