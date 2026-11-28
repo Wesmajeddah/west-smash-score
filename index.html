@@ -6428,7 +6428,7 @@
                 <!-- Cinematic film export: one user soundtrack, trim the desired portion. -->
                 <section id="wesma-film-studio" class="my-3 rounded-xl border border-amber-300/70 bg-slate-950 p-2 text-white shadow-lg">
                     <div class="text-center text-[11px] font-black tracking-[.18em] text-amber-200">WESMA • CINEMATIC AWARD FILM</div>
-                    <div class="text-center text-[9px] text-slate-300 mb-2">FULL CHAMPION FILM • THUNDERSTORM LIGHTNING • WINNER STATS & HISTORY</div>
+                    <div class="text-center text-[9px] text-slate-300 mb-2">CHAMPIONS ONLY • SLOW-MOTION SMASH • SHUTTLE IMPACT • FEATHER REVEAL</div>
                     <canvas id="wesma-film-canvas" width="720" height="1280" class="block w-full rounded-lg border border-amber-200/40" style="aspect-ratio:9/16;background:#07131d"></canvas>
                     <div class="grid grid-cols-2 gap-2 mt-2">
                         <label class="col-span-2 text-[9px] font-bold text-slate-200">Add your own music file (no built-in music)
@@ -6472,7 +6472,7 @@
 
             // Film-only snapshot. The source scoring/history objects are read-only here.
             window.wesmaFilmRankings = {
-                first: firstPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t),defeatedDetails:Array.isArray(t.defeatedDetails)?t.defeatedDetails.map(d=>({name:String(d.name||d.teamName||''),count:Number(d.count||d.wins)||0})):[]}))
+                first: firstPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)}))
             };
             initWesmaFilmStudio();
 
@@ -6649,34 +6649,294 @@
         }
 
         function wesmaFilmDraw(ctx,elapsed){
-            const W=720,H=1280,t=Math.max(0,Number(elapsed)||0);
+            const W=720,H=1280;
             const sets=window.wesmaFilmRankings||{first:[]};
-            const winners=(sets.first||[]).map(x=>({...x,name:String(x.name||'').trim()})).filter(x=>x.name);
-            const champ=winners[0]||{name:'WESMA CHAMPIONS',wins:0,losses:0,played:0};
-            const names=winners.length?winners.map(x=>x.name):['CHAMPIONS'];
-            const scene=Math.min(4,Math.floor(t/6));
-            const img=wesmaCinematicImages[scene%Math.max(1,wesmaCinematicImages.length)];
+            const winners=(sets.first||[]).map(t=>String(t.name||'').trim()).filter(Boolean);
+            const rawNames=winners.length?winners:['CHAMPIONS'];
+            const t=Math.max(0,Number(elapsed)||0);
+            const sceneDuration=3.25,sceneCount=4,sceneEnd=sceneDuration*sceneCount;
             ctx.clearRect(0,0,W,H);
-            // Fit complete supplied scene; blurred cover only fills the unused edges.
-            if(img&&img.complete&&img.naturalWidth){
-                const iw=img.naturalWidth,ih=img.naturalHeight,cover=Math.max(W/iw,H/ih);
-                ctx.save();ctx.filter='blur(25px) brightness(.38)';ctx.drawImage(img,(W-iw*cover)/2,(H-ih*cover)/2,iw*cover,ih*cover);ctx.restore();
-                const contain=Math.min(W/iw,H/ih);ctx.drawImage(img,(W-iw*contain)/2,(H-ih*contain)/2,iw*contain,ih*contain);
-            }else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#142331');g.addColorStop(1,'#090d12');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
-            // Natural, irregular thunderstorm flashes across the entire frame.
-            const phase=t%7.3;let flash=0;if(phase>1.05&&phase<1.18)flash=.82;if(phase>1.21&&phase<1.27)flash=.38;if(phase>1.34&&phase<1.40)flash=.65;if(phase>4.6&&phase<4.68)flash=.48;
-            if(flash){ctx.fillStyle='rgba(205,225,255,'+flash+')';ctx.fillRect(0,0,W,H);}
-            // Forked lightning bolt, branching, short-lived, randomized by repeatable frame time.
-            if(flash>.35){let seed=Math.floor(t*12)+3;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};ctx.save();ctx.strokeStyle='rgba(220,239,255,.95)';ctx.shadowColor='#b7d9ff';ctx.shadowBlur=25;ctx.lineWidth=4;ctx.beginPath();let x=90+rand()*540,y=0;ctx.moveTo(x,y);for(let i=0;i<9;i++){x+=rand()*90-45;y+=105+rand()*55;ctx.lineTo(x,y);}ctx.stroke();ctx.lineWidth=2;for(let b=0;b<3;b++){ctx.beginPath();ctx.moveTo(x-80+b*45,450+b*120);ctx.lineTo(x-130+rand()*170,560+b*150);ctx.lineTo(x-160+rand()*240,660+b*150);ctx.stroke();}ctx.restore();}
-            const text=(str,y,size,color='#f4c66f',font='900')=>{ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=font+' '+size+'px "Arial Black",Impact,sans-serif';ctx.lineWidth=5;ctx.strokeStyle='rgba(20,10,3,.9)';ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=18;ctx.strokeText(str,W/2,y,660);ctx.fillStyle=color;ctx.fillText(str,W/2,y,660);ctx.restore();};
-            const goldRule=y=>{const gr=ctx.createLinearGradient(40,0,W-40,0);gr.addColorStop(0,'transparent');gr.addColorStop(.5,'#f3c66c');gr.addColorStop(1,'transparent');ctx.fillStyle=gr;ctx.fillRect(40,y,W-80,3);};
-            if(t<3){text('WESMA CHAMPIONS',H*.46,62);text('BADMINTON CLUB',H*.53,22,'#e9d8b3','700');}
-            else if(t<11){const list=names.slice(0,2);list.forEach((n,i)=>text(n.toUpperCase(),H*.43+i*150,Math.min(92,Math.floor(600/Math.max(5,n.length*.58)))));goldRule(H*.61);}
-            else if(t<18){text(champ.name.toUpperCase(),H*.28,48);text(String(champ.wins||0)+' WINS',H*.42,72);text(String(champ.played||0)+' MATCHES',H*.53,55);text(String(champ.losses||0)+' LOSSES',H*.62,42);goldRule(H*.68);text((Number(champ.wins)>=4?'DOMINANT FORCE':'CHAMPION PERFORMANCE'),H*.75,25,'#f2dfb6','800');}
-            else if(t<24){text('RIVALRY RECORD',H*.27,35);const detail=(champ.defeatedDetails||[]).slice().sort((a,b)=>(b.count||b.wins||0)-(a.count||a.wins||0))[0];text(String(detail&&(detail.name||detail.teamName)||'TOP RIVAL'),H*.46,54);text('MOST DEFEATED OPPONENT',H*.57,23,'#e9d8b3','800');text(String(detail&&(detail.count||detail.wins)||0)+' TIMES',H*.65,42);}
-            else{text('HISTORY PERFORMANCE',H*.28,31);text(champ.name.toUpperCase(),H*.42,45);text(String(champ.wins||0)+' CURRENT WINS',H*.53,43);text('WESMA • SINCE 2026',H*.68,22,'#e9d8b3','800');}
-            // subtle vignette, no sword shine / moving metallic sweep
-            const vg=ctx.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,H*.8);vg.addColorStop(0,'transparent');vg.addColorStop(1,'rgba(0,0,0,.35)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+
+            const drawScene=(index,alpha=1,zoom=1)=>{
+                const img=wesmaCinematicImages[index];
+                if(!img||!img.complete||!img.naturalWidth){
+                    const g=ctx.createLinearGradient(0,0,W,H);
+                    g.addColorStop(0,'#06182b');g.addColorStop(1,'#07101c');
+                    ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.restore();
+                    return;
+                }
+                const iw=img.naturalWidth,ih=img.naturalHeight;
+                ctx.save();ctx.globalAlpha=alpha;
+                // Cinematic blurred fill keeps the entire original photograph visible in front.
+                const cover=Math.max(W/iw,H/ih)*1.08,bw=iw*cover,bh=ih*cover;
+                ctx.save();ctx.filter='blur(26px) brightness(.42) saturate(1.12)';
+                ctx.drawImage(img,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();
+                ctx.fillStyle='rgba(2,10,22,.24)';ctx.fillRect(0,0,W,H);
+                const contain=Math.min((W-28)/iw,(H-34)/ih)*zoom;
+                const dw=iw*contain,dh=ih*contain;
+                ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=22;
+                ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
+                ctx.shadowBlur=0;
+                const vignette=ctx.createRadialGradient(W/2,H/2,H*.22,W/2,H/2,H*.78);
+                vignette.addColorStop(0,'rgba(0,0,0,0)');
+                vignette.addColorStop(1,'rgba(0,0,0,.30)');
+                ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
+                ctx.restore();
+            };
+
+            // Four supplied animated badminton scenes play in the exact upload order.
+            if(t<sceneEnd){
+                const index=Math.min(sceneCount-1,Math.floor(t/sceneDuration));
+                const local=(t-index*sceneDuration)/sceneDuration;
+                const zoom=1.015+Math.min(1,local)*.035;
+                drawScene(index,1,zoom);
+                if(index>0&&local<.16){
+                    const fade=1-local/.16;
+                    drawScene(index-1,fade,1.045);
+                }
+                // Subtle cinematic light sweep; no detail is painted over the players.
+                ctx.save();
+                const sweep=(t*95)%(W+260)-130;
+                const beam=ctx.createLinearGradient(sweep-100,0,sweep+100,0);
+                beam.addColorStop(0,'rgba(255,255,255,0)');
+                beam.addColorStop(.5,'rgba(160,210,255,.10)');
+                beam.addColorStop(1,'rgba(255,255,255,0)');
+                ctx.fillStyle=beam;ctx.fillRect(0,0,W,H);ctx.restore();
+                return;
+            }
+
+            /*
+             * CHAMPION NAME INTRO — styled from the attached reference:
+             * black cinema backdrop, oversized antique-gold serif lettering,
+             * deep 3-D extrusion, bevel highlights, warm metallic sweep and
+             * a subtle floor reflection. Only the champion-intro presentation
+             * is changed; ranking/match data and the four preceding scenes stay intact.
+             */
+            const reveal=Math.min(1,Math.max(0,(t-sceneEnd)/2.8));
+            const localReveal=t-sceneEnd;
+
+            ctx.save();
+            ctx.fillStyle='#000';
+            ctx.fillRect(0,0,W,H);
+
+            // Very subtle warm atmospheric glow behind the lettering.
+            const aura=ctx.createRadialGradient(W/2,H*.45,20,W/2,H*.45,470);
+            aura.addColorStop(0,'rgba(255,193,78,.075)');
+            aura.addColorStop(.42,'rgba(145,86,20,.035)');
+            aura.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=aura;
+            ctx.fillRect(0,0,W,H);
+
+            // Slow metallic dust / micro-sparks.
+            for(let i=0;i<46;i++){
+                const px=(i*97+Math.sin(t*.34+i*1.7)*34)%W;
+                const py=(i*61+t*(7+(i%5)*2.2))%H;
+                const pa=(.12+.32*Math.abs(Math.sin(t*1.1+i)))*reveal;
+                ctx.globalAlpha=pa;
+                ctx.fillStyle=i%4===0?'#fff0bd':'#d8a746';
+                ctx.beginPath();
+                ctx.arc(px,py,.7+(i%3)*.35,0,Math.PI*2);
+                ctx.fill();
+            }
+            ctx.globalAlpha=1;
+
+            // Build display lines: one champion per line, while a single
+            // two-word champion name is split into the same two-line rhythm
+            // as the supplied reference artwork.
+            let displayNames=[];
+            if(rawNames.length===1){
+                const single=rawNames[0];
+                const parts=single.split(/\s+/).filter(Boolean);
+                if(parts.length===2) displayNames=[parts[0],parts[1]];
+                else displayNames=[single];
+            }else{
+                displayNames=rawNames.slice(0,4);
+            }
+
+            const lineGap=displayNames.length<=2?196:(displayNames.length===3?158:128);
+            const maxNameLength=Math.max(...displayNames.map(n=>n.length),1);
+            let baseSize=displayNames.length<=2
+                ? Math.min(112,Math.floor(575/Math.max(1,maxNameLength*.54)))
+                : Math.min(92,Math.floor(575/Math.max(1,maxNameLength*.54)));
+            baseSize=Math.max(52,baseSize);
+
+            const totalHeight=(displayNames.length-1)*lineGap;
+            const centerY=H*.47;
+
+            // Elegant thin top/bottom gold rules echo the reference's
+            // luxury title-card framing without adding a competing logo.
+            const ruleY1=centerY-totalHeight/2-92;
+            const ruleY2=centerY+totalHeight/2+86;
+            const ruleAlpha=Math.min(1,reveal*1.15);
+
+            ctx.globalAlpha=ruleAlpha;
+            const ruleGrad=ctx.createLinearGradient(70,0,W-70,0);
+            ruleGrad.addColorStop(0,'rgba(255,227,153,0)');
+            ruleGrad.addColorStop(.18,'rgba(214,163,67,.55)');
+            ruleGrad.addColorStop(.5,'rgba(255,239,178,.95)');
+            ruleGrad.addColorStop(.82,'rgba(214,163,67,.55)');
+            ruleGrad.addColorStop(1,'rgba(255,227,153,0)');
+            ctx.fillStyle=ruleGrad;
+            ctx.fillRect(78,ruleY1,W-156,1.2);
+            ctx.fillRect(78,ruleY2,W-156,1.2);
+            ctx.globalAlpha=1;
+
+            const ease=Math.min(1,reveal);
+            const staggerStep=.22;
+
+            displayNames.forEach((rawName,index)=>{
+                const name=String(rawName||'CHAMPION').toUpperCase();
+                const nameReveal=Math.max(0,Math.min(1,(ease-index*staggerStep)/(1-staggerStep*Math.max(0,displayNames.length-1))));
+                const smooth=1-Math.pow(1-nameReveal,3);
+                const y=centerY-totalHeight/2+index*lineGap;
+                const enterY=42*(1-smooth);
+                const scale=.91+.09*smooth;
+
+                ctx.save();
+                ctx.translate(W/2,y+enterY);
+                ctx.scale(scale,scale);
+                ctx.textAlign='center';
+                ctx.textBaseline='middle';
+
+                let fitted=baseSize;
+                ctx.font=`900 ${fitted}px Georgia, "Times New Roman", serif`;
+                while(ctx.measureText(name).width>650&&fitted>42){
+                    fitted-=2;
+                    ctx.font=`900 ${fitted}px Georgia, "Times New Roman", serif`;
+                }
+
+                /*
+                 * Deep extrusion: several offset passes make the flat canvas
+                 * text read like the heavy raised gold lettering in the reference.
+                 */
+                ctx.globalAlpha=nameReveal;
+                for(let d=18;d>=2;d-=2){
+                    const shade=38+Math.round((18-d)*1.2);
+                    ctx.fillStyle=`rgb(${shade},${22+Math.round((18-d)*.7)},${8})`;
+                    ctx.fillText(name,d*.62,d*.62);
+                }
+
+                // Dark outer edge.
+                ctx.lineWidth=8;
+                ctx.strokeStyle='rgba(28,15,5,.98)';
+                ctx.shadowColor='rgba(0,0,0,.95)';
+                ctx.shadowBlur=22;
+                ctx.strokeText(name,0,0);
+
+                // Antique-gold metallic body gradient.
+                const gold=ctx.createLinearGradient(0,-fitted*.62,0,fitted*.62);
+                gold.addColorStop(0,'#fff4c7');
+                gold.addColorStop(.10,'#f6d77f');
+                gold.addColorStop(.28,'#c28a2d');
+                gold.addColorStop(.47,'#ffe8a0');
+                gold.addColorStop(.62,'#9a641b');
+                gold.addColorStop(.80,'#e1b85c');
+                gold.addColorStop(1,'#6f4310');
+                ctx.fillStyle=gold;
+                ctx.shadowColor='rgba(255,188,65,.42)';
+                ctx.shadowBlur=16;
+                ctx.fillText(name,0,0);
+                ctx.shadowBlur=0;
+
+                // Fine inner highlight, giving the letters a beveled rim.
+                ctx.lineWidth=2.1;
+                ctx.strokeStyle='rgba(255,248,213,.78)';
+                ctx.globalAlpha=nameReveal*.72;
+                ctx.strokeText(name,-.7,-.9);
+
+                // Tiny engraved-looking glints on the top edge.
+                ctx.globalAlpha=nameReveal*.55;
+                ctx.lineWidth=1;
+                ctx.strokeStyle='rgba(255,231,157,.9)';
+                ctx.strokeText(name,-1.1,-1.4);
+
+                ctx.restore();
+            });
+
+            // Warm floor/reflection beneath the title, matching the attached
+            // reference's visible gold reflection on black.
+            ctx.globalAlpha=Math.min(1,reveal*1.1);
+            const floorY=ruleY2+26;
+            const floorGlow=ctx.createRadialGradient(W/2,floorY,5,W/2,floorY,250);
+            floorGlow.addColorStop(0,'rgba(225,174,72,.30)');
+            floorGlow.addColorStop(.35,'rgba(157,94,18,.12)');
+            floorGlow.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=floorGlow;
+            ctx.fillRect(0,floorY-40,W,90);
+
+            // Soft mirrored title reflection, deliberately low opacity.
+            ctx.save();
+            ctx.translate(0,floorY+10);
+            ctx.scale(1,-.34);
+            ctx.globalAlpha=.16*reveal;
+            ctx.filter='blur(2.2px)';
+            displayNames.forEach((rawName,index)=>{
+                const name=String(rawName||'CHAMPION').toUpperCase();
+                const y=centerY-totalHeight/2+index*lineGap;
+                let fitted=baseSize;
+                ctx.font=`900 ${fitted}px Georgia, "Times New Roman", serif`;
+                while(ctx.measureText(name).width>650&&fitted>42){
+                    fitted-=2;
+                    ctx.font=`900 ${fitted}px Georgia, "Times New Roman", serif`;
+                }
+                const gold=ctx.createLinearGradient(0,-fitted*.62,0,fitted*.62);
+                gold.addColorStop(0,'#f2d276');gold.addColorStop(.5,'#a56b1c');gold.addColorStop(1,'#5b360b');
+                ctx.fillStyle=gold;
+                ctx.textAlign='center';ctx.textBaseline='middle';
+                ctx.fillText(name,W/2,y);
+            });
+            ctx.restore();
+
+            // Small premium caption, intentionally secondary to the giant
+            // champion name treatment.
+            ctx.globalAlpha=Math.min(1,Math.max(0,(reveal-.25)/.75));
+            ctx.textAlign='center';
+            ctx.textBaseline='middle';
+            ctx.font='800 18px Inter, Arial, sans-serif';
+            ctx.fillStyle='#e8c46f';
+            ctx.shadowColor='rgba(240,188,78,.65)';
+            ctx.shadowBlur=10;
+            ctx.fillText('WESMA CHAMPIONS',W/2,ruleY2+62);
+
+            // Final soft vignette for a theatrical black finish.
+            ctx.globalAlpha=1;
+            const vignette=ctx.createRadialGradient(W/2,H*.48,H*.18,W/2,H*.48,H*.82);
+            vignette.addColorStop(0,'rgba(0,0,0,0)');
+            vignette.addColorStop(.72,'rgba(0,0,0,.12)');
+            vignette.addColorStop(1,'rgba(0,0,0,.58)');
+            ctx.fillStyle=vignette;
+            ctx.fillRect(0,0,W,H);
+
+            // Natural storm: irregular lightning flashes illuminate the complete winner frame.
+            // This overlay is limited to the cinematic canvas and does not add text/logo layers.
+            const stormTime=Number(elapsed)||0;
+            const stormPhase=(stormTime*1.73)%7.4;
+            let flash=0;
+            if(stormPhase<.10) flash=.82;
+            else if(stormPhase<.19) flash=.12;
+            else if(stormPhase<.27) flash=.48;
+            else if(stormPhase>3.05&&stormPhase<3.13) flash=.58;
+            else if(stormPhase>3.18&&stormPhase<3.24) flash=.22;
+            if(stormTime<sceneEnd) flash=0;
+            if(flash>0){
+                ctx.save();
+                ctx.globalCompositeOperation='screen';
+                const stormGlow=ctx.createRadialGradient(W*.52,H*.25,8,W*.52,H*.35,H*.9);
+                stormGlow.addColorStop(0,`rgba(215,235,255,${flash*.48})`);
+                stormGlow.addColorStop(.42,`rgba(130,175,225,${flash*.22})`);
+                stormGlow.addColorStop(1,`rgba(190,220,255,${flash*.08})`);
+                ctx.fillStyle=stormGlow;ctx.fillRect(0,0,W,H);
+                // Branching bolt generated for each burst; sharp and irregular, not a shine sweep.
+                const seed=Math.floor(stormTime*5.7)+17;
+                let rnd=seed;const rand=()=>{rnd=(rnd*9301+49297)%233280;return rnd/233280;};
+                const boltX=W*(.25+rand()*.5);let x=boltX,y=H*.04;
+                ctx.beginPath();ctx.moveTo(x,y);
+                for(let i=0;i<13;i++){x+=((rand()-.5)*W*.15);y+=H*(.045+rand()*.035);ctx.lineTo(x,y);}
+                ctx.strokeStyle=`rgba(225,242,255,${Math.min(.95,flash+.2)})`;ctx.lineWidth=5;ctx.shadowColor='#b9dcff';ctx.shadowBlur=30;ctx.stroke();
+                for(let b=0;b<3;b++){let bx=x,by=H*(.28+rand()*.34);ctx.beginPath();ctx.moveTo(boltX+((rand()-.5)*W*.25),H*(.25+rand()*.2));for(let j=0;j<6;j++){bx+=((rand()-.5)*W*.12);by+=H*.035;ctx.lineTo(bx,by);}ctx.lineWidth=2.5;ctx.stroke();}
+                ctx.restore();
+            }
+            ctx.restore();
         }
 
         function wesmaFilmDrawTeamRows(ctx,teams,accent,progress,top,gap){
