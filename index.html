@@ -6437,7 +6437,7 @@
                         <label class="text-[9px] font-bold text-slate-200">Music start (seconds)
                             <input id="wesma-film-start" type="number" min="0" step="0.1" value="0" class="w-full rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
-                        <label class="text-[9px] font-bold text-slate-200">Music end (seconds • 24 sec minimum)
+                        <label class="text-[9px] font-bold text-slate-200">Music end (seconds • 40 sec minimum)
                             <input id="wesma-film-end" type="number" min="0" step="0.1" value="0" class="w-full rounded bg-white p-1.5 text-[10px] text-slate-900">
                         </label>
                     </div>
@@ -6472,7 +6472,7 @@
 
             // Film-only snapshot. The source scoring/history objects are read-only here.
             window.wesmaFilmRankings = {
-                first: firstPlaceTeams.map(t => ({id:String(t.id),name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)}))
+                first: firstPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)}))
             };
             initWesmaFilmStudio();
 
@@ -6650,97 +6650,86 @@
             if(!wesmaFilmAudioBuffer)throw new Error('Please add your own music file first.');
             const a=Math.max(0,Number(document.getElementById('wesma-film-start').value)||0);
             const b=Math.min(wesmaFilmAudioBuffer.duration,Number(document.getElementById('wesma-film-end').value)||0);
-            if(b-a<24)throw new Error('Select at least 24 seconds of music for the complete cinematic film.');
-            return {start:a,duration:24};
-        }
-
-        function wesmaFilmHistorySummary(team){
-            const rows=Array.isArray(tournamentHistory)?tournamentHistory:[];
-            const id=String(team&&team.id||'');
-            let wins=0,losses=0,titles=0,appearances=0;
-            const rankRows=[];
-            rows.forEach(record=>{
-                const list=Array.isArray(record&&record.teams)?record.teams.filter(t=>t&&!t.isDisabled):[];
-                const found=list.find(t=>String(t.id)===id);
-                if(!found)return;
-                appearances++;
-                const logs=getHistoryRecordMatchLogs(found,record);
-                wins+=logs.filter(x=>String(x.result).toUpperCase()==='WIN').length;
-                losses+=logs.filter(x=>String(x.result).toUpperCase()==='LOSS').length;
-                const podium=getPodiumGroups(list);
-                const rank=podium.find(g=>g.teams.some(t=>String(t.id)===id));
-                if(rank&&rank.rank===1)titles++;
-                rankRows.push({rank:rank?rank.rank:99,time:normalizeHistoryTimestamp(record.sessionId||record.startTimestamp||record.id)});
-            });
-            const peers=new Map();
-            rows.forEach(record=>(record.teams||[]).filter(t=>t&&!t.isDisabled).forEach(t=>{
-                const key=String(t.id); if(!peers.has(key))peers.set(key,{wins:0,titles:0});
-                const logs=getHistoryRecordMatchLogs(t,record);
-                peers.get(key).wins+=logs.filter(x=>String(x.result).toUpperCase()==='WIN').length;
-                const first=getPodiumGroups((record.teams||[]).filter(x=>x&&!x.isDisabled)).find(g=>g.rank===1);
-                if(first&&first.teams.some(x=>String(x.id)===key))peers.get(key).titles++;
-            }));
-            const sorted=[...peers.entries()].sort((a,b)=>b[1].wins-a[1].wins||b[1].titles-a[1].titles);
-            const rank=sorted.findIndex(([key])=>key===id)+1;
-            const tag=titles>=6?'HISTORY DOMINATORS':titles>=3?'ELITE TITLE CONTENDERS':titles>=1?'A NAME ETCHED IN HISTORY':'THE RISING FORCE';
-            return {wins,losses,titles,appearances,rank:rank||'—',tag};
+            if(b-a<40)throw new Error('Select at least 40 seconds of music for the complete synchronized film.');
+            return {start:a,duration:40};
         }
 
         function wesmaFilmDraw(ctx,elapsed){
-            const W=720,H=1280,total=24;
+            const W=720,H=1280,total=40;
             const t=Math.max(0,Math.min(total,Number(elapsed)||0));
             const frames=(wesmaSyncedFilmImages[0]||[]).filter(im=>im&&im.complete&&im.naturalWidth);
-            const champs=(window.wesmaFilmRankings&&Array.isArray(window.wesmaFilmRankings.first))?window.wesmaFilmRankings.first:[];
-            const names=champs.map(x=>String(x.name||'').trim()).filter(Boolean);
-            const champion=champs[0]||null;
-            const act=t<6?0:t<15?1:2;
-            const actTime=act===0?t:act===1?t-6:t-15;
-            ctx.clearRect(0,0,W,H);ctx.fillStyle='#050302';ctx.fillRect(0,0,W,H);
+            ctx.clearRect(0,0,W,H);
+            ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+            // Keep the original upper/portrait film only. Cross-fade adjacent source
+            // frames continuously so the exported 30fps video does not jump every few seconds.
             if(frames.length){
-                const idx=Math.min(frames.length-1,Math.floor((t/total)*frames.length));
-                const im=frames[idx],scale=Math.max(W/im.naturalWidth,H/im.naturalHeight)*1.04;
-                const w=im.naturalWidth*scale,h=im.naturalHeight*scale;
-                ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);
+                const position=(t/total)*frames.length;
+                const index=Math.min(frames.length-1,Math.floor(position));
+                const next=Math.min(frames.length-1,index+1);
+                const blend=index===frames.length-1?0:position-index;
+                const maxW=680,maxH=1120;
+                const drawFrame=(im,alpha)=>{
+                    if(!im||!im.naturalWidth||alpha<=0)return;
+                    const scale=Math.min(maxW/im.naturalWidth,maxH/im.naturalHeight);
+                    const w=im.naturalWidth*scale,h=im.naturalHeight*scale;
+                    ctx.globalAlpha=alpha;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);
+                };
+                drawFrame(frames[index],1-blend);
+                if(next!==index)drawFrame(frames[next],blend);
+                ctx.globalAlpha=1;
             }
-            // Deep vignette keeps the existing stone/rock background visible while making the reveal legible.
-            const shade=ctx.createLinearGradient(0,0,0,H);shade.addColorStop(0,'rgba(0,0,0,.18)');shade.addColorStop(.5,'rgba(0,0,0,.12)');shade.addColorStop(1,'rgba(0,0,0,.78)');ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);
-            // Act 1: short, quick awakening.
-            if(act===0){
-                ctx.textAlign='center';ctx.font='900 34px Georgia,serif';ctx.fillStyle='#f8c66a';ctx.shadowColor='#ff6b12';ctx.shadowBlur=22;ctx.fillText('THE AWAKENING',W/2,155);ctx.shadowBlur=0;
-                for(let i=0;i<24;i++){const x=(i*97+Math.floor(t*70))%W,y=(i*173+Math.floor(t*95))%H;ctx.fillStyle='rgba(255,150,45,.75)';ctx.beginPath();ctx.arc(x,y,(i%3)+1,0,Math.PI*2);ctx.fill();}
+            // Natural stone-break reveal: the champion name is built from massive,
+            // beveled rock-metal letterforms, emerging through fractured stone.
+            const names=(window.wesmaFilmRankings&&Array.isArray(window.wesmaFilmRankings.first))
+                ?window.wesmaFilmRankings.first.map(t=>String(t.name||'').trim()).filter(Boolean):[];
+            const originalNameArea=document.querySelector('#finish-match-modal-content .wesma-champions-name-text');
+            if(originalNameArea&&names.length){
+                const currentName=names.join(' & ');
+                if(originalNameArea.textContent.trim()!==currentName)originalNameArea.textContent=currentName;
             }
-            // Act 2: the name emerges as heavy forged lettering from the rock split.
-            if(act===1){
-                const p=Math.max(0,Math.min(1,actTime/4.5)),ease=1-Math.pow(1-p,3);
-                ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-                const title=names.join('  &  ')||'CHAMPIONS';let size=names.length>1?58:70;
-                ctx.font=`900 ${size}px Impact, "Arial Black", sans-serif`;
-                while(ctx.measureText(title).width>650&&size>34){size-=2;ctx.font=`900 ${size}px Impact, "Arial Black", sans-serif`;}
-                ctx.globalAlpha=ease;ctx.translate(W/2,680+(1-ease)*190);ctx.scale(.82+.18*ease,.82+.18*ease);
-                // Thick dark bevel, stone shadow and hot forged-gold face.
-                ctx.lineJoin='bevel';ctx.lineWidth=20;ctx.strokeStyle='#160b05';ctx.shadowColor='#ff6a00';ctx.shadowBlur=30;ctx.strokeText(title,0,0,660);
-                ctx.lineWidth=9;ctx.strokeStyle='#8b3c0a';ctx.shadowBlur=10;ctx.strokeText(title,0,0,660);
-                const gold=ctx.createLinearGradient(0,-55,0,55);gold.addColorStop(0,'#fff5c4');gold.addColorStop(.2,'#ffc94b');gold.addColorStop(.52,'#a94c08');gold.addColorStop(.78,'#f5a623');gold.addColorStop(1,'#fff0a1');ctx.fillStyle=gold;ctx.shadowColor='#ff8a12';ctx.shadowBlur=24;ctx.fillText(title,0,0,660);
-                // Single slow light sweep across the settled name.
-                const sweep=-370+Math.max(0,Math.min(1,(actTime-4)/4))*740;
-                ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.85;const beam=ctx.createLinearGradient(sweep-55,0,sweep+55,0);beam.addColorStop(0,'rgba(255,255,255,0)');beam.addColorStop(.5,'rgba(255,255,238,.95)');beam.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=beam;ctx.fillRect(-340,-75,680,150);ctx.restore();
-                // Lightning flashes behind the lettering, never over the text.
-                const flash=Math.pow(Math.max(0,Math.sin(actTime*2.7)),14);
-                if(flash>.12){ctx.globalAlpha=flash*.8;ctx.strokeStyle='#fff6d8';ctx.lineWidth=5;ctx.shadowColor='#f8a51e';ctx.shadowBlur=35;ctx.beginPath();ctx.moveTo(520,220);ctx.lineTo(480,340);ctx.lineTo(525,390);ctx.lineTo(430,520);ctx.stroke();}
-                ctx.restore();
-                ctx.textAlign='center';ctx.font='bold 20px Arial';ctx.fillStyle='#ffe4a2';ctx.shadowColor='#ff9a1b';ctx.shadowBlur=12;ctx.fillText('THE THUNDER REVEAL',W/2,260);ctx.shadowBlur=0;
-            }
-            // Act 3: history is always rendered from saved tournamentHistory, not placeholder data.
-            if(act===2){
-                const hist=champion?wesmaFilmHistorySummary(champion):{wins:0,losses:0,titles:0,appearances:0,rank:'—',tag:'CHAMPIONS'};
-                const title=names.join('  & ')||'CHAMPIONS';
-                ctx.textAlign='center';ctx.shadowColor='#ff8b19';ctx.shadowBlur=16;ctx.fillStyle='#ffd36d';ctx.font='900 26px Georgia,serif';ctx.fillText('THE LEGACY',W/2,150);ctx.shadowBlur=0;
-                ctx.font='900 38px Impact, "Arial Black", sans-serif';ctx.fillStyle='#fff0c0';ctx.shadowColor='#ff8c18';ctx.shadowBlur=15;ctx.fillText(title,W/2,245,650);ctx.shadowBlur=0;
-                const stats=[['HISTORY WINS',hist.wins],['HISTORY LOSSES',hist.losses],['TITLES',hist.titles],['ALL-TIME RANK',hist.rank]];
-                stats.forEach((item,i)=>{const col=i%2,row=Math.floor(i/2),x=190+col*340,y=440+row*205;ctx.fillStyle='rgba(12,8,5,.76)';ctx.strokeStyle='#bd7627';ctx.lineWidth=2;ctx.fillRect(x-145,y-58,290,116);ctx.strokeRect(x-145,y-58,290,116);ctx.textAlign='center';ctx.font='bold 17px Arial';ctx.fillStyle='#f4d9a4';ctx.fillText(item[0],x,y-15);ctx.font='900 48px Georgia';ctx.fillStyle='#ffc65a';ctx.shadowColor='#ff8b19';ctx.shadowBlur=12;ctx.fillText(String(item[1]),x,y+38);ctx.shadowBlur=0;});
-                ctx.textAlign='center';ctx.font='900 25px Georgia,serif';ctx.fillStyle='#ffce68';ctx.shadowColor='#ff7912';ctx.shadowBlur=16;ctx.fillText(hist.tag,W/2,930,650);ctx.shadowBlur=0;
-                ctx.font='italic bold 23px Georgia';ctx.fillStyle='#fff0d0';ctx.fillText('Built through battles. Remembered in history.',W/2,1000,660);
-                ctx.font='bold 16px Arial';ctx.fillStyle='#d8b887';ctx.fillText(`${hist.appearances} HISTORICAL APPEARANCES`,W/2,1080);
+            if(names.length){
+                const revealStart=25.0, revealDuration=5.8;
+                const progress=Math.max(0,Math.min(1,(t-revealStart)/revealDuration));
+                if(progress>0){
+                    const ease=1-Math.pow(1-progress,3);
+                    const title=names.join('  &  ').toUpperCase();
+                    ctx.save();
+                    ctx.translate(W/2,820+(1-ease)*175);
+                    ctx.globalAlpha=ease;
+                    const maxWidth=650;
+                    let fontSize=names.length>1?72:92;
+                    ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
+                    ctx.font=`1000 ${fontSize}px Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif`;
+                    while(ctx.measureText(title).width>maxWidth&&fontSize>38){fontSize-=2;ctx.font=`1000 ${fontSize}px Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif`;}
+                    const metrics=ctx.measureText(title), textWidth=Math.min(maxWidth,metrics.width);
+                    // Broken stone mass behind the lettering, with irregular fractured edges.
+                    ctx.save();ctx.translate(0,10+(1-ease)*16);ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=30;
+                    ctx.fillStyle='#171513';ctx.strokeStyle='#514b43';ctx.lineWidth=18;
+                    ctx.beginPath();ctx.moveTo(-textWidth/2-42,-67);ctx.lineTo(-textWidth/2-18,-94);ctx.lineTo(-textWidth/2+45,-88);ctx.lineTo(-textWidth/2+77,-105);ctx.lineTo(textWidth/2-64,-94);ctx.lineTo(textWidth/2-30,-108);ctx.lineTo(textWidth/2+38,-82);ctx.lineTo(textWidth/2+48,-35);ctx.lineTo(textWidth/2+32,54);ctx.lineTo(textWidth/2-20,81);ctx.lineTo(-textWidth/2+20,76);ctx.lineTo(-textWidth/2-49,53);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+                    // Deep extrusion and heavy beveled metallic/stone face.
+                    ctx.shadowColor='rgba(255,105,12,.8)';ctx.shadowBlur=26;
+                    ctx.lineWidth=22;ctx.strokeStyle='#120d09';ctx.strokeText(title,0,0,maxWidth);
+                    ctx.lineWidth=13;ctx.strokeStyle='#5a5145';ctx.strokeText(title,0,-5,maxWidth);
+                    ctx.lineWidth=5;ctx.strokeStyle='#b6a58a';ctx.strokeText(title,0,-8,maxWidth);
+                    const face=ctx.createLinearGradient(0,-fontSize*.65,0,fontSize*.58);
+                    face.addColorStop(0,'#f4ead4');face.addColorStop(.18,'#c9bda8');face.addColorStop(.48,'#777064');face.addColorStop(.72,'#38332d');face.addColorStop(1,'#d9c7a4');
+                    ctx.fillStyle=face;ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=18;ctx.fillText(title,0,-9,maxWidth);
+                    // Restrained cracks and chipped highlights make the surface feel carved, not flat.
+                    ctx.save();ctx.globalCompositeOperation='screen';ctx.strokeStyle='rgba(255,236,190,.68)';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(-textWidth*.28,-fontSize*.34);ctx.lineTo(-textWidth*.24,-fontSize*.08);ctx.lineTo(-textWidth*.29,fontSize*.02);ctx.moveTo(textWidth*.19,-fontSize*.2);ctx.lineTo(textWidth*.14,0);ctx.lineTo(textWidth*.2,fontSize*.18);ctx.stroke();ctx.restore();
+                    // Rock fragments move outward from the title's edges as it settles.
+                    for(let i=0;i<18;i++){
+                        const side=i%2?-1:1,seed=i*2.399;
+                        const x=side*(textWidth*.48+Math.sin(seed)*35)*(1+ease*.14);
+                        const y=Math.cos(seed*1.7)*82+(1-ease)*75;
+                        const r=3+(i%5)*2;
+                        ctx.save();ctx.translate(x,y);ctx.rotate(seed+progress);
+                        ctx.fillStyle=i%3?'#51483c':'#b08a55';ctx.beginPath();ctx.moveTo(-r,-r*.5);ctx.lineTo(r*1.3,-r);ctx.lineTo(r,r);ctx.lineTo(-r*.7,r*1.2);ctx.closePath();ctx.fill();ctx.restore();
+                    }
+                    // A single natural lightning flash behind the title, not a constant neon effect.
+                    const flash=Math.pow(Math.max(0,Math.sin((t-25.2)*Math.PI*2.3)),16);
+                    if(flash>.12){ctx.save();ctx.globalAlpha=flash*.72;ctx.strokeStyle='#fff5d7';ctx.lineWidth=4;ctx.shadowColor='#ffcf70';ctx.shadowBlur=34;ctx.beginPath();ctx.moveTo(250,-330);ctx.lineTo(220,-250);ctx.lineTo(263,-210);ctx.lineTo(190,-112);ctx.moveTo(490,-290);ctx.lineTo(458,-220);ctx.lineTo(485,-178);ctx.lineTo(415,-95);ctx.stroke();ctx.restore();}
+                    ctx.restore();
+                }
             }
         }
 
@@ -6789,7 +6778,7 @@
                 }else gain.connect(wesmaFilmAudioContext.destination);
                 wesmaFilmSource=source;
                 source.start(0,clip.start,clip.duration);
-                const total=24,startTime=performance.now();
+                const total=40,startTime=performance.now();
                 wesmaFilmStopFlag=false;
                 if(status)status.textContent=record?'Creating champion-only cinematic film…':'Playing champion-only cinematic preview…';
                 const tick=now=>{
