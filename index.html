@@ -6472,7 +6472,7 @@
 
             // Film-only snapshot. The source scoring/history objects are read-only here.
             window.wesmaFilmRankings = {
-                first: firstPlaceTeams.map(t => ({name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t)}))
+                first: firstPlaceTeams.map(t => ({id:String(t.id),name:String(t.name||''),wins:Number(t.wins)||0,losses:Number(t.losses)||0,played:getTeamPlayedCount(t),defeatedDetails:Array.isArray(t.defeatedDetails)?t.defeatedDetails.map(d=>({...d})):[]}))
             };
             initWesmaFilmStudio();
 
@@ -6654,9 +6654,88 @@
             return {start:a,duration:40};
         }
 
+        // Inferno Forge champion end-card. This is intentionally confined to the
+        // Cinematic Film canvas; no other screen, layout, or source artwork is changed.
+        function wesmaFilmGetAllTimeProfile(champion){
+            const rows=Array.isArray(tournamentHistory)?tournamentHistory:[];
+            const byId=new Map();
+            rows.forEach(record=>{
+                const recordTeams=Array.isArray(record&&record.teams)?record.teams:[];
+                const podium=getPodiumGroups(recordTeams.filter(team=>team&&!team.isDisabled));
+                const titleGroup=podium.find(group=>group.rank===1);
+                recordTeams.forEach(team=>{
+                    if(!team||String(team.id)!==String(champion.id))return;
+                    const key=String(team.id);
+                    if(!byId.has(key))byId.set(key,{wins:0,losses:0,titles:0,sessions:0});
+                    const stat=byId.get(key);
+                    const logs=getHistoryRecordMatchLogs(team,record);
+                    const wins=logs.filter(log=>String(log.result||'').toUpperCase()==='WIN').length;
+                    const losses=logs.filter(log=>String(log.result||'').toUpperCase()==='LOSS').length;
+                    stat.wins+=wins;stat.losses+=losses;stat.sessions++;
+                    if(titleGroup&&titleGroup.teams.some(t=>String(t.id)===key))stat.titles++;
+                });
+            });
+            const current=byId.get(String(champion.id))||{wins:0,losses:0,titles:0,sessions:0};
+            const profiles=[];
+            const seen=new Set();
+            rows.forEach(record=>(record.teams||[]).forEach(team=>{
+                if(!team||team.isDisabled||seen.has(String(team.id)))return;
+                seen.add(String(team.id));
+                const id=String(team.id);let wins=0,losses=0,titles=0;
+                rows.forEach(r=>{
+                    const found=(r.teams||[]).find(t=>t&&String(t.id)===id);
+                    if(!found)return;
+                    const logs=getHistoryRecordMatchLogs(found,r);
+                    wins+=logs.filter(log=>String(log.result||'').toUpperCase()==='WIN').length;
+                    losses+=logs.filter(log=>String(log.result||'').toUpperCase()==='LOSS').length;
+                    const first=getPodiumGroups((r.teams||[]).filter(t=>t&&!t.isDisabled)).find(g=>g.rank===1);
+                    if(first&&first.teams.some(t=>String(t.id)===id))titles++;
+                });
+                profiles.push({id,wins,losses,titles});
+            }));
+            profiles.sort((a,b)=>b.wins-a.wins||b.titles-a.titles||a.losses-b.losses);
+            const foundRank=profiles.findIndex(item=>item.id===String(champion.id));
+            const rank=foundRank>=0?foundRank+1:(profiles.length+1);
+            return {...current,rank,totalTeams:profiles.length};
+        }
+
+        function wesmaFilmDrawInfernoPoster(ctx){
+            const W=720,H=1280;
+            const source=(window.wesmaFilmRankings&&Array.isArray(window.wesmaFilmRankings.first))?window.wesmaFilmRankings.first:[];
+            const champion=source[0]||getChampionLastMatchWinner(getChampionPosterSourceTeams().filter(t=>!t.isDisabled));
+            const teamsForSession=Array.isArray(window.wesmaFilmRankings&&window.wesmaFilmRankings.first)?window.wesmaFilmRankings.first:[];
+            ctx.save();ctx.clearRect(0,0,W,H);
+            const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#090503');bg.addColorStop(.48,'#211006');bg.addColorStop(1,'#050302');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+            const glow=ctx.createRadialGradient(360,360,15,360,470,620);glow.addColorStop(0,'rgba(255,125,12,.38)');glow.addColorStop(.5,'rgba(130,43,4,.18)');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+            for(let i=0;i<95;i++){const x=(i*137+31)%W,y=(i*223+47)%H;ctx.fillStyle=i%4?'rgba(255,145,28,.55)':'rgba(255,220,125,.8)';ctx.beginPath();ctx.arc(x,y,((i*7)%18)/10+.6,0,Math.PI*2);ctx.fill();}
+            const plate=(x,y,w,h)=>{ctx.save();ctx.fillStyle='rgba(12,9,7,.88)';ctx.strokeStyle='#b96b18';ctx.lineWidth=3;ctx.shadowColor='#ff8b1a';ctx.shadowBlur=15;ctx.beginPath();ctx.moveTo(x+18,y);ctx.lineTo(x+w-18,y);ctx.lineTo(x+w,y+18);ctx.lineTo(x+w-18,y+h);ctx.lineTo(x+18,y+h);ctx.lineTo(x,y+h-18);ctx.lineTo(x,y+18);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();};
+            ctx.textAlign='center';ctx.shadowColor='#ff8a13';ctx.shadowBlur=18;ctx.fillStyle='#ffc75b';ctx.font='900 29px Georgia,serif';ctx.fillText('INFERNO FORGE  •  CHAMPION PROFILE',W/2,75);ctx.shadowBlur=0;
+            plate(24,108,672,180);
+            const names=teamsForSession.length?teamsForSession.map(t=>String(t.name||'').trim()).filter(Boolean):champion?[String(champion.name||'')]:[];
+            const nameText=names.join(' & ')||'CHAMPIONS';
+            ctx.textAlign='center';ctx.font=`900 ${nameText.length>21?48:nameText.length>15?56:68}px Georgia,serif`;ctx.lineWidth=3;ctx.strokeStyle='#5a2105';ctx.shadowColor='#ff9b24';ctx.shadowBlur=24;ctx.fillStyle='#ffd36b';ctx.strokeText(nameText,W/2,210,630);ctx.fillText(nameText,W/2,210,630);ctx.shadowBlur=0;
+            ctx.font='900 22px Arial,sans-serif';ctx.fillStyle='#f7c76d';ctx.fillText('CURRENT SESSION CHAMPIONS',W/2,258);
+            const live=champion||{};const wins=Math.max(0,Number(live.wins)||0),losses=Math.max(0,Number(live.losses)||0),played=Math.max(wins+losses,Number(live.played)||0),rate=played?((wins/played)*100).toFixed(1)+'%':'—';
+            plate(28,320,664,205);const cols=[110,270,430,590];const labels=['MATCHES','WINS','LOSSES','WIN RATE'];const vals=[String(played),String(wins),String(losses),rate];
+            cols.forEach((x,i)=>{ctx.textAlign='center';ctx.font='bold 20px Arial';ctx.fillStyle='#f1dfc5';ctx.fillText(labels[i],x,370);ctx.font='900 48px Georgia';ctx.fillStyle='#ffbf42';ctx.shadowColor='#e87916';ctx.shadowBlur=12;ctx.fillText(vals[i],x,445);ctx.shadowBlur=0;if(i<3){ctx.strokeStyle='#c17b27';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+80,350);ctx.lineTo(x+80,490);ctx.stroke();}});
+            plate(28,555,664,145);ctx.textAlign='center';ctx.font='900 25px Georgia';ctx.fillStyle='#ffc65b';ctx.fillText('MATCH HIGHLIGHTS',W/2,600);ctx.font='italic bold 25px Arial';ctx.fillStyle='#fff0d8';ctx.fillText(`${wins} victories recorded`,W/2,640);
+            const latestWin=(Array.isArray(champion&&champion.defeatedDetails)?champion.defeatedDetails:[]).slice().sort((a,b)=>(Number(b.timestamp)||0)-(Number(a.timestamp)||0))[0];
+            const latestDetail=latestWin?`LATEST WIN VS ${String(latestWin.name||'OPPONENT').toUpperCase()}  •  ${latestWin.timestamp?new Date(Number(latestWin.timestamp)).toLocaleDateString('en-GB'):'RECORDED'}`:'MATCH HISTORY DETAILS';
+            ctx.font='bold 16px Arial';ctx.fillStyle='#e9c99b';ctx.fillText(latestDetail,W/2,675,620);
+            const all=champion?wesmaFilmGetAllTimeProfile(champion):{rank:0,titles:0,wins:0};
+            plate(28,735,664,235);ctx.font='900 30px Georgia';ctx.fillStyle='#ffc65b';ctx.fillText('WESMA HISTORY RANK',W/2,785);
+            const hist=[['ALL-TIME POSITION',all.rank?'#'+all.rank:'—'],['HISTORICAL TITLES',String(all.titles||0)],['CAREER WINS',String(all.wins||0)]];
+            hist.forEach((item,i)=>{const x=140+i*220;ctx.font='bold 17px Arial';ctx.fillStyle='#f1dfc5';ctx.fillText(item[0],x,845);ctx.font='900 54px Georgia';ctx.fillStyle='#ffc34e';ctx.shadowColor='#e87916';ctx.shadowBlur=12;ctx.fillText(item[1],x,920);ctx.shadowBlur=0;if(i<2){ctx.strokeStyle='#c17b27';ctx.beginPath();ctx.moveTo(x+110,820);ctx.lineTo(x+110,940);ctx.stroke();}});
+            let tagline=(champion&&getDynamicBadgeTitle(champion))||((all.titles>=6)?'WESMA HISTORY DOMINATOR':(all.titles>=3)?'ELITE TITLE CONTENDER':(all.titles>=1)?'A NAME ETCHED IN HISTORY':'FORGED IN FIRE. REMEMBERED IN HISTORY.');
+            ctx.font='italic 900 34px Georgia';ctx.fillStyle='#ffbd45';ctx.shadowColor='#ff7410';ctx.shadowBlur=20;ctx.fillText(tagline,W/2,1065,660);ctx.shadowBlur=0;
+            ctx.font='bold 17px Arial';ctx.fillStyle='#e8cda5';ctx.fillText('WESMA BADMINTON • CHAMPIONS',W/2,1195);
+            ctx.restore();
+        }
+
         function wesmaFilmDraw(ctx,elapsed){
             const W=720,H=1280,total=40;
             const t=Math.max(0,Math.min(total,Number(elapsed)||0));
+            if(t>=32){wesmaFilmDrawInfernoPoster(ctx);return;}
             const frames=(wesmaSyncedFilmImages[0]||[]).filter(im=>im&&im.complete&&im.naturalWidth);
             ctx.clearRect(0,0,W,H);
             ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
