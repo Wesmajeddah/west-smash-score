@@ -6678,9 +6678,11 @@
             ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
             // Keep the original upper/portrait film only. Cross-fade adjacent source
             // frames continuously so the exported 30fps video does not jump every few seconds.
+            // Keep index in this function scope because the champion reveal below uses it too.
+            let index=-1;
             if(frames.length){
                 const position=(t/total)*frames.length;
-                const index=Math.min(frames.length-1,Math.floor(position));
+                index=Math.min(frames.length-1,Math.floor(position));
                 const next=Math.min(frames.length-1,index+1);
                 const blend=index===frames.length-1?0:position-index;
                 const maxW=680,maxH=1120;
